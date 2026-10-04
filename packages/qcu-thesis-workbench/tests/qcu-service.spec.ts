@@ -164,8 +164,8 @@ describe('QCU desktop service', () => {
     expect(ready.url).toMatch(/^http:\/\/127\.0\.0\.1:\d+$/)
     expect(launches).toHaveLength(1)
     expect(launches[0]).toMatchObject({
-      executable: process.execPath, args: ['-B', '-E', '-s', '-u', '-X', 'utf8', server, '--home', realpathSync(home), '--port', '0'],
-      options: { cwd: resolve(server, '..'), windowsHide: true, shell: false, stdio: ['ignore', 'pipe', 'pipe'] },
+      executable: process.execPath, args: ['-B', '-E', '-s', '-u', '-X', 'utf8', server, '--home', realpathSync(home), '--port', '0', '--parent-stdin'],
+      options: { cwd: resolve(server, '..'), windowsHide: true, shell: false, stdio: ['pipe', 'pipe', 'pipe'] },
     })
     expect(existsSync(join(home, 'probe-entered'))).toBe(true)
     const stopping = service.stop()
@@ -411,6 +411,31 @@ describe('QCU desktop service', () => {
     expectClosed(children)
     expect(failure).toHaveBeenCalledWith(new Error('QCU service: child exited unexpectedly'))
     expect(failure).toHaveBeenCalledTimes(1)
+  })
+
+  it('contains lifetime-pipe errors, revokes readiness and stops only its owned child', async () => {
+    const failure = vi.fn()
+    const { service, children } = fixture({}, { onFailure: failure })
+    await service.start()
+    expect(children[0]?.stdin).not.toBeNull()
+    children[0]?.stdin?.emit('error', new Error('synthetic-private-token-never-log'))
+    await service.stop()
+    expectClosed(children)
+    expect(failure).toHaveBeenCalledExactlyOnceWith(new Error('QCU service: parent lifetime pipe failed'))
+    children[0]?.stdin?.emit('error', new Error('late private diagnostic'))
+    expect(failure).toHaveBeenCalledTimes(1)
+  })
+
+  it('cancels startup on lifetime-pipe failure without a readiness callback', async () => {
+    const failure = vi.fn()
+    const { service, home, children } = fixture({ hangProbe: true }, { onFailure: failure })
+    const started = service.start()
+    const rejected = expect(started).rejects.toThrow('QCU service: parent lifetime pipe failed')
+    await expect.poll(() => existsSync(join(home, 'probe-entered'))).toBe(true)
+    children[0]?.stdin?.emit('error', new Error('synthetic-private-token-never-log'))
+    await rejected
+    expectClosed(children)
+    expect(failure).not.toHaveBeenCalled()
   })
 
   it('settles spawn failures with sanitized errors and repeatable stop', async () => {

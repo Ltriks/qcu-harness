@@ -4,7 +4,7 @@ This version retains the official external business bundle and adds a fixed QCU 
 
 ## Public upstream changes
 
-The cumulative patch changes 16 production source files, +1403/-7 against fixed commit 639ed015397290b3745d163aafe02ffee4aa3f84. Seven existing production files account for +90/-7; nine new fixed modules account for +1313. Build/package metadata, documentation and tests are counted separately in MANIFEST.json. The old embedded candidate changed 36 production files, including 21 existing files; moving business code into the external bundle does not make that code disappear.
+The cumulative patch changes 16 production source files, +1403/-7 against fixed commit 639ed015397290b3745d163aafe02ffee4aa3f84. Seven existing production files account for +90/-7; nine new fixed modules account for +1313. Build/package metadata, documentation and tests are represented separately in the cumulative patch and source slice under `upstream/`. The old embedded candidate changed 36 production files, including 21 existing files; moving business code into the external bundle does not make that code disappear.
 
 The previous thin candidate had eight production source changes, +1027/-4. The additional source work establishes a fixed entry, persistent-in-process policy, and last-applied launch restrictions; it does not introduce a generic provider/permission registry or modify the model, SessionWorkspace, or Tools execution kernel.
 
@@ -16,7 +16,7 @@ The previous thin candidate had eight production source changes, +1027/-4. The a
 
 ## Working rules
 
-Use the official bundle/Client/Skill mechanism for business changes. A new tool name, model-data purpose, local path, native operation or forbidden module requires a separate explicit policy review. A business package cannot grant itself broader permissions. Keep matched protocol definitions and their parity tests together. Eight resource hashes retain candidate bytes; three legacy web hashes are deliberately revised by the recorded Mac feedback merge. Review further resource changes explicitly.
+Use the official bundle/Client/Skill mechanism for business changes. A new tool name, model-data purpose, local path, native operation or forbidden module requires a separate explicit policy review. A business package cannot grant itself broader permissions. Keep matched protocol definitions and their parity tests together. The import retained eight original resource hashes and deliberately revised three legacy web hashes for the recorded Mac feedback merge. The parent-lifetime fix subsequently revises server.py and adds parent_lifetime.py; seven original resources and all three feedback revisions remain unchanged. RESOURCE-SHA256.json tracks all twelve current resources. Review further resource changes explicitly.
 
 For unavailable behavior, inspect discovery/configuration, dedicated entry identity, pre-entry policy, owned Python readiness, private child/generation binding, then native occurrence lifecycle. Never replace a failed stage with a generic browser, raw renderer target, dynamic runner, ordinary profile, or unrestricted shell.
 
@@ -24,4 +24,4 @@ For DSH upgrades, use a separate fixed checkout and synthetic home, review the p
 
 ## Remaining limits
 
-No new native GUI acceptance, real browser storage-erasure certification, Mac installation/coexistence, Windows ACL validation, signing, qualified update feed, or stable-profile migration is established. Abrupt Host death may orphan Python; the preserved service has no parent-death watchdog. Private data must not be recovered by killing an arbitrary PID from a stale record. Arbitrary same-privilege Node code is not sandboxed. The old Mac feedback files are reconciled in this repository; their new native visual acceptance and legacy conversation-authorization revocation remain unfinished. Hashes and logs provide reproducibility, not tamper-proof runtime audit.
+No new native GUI acceptance, real browser storage-erasure certification, Mac installation/coexistence, Windows ACL validation, signing, qualified update feed, or stable-profile migration is established. The managed service now observes a parent-lifetime pipe and exits after Host death; see [lifecycle behavior and limits](HOST-LIFECYCLE.md). Previously orphaned live services are not automatically adopted or terminated. Private data must not be recovered by killing an arbitrary PID from a stale record. Arbitrary same-privilege Node code is not sandboxed. The old Mac feedback files are reconciled in this repository; their new native visual acceptance and legacy conversation-authorization revocation remain unfinished. Hashes and logs provide reproducibility, not tamper-proof runtime audit.

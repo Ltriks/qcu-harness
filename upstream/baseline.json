@@ -2,7 +2,7 @@
   "repository": "https://github.com/deepseek-ai/deepseek-harness.git",
   "commit": "639ed015397290b3745d163aafe02ffee4aa3f84",
   "patch": "qcu-office.patch",
-  "patchSha256": "2fb6bf6defd37e039bd7f1c36527771b79c00d99863eada2f89b3ddc86d74aed",
+  "patchSha256": "e11c5dcdbb3b165bc30c3ecada947197bfb12ed075137ca772081f5da9669e34",
   "lockfile": "source/pnpm-lock.yaml",
   "lockfileSha256": "dac4d1d7c74bb6d49dd8c3fb9615a4624a7d9fab18845da61499c96e4b542ba5",
   "node": "24.19.0",

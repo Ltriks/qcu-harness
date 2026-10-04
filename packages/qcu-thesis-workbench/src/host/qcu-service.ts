@@ -291,11 +291,14 @@ export class QcuService {
       run.home = home
       await recoverStaleOwnership(home, run.abort.signal)
       run.abort.signal.throwIfAborted()
-      const child = this.spawnChild(this.options.python, ['-B', '-E', '-s', '-u', '-X', 'utf8', this.options.server, '--home', home, '--port', '0'], {
+      const child = this.spawnChild(this.options.python, ['-B', '-E', '-s', '-u', '-X', 'utf8', this.options.server, '--home', home, '--port', '0', '--parent-stdin'], {
         cwd: dirname(this.options.server), env: environment(this.options.environment ?? process.env),
-        stdio: ['ignore', 'pipe', 'pipe'], windowsHide: true, shell: false,
+        stdio: ['pipe', 'pipe', 'pipe'], windowsHide: true, shell: false,
       })
       run.child = child
+      // Retain the only Host-owned writer for this child's lifetime. No bytes or
+      // credentials travel through it; Host death closes it even after SIGKILL.
+      child.stdin?.on('error', () => { this.unexpected(run, failure('parent lifetime pipe failed')) })
       child.stderr?.resume()
       run.closed = new Promise((resolveClosed) => {
         child.once('close', () => {

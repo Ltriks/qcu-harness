@@ -14,6 +14,7 @@ from pathlib import Path
 from urllib.parse import urlsplit
 
 from engine import Document, InputError, MAX_UPLOAD, check, report_html, validate_rule
+from parent_lifetime import OwnedServiceFiles, ParentStdinLifetime
 
 ROOT = Path(__file__).resolve().parents[1]
 ID = re.compile(r'^[a-zA-Z0-9-]{1,100}$')
@@ -235,26 +236,41 @@ def main():
     parser.add_argument('--home', required=True)
     parser.add_argument('--port', type=int, default=0)
     parser.add_argument('--open', action='store_true')
+    parser.add_argument('--parent-stdin', action='store_true',
+                        help='exit when the owning Host closes its private stdin pipe')
     args = parser.parse_args()
     home = Path(args.home).resolve()
-    home.mkdir(parents=True, exist_ok=True, mode=0o700)
-    lock = home / 'server.lock'
-    try:
-        fd = os.open(lock, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600)
-    except FileExistsError:
-        parser.exit(2, '本目录已有运行锁。请先关闭既有服务；若异常退出，确认无服务运行后再人工移除 server.lock。\n')
-    with os.fdopen(fd, 'w', encoding='utf-8') as owner:
-        json.dump({'pid': os.getpid()}, owner)
-        owner.flush()
-        os.fsync(owner.fileno())
     server = None
-    bridge_path = home / 'bridge.json'
+    owned = OwnedServiceFiles(home)
+    cleanup_lock = threading.Lock()
+
+    def cleanup():
+        with cleanup_lock:
+            try:
+                if server:
+                    server.server_close()
+            finally:
+                owned.cleanup()
+
+    parent = ParentStdinLifetime(cleanup) if args.parent_stdin else None
     try:
+        home.mkdir(parents=True, exist_ok=True, mode=0o700)
+        if parent and parent.lost.is_set():
+            return
+        try:
+            owned.create(owned.lock_path, json.dumps({'pid': os.getpid()}).encode(), sync=True)
+        except FileExistsError:
+            parser.exit(2, '本目录已有运行锁。请先关闭既有服务；若异常退出，确认无服务运行后再人工移除 server.lock。\n')
+        if parent and parent.lost.is_set():
+            return
         server = create_server(home, args.port)
+        if parent and parent.lost.is_set():
+            return
         # This file is a local credential, never packaged or sent to the model.
-        fd = os.open(bridge_path, os.O_CREAT | os.O_TRUNC | os.O_WRONLY, 0o600)
-        with os.fdopen(fd, 'w', encoding='utf-8') as f:
-            json.dump(server.bridge, f)
+        bridge_path = owned.bridge_path
+        owned.create(bridge_path, json.dumps(server.bridge).encode())
+        if parent and parent.lost.is_set():
+            return
         print(json.dumps({'url': server.bridge['base_url'], 'bridge_path': str(bridge_path)}, ensure_ascii=False), flush=True)
         if args.open:
             import webbrowser
@@ -262,14 +278,18 @@ def main():
         def stop(*_):
             raise KeyboardInterrupt
         signal.signal(signal.SIGTERM, stop)
-        server.serve_forever(poll_interval=0.2)
+        if parent:
+            parent.serve(server)
+        else:
+            server.serve_forever(poll_interval=0.2)
     except KeyboardInterrupt:
         pass
     finally:
-        if server:
-            server.server_close()
-        bridge_path.unlink(missing_ok=True)
-        lock.unlink(missing_ok=True)
+        try:
+            cleanup()
+        finally:
+            if parent:
+                parent.finished.set()
 
 
 if __name__ == '__main__':

@@ -14,3 +14,5 @@ QCU Office、城院 Skill 目录站、插件及办公 Skills 的独立源码仓�
 | scripts、tests、docs | 重建、合成回归、来源映射和维护限制 |
 
 先读 [维护说明](docs/MAINTENANCE.md)、[重建步骤](docs/REBUILD.md)、[已知限制](docs/KNOWN-LIMITS.md) 和 [第三方归属](NOTICE.md)。目录站中条目暂标为 draft；需要重建对应产物并审查后发布，不因迁入 Git 就声称安装链已通过。
+
+当前开发增量的父进程退出清理与复现证据见 [生命周期说明](docs/HOST-LIFECYCLE.md) 和 [验证记录](docs/LIFECYCLE-VALIDATION.md)。

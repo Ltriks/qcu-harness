@@ -5003,3 +5003,15 @@ index 6c7ce04c19..cb64f45096 100644
  
    apps/web:
      devDependencies:
+diff --git a/tsconfig.client.json b/tsconfig.client.json
+index 738ed0c5b4..02efbe6b2c 100644
+--- a/tsconfig.client.json
++++ b/tsconfig.client.json
+@@ -20,6 +20,7 @@
+     "apps/desktop/src/keybindings.ts",
+     "apps/desktop/src/browser-guests.ts",
+     "apps/desktop/src/ipc.ts",
++    "apps/desktop/src/qcu-native-contract.ts",
+     "apps/desktop/src/update-overlay.ts",
+     "apps/desktop/tests/**/*.client.spec.tsx",
+     // Source-subpath test imports can arrive through workspace links whose
