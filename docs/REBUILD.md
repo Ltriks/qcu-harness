@@ -8,7 +8,7 @@
 
 官方重建范围包括 packages/boot/app-boot、apps/cli、apps/desktop-host、apps/desktop 和 apps/web。依赖和本机原生 addon 准备后，优先在重建 upstream 运行官方 `pnpm run build`；固定基线的 scripts/build.ts 已包含 native-system、Host/Client 库和 Web 页面构建，再运行 `pnpm --filter @deepseek-ai/dsh-desktop run build`。仅为已完成大构建的局部恢复使用 `pnpm run build:web`，不重复完整构建。若显式分步构建，必须同时完成 `build:lib:host`、`build:lib:client` 和 `build:web`；只有 Host 构建会缺少 `./client` 类型声明，Host/Client 库及 Desktop 叶级构建本身也不生成 Web 静态页面。保留累计补丁中的原生、策略和真实进程用例。安装产物、源码 clone、node_modules 和生成 lib 留在忽略目录，不提交本仓库。专用入口的构建检查不代替签名、原生 GUI、安装或发布验收。
 
-启动前从本仓库运行 `node scripts/verify-desktop-web.mjs --upstream <重建 upstream>`；官方开发入口准备好 runtime project 后，再加 `--runtime-project <已准备的 runtime project>`，检查 Host 与 Electron 实际 resolver 的前端 index。命令只检查文件并输出布尔结果，缺失或不可读时非零退出，不构建、安装、启动或认证。只检查 Host 时 `rendererChecked=false`，不能算 Renderer 检查通过。在已认证的初始页面请求返回 404 时，应检查静态产物，不能把后续 Host 清理或 welcome 错误当作模型密钥问题。实际 Mac 修复前后证据及 GUI 未验项见 [Mac 启动验收](MAC-STARTUP-VALIDATION.md)。
+启动前从本仓库运行 `node scripts/verify-desktop-web.mjs --upstream <重建 upstream>`；官方开发入口准备好 runtime project 后，再加 `--runtime-project <已准备的 runtime project>`。Host 使用 web-app 的包解析；Renderer 严格检查 runtime project/node_modules/@deepseek-ai/dsh-web-frontend/dist/index.html，与固定 main.ts 的直接服务路径一致，不允许 Node 祖先目录回退，合法直接符号链接仍可跟随。Renderer 不要求 package.json 存在，其 `rendererManifestPresent` 仅报告直接 manifest 是否存在。命令只检查文件并输出布尔结果，缺失、不可读或检查期间消失时非零退出，不暴露底层错误/路径，不构建、安装、启动或认证。规范路径比较中断时 `artifactCheckCompleted=false`；`samePhysicalIndex=false` 也可能只表示两个合法文件不同，不单独决定失败。只检查 Host 时 `rendererChecked=false`，不能算 Renderer 检查通过。在已认证的初始页面请求返回 404 时，应检查静态产物，不能把后续 Host 清理或 welcome 错误当作模型密钥问题。实际 Mac 修复前后证据及 GUI 未验项见 [Mac 启动验收](MAC-STARTUP-VALIDATION.md)。
 
 只读产物检查的合成回归运行 `node --test tests/verify-desktop-web.test.mjs`，不要求安装依赖或启动 Electron。
 

@@ -1,6 +1,8 @@
 /** Synthetic frontend resolution cases; no Electron, credentials, private data or models. */
 import { mkdtempSync, mkdirSync, writeFileSync, rmSync, symlinkSync, readFileSync, chmodSync, statSync } from 'node:fs'
-import { join } from 'node:path'
+import fs from 'node:fs'
+import { syncBuiltinESMExports } from 'node:module'
+import { dirname, join } from 'node:path'
 import { tmpdir } from 'node:os'
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
@@ -23,7 +25,7 @@ function fixture(t) {
 
 function link(from, target, packagePath) {
   const path = join(from, packagePath)
-  mkdirSync(join(path, '..'), { recursive: true })
+  mkdirSync(dirname(path), { recursive: true })
   symlinkSync(target, path)
 }
 
@@ -49,11 +51,11 @@ test('fails when packages resolve but index is missing', t => {
   const result = verifyDesktopWeb(f.upstream, f.runtime)
   assert.equal(result.exitCode, 1)
   assert.equal(result.facts.hostManifestResolvable, true)
-  assert.equal(result.facts.rendererManifestResolvable, true)
+  assert.equal(result.facts.rendererManifestPresent, true)
   assert.equal(result.facts.hostIndexExists, false)
 })
 
-test('checks both resolvers and preserves readable artifact bytes', t => {
+test('accepts the official direct runtime package symlink and preserves artifact bytes', t => {
   const f = fixture(t)
   packageManifest(f.frontend)
   mkdirSync(join(f.frontend, 'dist'))
@@ -67,6 +69,71 @@ test('checks both resolvers and preserves readable artifact bytes', t => {
   assert.equal(result.facts.samePhysicalIndex, true)
   assert.deepEqual(readFileSync(index), before)
   assert.equal(verifyDesktopWeb(f.upstream).facts.rendererChecked, false)
+})
+
+test('rejects ancestor-only frontend even when Node can resolve it for runtime', t => {
+  const f = fixture(t)
+  packageManifest(f.frontend)
+  mkdirSync(join(f.frontend, 'dist'))
+  writeFileSync(join(f.frontend, 'dist', 'index.html'), '<html>synthetic</html>')
+  link(f.host, f.frontend, f.packagePath)
+  link(dirname(f.runtime), f.frontend, f.packagePath)
+  const result = verifyDesktopWeb(f.upstream, f.runtime)
+  assert.equal(result.exitCode, 1)
+  assert.equal(result.facts.hostIndexReadable, true)
+  assert.equal(result.facts.rendererIndexExists, false)
+  assert.equal(result.facts.rendererIndexReadable, false)
+  assert.equal(result.facts.samePhysicalIndex, false)
+})
+
+test('checks the actual runtime index without requiring a Renderer package manifest', t => {
+  const f = fixture(t)
+  packageManifest(f.frontend)
+  mkdirSync(join(f.frontend, 'dist'))
+  writeFileSync(join(f.frontend, 'dist', 'index.html'), '<html>synthetic Host</html>')
+  link(f.host, f.frontend, f.packagePath)
+  const direct = join(f.runtime, f.packagePath, 'dist')
+  mkdirSync(direct, { recursive: true })
+  writeFileSync(join(direct, 'index.html'), '<html>synthetic Renderer</html>')
+  const result = verifyDesktopWeb(f.upstream, f.runtime)
+  assert.equal(result.exitCode, 0)
+  assert.equal(result.facts.rendererIndexReadable, true)
+  assert.equal(result.facts.rendererManifestPresent, false)
+  assert.equal(result.facts.samePhysicalIndex, false)
+})
+
+test('fails safely when index disappears after access checks and before canonical comparison', t => {
+  const f = fixture(t)
+  packageManifest(f.frontend)
+  mkdirSync(join(f.frontend, 'dist'))
+  const index = join(f.frontend, 'dist', 'index.html')
+  writeFileSync(index, '<html>synthetic</html>')
+  link(f.host, f.frontend, f.packagePath)
+  link(f.runtime, f.frontend, f.packagePath)
+  const original = fs.realpathSync
+  const canonicalIndex = original(index)
+  let removed = false
+  fs.realpathSync = function(path, ...args) {
+    if (path === index || path === canonicalIndex) {
+      rmSync(index)
+      removed = true
+    }
+    return original(path, ...args)
+  }
+  syncBuiltinESMExports()
+  let result
+  try {
+    result = verifyDesktopWeb(f.upstream, f.runtime)
+  } finally {
+    fs.realpathSync = original
+    syncBuiltinESMExports()
+  }
+  assert.equal(removed, true)
+  assert.equal(result.exitCode, 1)
+  assert.equal(result.facts.artifactCheckCompleted, false)
+  assert.equal(result.facts.samePhysicalIndex, false)
+  assert.ok(Object.values(result.facts).every(value => typeof value === 'boolean'))
+  assert.equal(JSON.stringify(result).includes(dirname(f.upstream)), false)
 })
 
 test('fails when only Host has a readable frontend', t => {

@@ -3,8 +3,9 @@
   "hostIndexExists": true,
   "hostIndexReadable": true,
   "rendererChecked": true,
-  "rendererManifestResolvable": true,
+  "rendererManifestPresent": true,
   "rendererIndexExists": true,
   "rendererIndexReadable": true,
-  "samePhysicalIndex": true
+  "samePhysicalIndex": true,
+  "artifactCheckCompleted": true
 }

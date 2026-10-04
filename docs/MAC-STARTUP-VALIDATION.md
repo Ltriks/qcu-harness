@@ -26,7 +26,9 @@ Host、Client 库和 Desktop 叶级构建通过后，apps/web/dist/index.html �
 
 ## 相关验证与实际范围
 
-官方 web-document.spec.ts 与 qcu-office-entry.spec.ts 共 26 项通过，覆盖静态文档/认证与固定入口。本仓库新的只读检查用 5 项 Mac 合成测试验证前端包缺失、index 缺失、两个 resolver 均可读且原文件未变、只有 Host 可读时拒绝、index 不可读时拒绝且权限未改变。最后一项在 Windows 或 root 下显式跳过，不能把跳过算作该平台通过。Mac 实际完整 resolver 检查通过；既有 Host/Client/Electron 构建及业务包类型/聚焦回归保持独立记录，不重复累计。
+官方 web-document.spec.ts 与 qcu-office-entry.spec.ts 共 26 项通过，覆盖静态文档/认证与固定入口。本仓库只读检查当前用 8 项 Mac 合成测试验证前端包缺失、index 缺失、合法直接符号链接且原文件未变、祖先目录回退拒绝、Renderer 直接 index 不依赖 manifest、可读性检查后文件消失时受控失败、只有 Host 可读时拒绝、index 不可读时拒绝且权限未改变。权限用例在 Windows 或 root 下显式跳过，不能把跳过算作该平台通过。Mac 实际 Host 包解析及 Renderer 直接路径检查通过；既有 Host/Client/Electron 构建及业务包类型/聚焦回归保持独立记录，不重复累计。
+
+f6f3f26 的初版检查器使用 createRequire 检查 Renderer，会错误接受只存在于祖先 node_modules 的前端；其规范路径比较也可能抛出包含绝对路径的文件消失错误。本次严格匹配 main.ts 的直接路径，保留合法符号链接结构，并在比较中断时返回 `artifactCheckCompleted=false` 和非零退出，不输出底层错误。实际 Mac runtime 的直接路径确实存在且可读，修正后再检查通过；这项检查器修复不推翻前面的真实 404→200 HTTP 实测，不改变运行时认证或策略。修复前后 HTTP 快照保持原记录，mac-web-artifacts.json 更新为修正后的文件检查。
 
 实际 Mac 运行时为官方准备的 Node 24.21.0、Python 3.12.14；Electron 自带 Node 24.18.1。锁定工具为 pnpm 11.7.0、TypeScript 6.0.3、Vitest 4.1.8；这不是将 Linux 24.19.0 记录改写为 Mac 环境。冻结依赖复用已有可信缓存，没有下载新包，官方供应链元数据核验通过，安装脚本禁用。Mac 自有 Node QcuService 父进程强杀后 0.026 秒内清理监听与自有记录、同 Home 重启及独立合成服务保留均通过；Linux 专属的三项原用例跳过，不算 Mac 通过。
 
