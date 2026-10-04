@@ -1,0 +1,10 @@
+{
+  "hostManifestResolvable": true,
+  "hostIndexExists": true,
+  "hostIndexReadable": true,
+  "rendererChecked": true,
+  "rendererManifestResolvable": true,
+  "rendererIndexExists": true,
+  "rendererIndexReadable": true,
+  "samePhysicalIndex": true
+}

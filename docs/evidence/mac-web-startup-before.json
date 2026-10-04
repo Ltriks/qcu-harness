@@ -1,0 +1,23 @@
+{
+  "hostSpawned": true,
+  "hostReadyObserved": true,
+  "hostAlive": false,
+  "hostAliveAtInitialResponse": true,
+  "hostClosedAfterInitialResponse": true,
+  "initialHttpStatus": 404,
+  "authExchangeStatus": 303,
+  "authExchangeCookiePresent": true,
+  "defaultSessionAuthCookiePresent": true,
+  "qcuBundleSelected": true,
+  "qcuHelloObserved": false,
+  "qcuReadyObserved": false,
+  "qcuGrantObserved": false,
+  "workbenchBridgePresent": false,
+  "workbenchLockPresent": false,
+  "hostIndexExists": false,
+  "hostIndexReadable": false,
+  "rendererIndexExists": false,
+  "rendererIndexReadable": false,
+  "hostIndexWithinCandidate": true,
+  "rendererIndexWithinCandidate": true
+}

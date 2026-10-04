@@ -6,7 +6,11 @@
 
 在重建 upstream 中使用锁定 pnpm 11.7.0 和冻结锁文件，按照官方 README 构建依赖与本机原生 addon；本次迁移未重新安装依赖。package/scripts/link-development.mjs 仅链接匹配官方开发依赖，不是插件安装器。随后运行 package 的 build、三项 typecheck 及 test:host、test:native、test:client。真实服务用例必须明确提供 QCU_SERVICE_PYTHON 和 QCU_SERVICE_REAL_SERVER，否则相应跳过不可算通过。
 
-官方重建范围包括 packages/boot/app-boot、apps/cli、apps/desktop-host 和 apps/desktop。全新 checkout 必须同时构建 Host 与 Client 两个面：`pnpm run build:lib:host`、`pnpm run build:lib:client`；只有 Host 构建会缺少 `./client` 类型声明，不能据此修改业务类型或声称 Client 验证通过。保留累计补丁中的原生、策略和真实进程用例。安装产物、源码 clone、node_modules 和生成 lib 留在忽略目录，不提交本仓库。专用入口的构建检查不代替签名、原生 GUI、安装或发布验收。
+官方重建范围包括 packages/boot/app-boot、apps/cli、apps/desktop-host、apps/desktop 和 apps/web。依赖和本机原生 addon 准备后，优先在重建 upstream 运行官方 `pnpm run build`；固定基线的 scripts/build.ts 已包含 native-system、Host/Client 库和 Web 页面构建，再运行 `pnpm --filter @deepseek-ai/dsh-desktop run build`。仅为已完成大构建的局部恢复使用 `pnpm run build:web`，不重复完整构建。若显式分步构建，必须同时完成 `build:lib:host`、`build:lib:client` 和 `build:web`；只有 Host 构建会缺少 `./client` 类型声明，Host/Client 库及 Desktop 叶级构建本身也不生成 Web 静态页面。保留累计补丁中的原生、策略和真实进程用例。安装产物、源码 clone、node_modules 和生成 lib 留在忽略目录，不提交本仓库。专用入口的构建检查不代替签名、原生 GUI、安装或发布验收。
+
+启动前从本仓库运行 `node scripts/verify-desktop-web.mjs --upstream <重建 upstream>`；官方开发入口准备好 runtime project 后，再加 `--runtime-project <已准备的 runtime project>`，检查 Host 与 Electron 实际 resolver 的前端 index。命令只检查文件并输出布尔结果，缺失或不可读时非零退出，不构建、安装、启动或认证。只检查 Host 时 `rendererChecked=false`，不能算 Renderer 检查通过。在已认证的初始页面请求返回 404 时，应检查静态产物，不能把后续 Host 清理或 welcome 错误当作模型密钥问题。实际 Mac 修复前后证据及 GUI 未验项见 [Mac 启动验收](MAC-STARTUP-VALIDATION.md)。
+
+只读产物检查的合成回归运行 `node --test tests/verify-desktop-web.test.mjs`，不要求安装依赖或启动 Electron。
 
 无需模型的局部回归：packages/qcu-thesis-workbench/tests/web.test.mjs、tests/test_workbench.py、Client 两组测试，仓库 tests/test_skills.py，以及 hub/plugins/chengyuan-skill-installer/test/install.test.mjs。Python 使用标准库；DOM 测试复用锁定 jsdom。scripts/build-skills.py 在新的 --out 目录生成三项 QCU draft 包；hub/scripts/batch-publish-skills.sh 从唯一 skills 源目录生成其他包。不要在此阶段执行 Docker 部署或系统软件引导脚本。
 
