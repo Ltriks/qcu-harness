@@ -1,0 +1,11 @@
+{
+  "id": "demo-basic-v1",
+  "name": "演示规则（不是 QCU 正式规范）",
+  "version": "1.0.0",
+  "source": "demo",
+  "page": {"width_mm": 210, "height_mm": 297, "top_mm": 25.4, "bottom_mm": 25.4, "left_mm": 25.4, "right_mm": 25.4},
+  "styles": {
+    "Normal": {"font_east_asia": "宋体", "font_latin": "Times New Roman", "size_pt": 12, "line_multiple": 1.5, "first_line_mm": 0},
+    "Heading1": {"font_east_asia": "黑体", "font_latin": "Arial", "size_pt": 16, "line_multiple": 1.5, "first_line_mm": 0}
+  }
+}

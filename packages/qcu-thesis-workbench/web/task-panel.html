@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>QCU · 本机论文格式检查</title>
+  <link rel="stylesheet" href="/task-panel.css">
+  <script src="/task-panel.js" defer></script>
+</head>
+<body>
+  <main class="task-shell">
+    <header class="task-header">
+      <div class="eyebrow">QCU WORKBENCH <span>仅本机</span></div>
+      <h1>论文格式检查</h1>
+      <p>选择 DOCX 和检查规则，明确授权后开始本次检查。</p>
+    </header>
+
+    <aside class="privacy-note" aria-label="本机任务范围">
+      <strong>文件与报告只留在本机服务</strong>
+      <p>本任务不授予模型或对话读取权限，不发送论文到对话，也不修改原始 DOCX。</p>
+    </aside>
+
+    <form id="task-form" novalidate>
+      <section class="step">
+        <label class="step-title" for="task-document"><span>1</span> 选择论文副本</label>
+        <p class="hint" id="file-help">支持 .docx，最大 20 MB。选择文件后不会自动检查。</p>
+        <input id="task-document" type="file" accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document" aria-describedby="file-help file-state">
+        <p id="file-state" class="file-state">还没有选择文件</p>
+        <button id="clear-file" type="button" class="text-button" disabled>清除选择</button>
+      </section>
+
+      <section class="step">
+        <label class="step-title" for="task-rule"><span>2</span> 选择已有规则</label>
+        <select id="task-rule" aria-describedby="rule-meta" disabled><option value="">正在读取规则…</option></select>
+        <p id="rule-meta" class="rule-meta">DEMO / 个人规则不是 QCU 正式规范</p>
+        <button id="reload-rules" class="text-button" type="button" hidden>重新读取规则</button>
+      </section>
+
+      <section class="step consent-step">
+        <div class="step-title"><span>3</span> 授权本次检查</div>
+        <label class="consent-label" for="local-authorized">
+          <input id="local-authorized" type="checkbox" autocomplete="off" disabled>
+          <span>我授权使用所选文件和规则，仅执行本次本机格式检查</span>
+        </label>
+        <p class="hint">每次检查都需重新勾选。更换文件或规则会清除授权和旧结果。</p>
+        <button id="task-run" class="primary-button" type="submit" disabled>开始本次本机检查</button>
+      </section>
+    </form>
+
+    <section id="task-progress" class="feedback progress-card" role="status" aria-live="polite" tabindex="-1" hidden>
+      <div class="progress-heading"><span class="spinner" aria-hidden="true"></span><strong id="progress-title">正在本机检查</strong></div>
+      <p id="progress-detail"></p>
+    </section>
+
+    <section id="task-error" class="feedback error-card" role="alert" tabindex="-1" hidden>
+      <h2>本次操作未完成</h2>
+      <p id="error-message"></p>
+      <p class="hint">请核对文件或规则后重试；再次检查前需要重新勾选授权。</p>
+    </section>
+
+    <section id="task-result" class="feedback result-card" tabindex="-1" aria-labelledby="result-heading" hidden>
+      <div class="eyebrow">本机检查结果</div>
+      <h2 id="result-heading">检查已完成</h2>
+      <p id="result-context" class="hint"></p>
+      <dl class="counts">
+        <div><dt>符合所选检查项</dt><dd id="count-passed">0</dd></div>
+        <div><dt>不符合所选规则</dt><dd id="count-failed">0</dd></div>
+        <div><dt>无法判断</dt><dd id="count-unknown">0</dd></div>
+      </dl>
+      <p id="result-scope" class="result-scope"></p>
+      <p class="hint">“无法判断”不计为通过，必须人工复核。报告列出本次覆盖范围及未检查项目。</p>
+      <a id="task-report" class="report-link">在本机查看完整报告 <span aria-hidden="true">→</span></a>
+      <a id="task-download" class="report-download" download="qcu-thesis-report.html">保存本机 HTML 报告</a>
+    </section>
+
+    <p id="task-notice" class="task-notice" role="status" aria-live="polite"></p>
+    <footer class="close-note">关闭面板不保证停止已经开始的本机计算。重新打开不会自动检查；查看报告后可用面板的返回按钮回到结果摘要。</footer>
+  </main>
+</body>
+</html>

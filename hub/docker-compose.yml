@@ -1,0 +1,11 @@
+services:
+  catalog:
+    image: nginx:alpine
+    container_name: chengyuan-skill-catalog
+    ports:
+      - "8080:80"
+    volumes:
+      # 单一目录挂载（Colima/virtiofs 下避免对同一路径叠挂文件失败）
+      - ./serve:/usr/share/nginx/html:ro
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    restart: unless-stopped

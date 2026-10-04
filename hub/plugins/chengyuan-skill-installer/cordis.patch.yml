@@ -1,0 +1,9 @@
+# 把城院安装器插入每位师生本机的 web profile（http://127.0.0.1:3080）。
+# 共用局域网目录站默认 http://127.0.0.1:8080，由 lib/config.js 提供。
+# 默认不写入 catalogBaseUrl，让 CHENGYUAN_CATALOG_URL 可覆盖目录站。
+# 如需固定插件配置，可在 config 下设置 catalogBaseUrl；其优先级高于环境变量。
+- insert:
+    - id: chengyuan-skill-installer
+      name: chengyuan-skill-installer
+      config:
+        idPrefix: chengyuan-

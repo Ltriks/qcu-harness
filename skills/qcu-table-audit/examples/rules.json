@@ -1,0 +1,10 @@
+{
+  "columns": {
+    "学号": {"type": "string", "required": true},
+    "姓名": {"required": true, "trim": true},
+    "日期": {"type": "date", "date_format": "%Y/%m/%d", "normalize_date": true},
+    "时长": {"type": "number"}
+  },
+  "unique_keys": [["学号"]],
+  "drop_exact_duplicates": true
+}

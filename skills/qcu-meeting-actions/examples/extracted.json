@@ -1,0 +1,9 @@
+{
+  "items": [
+    {"kind": "decision", "task": "先用模拟数据试用表格检查", "owner": null, "deadline": null, "evidence": {"start_line": 2, "end_line": 2, "quote": "主持人：已决定先用模拟数据试用表格检查。"}},
+    {"kind": "action", "task": "整理测试表并交给大家", "owner": "示例甲", "deadline": "周五前", "evidence": {"start_line": 3, "end_line": 3, "quote": "示例甲：我负责整理测试表，周五前交给大家。"}},
+    {"kind": "proposal", "task": "增加自动发邮件功能", "owner": null, "deadline": "下个月", "evidence": {"start_line": 4, "end_line": 4, "quote": "示例乙：建议下个月增加自动发邮件，还没有决定。"}},
+    {"kind": "open_question", "task": "确认院系规则提供人和时间", "owner": null, "deadline": null, "evidence": {"start_line": 5, "end_line": 5, "quote": "主持人：院系规则由谁提供、什么时候提供，今天还没有确定。"}}
+  ],
+  "uncertainties": ["会议日期未知，周五前及下个月不转换成具体日期。", "自动发邮件仅为建议。", "院系规则提供人和时间尚未明确。"]
+}

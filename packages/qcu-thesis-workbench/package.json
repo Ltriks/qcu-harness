@@ -1,0 +1,74 @@
+{
+  "name": "qcu-thesis-workbench",
+  "version": "0.2.0-external.3",
+  "description": "External official Cordis QCU local thesis workbench bundle",
+  "type": "module",
+  "main": "lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./client": "./lib/client.js",
+    "./cordis.patch.yml": "./cordis.patch.yml",
+    "./package.json": "./package.json"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "inject": [
+        "@deepseek-ai/dsh-client-ui-conversation",
+        "@deepseek-ai/dsh-client-locale"
+      ],
+      "platform": "web"
+    }
+  },
+  "files": [
+    "lib",
+    "plugin/index.js",
+    "cordis.patch.yml",
+    "runtime/*.py",
+    "web",
+    "rules",
+    "skills",
+    "README.md",
+    "THIN-NATIVE-ADAPTER.md",
+    "RESOURCE-SHA256.json"
+  ],
+  "scripts": {
+    "build:host": "node scripts/build-host.mjs",
+    "build:client": "node scripts/build-client.mjs",
+    "build": "npm run build:host && npm run build:client",
+    "test:host": "vitest run --config vitest.host.config.mjs",
+    "typecheck:host": "tsc --project tsconfig.host.json --noEmit",
+    "test:native": "vitest run --config vitest.native.config.mjs",
+    "typecheck:native": "tsc --project tsconfig.native.json --noEmit",
+    "test:client": "node --test tests/client-*.test.mjs",
+    "typecheck:client": "tsc --project tsconfig.client.json --noEmit"
+  },
+  "engines": {
+    "node": "^22.19.0 || >=24.0.0"
+  },
+  "peerDependencies": {
+    "@deepseek-ai/cordis": "4.0.4",
+    "@deepseek-ai/dsh-tools": "0.2.0-rc.2",
+    "@deepseek-ai/dsh-skill": "0.2.0-rc.2",
+    "@deepseek-ai/dsh-skill-filesystem": "0.2.0-rc.2",
+    "@deepseek-ai/dsh-agent-preset": "0.2.0-rc.2",
+    "@deepseek-ai/dsh-persona": "0.2.0-rc.2"
+  },
+  "devDependencies": {
+    "esbuild": "0.25.12",
+    "typescript": "6.0.3",
+    "vitest": "4.1.8",
+    "@types/node": "22.20.0",
+    "react": "18.3.1",
+    "@types/react": "18.3.31",
+    "react-dom": "18.3.1",
+    "jsdom": "29.1.1",
+    "tsx": "4.22.4",
+    "@deepseek-ai/dsh-system-prompt": "0.2.0-rc.2",
+    "@deepseek-ai/dsh-llm": "0.2.0-rc.2"
+  },
+  "private": true,
+  "license": "MIT"
+}

@@ -1,0 +1,40 @@
+{
+  "name": "chengyuan-skill-installer",
+  "version": "0.1.0",
+  "description": "城院 DSH Skill 安装器：从校内目录站安装已审 SKILL.md 包到 ~/.dsh/skills",
+  "type": "module",
+  "scripts": {
+    "test": "node --test test/*.test.mjs"
+  },
+  "main": "lib/index.js",
+  "bin": {
+    "chengyuan-skill": "./bin/chengyuan-skill.js"
+  },
+  "exports": {
+    ".": "./lib/index.js",
+    "./cordis.patch.yml": "./cordis.patch.yml",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib",
+    "bin",
+    "cordis.patch.yml",
+    "README.md"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  },
+  "keywords": [
+    "dsh",
+    "dsh-plugin",
+    "deepseek-harness",
+    "chengyuan",
+    "skill"
+  ],
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  }
+}

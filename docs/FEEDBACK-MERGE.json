@@ -1,0 +1,17 @@
+{
+  "web/app.js": {
+    "candidateSha256": "2b98d182b1d4a81c23d91a167f606a845d8499ffbae71c41aabb2d2f75326fa3",
+    "currentSha256": "a64f7dea52c2dc49540716c52781a7a1b27dac5db1da963ae8b82b8f10927595",
+    "merge": "candidate equals pre-fix baseline; exact supported Mac feedback bytes applied"
+  },
+  "web/index.html": {
+    "candidateSha256": "cb7e559fda8e689da271ce1079a785e7429037ca3e2ce7bed187ab8930a89211",
+    "currentSha256": "3c094047bb75683ad36d9f0c151c4d784f91f88db8fbbfe79e57f4381e63aa05",
+    "merge": "candidate equals pre-fix baseline; exact supported Mac feedback bytes applied"
+  },
+  "web/app.css": {
+    "candidateSha256": "db7b7275c9b8559f4c8098894ea777753c09c4832760f9a260e281c3e5cffdb0",
+    "currentSha256": "c4830357290940d343ea62ac5de3bb179a2dc74fac4f336ba3a36a16ca34ffc0",
+    "merge": "candidate equals pre-fix baseline; exact supported Mac feedback bytes applied"
+  }
+}

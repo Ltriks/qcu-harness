@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>主题 / Themes · 城院 DSH 目录站</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&amp;family=Spectral:wght@400;600;700&amp;family=Fira+Code&amp;family=Space+Grotesk:wght@500;600;700&amp;display=swap" rel="stylesheet" />
+  <style>
+    :root { color-scheme: dark; font-family: "PingFang SC", "Noto Sans SC", sans-serif; background: #171918; color: #f0eee7; }
+    * { box-sizing: border-box; }
+    body { margin: 0; }
+    main { max-width: 1200px; margin: auto; padding: 32px 24px 64px; }
+    a { color: inherit; text-underline-offset: 5px; }
+    .back { display: inline-block; padding: 12px 0; }
+    header { padding: 40px 0 32px; }
+    .kicker { color: #c7b88e; letter-spacing: .16em; font-size: .75rem; }
+    h1 { font-size: clamp(2rem, 5vw, 3.5rem); margin: 12px 0 16px; }
+    header p, .notice, footer { color: #b8bdb7; line-height: 1.8; }
+    .notice { border-top: 1px solid #41473f; padding-top: 20px; margin-bottom: 24px; }
+    .themes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
+    .theme {
+      --bg: #1A0F0A; --panel: #2C1A10; --text: #F5E6D3; --muted: #cbb99f;
+      --accent: #CA8A04; --line: #74512b; --on-accent: #1A0F0A; --chip: #3D2517;
+      --radius: 5px; --border: 1px; --shadow: 0 8px 24px #10090488;
+      --body: "Spectral", "Songti SC", "Noto Serif SC", SimSun, serif;
+      --heading: "Cinzel", "Songti SC", "Noto Serif SC", SimSun, serif;
+      background: var(--bg); color: var(--text); border: var(--border) solid var(--line);
+      border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow);
+      font-family: var(--body); display: flex; flex-direction: column; min-width: 0;
+    }
+    .theme[data-theme="neobrutal"] {
+      color-scheme: light;
+      --bg: #f2f5f6; --panel: #ffffff; --text: #111111; --muted: #424b50;
+      --accent: #ffe566; --line: #111111; --on-accent: #111111; --chip: #edf0f2;
+      --radius: 4px; --border: 3px; --shadow: 5px 5px 0 #080b09;
+      --body: "Space Grotesk", "PingFang SC", "Noto Sans SC", sans-serif;
+      --heading: var(--body);
+      background-image: linear-gradient(#1111110a 1px, transparent 1px), linear-gradient(90deg, #1111110a 1px, transparent 1px);
+      background-size: 24px 24px;
+    }
+    .theme[data-theme="classic"] {
+      --bg: #0f1419; --panel: #1a2332; --text: #e7ecf3; --muted: #a8b6c9;
+      --accent: #3d8bfd; --line: #334155; --on-accent: #081527; --chip: #243044;
+      --radius: 12px; --border: 1px; --shadow: none;
+      --body: "IBM Plex Sans", "PingFang SC", "Noto Sans SC", sans-serif;
+      --heading: var(--body);
+    }
+    .theme-top { display: flex; justify-content: space-between; gap: 8px; align-items: center; }
+    .number { color: var(--muted); font-size: .75rem; letter-spacing: .12em; }
+    .current { font-size: .75rem; color: var(--text); border-bottom: 2px solid var(--accent); }
+    .current[hidden] { display: none; }
+    h2, h3, button { font-family: var(--heading); }
+    h2 { font-size: 1.8rem; margin: 20px 0 8px; }
+    .description { color: var(--muted); line-height: 1.7; min-height: 3.4em; margin: 0 0 24px; }
+    .preview { background: var(--panel); border: var(--border) solid var(--line); border-top: 3px solid var(--accent); border-radius: var(--radius); padding: 18px; box-shadow: var(--shadow); }
+    .chip { display: inline-block; padding: 4px 7px; background: var(--chip); font-size: .7rem; text-transform: uppercase; letter-spacing: .09em; border: 1px solid var(--line); }
+    [data-theme="questui"] .chip { background: #581C87; }
+    [data-theme="neobrutal"] .chip { background: #2dd4bf; }
+    h3 { font-size: 1.2rem; margin: 16px 0 8px; }
+    .preview p { color: var(--muted); font-size: .9rem; line-height: 1.8; margin: 0; }
+    .preview code { display: block; font-family: "Fira Code", ui-monospace, monospace; font-size: .72rem; line-height: 1.8; padding-top: 16px; overflow-wrap: anywhere; }
+    .swatches { display: flex; gap: 8px; margin: 24px 0; }
+    .swatches span { width: 24px; height: 24px; border: 1px solid var(--muted); border-radius: 50%; background: var(--swatch); }
+    button { margin-top: auto; width: 100%; min-height: 48px; padding: 12px; background: var(--accent); color: var(--on-accent); border: var(--border) solid var(--line); border-radius: var(--radius); cursor: pointer; font-size: .95rem; font-weight: 700; transition: box-shadow 300ms, transform 300ms; }
+    button:focus-visible, a:focus-visible { outline: 3px solid #eab94c; outline-offset: 5px; }
+    [data-theme="neobrutal"] button:focus-visible { outline-color: #1559d6; }
+    @media (hover: hover) { button:hover { transform: translateY(-2px); box-shadow: 0 0 18px var(--accent); } }
+    button:active { transform: translateY(1px); }
+    #status { color: #f1bb8b; line-height: 1.8; }
+    footer { margin-top: 32px; font-size: .8rem; }
+    @media (max-width: 900px) { .themes { grid-template-columns: 1fr; } .description { min-height: 0; } }
+    @media (max-width: 600px) { main { padding: 20px 16px 40px; } header { padding-top: 24px; } .theme { padding: 20px; } }
+    @media (prefers-reduced-motion: reduce) { button { transition: none; } }
+  </style>
+</head>
+<body>
+  <main>
+    <a class="back" href="./">← 返回目录首页</a>
+    <header>
+      <div class="kicker">CHENGYUAN DSH / APPEARANCE</div>
+      <h1>给探索换一种风格</h1>
+      <p>同一份精选目录，三种阅读氛围。挑选喜欢的主题，继续发现值得装的工具。</p>
+    </header>
+    <p class="notice">主题仅影响本机浏览器展示，不改服务端 catalog 数据。选择会在此浏览器中保存，随时可以回来切换。</p>
+    <div class="themes">
+      <article class="theme" data-theme="questui">
+        <div class="theme-top"><span class="number">01 / FANTASY</span><span class="current" hidden>当前使用</span></div>
+        <h2>QuestUI</h2>
+        <p class="description">羊皮纸文字、深棕层次与金色辉光。像翻开一册冒险手札。默认主题。</p>
+        <div class="preview">
+          <span class="chip">Skill · 精选</span>
+          <h3>学习方法教练</h3>
+          <p>拆解作业，规划一周节奏，让每一次学习都有方向。</p>
+          <code>node bin/chengyuan-skill.js install chengyuan-study-coach</code>
+        </div>
+        <div class="swatches" aria-label="金色、深红、皇室紫与羊皮纸色"><span style="--swatch:#CA8A04"></span><span style="--swatch:#991B1B"></span><span style="--swatch:#581C87"></span><span style="--swatch:#F5E6D3"></span></div>
+        <button type="button" data-apply="questui" aria-label="应用 QuestUI 到目录">应用到目录 →</button>
+      </article>
+      <article class="theme" data-theme="neobrutal">
+        <div class="theme-top"><span class="number">02 / BOLD</span><span class="current" hidden>当前使用</span></div>
+        <h2>Neobrutal</h2>
+        <p class="description">亮黄与薄荷绿，粗边框与硬阴影。保留现行粗野主义的鲜明个性。</p>
+        <div class="preview">
+          <span class="chip">Skill · 精选</span>
+          <h3>学习方法教练</h3>
+          <p>拆解作业，规划一周节奏，让每一次学习都有方向。</p>
+          <code>node bin/chengyuan-skill.js install chengyuan-study-coach</code>
+        </div>
+        <div class="swatches" aria-label="亮黄、薄荷绿与黑白"><span style="--swatch:#ffe566"></span><span style="--swatch:#2dd4bf"></span><span style="--swatch:#111111"></span><span style="--swatch:#ffffff"></span></div>
+        <button type="button" data-apply="neobrutal" aria-label="应用 Neobrutal 到目录">应用到目录 →</button>
+      </article>
+      <article class="theme" data-theme="classic">
+        <div class="theme-top"><span class="number">03 / FOCUS</span><span class="current" hidden>当前使用</span></div>
+        <h2>Classic</h2>
+        <p class="description">熟悉的深色蓝系，柔和圆角与克制线条。安静地浏览，专注于内容。</p>
+        <div class="preview">
+          <span class="chip">Skill · 精选</span>
+          <h3>学习方法教练</h3>
+          <p>拆解作业，规划一周节奏，让每一次学习都有方向。</p>
+          <code>node bin/chengyuan-skill.js install chengyuan-study-coach</code>
+        </div>
+        <div class="swatches" aria-label="深蓝背景、面板、蓝色与浅色文字"><span style="--swatch:#0f1419"></span><span style="--swatch:#1a2332"></span><span style="--swatch:#3d8bfd"></span><span style="--swatch:#e7ecf3"></span></div>
+        <button type="button" data-apply="classic" aria-label="应用 Classic 到目录">应用到目录 →</button>
+      </article>
+    </div>
+    <p id="status" role="status" aria-live="polite"></p>
+    <footer>主题预览为展示样例 · <a href="https://designmd.ai/chef/questui" target="_blank" rel="noopener noreferrer">QuestUI 设计参考</a></footer>
+  </main>
+  <script>
+    (() => {
+      const key = "chengyuan-catalog-theme";
+      const allowed = ["questui", "neobrutal", "classic"];
+      let theme = "questui";
+      try {
+        const saved = localStorage.getItem(key);
+        if (allowed.includes(saved)) theme = saved;
+      } catch (_) { /* Match the catalog's default when storage is unavailable. */ }
+      document.querySelector(`.theme[data-theme="${theme}"] .current`).hidden = false;
+      document.querySelectorAll("[data-apply]").forEach(button => {
+        button.addEventListener("click", () => {
+          const selected = button.dataset.apply;
+          if (!allowed.includes(selected)) return;
+          try {
+            localStorage.setItem(key, selected);
+          } catch (_) {
+            document.getElementById("status").textContent = "浏览器未能保存主题，请允许本站使用本地存储后重试。你也可以返回目录首页，使用默认 QuestUI 主题。";
+            return;
+          }
+          window.location.assign("./");
+        });
+      });
+    })();
+  </script>
+</body>
+</html>

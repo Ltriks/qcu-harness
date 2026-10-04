@@ -1,0 +1,20 @@
+{
+  "canonicalSkills": {
+    "chengyuan-acct-entry-coach": "717f3e16747605f6ee9ddd9d45dec9502dac3cf9aa154023d3a775f5333da114",
+    "chengyuan-acct-practice-brief": "974a80344021e5e4eed1ddaa68383b6406c471f81f945ae14bc08f4e016749d3",
+    "chengyuan-acct-statement-reader": "386e84a9ed4a5504be808aa123e081c3399e609a4954b6fef42987c349d04ea1",
+    "chengyuan-acct-teacher-draft": "f70b832db9292c249bfc997ddb1e08acb8270cee9d7ba034acdcc06abefe3724",
+    "chengyuan-course-qa": "f3f652e2ae91b6d991499796fc0702825525740bd7208ed22fde06aac54529b2",
+    "chengyuan-exam-review": "d1183f77520e96c85ab4c04ef4030902eff57057817a2fa2a378819eab4111a7",
+    "chengyuan-integrity-guard": "d54fcd0fac35b8c067db1f4a3ed5f1ca04726aa30e3f8f0415acf8114a9237f8",
+    "chengyuan-note-organizer": "3f626b958ba5190e56677fff06aca06fbca623ecc0d1ba4ff4f7436f1a168445",
+    "chengyuan-reading-outline": "ad3fd38f26940729bb9a2c9f564822b615fd610928b2df567fc8232f7d268770",
+    "chengyuan-study-coach": "dfd2fac7624c2f46f0bdcb15c7ea475156082d538b44d023f39b7e445e42de32",
+    "qcu-document-diff": "563d65527510df8d62dfdc566b0fe7a75252d803f78f89c55b143915477133a7",
+    "qcu-meeting-actions": "da7d6231070a8439e0f0046a5eb137614a2b7844fa8b088df15db96139c12e1f",
+    "qcu-table-audit": "4751b6a70ae4f26609333ef08521a6018d2f14db351c3a3b2aa2b3bfade755cf"
+  },
+  "packagedBusinessSkill": "../packages/qcu-thesis-workbench/skills/qcu-thesis-format-check",
+  "duplicateIds": [],
+  "note": "10 Chengyuan and 3 QCU skills have distinct IDs; related office topics remain separate implementations."
+}

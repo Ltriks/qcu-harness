@@ -1,0 +1,159 @@
+{
+  "title": "城院 DSH 目录站",
+  "tagline": "不追求全，只追求值得装 · 技能与插件分开看",
+  "compatible_dsh": "@deepseek-ai/dsh >= 0.1.1-rc.2（官方 npm / GitHub developer preview）",
+  "updated_at": "2026-09-07",
+  "install_hint": "技能：用城院安装器装到 ~/.dsh/skills，或下载 zip 解压后新开会话。插件：先下载目录站 /plugins 下的 tgz，再 dsh plugin --profile web add <本地tgz>；装完重启 dsh web。插件与技能安装通道不同，勿混用。",
+  "skill_hint": "Skill = 给模型的任务说明书（Markdown）。推荐装完城院安装器后：node …/chengyuan-skill.js install --all 或对话里让模型调用安装工具。",
+  "plugin_hint": "Plugin = 扩展 DSH 运行时。城院自研包优先从本站 /plugins 下载 tgz 再本地 add；社区插件一次只装一个，避开撞 id 的全家桶。",
+  "skills": [
+    {
+      "id": "chengyuan-study-coach",
+      "name": "学习方法教练",
+      "category": "通用",
+      "version": "0.1.0",
+      "risk": "低",
+      "summary": "作业拆解、一周节奏、错题复盘；不代写应交正文",
+      "file": "chengyuan-study-coach-0.1.0.zip",
+      "status": "draft"
+    },
+    {
+      "id": "chengyuan-integrity-guard",
+      "name": "学术诚信提示",
+      "category": "通用",
+      "version": "0.1.0",
+      "risk": "低",
+      "summary": "拒绝代写终稿；引用与 AI 使用边界",
+      "file": "chengyuan-integrity-guard-0.1.0.zip",
+      "status": "draft"
+    },
+    {
+      "id": "chengyuan-course-qa",
+      "name": "课程资料问答",
+      "category": "通用",
+      "version": "0.1.0",
+      "risk": "中",
+      "summary": "基于本地大纲/讲义答疑；含基础会计样例资料（课未定时也可作通用资料问答模板）",
+      "file": "chengyuan-course-qa-0.1.0.zip",
+      "status": "draft"
+    },
+    {
+      "id": "chengyuan-note-organizer",
+      "name": "课堂笔记整理",
+      "category": "通用",
+      "version": "0.1.0",
+      "risk": "低",
+      "summary": "把乱记/要点整理成可复习笔记；不扩写成可交作业",
+      "file": "chengyuan-note-organizer-0.1.0.zip",
+      "status": "draft"
+    },
+    {
+      "id": "chengyuan-exam-review",
+      "name": "考前复盘",
+      "category": "通用",
+      "version": "0.1.0",
+      "risk": "中",
+      "summary": "考点清单、3 日节奏、自测题干；不给整套标准答案卷",
+      "file": "chengyuan-exam-review-0.1.0.zip",
+      "status": "draft"
+    },
+    {
+      "id": "chengyuan-reading-outline",
+      "name": "教材精读提纲",
+      "category": "通用",
+      "version": "0.1.0",
+      "risk": "低",
+      "summary": "一章教材/文献的导读与概念地图；不写读书报告终稿",
+      "file": "chengyuan-reading-outline-0.1.0.zip",
+      "status": "draft"
+    },
+    {
+      "id": "chengyuan-acct-entry-coach",
+      "name": "会计分录思路辅导",
+      "category": "会计",
+      "version": "0.1.0",
+      "risk": "中",
+      "summary": "借贷方向与平衡自查；引导为主，不批量给习题册答案",
+      "file": "chengyuan-acct-entry-coach-0.1.0.zip",
+      "status": "draft"
+    },
+    {
+      "id": "chengyuan-acct-statement-reader",
+      "name": "报表指标解读",
+      "category": "会计",
+      "version": "0.1.0",
+      "risk": "低",
+      "summary": "资产负债表/利润表教学级解读；不算投资建议",
+      "file": "chengyuan-acct-statement-reader-0.1.0.zip",
+      "status": "draft"
+    },
+    {
+      "id": "chengyuan-acct-practice-brief",
+      "name": "实训题审题拆解",
+      "category": "会计",
+      "version": "0.1.0",
+      "risk": "中",
+      "summary": "出纳/综模/财务共享等实训开工步骤",
+      "file": "chengyuan-acct-practice-brief-0.1.0.zip",
+      "status": "draft"
+    },
+    {
+      "id": "chengyuan-acct-teacher-draft",
+      "name": "会计备课/出题提纲",
+      "category": "会计",
+      "version": "0.1.0",
+      "risk": "低",
+      "summary": "教师侧教案与练习题干草稿（待审定）",
+      "file": "chengyuan-acct-teacher-draft-0.1.0.zip",
+      "status": "draft"
+    }
+  ],
+  "plugins": [
+    {
+      "id": "chengyuan-skill-installer",
+      "name": "城院 Skill 安装器",
+      "category": "城院自研",
+      "version": "0.1.0",
+      "risk": "低",
+      "summary": "从本目录站安装已审 chengyuan-* skill 到 ~/.dsh/skills。提供 chengyuan_skill_list / chengyuan_skill_install 工具，也可纯 CLI 使用。",
+      "status": "draft",
+      "file": "chengyuan-skill-installer-0.1.0.tgz",
+      "install": "curl -fsSL -o /tmp/chengyuan-skill-installer-0.1.0.tgz http://127.0.0.1:8080/plugins/chengyuan-skill-installer-0.1.0.tgz && npx @deepseek-ai/dsh@0.1.1-rc.2 plugin --profile web add /tmp/chengyuan-skill-installer-0.1.0.tgz",
+      "cli_alt": "仅装 skill、不装插件时：浏览器下 zip 解压到 ~/.dsh/skills/；或拿到安装器源码后 node bin/chengyuan-skill.js install --all",
+      "notes": "内网 tgz 分发，无需开发机 link: 路径。装完重启 dsh web。Windows 可用浏览器下载 tgz 后：npx @deepseek-ai/dsh@0.1.1-rc.2 plugin --profile web add .\\chengyuan-skill-installer-0.1.0.tgz"
+    },
+    {
+      "id": "dsh-sql",
+      "name": "dsh-sql（数据库工具）",
+      "category": "技术体验",
+      "version": "0.4.x",
+      "risk": "中",
+      "summary": "给 Agent 增加 sql_list/query/schema/exec。适合本地 SQLite 演示；勿连学校生产库。",
+      "status": "draft",
+      "install": "npx @deepseek-ai/dsh@0.1.1-rc.2 plugin --profile web add github:STARDUSTLC666/dsh-sql",
+      "notes": "需在 ~/.dsh/profiles/web/cordis.patch.yml 配置 connections。写操作默认审批。"
+    },
+    {
+      "id": "dsh-plugin-hub",
+      "name": "DSH Plugin Hub",
+      "category": "技术体验",
+      "version": "0.3.x",
+      "risk": "低",
+      "summary": "在设置里浏览社区插件目录（只检索，不自动乱装）。peer 警告可忽略。",
+      "status": "draft",
+      "install": "npx @deepseek-ai/dsh@0.1.1-rc.2 plugin --profile web add @czj-git/dsh-plugin-hub",
+      "notes": "装完重启；设置 → Plugin Hub。挑选插件时避开与官方 web 撞 id 的第二套全家桶。"
+    },
+    {
+      "id": "dsh-web-all",
+      "name": "dsh-web-all（社区 UI 全家桶）",
+      "category": "技术体验",
+      "version": "0.3.x",
+      "risk": "高",
+      "summary": "侧栏/看板/皮肤等。已装则不要再装废弃的 dsh-web-ui-all（会 duplicate web-ui-compat）。任务看板在 0.1.1-rc.2 上可能刷 session/list 警告。",
+      "status": "draft",
+      "install": "npx @deepseek-ai/dsh@0.1.1-rc.2 plugin --profile web add @linxin666/dsh-web-all@latest",
+      "notes": "课堂试点非必须。勿与 @linxin666/dsh-web-ui-all 同时安装。"
+    }
+  ]
+}

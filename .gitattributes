@@ -1,0 +1,3 @@
+# Unified-diff blank context lines require their single space prefix.
+# Preserve the pinned cumulative patch bytes; ordinary source keeps normal checks.
+upstream/qcu-office.patch whitespace=-blank-at-eol

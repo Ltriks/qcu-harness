@@ -1,0 +1,832 @@
+{
+  "candidate": {
+    "name": "QCU-OFFICIAL-BUNDLE-THIN-NATIVE-CANDIDATE-2026-10-04.zip",
+    "version": 1,
+    "bytes": 689886,
+    "sha256": "d7b9ff46d7f1122052db8838d32af57062ef665d5acb5c4ac1f2d0492e6ff514"
+  },
+  "officialBaseline": "639ed015397290b3745d163aafe02ffee4aa3f84",
+  "sources": [
+    {
+      "path": "packages/qcu-thesis-workbench/README.md",
+      "source": "thin-native-v1:package/README.md",
+      "inputSha256": "9d464d2ffe2e41b051fcaeb8bbce82f8e89a8596bc2e341a27193371ee380c4e"
+    },
+    {
+      "path": "packages/qcu-thesis-workbench/RESOURCE-SHA256.json",
+      "source": "thin-native-v1:package/RESOURCE-SHA256.json",
+      "inputSha256": "0856cb42b36c2996f7f26a6579899662d828b480c115ae3c97b0bba56b4987e2"
+    },
+    {
+      "path": "packages/qcu-thesis-workbench/THIN-NATIVE-ADAPTER.md",
+      "source": "thin-native-v1:package/THIN-NATIVE-ADAPTER.md",
+      "inputSha256": "e16d4b969018e26b00fe760187c066b0fd2d1485a27ef6f88b43f9ba028e1c17"
+    },
+    {
+      "path": "packages/qcu-thesis-workbench/cordis.patch.yml",
+      "source": "thin-native-v1:package/cordis.patch.yml",
+      "inputSha256": "1b8af0bd2bf5d62f0eb17bf968c05238e9ca6789b7038dbf3a1499b07e2bdea6"
+    },
+    {
+      "path": "packages/qcu-thesis-workbench/oxlint.client.json",
+      "source": "thin-native-v1:package/oxlint.client.json",
+      "inputSha256": "add707fe1d8e695d6cebf4a4ec2c524652c5aeb2cb66563865017ebb2e6206c8"
+    },
+    {
+      "path": "packages/qcu-thesis-workbench/package.json",
+      "source": "thin-native-v1:package/package.json",
+      "inputSha256": "4ee4c88d51975ec62e34b7cad03f737794ea421022eb99ea516ce883e3c418cf"
+    },
+    {
+      "path": "packages/qcu-thesis-workbench/plugin/index.d.ts",
+      "source": "thin-native-v1:package/plugin/index.d.ts",
+      "inputSha256": "e73ef6436a529ff290faa0ba2ecd8411a8586e0c20c23abad223d23207170e41"
+    },
+    {
+      "path": "packages/qcu-thesis-workbench/plugin/index.js",
+      "source": "thin-native-v1:package/plugin/index.js",
+      "inputSha256": "1daf145b34f2ff6a380be48deb7506eee412216775cbcfc5b3b8d8dbfe3938ac"
+    },
+    {
+      "path": "packages/qcu-thesis-workbench/rules/demo.json",
+      "source": "thin-native-v1:package/rules/demo.json",
+      "inputSha256": "94dcd86228b78fb75908f89ab26e9104ea25c5419482eebd59b8c2210b79cb5b"
+    },
+    {
+      "path": "packages/qcu-thesis-workbench/runtime/engine.py",
+      "source": "thin-native-v1:package/runtime/engine.py",
+      "inputSha256": "4f517c8d5f474bc1545b32c0c84a543b174fc5978ccb033c296d76ad62291e7c"
+    },
+    {
+      "path": "packages/qcu-thesis-workbench/runtime/server.py",
+      "source": "thin-native-v1:package/runtime/server.py",
+      "inputSha256": "11f7b71d5cd10c5b636ffa9bd69f8e50bbe9af4254043b78b668ec6df81a8e5e"
+    },
+    {
+      "path": "packages/qcu-thesis-workbench/scripts/build-client.mjs",
+      "source": "thin-native-v1:package/scripts/build-client.mjs",
+      "inputSha256": "d74fbfdfade510942cdc0ab742168fec6ba5542c4e45799deb37eca3856fcae5"
+    },
+    {
+      "path": "packages/qcu-thesis-workbench/scripts/build-host.mjs",
+      "source": "thin-native-v1:package/scripts/build-host.mjs",
+      "inputSha256": "795b5c7dfa990fc40adac974bca1094a46543be2b62450e56a2bc574175a2ffc"
+    },
+    {
+      "path": "packages/qcu-thesis-workbench/scripts/link-development.mjs",
+      "source": "thin-native-v1:package/scripts/link-development.mjs",
+      "inputSha256": "1d58ad589777072f3370674b8b8d033c11cab0ce2d8c467419cf351938e1242b"
+    },
+    {
+      "path": "packages/qcu-thesis-workbench/skills/qcu-thesis-format-check/SKILL.md",
+      "source": "thin-native-v1:package/skills/qcu-thesis-format-check/SKILL.md",
+      "inputSha256": "e8899d51cfaf4c849d93d36f8fddd8c1b3b2f79fbe2393b325e9f442d3a98e4f"
+    },
+    {
+      "path": "packages/qcu-thesis-workbench/src/client/QcuEntry.tsx",
+      "source": "thin-native-v1:package/src/client/QcuEntry.tsx",
+      "inputSha256": "fd211d2064cb77d285e8cc8150f6eeb34ebcd99e156041539288d987b55eb45e"
+    },
+    {
+      "path": "packages/qcu-thesis-workbench/src/client/README.md",
+      "source": "thin-native-v1:package/src/client/README.md",
+      "inputSha256": "5fdae81055ac38aab125f070493462d3e0e150a0cd4a8a298b1ed42884292cfe"
+    },
+    {
+      "path": "packages/qcu-thesis-workbench/src/client/assets.d.ts",
+      "source": "thin-native-v1:package/src/client/assets.d.ts",
+      "inputSha256": "e6e488ba402d2579f11ce49c894b092cf45813091688be08a7b1128c893af925"
+    },
+    {
+      "path": "packages/qcu-thesis-workbench/src/client/controller.ts",
+      "source": "thin-native-v1:package/src/client/controller.ts",
+      "inputSha256": "c6371bbbbd8ac59b9df18d7d113ddbe07ee29878df1c7554aecbf249a2e9d9bb"
+    },
+    {
+      "path": "packages/qcu-thesis-workbench/src/client/index.ts",
+      "source": "thin-native-v1:package/src/client/index.ts",
+      "inputSha256": "6aa80c16f176137c67c8fb1f04b536fa7ae9350c6265a4950e2c23bd5c7492ac"
+    },
+    {
+      "path": "packages/qcu-thesis-workbench/src/client/locales.ts",
+      "source": "thin-native-v1:package/src/client/locales.ts",
+      "inputSha256": "e321073a525ebe1b09249678ebcf9c8d09ceeb64f18c95010d55d65f8781d154"
+    },
+    {
+      "path": "packages/qcu-thesis-workbench/src/client/styles.css",
+      "source": "thin-native-v1:package/src/client/styles.css",
+      "inputSha256": "80d6ef496988c086725f9c7afc0940c044dfa2bdf764d8e7e8c38203bc5066f5"
+    },
+    {
+      "path": "packages/qcu-thesis-workbench/src/host/desktop-binding.ts",
+      "source": "thin-native-v1:package/src/host/desktop-binding.ts",
+      "inputSha256": "bdb7f40c8143dd5ff070a2614d303b5803d0b18aacf8d4857916c049c910a82d"
+    },
+    {
+      "path": "packages/qcu-thesis-workbench/src/host/local-owner.ts",
+      "source": "thin-native-v1:package/src/host/local-owner.ts",
+      "inputSha256": "b1868d9ca7222c2566f1991f848c406ad8a1ea5b937fe293f34b144a85000270"
+    },
+    {
+      "path": "packages/qcu-thesis-workbench/src/host/private-wire.ts",
+      "source": "thin-native-v1:package/src/host/private-wire.ts",
+      "inputSha256": "78b6541ccb90ef21aca368e8d39c4382b89ad08df62e74fb45aee15b417f27ab"
+    },
+    {
+      "path": "packages/qcu-thesis-workbench/src/host/qcu-service.ts",
+      "source": "thin-native-v1:package/src/host/qcu-service.ts",
+      "inputSha256": "3a613ed34342faffbe3b4df6a5270d66f6d7fb431d985f831851bae9172c7c98"
+    },
+    {
+      "path": "packages/qcu-thesis-workbench/src/index.ts",
+      "source": "thin-native-v1:package/src/index.ts",
+      "inputSha256": "5d1ba46745bcc076543d19a2d2191f2bae8bad77f485492a6a0c10afa6fc0295"
+    },
+    {
+      "path": "packages/qcu-thesis-workbench/src/native-contract.ts",
+      "source": "thin-native-v1:package/src/native-contract.ts",
+      "inputSha256": "064ce144a0df8a458febf6bb7c2e810f5314fcfe928d7c395e63963c479db04b"
+    },
+    {
+      "path": "packages/qcu-thesis-workbench/tests/client-artifact.test.mjs",
+      "source": "thin-native-v1:package/tests/client-artifact.test.mjs",
+      "inputSha256": "c5a73dcd116cb7c269a9a6adde6ca4a9c2fff78684b0ef126415bce74e149ec9"
+    },
+    {
+      "path": "packages/qcu-thesis-workbench/tests/client-controller.test.mjs",
+      "source": "thin-native-v1:package/tests/client-controller.test.mjs",
+      "inputSha256": "513cb6439368b7206f45e8ff459b63089c98cdc480f841922a8874216212ca30"
+    },
+    {
+      "path": "packages/qcu-thesis-workbench/tests/fixtures/original-persona.txt",
+      "source": "thin-native-v1:package/tests/fixtures/original-persona.txt",
+      "inputSha256": "33079ca77886028ac04cb7c8c96fef2c20e89799c002b2adfefcf658545e6980"
+    },
+    {
+      "path": "packages/qcu-thesis-workbench/tests/fixtures/private-ipc-child.ts",
+      "source": "thin-native-v1:package/tests/fixtures/private-ipc-child.ts",
+      "inputSha256": "14baebb72e8de64af14ceb2363255dfb7dd8c17c2fd253de3f269cfd8c0bae49"
+    },
+    {
+      "path": "packages/qcu-thesis-workbench/tests/host-lifecycle.spec.ts",
+      "source": "thin-native-v1:package/tests/host-lifecycle.spec.ts",
+      "inputSha256": "c4645bd7d9e3bf7813da148ddf778b511a13d2b392547025a88513b6507441db"
+    },
+    {
+      "path": "packages/qcu-thesis-workbench/tests/host-native-unload.spec.ts",
+      "source": "thin-native-v1:package/tests/host-native-unload.spec.ts",
+      "inputSha256": "dc2c25d422caee15d2c66ff4e8ff47c1de25294d1a330bb9eced14cb083eafae"
+    },
+    {
+      "path": "packages/qcu-thesis-workbench/tests/host-policy-proof.spec.ts",
+      "source": "thin-native-v1:package/tests/host-policy-proof.spec.ts",
+      "inputSha256": "4015a2c3ad04c5c44141240580612ceb9b2a7ebb23b020074942674bb53c5dc9"
+    },
+    {
+      "path": "packages/qcu-thesis-workbench/tests/host-policy.spec.ts",
+      "source": "thin-native-v1:package/tests/host-policy.spec.ts",
+      "inputSha256": "8ee06221973c2881f9fc2aeb418efccb946ec61322673f9f67a2e6aa8799d552"
+    },
+    {
+      "path": "packages/qcu-thesis-workbench/tests/native-adapter.spec.ts",
+      "source": "thin-native-v1:package/tests/native-adapter.spec.ts",
+      "inputSha256": "67ad474ab9abad6b4539f5429295154dab60029ffa6fb275fbe73be958ccdba0"
+    },
+    {
+      "path": "packages/qcu-thesis-workbench/tests/native-contract.spec.ts",
+      "source": "thin-native-v1:package/tests/native-contract.spec.ts",
+      "inputSha256": "c68508a154363287560c76b40a628cfe266ff1909419f00e740ba02fc1fcdaac"
+    },
+    {
+      "path": "packages/qcu-thesis-workbench/tests/native-private-binding.spec.ts",
+      "source": "thin-native-v1:package/tests/native-private-binding.spec.ts",
+      "inputSha256": "a896e886569f12f058a5a5117c37d05507012097bd0c693e7946643fe45c55aa"
+    },
+    {
+      "path": "packages/qcu-thesis-workbench/tests/native-process-ipc.spec.ts",
+      "source": "thin-native-v1:package/tests/native-process-ipc.spec.ts",
+      "inputSha256": "c6b8ad4ddc277bcff0288bcd9f71299bd7a69e0a4b3c0779cc3ee14a0b2e2962"
+    },
+    {
+      "path": "packages/qcu-thesis-workbench/tests/qcu-service.spec.ts",
+      "source": "thin-native-v1:package/tests/qcu-service.spec.ts",
+      "inputSha256": "fe8a4b520249747dbf9230b390b2ca5552ae56b5fb44929da7af962808659c97"
+    },
+    {
+      "path": "packages/qcu-thesis-workbench/tests/support/native-adapter-reference.ts",
+      "source": "thin-native-v1:package/tests/support/native-adapter-reference.ts",
+      "inputSha256": "76b44ad3e288705519c2453ef4bce6a9416194ff27bdeaa37776a3b3abd407a1"
+    },
+    {
+      "path": "packages/qcu-thesis-workbench/tsconfig.client.json",
+      "source": "thin-native-v1:package/tsconfig.client.json",
+      "inputSha256": "11886d9bcb629b2a6f7924cfd7d3b22634ad6d8681ac98cf0f0b2296756d2bdc"
+    },
+    {
+      "path": "packages/qcu-thesis-workbench/tsconfig.host.json",
+      "source": "thin-native-v1:package/tsconfig.host.json",
+      "inputSha256": "fc64adbcbc480f1fb8bbf5b2b46417186ba2108604fd29a3d397a0b945f49587"
+    },
+    {
+      "path": "packages/qcu-thesis-workbench/tsconfig.native.json",
+      "source": "thin-native-v1:package/tsconfig.native.json",
+      "inputSha256": "962ca68d40f43d5b9fbc68d2961727daad63f9ac1db3ee09ae789da5b3b1c797"
+    },
+    {
+      "path": "packages/qcu-thesis-workbench/vitest.host.config.mjs",
+      "source": "thin-native-v1:package/vitest.host.config.mjs",
+      "inputSha256": "2a70b200817a00eab7944ef1c678dda1160a0137e79782fb2abbea2cd5bc1dd8"
+    },
+    {
+      "path": "packages/qcu-thesis-workbench/vitest.native.config.mjs",
+      "source": "thin-native-v1:package/vitest.native.config.mjs",
+      "inputSha256": "6267b05a544c7a0bcc5fdb37ca176880bc32c80907e745cd4f905e40eaba432d"
+    },
+    {
+      "path": "packages/qcu-thesis-workbench/web/app.css",
+      "source": "thin-native-v1:package/web/app.css",
+      "inputSha256": "db7b7275c9b8559f4c8098894ea777753c09c4832760f9a260e281c3e5cffdb0"
+    },
+    {
+      "path": "packages/qcu-thesis-workbench/web/app.js",
+      "source": "thin-native-v1:package/web/app.js",
+      "inputSha256": "2b98d182b1d4a81c23d91a167f606a845d8499ffbae71c41aabb2d2f75326fa3"
+    },
+    {
+      "path": "packages/qcu-thesis-workbench/web/index.html",
+      "source": "thin-native-v1:package/web/index.html",
+      "inputSha256": "cb7e559fda8e689da271ce1079a785e7429037ca3e2ce7bed187ab8930a89211"
+    },
+    {
+      "path": "packages/qcu-thesis-workbench/web/task-panel.css",
+      "source": "thin-native-v1:package/web/task-panel.css",
+      "inputSha256": "805b4947f8b98875400a69ec4c5d4e7f519939c7656ed35e4d895c175c9a4e44"
+    },
+    {
+      "path": "packages/qcu-thesis-workbench/web/task-panel.html",
+      "source": "thin-native-v1:package/web/task-panel.html",
+      "inputSha256": "88fcd44b64202133ea7d7fc8e4f5bbb0a6191a769fec1411a150f61f97fd06ad"
+    },
+    {
+      "path": "packages/qcu-thesis-workbench/web/task-panel.js",
+      "source": "thin-native-v1:package/web/task-panel.js",
+      "inputSha256": "3be27976d4a5bd9f25ffd5765be064569891132fa5ea6c91edf280b10e872714"
+    },
+    {
+      "path": "upstream/source/apps/cli/src/profile-boot.ts",
+      "source": "thin-native-v1:shell-source/apps/cli/src/profile-boot.ts",
+      "inputSha256": "4b02e872e29cb135bafc139836ae57258e2e10e5017cb437aa04c1b45d926887"
+    },
+    {
+      "path": "upstream/source/apps/cli/tests/profiles/web/tests/default-web-process.ts",
+      "source": "thin-native-v1:shell-source/apps/cli/tests/profiles/web/tests/default-web-process.ts",
+      "inputSha256": "52d72c79145c80e9da7762e11189e23cd376a0cb17c86252a65d83a821717633"
+    },
+    {
+      "path": "upstream/source/apps/cli/tests/profiles/web/tests/fixtures/qcu-persistent-restrictions-driver.mjs",
+      "source": "thin-native-v1:shell-source/apps/cli/tests/profiles/web/tests/fixtures/qcu-persistent-restrictions-driver.mjs",
+      "inputSha256": "1389b7308dc89e1015257c061fe8a88fd144d057ef4180bbc304e3cc7f171d94"
+    },
+    {
+      "path": "upstream/source/apps/cli/tests/profiles/web/tests/fixtures/qcu-protected-business.mjs",
+      "source": "thin-native-v1:shell-source/apps/cli/tests/profiles/web/tests/fixtures/qcu-protected-business.mjs",
+      "inputSha256": "648d6d29c5ada857f659dae24eddc03516bb169dae07b1b1b1f943834cf030ef"
+    },
+    {
+      "path": "upstream/source/apps/cli/tests/profiles/web/tests/fixtures/qcu-protected-probe.mjs",
+      "source": "thin-native-v1:shell-source/apps/cli/tests/profiles/web/tests/fixtures/qcu-protected-probe.mjs",
+      "inputSha256": "d37419704963fa39bfb22c73b7cd1c8653feb4745f66c307d01f5971eb4b45c5"
+    },
+    {
+      "path": "upstream/source/apps/cli/tests/profiles/web/tests/fixtures/qcu-protected-profile-driver.mjs",
+      "source": "thin-native-v1:shell-source/apps/cli/tests/profiles/web/tests/fixtures/qcu-protected-profile-driver.mjs",
+      "inputSha256": "bcf1005e6ef7faf1af7b5d87df6118061871b0f5a1b6894d9a9c8d5997c89c5f"
+    },
+    {
+      "path": "upstream/source/apps/cli/tests/profiles/web/tests/qcu-native-handoff.expected.e2e.ts",
+      "source": "thin-native-v1:shell-source/apps/cli/tests/profiles/web/tests/qcu-native-handoff.expected.e2e.ts",
+      "inputSha256": "081f8eeb6418e53935c7187c0aa3eb49b69ba8002829fe1d1405334ddc824915"
+    },
+    {
+      "path": "upstream/source/apps/cli/tests/profiles/web/tests/qcu-persistent-restrictions.expected.e2e.ts",
+      "source": "thin-native-v1:shell-source/apps/cli/tests/profiles/web/tests/qcu-persistent-restrictions.expected.e2e.ts",
+      "inputSha256": "64c020ec9299e3ffd0670178ca203710c6fdb15a331936edacfbda68ad49f141"
+    },
+    {
+      "path": "upstream/source/apps/cli/tests/profiles/web/tests/qcu-protected-lifecycle.expected.e2e.ts",
+      "source": "thin-native-v1:shell-source/apps/cli/tests/profiles/web/tests/qcu-protected-lifecycle.expected.e2e.ts",
+      "inputSha256": "6e40a0893c1b8ad0560f9dca09653baf3e91b59400e8ce14100807be414e4f99"
+    },
+    {
+      "path": "upstream/source/apps/cli/tests/profiles/web/tests/qcu-protected-native-unload.expected.e2e.ts",
+      "source": "thin-native-v1:shell-source/apps/cli/tests/profiles/web/tests/qcu-protected-native-unload.expected.e2e.ts",
+      "inputSha256": "32725c1ac6f13850fefbd4664735db2e8f5b0b28017e5884cb14a372b168da7a"
+    },
+    {
+      "path": "upstream/source/apps/desktop-host/package.json",
+      "source": "thin-native-v1:shell-source/apps/desktop-host/package.json",
+      "inputSha256": "944496276b58e258b2ba5a604690deb9d21d6665f5d7171fb8f1a5b280233ca3"
+    },
+    {
+      "path": "upstream/source/apps/desktop-host/src/index.ts",
+      "source": "thin-native-v1:shell-source/apps/desktop-host/src/index.ts",
+      "inputSha256": "2be15906bba1fe7589d42e723e8be4ceffe1300be70d4549e9b2dd9afc252683"
+    },
+    {
+      "path": "upstream/source/apps/desktop-host/src/qcu-launch.ts",
+      "source": "thin-native-v1:shell-source/apps/desktop-host/src/qcu-launch.ts",
+      "inputSha256": "728480ffdef07d907d27cc26999e94feca8ad2b9c163ed642f25857ff20047a0"
+    },
+    {
+      "path": "upstream/source/apps/desktop-host/src/qcu-policy.ts",
+      "source": "thin-native-v1:shell-source/apps/desktop-host/src/qcu-policy.ts",
+      "inputSha256": "3f8e05ab1703dc00c63d83aea320dd2b90fb8095eeb11549ca8ddf539c992731"
+    },
+    {
+      "path": "upstream/source/apps/desktop-host/src/qcu-profile-policy.ts",
+      "source": "thin-native-v1:shell-source/apps/desktop-host/src/qcu-profile-policy.ts",
+      "inputSha256": "c8388c21d7b9e69d4383fd0ccee5c1612294d31646ca78d6d858ed0ccfef7da6"
+    },
+    {
+      "path": "upstream/source/apps/desktop-host/tests/qcu-launch.spec.ts",
+      "source": "thin-native-v1:shell-source/apps/desktop-host/tests/qcu-launch.spec.ts",
+      "inputSha256": "aa7d5f074cbc8dc0c03950ca8b9886548ed88d2b8e6646f4aab78667e51be7a7"
+    },
+    {
+      "path": "upstream/source/apps/desktop-host/tests/qcu-policy.spec.ts",
+      "source": "thin-native-v1:shell-source/apps/desktop-host/tests/qcu-policy.spec.ts",
+      "inputSha256": "abdc2c1dcc431f302868cdb6c2a79a90381cb50ce3eb8152e4f81d1a865f6967"
+    },
+    {
+      "path": "upstream/source/apps/desktop-host/tests/qcu-profile-policy.spec.ts",
+      "source": "thin-native-v1:shell-source/apps/desktop-host/tests/qcu-profile-policy.spec.ts",
+      "inputSha256": "723e314892a7eab251790e3b8cae0c21072d016ffb1dc7efa2fa004d5f146373"
+    },
+    {
+      "path": "upstream/source/apps/desktop-host/tsconfig.json",
+      "source": "thin-native-v1:shell-source/apps/desktop-host/tsconfig.json",
+      "inputSha256": "fe7efac59ed3a47597893735b9d82ebf12bad304a0b866107618a626dbc95705"
+    },
+    {
+      "path": "upstream/source/apps/desktop/package.json",
+      "source": "thin-native-v1:shell-source/apps/desktop/package.json",
+      "inputSha256": "c3e3f6e93520d7a84837e05ddcabc707dd48a03e0be9b2136ca7a7113083767a"
+    },
+    {
+      "path": "upstream/source/apps/desktop/src/host-process.ts",
+      "source": "thin-native-v1:shell-source/apps/desktop/src/host-process.ts",
+      "inputSha256": "2c3e8533ac0c68e9f0e11a7a6b855921ee97f5f0da93168ad9b8478171fed33b"
+    },
+    {
+      "path": "upstream/source/apps/desktop/src/ipc.ts",
+      "source": "thin-native-v1:shell-source/apps/desktop/src/ipc.ts",
+      "inputSha256": "6935cd9275157708d0895065c243cff20bd4dff61040169df41da036e0e23d16"
+    },
+    {
+      "path": "upstream/source/apps/desktop/src/main.ts",
+      "source": "thin-native-v1:shell-source/apps/desktop/src/main.ts",
+      "inputSha256": "30f92eaf742042717a42fa69935c48d377e84f26721b0dacd22c5e519fb03d2a"
+    },
+    {
+      "path": "upstream/source/apps/desktop/src/preload-app.ts",
+      "source": "thin-native-v1:shell-source/apps/desktop/src/preload-app.ts",
+      "inputSha256": "a8e2e7caeab5da48b00dbb69b8d76818a5ae33bee38a4996ad10e5bc5007788b"
+    },
+    {
+      "path": "upstream/source/apps/desktop/src/qcu-host-binding.ts",
+      "source": "thin-native-v1:shell-source/apps/desktop/src/qcu-host-binding.ts",
+      "inputSha256": "88cc1194a9702504d79433adc8d5e95be7197069dead6b01082b6c39c2ca576e"
+    },
+    {
+      "path": "upstream/source/apps/desktop/src/qcu-main.ts",
+      "source": "thin-native-v1:shell-source/apps/desktop/src/qcu-main.ts",
+      "inputSha256": "7b824679bb821a4d9db1720333a2b397b9595f7587f8d4b6060124a703e02928"
+    },
+    {
+      "path": "upstream/source/apps/desktop/src/qcu-native-contract.ts",
+      "source": "thin-native-v1:shell-source/apps/desktop/src/qcu-native-contract.ts",
+      "inputSha256": "7555032cb6b729e1a761c03758592c286d40c95c189565d8e62ee5061965cd27"
+    },
+    {
+      "path": "upstream/source/apps/desktop/src/qcu-native-ipc.ts",
+      "source": "thin-native-v1:shell-source/apps/desktop/src/qcu-native-ipc.ts",
+      "inputSha256": "4d9706b34ca7805c5d366b8b53db396303f2b3c00fa638853b17743c0ae513e1"
+    },
+    {
+      "path": "upstream/source/apps/desktop/src/qcu-office-entry.ts",
+      "source": "thin-native-v1:shell-source/apps/desktop/src/qcu-office-entry.ts",
+      "inputSha256": "2aa0833975fc2881023728649c807b48dc402411fa69aad2b878361568c79dd9"
+    },
+    {
+      "path": "upstream/source/apps/desktop/src/qcu-task-panel.ts",
+      "source": "thin-native-v1:shell-source/apps/desktop/src/qcu-task-panel.ts",
+      "inputSha256": "a3ee8856a85c561c556642002dbdb5e10e99943415be31004ff97d03aeb5d6c2"
+    },
+    {
+      "path": "upstream/source/apps/desktop/tests/fixtures/qcu-entry-probe.mjs",
+      "source": "thin-native-v1:shell-source/apps/desktop/tests/fixtures/qcu-entry-probe.mjs",
+      "inputSha256": "53c88d9698c25842e9dcfca0a598b39d0e3dce038493a4cc05b527826a35d6e5"
+    },
+    {
+      "path": "upstream/source/apps/desktop/tests/host-process.spec.ts",
+      "source": "thin-native-v1:shell-source/apps/desktop/tests/host-process.spec.ts",
+      "inputSha256": "469e73c351e6ad74751a37a5e577918377ee822a5a52cc016dafa6b2445abb4c"
+    },
+    {
+      "path": "upstream/source/apps/desktop/tests/preload-app.spec.ts",
+      "source": "thin-native-v1:shell-source/apps/desktop/tests/preload-app.spec.ts",
+      "inputSha256": "4cbaef38f50d1e33f03243f2e7e2cd5150aefaa4be325ce107abbfbbb239541d"
+    },
+    {
+      "path": "upstream/source/apps/desktop/tests/qcu-host-wiring.spec.ts",
+      "source": "thin-native-v1:shell-source/apps/desktop/tests/qcu-host-wiring.spec.ts",
+      "inputSha256": "f12cb5f96d0148fca73e20a7e2253d30b9d5fea2d3480aff40d1fdd30aadf859"
+    },
+    {
+      "path": "upstream/source/apps/desktop/tests/qcu-native-contract.spec.ts",
+      "source": "thin-native-v1:shell-source/apps/desktop/tests/qcu-native-contract.spec.ts",
+      "inputSha256": "8e1c13688eb62a818feb07378ae1a126d7fe1c3476ba9f1ab2cef6226cc1ffd8"
+    },
+    {
+      "path": "upstream/source/apps/desktop/tests/qcu-native-ipc.spec.ts",
+      "source": "thin-native-v1:shell-source/apps/desktop/tests/qcu-native-ipc.spec.ts",
+      "inputSha256": "4379d989ef78decf3945d312903ffef1d6858681c4f1366212bda05b22cc0997"
+    },
+    {
+      "path": "upstream/source/apps/desktop/tests/qcu-office-entry.built.e2e.ts",
+      "source": "thin-native-v1:shell-source/apps/desktop/tests/qcu-office-entry.built.e2e.ts",
+      "inputSha256": "f998954f30a98c7dc8d5d72cdf7172dde9c31698fd85780d76316afd0b460dca"
+    },
+    {
+      "path": "upstream/source/apps/desktop/tests/qcu-office-entry.spec.ts",
+      "source": "thin-native-v1:shell-source/apps/desktop/tests/qcu-office-entry.spec.ts",
+      "inputSha256": "e70657667d3c8f411dd6aff4e6bd53e87b30ec842ca7b89e689b72dc254ca4f9"
+    },
+    {
+      "path": "upstream/source/apps/desktop/tests/qcu-task-panel.spec.ts",
+      "source": "thin-native-v1:shell-source/apps/desktop/tests/qcu-task-panel.spec.ts",
+      "inputSha256": "f05e73c5b4140e64ac8bcc5d8381aa97a8c4109311b47fbe9373f1e2860f75ba"
+    },
+    {
+      "path": "upstream/source/apps/desktop/tests/update-coordinator.spec.ts",
+      "source": "thin-native-v1:shell-source/apps/desktop/tests/update-coordinator.spec.ts",
+      "inputSha256": "57388b1500bd3bb9c813851d669db072013d9cf7cd93fe180389b49f1ca82fec"
+    },
+    {
+      "path": "upstream/source/apps/desktop/tsdown.config.ts",
+      "source": "thin-native-v1:shell-source/apps/desktop/tsdown.config.ts",
+      "inputSha256": "3764f634c415d28bcdf815350fa24fcca91d2ff6173a30196f1b4c8c35472a4a"
+    },
+    {
+      "path": "upstream/source/docs/upgrade-guide/v0.2.0-rc.2/qcu-dedicated-launch/guide.i18n.yaml",
+      "source": "thin-native-v1:shell-source/docs/upgrade-guide/v0.2.0-rc.2/qcu-dedicated-launch/guide.i18n.yaml",
+      "inputSha256": "16eb0384b9987cb33d9c0ec2fcc5094514e46cb34fd5e1aca61a1974b671dc17"
+    },
+    {
+      "path": "upstream/source/docs/upgrade-guide/v0.2.0-rc.2/qcu-dedicated-launch/guide.md",
+      "source": "thin-native-v1:shell-source/docs/upgrade-guide/v0.2.0-rc.2/qcu-dedicated-launch/guide.md",
+      "inputSha256": "0b59ded6aec8058bbc79f7487b56c7e026b37e6ed84f2712aa6913669ae5e504"
+    },
+    {
+      "path": "upstream/source/docs/upgrade-guide/v0.2.0-rc.2/qcu-dedicated-launch/guide.zh.md",
+      "source": "thin-native-v1:shell-source/docs/upgrade-guide/v0.2.0-rc.2/qcu-dedicated-launch/guide.zh.md",
+      "inputSha256": "be23d25603b15fb4f718fef1207f44497a85e7bd227cc68cfc1175e114023c7b"
+    },
+    {
+      "path": "upstream/source/packages/boot/app-boot/README.i18n.yaml",
+      "source": "thin-native-v1:shell-source/packages/boot/app-boot/README.i18n.yaml",
+      "inputSha256": "80c45237d7e22e67792067c64f8a73badd448a2abeb1a7a09dfcc164f0375fad"
+    },
+    {
+      "path": "upstream/source/packages/boot/app-boot/README.md",
+      "source": "thin-native-v1:shell-source/packages/boot/app-boot/README.md",
+      "inputSha256": "2d937a2a609e122631826bd28b904e270bd752f8e010899e3d419e24cc92a7c0"
+    },
+    {
+      "path": "upstream/source/packages/boot/app-boot/README.zh.md",
+      "source": "thin-native-v1:shell-source/packages/boot/app-boot/README.zh.md",
+      "inputSha256": "1ad1df2d0a36e232277d6c0d7a587089a6deecc40d47c58812bfa34185426a7c"
+    },
+    {
+      "path": "upstream/source/packages/boot/app-boot/src/profile-context.ts",
+      "source": "thin-native-v1:shell-source/packages/boot/app-boot/src/profile-context.ts",
+      "inputSha256": "d6ce6bdd8fd2506d0facb17e4e14fef56d8ff37b39e8a69b71bb2c93a7e3fa6b"
+    },
+    {
+      "path": "upstream/source/packages/boot/app-boot/tests/launch-restrictions.spec.ts",
+      "source": "thin-native-v1:shell-source/packages/boot/app-boot/tests/launch-restrictions.spec.ts",
+      "inputSha256": "7635af74250514c26b5f87c78b3332113e3e656e6ad5d45632f15385bde1949b"
+    },
+    {
+      "path": "upstream/source/pnpm-lock.yaml",
+      "source": "thin-native-v1:shell-source/pnpm-lock.yaml",
+      "inputSha256": "dac4d1d7c74bb6d49dd8c3fb9615a4624a7d9fab18845da61499c96e4b542ba5"
+    },
+    {
+      "path": "upstream/qcu-office.patch",
+      "source": "thin-native-v1:shell-and-tests.patch",
+      "inputSha256": "2fb6bf6defd37e039bd7f1c36527771b79c00d99863eada2f89b3ddc86d74aed"
+    },
+    {
+      "path": "tests/fixtures/01-demo-match.docx",
+      "source": "thin-native-v1:synthetic-fixture",
+      "inputSha256": "b9e53a2510fe5d8558f50d7e9ed7169f9e7c361eecba169b12c46f3fb324992f"
+    },
+    {
+      "path": "docs/POLICY-LIFETIME.md",
+      "source": "thin-native-v1:docs/POLICY-LIFETIME.md",
+      "inputSha256": "5907fe1db1e53686df9090048d012b08c4aa8f366b340976dc26025ded9c7b66"
+    },
+    {
+      "path": "docs/MAINTENANCE.md",
+      "source": "thin-native-v1:docs/MAINTENANCE.md",
+      "inputSha256": "dd9b16e17e7a34fa76cb01289b269f07d88a990baeec3b4a821a1941e580bc82"
+    },
+    {
+      "path": "packages/qcu-thesis-workbench/tests/web.test.mjs",
+      "source": "mac-feedback:DOM-regression",
+      "inputSha256": "bdb697a0de78264d7519faa1204fc5757828cc63576366bd1693791661b5af0c"
+    },
+    {
+      "path": "packages/qcu-thesis-workbench/tests/test_workbench.py",
+      "source": "legacy-synthetic:Python-regression",
+      "inputSha256": "e241daaa62af5610fcc2e4938d393eddbcf74cd031951a2c2d8419bceb9bc4f8"
+    },
+    {
+      "path": "hub/nginx/default.conf",
+      "source": "chengyuan-catalog:nginx/default.conf",
+      "inputSha256": "91730c7ed0e205281f3b3bce290351f36d9402e878780c9ee98af35a1b95e382"
+    },
+    {
+      "path": "hub/packaging/install-dsh-macos.sh",
+      "source": "chengyuan-catalog:packaging/install-dsh-macos.sh",
+      "inputSha256": "731f545832f72dfe851af594a7a44fc642e289008ef3eb79f43534a137d0a93d"
+    },
+    {
+      "path": "hub/packaging/install-dsh-windows.ps1",
+      "source": "chengyuan-catalog:packaging/install-dsh-windows.ps1",
+      "inputSha256": "50e976216e5ffaf232b09b3763eaea589b64224f0ba759e2abe4a5a6fe630223"
+    },
+    {
+      "path": "hub/packaging/templates/model-config.env.example",
+      "source": "chengyuan-catalog:packaging/templates/model-config.env.example",
+      "inputSha256": "3df00eba61f29cf40318c174237fc97baae4e9f32f8c5d9cccad4ae3a1669893"
+    },
+    {
+      "path": "hub/plugins/chengyuan-skill-installer/README.md",
+      "source": "chengyuan-catalog:plugins/chengyuan-skill-installer/README.md",
+      "inputSha256": "d914c9b0f4b8409a17676cb76ce14668c5a4c71d1f496ee44a0ce2daf06a1268"
+    },
+    {
+      "path": "hub/plugins/chengyuan-skill-installer/bin/chengyuan-skill.js",
+      "source": "chengyuan-catalog:plugins/chengyuan-skill-installer/bin/chengyuan-skill.js",
+      "inputSha256": "32c315e771101a47a6ec01099e507fa8b282ec7f6be5b985ff9f1f07619e7793"
+    },
+    {
+      "path": "hub/plugins/chengyuan-skill-installer/cordis.patch.yml",
+      "source": "chengyuan-catalog:plugins/chengyuan-skill-installer/cordis.patch.yml",
+      "inputSha256": "dcc373491be781f597befa56a302357139464dfb5fb014f3117acd7ab88b1cbf"
+    },
+    {
+      "path": "hub/plugins/chengyuan-skill-installer/lib/catalog.js",
+      "source": "chengyuan-catalog:plugins/chengyuan-skill-installer/lib/catalog.js",
+      "inputSha256": "9c74b93ad19922ee87cd0ee21dd116d173989742c1fd4064cff425e8527eaafd"
+    },
+    {
+      "path": "hub/plugins/chengyuan-skill-installer/lib/config.js",
+      "source": "chengyuan-catalog:plugins/chengyuan-skill-installer/lib/config.js",
+      "inputSha256": "16599838cf83dae89fe8bbc8a174cc3669191a7fe87d4b3c894fb5fad6dd1c27"
+    },
+    {
+      "path": "hub/plugins/chengyuan-skill-installer/lib/index.js",
+      "source": "chengyuan-catalog:plugins/chengyuan-skill-installer/lib/index.js",
+      "inputSha256": "9e9a3611e5150d9f4a870c264c79c04acdabd71e4cab399680b84e2c6af12dd0"
+    },
+    {
+      "path": "hub/plugins/chengyuan-skill-installer/lib/install.js",
+      "source": "chengyuan-catalog:plugins/chengyuan-skill-installer/lib/install.js",
+      "inputSha256": "4e1f5bfd2a107d525646361bc1d00a39195e5ef3b30f23295c45bc7b08c4aa1a"
+    },
+    {
+      "path": "hub/plugins/chengyuan-skill-installer/package.json",
+      "source": "chengyuan-catalog:plugins/chengyuan-skill-installer/package.json",
+      "inputSha256": "c77b40e84b7ed9f44a15a517562354fc658a0fed81d1a09afa85a59ddda94126"
+    },
+    {
+      "path": "hub/plugins/chengyuan-skill-installer/test/install.test.mjs",
+      "source": "chengyuan-catalog:plugins/chengyuan-skill-installer/test/install.test.mjs",
+      "inputSha256": "1dc4055c0f50c1bb57a0fc4ac0917e694f9aaf034a6d31e8d26fb3c968f15b79"
+    },
+    {
+      "path": "hub/scripts/batch-publish-skills.sh",
+      "source": "chengyuan-catalog:scripts/batch-publish-skills.sh",
+      "inputSha256": "356d95bc79028ee4aad54751818e4e0b43cf94759cf0c55f64baf23668c1619d"
+    },
+    {
+      "path": "hub/scripts/bootstrap-docker-host.sh",
+      "source": "chengyuan-catalog:scripts/bootstrap-docker-host.sh",
+      "inputSha256": "1583a93f128ab808f1981ce07da97fbc7c3680b1cfedb6670515d1dccc089d69"
+    },
+    {
+      "path": "hub/scripts/bootstrap-docker-macos.sh",
+      "source": "chengyuan-catalog:scripts/bootstrap-docker-macos.sh",
+      "inputSha256": "76d90291ac929a413e31c7cd8c34178aa2c3aa8e713db6ab7eb662ca0e9bc8b2"
+    },
+    {
+      "path": "hub/scripts/deploy-catalog.sh",
+      "source": "chengyuan-catalog:scripts/deploy-catalog.sh",
+      "inputSha256": "19de8d2bd8e18d27dfd668124dd3fd447e039961c9d552cb9dc57880283a3d90"
+    },
+    {
+      "path": "hub/scripts/publish-plugin.sh",
+      "source": "chengyuan-catalog:scripts/publish-plugin.sh",
+      "inputSha256": "4820e2ea1fff242dbe1dea2efcc4625184ab7ea9117e303fc5f41a5e32679eff"
+    },
+    {
+      "path": "hub/scripts/publish-skill.sh",
+      "source": "chengyuan-catalog:scripts/publish-skill.sh",
+      "inputSha256": "2e35436e9bda55b8aa40750a89b0656d62235bbc2c5205369b3c28f8279f7e9d"
+    },
+    {
+      "path": "skills/chengyuan-acct-entry-coach/SKILL.md",
+      "source": "chengyuan-catalog:skills-src/chengyuan-acct-entry-coach/SKILL.md",
+      "inputSha256": "717f3e16747605f6ee9ddd9d45dec9502dac3cf9aa154023d3a775f5333da114"
+    },
+    {
+      "path": "skills/chengyuan-acct-practice-brief/SKILL.md",
+      "source": "chengyuan-catalog:skills-src/chengyuan-acct-practice-brief/SKILL.md",
+      "inputSha256": "974a80344021e5e4eed1ddaa68383b6406c471f81f945ae14bc08f4e016749d3"
+    },
+    {
+      "path": "skills/chengyuan-acct-statement-reader/SKILL.md",
+      "source": "chengyuan-catalog:skills-src/chengyuan-acct-statement-reader/SKILL.md",
+      "inputSha256": "386e84a9ed4a5504be808aa123e081c3399e609a4954b6fef42987c349d04ea1"
+    },
+    {
+      "path": "skills/chengyuan-acct-teacher-draft/SKILL.md",
+      "source": "chengyuan-catalog:skills-src/chengyuan-acct-teacher-draft/SKILL.md",
+      "inputSha256": "f70b832db9292c249bfc997ddb1e08acb8270cee9d7ba034acdcc06abefe3724"
+    },
+    {
+      "path": "skills/chengyuan-course-qa/SKILL.md",
+      "source": "chengyuan-catalog:skills-src/chengyuan-course-qa/SKILL.md",
+      "inputSha256": "f3f652e2ae91b6d991499796fc0702825525740bd7208ed22fde06aac54529b2"
+    },
+    {
+      "path": "skills/chengyuan-course-qa/sample-course-materials/01-大纲.md",
+      "source": "chengyuan-catalog:skills-src/chengyuan-course-qa/sample-course-materials/01-大纲.md",
+      "inputSha256": "463a08191228a5be9481ebb722c74a1c8b06b27d2a49e182f272590d9a477d0c"
+    },
+    {
+      "path": "skills/chengyuan-course-qa/sample-course-materials/02-讲义摘录.md",
+      "source": "chengyuan-catalog:skills-src/chengyuan-course-qa/sample-course-materials/02-讲义摘录.md",
+      "inputSha256": "a78cd2a4615038e337c83f3d9380187dec5a61957db5fdc9d324e1d8f120b68f"
+    },
+    {
+      "path": "skills/chengyuan-course-qa/sample-course-materials/03-习题.md",
+      "source": "chengyuan-catalog:skills-src/chengyuan-course-qa/sample-course-materials/03-习题.md",
+      "inputSha256": "75bc0ad8364999fcd2858400c05ecad9539afe3fc0d3b6d3087b001bedcb6e88"
+    },
+    {
+      "path": "skills/chengyuan-exam-review/SKILL.md",
+      "source": "chengyuan-catalog:skills-src/chengyuan-exam-review/SKILL.md",
+      "inputSha256": "d1183f77520e96c85ab4c04ef4030902eff57057817a2fa2a378819eab4111a7"
+    },
+    {
+      "path": "skills/chengyuan-integrity-guard/SKILL.md",
+      "source": "chengyuan-catalog:skills-src/chengyuan-integrity-guard/SKILL.md",
+      "inputSha256": "d54fcd0fac35b8c067db1f4a3ed5f1ca04726aa30e3f8f0415acf8114a9237f8"
+    },
+    {
+      "path": "skills/chengyuan-note-organizer/SKILL.md",
+      "source": "chengyuan-catalog:skills-src/chengyuan-note-organizer/SKILL.md",
+      "inputSha256": "3f626b958ba5190e56677fff06aca06fbca623ecc0d1ba4ff4f7436f1a168445"
+    },
+    {
+      "path": "skills/chengyuan-reading-outline/SKILL.md",
+      "source": "chengyuan-catalog:skills-src/chengyuan-reading-outline/SKILL.md",
+      "inputSha256": "ad3fd38f26940729bb9a2c9f564822b615fd610928b2df567fc8232f7d268770"
+    },
+    {
+      "path": "skills/chengyuan-study-coach/SKILL.md",
+      "source": "chengyuan-catalog:skills-src/chengyuan-study-coach/SKILL.md",
+      "inputSha256": "dfd2fac7624c2f46f0bdcb15c7ea475156082d538b44d023f39b7e445e42de32"
+    },
+    {
+      "path": "hub/web/index.html",
+      "source": "chengyuan-catalog:web/index.html",
+      "inputSha256": "91b0d74a1cc6bc713fc0b88ee0eb367f7dc18d5f8570acd6d827c510dbd78b9b"
+    },
+    {
+      "path": "hub/web/themes.html",
+      "source": "chengyuan-catalog:web/themes.html",
+      "inputSha256": "5e400f184335b684375419d83e7690668314334b2d478fb668406c831cec9819"
+    },
+    {
+      "path": "hub/docker-compose.yml",
+      "source": "chengyuan-catalog:docker-compose.yml",
+      "inputSha256": "f4cf0612f57b865d097474dd6c7f397b968bcf0aab4f4e9be6714bc658ac0756"
+    },
+    {
+      "path": "hub/data/catalog.json",
+      "source": "chengyuan-catalog:catalog-metadata; draft until local artifacts rebuilt",
+      "inputSha256": "4d8b293fdc659bd5685ce794c9d55c0d7412e79199b36465e6a8a8c7e14ec0db"
+    },
+    {
+      "path": "skills/qcu-document-diff/SKILL.md",
+      "source": "qcu-general-skills:skills/qcu-document-diff/SKILL.md",
+      "inputSha256": "563d65527510df8d62dfdc566b0fe7a75252d803f78f89c55b143915477133a7"
+    },
+    {
+      "path": "skills/qcu-document-diff/examples/new.md",
+      "source": "qcu-general-skills:skills/qcu-document-diff/examples/new.md",
+      "inputSha256": "4aca7189f4ca9e4c209c77bac9c7a5bc72815179f02833ac3e47a142697d9b73"
+    },
+    {
+      "path": "skills/qcu-document-diff/examples/old.md",
+      "source": "qcu-general-skills:skills/qcu-document-diff/examples/old.md",
+      "inputSha256": "755465a1ccdba7d074bcdad4f1fcc0b9a6baf3895bde726c419e0e468ac285ea"
+    },
+    {
+      "path": "skills/qcu-document-diff/scripts/compare.py",
+      "source": "qcu-general-skills:skills/qcu-document-diff/scripts/compare.py",
+      "inputSha256": "8be50ed70ccf3ba98e94c988bbd0cabaf496e0c4faf87eac8ab71f08541d24d9"
+    },
+    {
+      "path": "skills/qcu-meeting-actions/SKILL.md",
+      "source": "qcu-general-skills:skills/qcu-meeting-actions/SKILL.md",
+      "inputSha256": "da7d6231070a8439e0f0046a5eb137614a2b7844fa8b088df15db96139c12e1f"
+    },
+    {
+      "path": "skills/qcu-meeting-actions/examples/extracted.json",
+      "source": "qcu-general-skills:skills/qcu-meeting-actions/examples/extracted.json",
+      "inputSha256": "ec780a32bc6490ecf4d5e20fbadb85996a17eca2d8463ed81af012d7d92d9229"
+    },
+    {
+      "path": "skills/qcu-meeting-actions/examples/transcript.txt",
+      "source": "qcu-general-skills:skills/qcu-meeting-actions/examples/transcript.txt",
+      "inputSha256": "0a8d1581bc2c1cec7424915db666b043007ddd14f17839974aec46e67a0ccb11"
+    },
+    {
+      "path": "skills/qcu-meeting-actions/references/output-contract.md",
+      "source": "qcu-general-skills:skills/qcu-meeting-actions/references/output-contract.md",
+      "inputSha256": "84e9da37a40fe4201ec5b3f24a787c0746f5f08d344dbbc52929aaa85127d52c"
+    },
+    {
+      "path": "skills/qcu-meeting-actions/scripts/actions.py",
+      "source": "qcu-general-skills:skills/qcu-meeting-actions/scripts/actions.py",
+      "inputSha256": "47465130345c25e2bdef634a0b358b52f45baefbeffb8bc6e98646322bc9bacc"
+    },
+    {
+      "path": "skills/qcu-table-audit/SKILL.md",
+      "source": "qcu-general-skills:skills/qcu-table-audit/SKILL.md",
+      "inputSha256": "4751b6a70ae4f26609333ef08521a6018d2f14db351c3a3b2aa2b3bfade755cf"
+    },
+    {
+      "path": "skills/qcu-table-audit/examples/input.csv",
+      "source": "qcu-general-skills:skills/qcu-table-audit/examples/input.csv",
+      "inputSha256": "25304bd4e8e4353350222957967ca41907e4100a1e05a3c0b3ff6fc7088d43ee"
+    },
+    {
+      "path": "skills/qcu-table-audit/examples/rules.json",
+      "source": "qcu-general-skills:skills/qcu-table-audit/examples/rules.json",
+      "inputSha256": "0b97609070d2aa5119785d1ef26f91ef8d05ff5703d4248208b93794a8864fce"
+    },
+    {
+      "path": "skills/qcu-table-audit/scripts/audit.py",
+      "source": "qcu-general-skills:skills/qcu-table-audit/scripts/audit.py",
+      "inputSha256": "84473d6095d7ec66cdef8e67335e3d3690134606cca887ac1b56205ba0ff2808"
+    },
+    {
+      "path": "tests/test_skills.py",
+      "source": "qcu-general-skills:tests/test_skills.py",
+      "inputSha256": "fb1c7fc61bc5a4c0eb6cf0408f9f3d2a5735094a6630866dffcf61f833245a8e"
+    },
+    {
+      "path": "scripts/build-skills.py",
+      "source": "qcu-general-skills:build.py",
+      "inputSha256": "b74433e0e54390cac782c4609d7fb369ba14530d8c01c0d84dbfa9e1d4a2924a"
+    }
+  ],
+  "publicDefaultEdits": [
+    "hub/data/catalog.json",
+    "hub/packaging/install-dsh-macos.sh",
+    "hub/packaging/install-dsh-windows.ps1",
+    "hub/packaging/templates/model-config.env.example",
+    "hub/plugins/chengyuan-skill-installer/README.md",
+    "hub/plugins/chengyuan-skill-installer/cordis.patch.yml",
+    "hub/plugins/chengyuan-skill-installer/lib/config.js",
+    "hub/scripts/bootstrap-docker-macos.sh",
+    "hub/scripts/deploy-catalog.sh",
+    "hub/scripts/publish-skill.sh"
+  ],
+  "excluded": [
+    "private Library identifiers",
+    "verification logs",
+    "archive binaries",
+    "built external lib",
+    "real profiles and documents",
+    "internal team plans",
+    "dependency trees"
+  ]
+}

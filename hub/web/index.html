@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="questui">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script>
+    // Resolve before styles paint; restricted storage must not prevent catalog loading.
+    (() => {
+      let theme = "questui";
+      try {
+        const saved = localStorage.getItem("chengyuan-catalog-theme");
+        if (["questui", "neobrutal", "classic"].includes(saved)) theme = saved;
+      } catch (_) { /* Use the default when browser storage is unavailable. */ }
+      document.documentElement.dataset.theme = theme;
+    })();
+  </script>
+  <title>城院 DSH 目录站</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&amp;family=Spectral:wght@400;600;700&amp;family=Fira+Code&amp;family=Space+Grotesk:wght@500;600;700&amp;display=swap" rel="stylesheet" />
+  <style>
+    :root, html[data-theme="questui"] {
+      color-scheme: dark;
+      --bg: #1A0F0A; --panel: #2C1A10; --text: #F5E6D3; --muted: #cbb99f;
+      --accent: #CA8A04; --ok: #264832; --warn: #654508; --danger: #991B1B;
+      --rare: #581C87; --line: #74512b; --inset: #21130d; --chip: #3D2517;
+      --on-accent: #1A0F0A; --on-status: #F5E6D3; --disabled: #3D2517;
+      --hero: linear-gradient(120deg, #3D2517, #2C1A10 65%, #422516);
+      --backdrop: radial-gradient(ellipse at 50% 0%, #66401755, transparent 65%);
+      --pattern-size: auto; --border: 1px; --radius: 5px; --chip-radius: 3px;
+      --shadow: 0 8px 24px #10090488; --small-shadow: 0 3px 8px #10090466;
+      --active-bg: #3D2517; --active-text: #F5E6D3; --active-shadow: 0 0 18px #CA8A0444;
+      --focus: #eab94c; --heading: "Cinzel", "Songti SC", "Noto Serif SC", SimSun, serif;
+      --body: "Spectral", "Songti SC", "Noto Serif SC", SimSun, serif;
+      --code: "Fira Code", ui-monospace, SFMono-Regular, Menlo, monospace;
+      --tracking: 0.02em; --label-tracking: 0.09em; --card-top: #CA8A04;
+    }
+    html[data-theme="neobrutal"] {
+      color-scheme: light;
+      --bg: #f2f5f6; --panel: #ffffff; --text: #111111; --muted: #424b50;
+      --accent: #ffe566; --ok: #2dd4bf; --warn: #ffe566; --danger: #ff929c;
+      --line: #111111; --inset: #edf0f2; --chip: #edf0f2; --disabled: #e0e4e6;
+      --on-accent: #111111; --on-status: #111111; --hero: #ffe566;
+      --backdrop: linear-gradient(#1111110a 1px, transparent 1px), linear-gradient(90deg, #1111110a 1px, transparent 1px);
+      --pattern-size: 24px 24px; --border: 3px; --radius: 4px; --chip-radius: 2px;
+      --shadow: 5px 5px 0 #111; --small-shadow: 3px 3px 0 #111;
+      --active-bg: #111111; --active-text: #ffe566; --active-shadow: 3px 3px 0 #111;
+      --focus: #1559d6; --heading: "Space Grotesk", "PingFang SC", "Noto Sans SC", sans-serif;
+      --body: "Space Grotesk", "PingFang SC", "Noto Sans SC", sans-serif;
+      --tracking: -0.04em; --label-tracking: 0.04em; --card-top: #111111;
+    }
+    html[data-theme="classic"] {
+      color-scheme: dark;
+      --bg: #0f1419; --panel: #1a2332; --text: #e7ecf3; --muted: #a8b6c9;
+      --accent: #3d8bfd; --ok: #174631; --warn: #624819; --danger: #782d37;
+      --line: #334155; --inset: #101a29; --chip: #243044; --disabled: #243044;
+      --on-accent: #081527; --on-status: #e7ecf3;
+      --hero: linear-gradient(120deg, #1b3a5f, #1a2332);
+      --backdrop: radial-gradient(1200px 600px at 10% -10%, #1b3a5f, transparent 55%);
+      --pattern-size: auto; --border: 1px; --radius: 12px; --chip-radius: 999px;
+      --shadow: none; --small-shadow: none;
+      --active-bg: #203c60; --active-text: #e7ecf3; --active-shadow: none;
+      --focus: #7bb1ff; --heading: "IBM Plex Sans", "PingFang SC", "Noto Sans SC", sans-serif;
+      --body: "IBM Plex Sans", "PingFang SC", "Noto Sans SC", sans-serif;
+      --tracking: -0.02em; --label-tracking: 0; --card-top: #334155;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: var(--body);
+      background-color: var(--bg);
+      background-image: var(--backdrop);
+      background-size: var(--pattern-size);
+      color: var(--text);
+      min-height: 100vh;
+    }
+    main { max-width: 1120px; margin: 0 auto; padding: 40px 24px 64px; }
+    .hero {
+      padding: 28px 32px; margin-bottom: 24px;
+      background: var(--hero); border: var(--border) solid var(--line);
+      box-shadow: var(--shadow); border-radius: var(--radius); border-top: 3px solid var(--card-top);
+    }
+    .eyebrow {
+      display: inline-block; padding: 5px 10px; margin-bottom: 18px;
+      background: var(--active-bg); color: var(--active-text); border: 1px solid var(--line); font-size: 0.8rem;
+      font-weight: 700; letter-spacing: 0.08em;
+    }
+    h1 { font-size: clamp(2rem, 5vw, 3.6rem); line-height: 1.15; margin: 0 0 14px; letter-spacing: var(--tracking); font-weight: 700; }
+    .tagline { color: var(--text); font-size: 1.05rem; font-weight: 600; }
+    .meta {
+      display: flex; flex-wrap: wrap; gap: 12px 24px;
+      padding: 16px 20px; background: var(--panel); border: var(--border) solid var(--line);
+      color: var(--muted); font-size: 0.85rem; margin-bottom: 20px;
+      box-shadow: var(--shadow);
+    }
+    .meta > div { min-width: 0; }
+    .meta strong { color: var(--text); font-weight: 700; }
+    .hint {
+      border: 2px solid var(--line); border-left-width: 8px;
+      padding: 14px 18px; margin-bottom: 24px;
+      background: var(--panel); color: var(--muted); font-size: 0.9rem; line-height: 1.7;
+    }
+    .hint:empty { display: none; }
+    #modeHint { background: var(--inset); margin-bottom: 18px; }
+    button { font: inherit; }
+    button, a.btn { touch-action: manipulation; }
+    button:focus-visible, a:focus-visible { outline: 3px solid var(--focus); outline-offset: 5px; }
+    .tabs { display: flex; gap: 14px; margin: 32px 0 20px; }
+    .tabs button {
+      flex: 1; min-width: 0; padding: 14px; border-radius: var(--radius); cursor: pointer;
+      border: var(--border) solid var(--line); background: var(--panel); color: var(--text);
+      font-size: 1.1rem; font-weight: 700; box-shadow: var(--shadow);
+    }
+    .tabs button.active {
+      background: var(--active-bg); color: var(--active-text); border-color: var(--accent); box-shadow: var(--active-shadow);
+    }
+    .filters { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 24px; }
+    .filters button {
+      background: var(--panel); border: 2px solid var(--line); color: var(--text);
+      min-height: 44px; max-width: 100%; padding: 8px 16px; border-radius: var(--chip-radius); cursor: pointer;
+      font-weight: 600; box-shadow: var(--small-shadow);
+    }
+    .filters button.active { background: var(--active-bg); color: var(--active-text); border-color: var(--accent); box-shadow: var(--active-shadow); }
+    .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px; }
+    article {
+      display: flex; flex-direction: column; min-width: 0;
+      background: var(--panel); border-radius: var(--radius); padding: 22px;
+      border: var(--border) solid var(--line); box-shadow: var(--shadow);
+    }
+    article h2 { margin: 0 0 10px; font-size: 1.3rem; line-height: 1.4; letter-spacing: -0.02em; }
+    .row { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-bottom: 16px; }
+    .pill {
+      font-size: 0.72rem; padding: 3px 7px; border: 2px solid var(--line); border-radius: var(--chip-radius);
+      background: var(--chip); color: var(--text); font-weight: 600; max-width: 100%;
+    }
+    .pill.risk-低 { background: var(--ok); }
+    .pill.risk-中 { background: var(--warn); }
+    .pill.risk-高 { background: var(--danger); }
+    p { margin: 0; color: var(--muted); line-height: 1.7; font-size: 0.95rem; }
+    h1, h2, p, .meta, .hint, .pill, button, footer { overflow-wrap: anywhere; }
+    .notes { margin-top: 12px; font-size: 0.85rem; color: var(--muted); }
+    .cmd {
+      margin-top: 16px; padding: 12px; border-radius: var(--chip-radius);
+      background: var(--chip); border: 2px solid var(--line);
+      font-family: var(--code);
+      font-size: 0.78rem; line-height: 1.65; color: var(--text); overflow-wrap: anywhere;
+    }
+    .actions { margin-top: auto; padding-top: 20px; display: flex; gap: 12px; flex-wrap: wrap; }
+    a.btn, button.btn, span.btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      min-height: 44px; max-width: 100%; padding: 9px 12px; border-radius: var(--chip-radius);
+      background: var(--accent); color: var(--on-accent); text-decoration: none; font-size: 0.85rem; font-weight: 700;
+      border: 2px solid var(--line); cursor: pointer; box-shadow: var(--small-shadow);
+    }
+    a.btn { background: var(--ok); color: var(--on-status); }
+    span.btn.disabled, button.btn:disabled { background: var(--disabled); color: var(--muted); cursor: not-allowed; box-shadow: none; }
+    h1, h2, .eyebrow, button, a.btn { font-family: var(--heading); }
+    .hero-top { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; flex-wrap: wrap; }
+    .theme-link { color: var(--text); text-underline-offset: 5px; padding: 10px 0; }
+    .pill { text-transform: uppercase; letter-spacing: var(--label-tracking); }
+    article { border-top: 3px solid var(--card-top); }
+    .pill[class*="risk-"] { color: var(--on-status); }
+    html[data-theme="questui"] .eyebrow { background: var(--rare); color: var(--text); }
+    html[data-theme="questui"] .hint { border-left-color: var(--accent); }
+    html[data-theme="neobrutal"] .filters button.active { background: var(--ok); color: var(--text); border-color: var(--line); }
+    button, a { transition: background-color 300ms, color 300ms, box-shadow 300ms, transform 300ms; }
+    @media (prefers-reduced-motion: reduce) { button, a { transition: none; } }
+    @media (hover: hover) {
+      .tabs button:hover, .filters button:hover, a.btn:hover, button.btn:enabled:hover { transform: translate(-1px, -1px); }
+    }
+    .tabs button:active, .filters button:active, a.btn:active, button.btn:enabled:active { transform: translate(2px, 2px); box-shadow: none; }
+    footer { margin-top: 40px; padding-top: 20px; border-top: var(--border) solid var(--line); color: var(--muted); font-size: 0.85rem; line-height: 1.8; }
+    @media (max-width: 700px) {
+      main { padding: 20px 16px 40px; }
+      .hero { padding: 22px 18px; }
+      .eyebrow { letter-spacing: 0.03em; }
+      .meta { padding: 14px; gap: 10px 16px; }
+      .meta > div:first-child { flex-basis: 100%; }
+      .hint { padding: 12px; }
+      .tabs { gap: 10px; }
+      .tabs button { padding: 12px 8px; font-size: 1rem; }
+      .grid { grid-template-columns: minmax(0, 1fr); gap: 20px; }
+      article { padding: 18px 16px; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header class="hero">
+      <div class="hero-top">
+        <div class="eyebrow">校内 Skill 市场 / CAMPUS PICKS</div>
+        <a class="theme-link" href="themes.html">主题 / Themes →</a>
+      </div>
+      <h1 id="title">城院 DSH 目录站</h1>
+      <p class="tagline" id="tagline">不追求全，只追求值得装</p>
+    </header>
+    <div class="meta">
+      <div>兼容 DSH：<strong id="compat">—</strong></div>
+      <div>更新：<strong id="updated">—</strong></div>
+      <div>技能：<strong id="skillCount">0</strong></div>
+      <div>插件：<strong id="pluginCount">0</strong></div>
+    </div>
+    <div class="hint" id="hint"></div>
+    <div class="tabs" role="group" aria-label="目录类型">
+      <button type="button" class="active" data-tab="skills" id="tab-skills" aria-pressed="true" aria-controls="list">技能 Skill</button>
+      <button type="button" data-tab="plugins" id="tab-plugins" aria-pressed="false" aria-controls="list">插件 Plugin</button>
+    </div>
+    <div class="hint" id="modeHint"></div>
+    <div class="filters" id="filters" role="group" aria-label="分类筛选"></div>
+    <div class="grid" id="list"></div>
+    <footer>研发中心精选上传 · 技能与插件安装通道不同 · 模型密钥请自备</footer>
+  </main>
+  <script>
+    async function main() {
+      const res = await fetch("./catalog.json", { cache: "no-store" });
+      const data = await res.json();
+      document.getElementById("title").textContent = data.title || "城院 DSH 目录站";
+      document.getElementById("tagline").textContent = data.tagline || "";
+      document.getElementById("compat").textContent = data.compatible_dsh || "—";
+      document.getElementById("updated").textContent = data.updated_at || "—";
+      document.getElementById("hint").textContent = data.install_hint || "";
+
+      const skills = data.skills || [];
+      const plugins = data.plugins || [];
+      document.getElementById("skillCount").textContent = String(skills.length);
+      document.getElementById("pluginCount").textContent = String(plugins.length);
+
+      let tab = "skills";
+      let active = "全部";
+      const filters = document.getElementById("filters");
+      const list = document.getElementById("list");
+      const modeHint = document.getElementById("modeHint");
+
+      function currentItems() {
+        return tab === "skills" ? skills : plugins;
+      }
+
+      function copyText(text, btn) {
+        navigator.clipboard.writeText(text).then(() => {
+          const old = btn.textContent;
+          btn.textContent = "已复制";
+          setTimeout(() => { btn.textContent = old; }, 1200);
+        }).catch(() => {
+          prompt("复制下面命令：", text);
+        });
+      }
+
+      function render() {
+        const items = currentItems();
+        modeHint.textContent = tab === "skills"
+          ? (data.skill_hint || "")
+          : (data.plugin_hint || "");
+
+        const cats = ["全部", ...Array.from(new Set(items.map(s => s.category).filter(Boolean)))];
+        if (!cats.includes(active)) active = "全部";
+
+        filters.innerHTML = "";
+        cats.forEach(c => {
+          const b = document.createElement("button");
+          b.textContent = c;
+          b.className = c === active ? "active" : "";
+          b.type = "button";
+          b.setAttribute("aria-pressed", String(c === active));
+          b.onclick = () => {
+            active = c;
+            render();
+            Array.from(filters.children).find(button => button.textContent === c)?.focus();
+          };
+          filters.appendChild(b);
+        });
+
+        list.innerHTML = "";
+        items.filter(s => active === "全部" || s.category === active).forEach(s => {
+          const el = document.createElement("article");
+          const canDownload = s.file && s.status === "published";
+          const installCmd = tab === "skills"
+            ? `node bin/chengyuan-skill.js install ${s.id}`
+            : (s.install || "");
+
+          const row = document.createElement("div");
+          row.className = "row";
+          row.innerHTML = `
+            <span class="pill">${s.category || "—"}</span>
+            <span class="pill risk-${s.risk || ""}">风险 ${s.risk || "—"}</span>
+            <span class="pill">v${s.version || "?"}</span>
+            <span class="pill">${s.status || "planned"}</span>`;
+          el.appendChild(row);
+
+          const h2 = document.createElement("h2");
+          h2.textContent = s.name || "";
+          el.appendChild(h2);
+
+          const summary = document.createElement("p");
+          summary.textContent = s.summary || "";
+          el.appendChild(summary);
+
+          if (tab === "plugins" && s.notes) {
+            const notes = document.createElement("p");
+            notes.className = "notes";
+            notes.textContent = s.notes;
+            el.appendChild(notes);
+          }
+
+          if (installCmd) {
+            const cmd = document.createElement("div");
+            cmd.className = "cmd";
+            cmd.textContent = installCmd;
+            el.appendChild(cmd);
+          }
+          if (tab === "plugins" && s.cli_alt) {
+            const alt = document.createElement("div");
+            alt.className = "cmd";
+            alt.textContent = s.cli_alt;
+            el.appendChild(alt);
+          }
+
+          const actions = document.createElement("div");
+          actions.className = "actions";
+          if (tab === "skills") {
+            if (canDownload) {
+              const a = document.createElement("a");
+              a.className = "btn";
+              a.href = `./skills/${s.file}`;
+              a.textContent = "下载 zip";
+              actions.appendChild(a);
+            } else {
+              const span = document.createElement("span");
+              span.className = "btn disabled";
+              span.textContent = "待发布";
+              actions.appendChild(span);
+            }
+          } else if (tab === "plugins" && canDownload) {
+            const a = document.createElement("a");
+            a.className = "btn";
+            a.href = `./plugins/${s.file}`;
+            a.textContent = "下载插件包";
+            actions.appendChild(a);
+          }
+          if (installCmd) {
+            const btn = document.createElement("button");
+            btn.type = "button";
+            btn.className = "btn";
+            btn.textContent = tab === "skills" ? "复制安装命令" : "复制安装命令";
+            btn.addEventListener("click", () => copyText(installCmd, btn));
+            actions.appendChild(btn);
+          } else if (tab === "plugins") {
+            const span = document.createElement("span");
+            span.className = "btn disabled";
+            span.textContent = "无安装命令";
+            actions.appendChild(span);
+          }
+          el.appendChild(actions);
+          list.appendChild(el);
+        });
+      }
+
+      document.querySelectorAll(".tabs button").forEach(btn => {
+        btn.addEventListener("click", () => {
+          tab = btn.dataset.tab;
+          document.querySelectorAll(".tabs button").forEach(b => {
+            b.classList.toggle("active", b === btn);
+            b.setAttribute("aria-pressed", String(b === btn));
+          });
+          active = "全部";
+          render();
+        });
+      });
+
+      render();
+    }
+    main().catch(err => {
+      document.getElementById("hint").textContent = "无法加载 catalog.json：" + err;
+    });
+  </script>
+</body>
+</html>

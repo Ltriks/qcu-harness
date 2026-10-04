@@ -1,0 +1,15 @@
+.qcu-entry { display: inline-flex; align-items: center; gap: 8px; }
+.qcu-entry-button { box-sizing: border-box; display: inline-flex; align-items: center; justify-content: center; gap: 4px; height: 28px; padding: 0 10px; border: 0.5px solid var(--dsw-alias-border-l3); border-radius: var(--dsw-radius-sm); color: var(--dsw-alias-label-primary); background: transparent; font: inherit; font-size: 12px; line-height: 18px; font-weight: 400; cursor: pointer; -webkit-app-region: no-drag; }
+.qcu-entry-button:hover:not(:disabled) { background: var(--dsw-alias-interactive-bg-hover); }
+.qcu-entry-button:focus-visible { outline: 2px solid var(--dsw-alias-label-primary); outline-offset: 2px; }
+.qcu-entry-button:disabled { opacity: 0.5; cursor: not-allowed; }
+.qcu-entry-error { color: var(--dsw-alias-label-primary); font-size: 12px; }
+.qcu-panel { box-sizing: border-box; position: fixed; inset: max(24px, var(--dsh-frame-overlay-top, 24px)) 24px 24px; width: auto; height: auto; max-width: none; max-height: none; margin: 0; padding: 0; border: 0.5px solid var(--dsw-alias-border-l3); border-radius: var(--dsw-radius-panel); color: var(--dsw-alias-label-primary); background: var(--dsw-alias-bg-layer-2); }
+.qcu-panel[open] { display: flex; flex-direction: column; }
+.qcu-panel::backdrop { background: var(--dsw-alias-bg-mask-1); }
+.qcu-panel-header { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 12px; }
+.qcu-panel-title { flex: 1; margin: 0; font-size: 14px; font-weight: 500; }
+.qcu-panel-note { margin: 0; padding: 0 12px 12px; font-size: 12px; }
+.qcu-panel-view { flex: 1; min-width: 1px; min-height: 1px; margin: 0 12px 12px; }
+.qcu-panel-status { padding: 12px; font-size: 13px; }
+@media (max-width: 480px) { .qcu-panel { left: 8px; right: 8px; bottom: 8px; } }
