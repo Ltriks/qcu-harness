@@ -46,7 +46,8 @@ function fakeSession() {
     setDisplayMediaRequestHandler: vi.fn<(handler: (request: unknown, callback: (streams: object) => void) => void) => void>(),
     webRequest: { onBeforeRequest: vi.fn<(
       handler: (details: RequestDetails, callback: (response: { cancel: boolean }) => void) => void,
-    ) => void>(), onHeadersReceived: vi.fn<(
+    ) => void>(), onBeforeSendHeaders: vi.fn(),
+      onHeadersReceived: vi.fn<(
       handler: (details: { statusCode: number }, callback: (response: { cancel: boolean }) => void) => void,
     ) => void>() },
     closeAllConnections: vi.fn(async () => {}), clearStorageData: vi.fn(async () => {}),
@@ -779,5 +780,33 @@ describe('QCU cancelled-save retry', () => {
     expect(onError).not.toHaveBeenCalled();
     await panel.close(owner, first);
     expect(firstSave.cancel).not.toHaveBeenCalled(); expect(retry.cancel).not.toHaveBeenCalled();
+  });
+});
+
+
+describe('QCU fixed conversation handoff request scope', () => {
+  it('attaches only the owned occurrence digest and strips page-authored scope headers', async () => {
+    const tag='a'.repeat(64);
+    await panel.open(owner,qcuContextId(`scope_${tag}_opaque-random`),bounds);
+    const contents=views[0]!.webContents;
+    const handler=browserSession.webRequest.onBeforeSendHeaders.mock.calls[0]![0]!;
+    const callback=vi.fn();
+    handler({url:`${origin}/api/task/latest`,webContentsId:contents.id,frame:contents.mainFrame,requestHeaders:{'x-qcu-task-session':'forged','Accept':'application/json'}},callback);
+    expect(callback).toHaveBeenCalledWith({requestHeaders:{Accept:'application/json','X-QCU-Task-Session':tag}});
+    const foreign=vi.fn();handler({url:`${origin}/api/task/latest`,webContentsId:99999,frame:contents.mainFrame,requestHeaders:{}},foreign);
+    expect(foreign).toHaveBeenCalledWith({cancel:true});
+    const external=vi.fn();handler({url:'https://example.com/',webContentsId:contents.id,frame:contents.mainFrame,requestHeaders:{}},external);
+    expect(external).toHaveBeenCalledWith({cancel:true});
+    const child=vi.fn();handler({url:`${origin}/api/task/latest`,webContentsId:contents.id,frame:{},requestHeaders:{}},child);
+    expect(child).toHaveBeenCalledWith({cancel:true});
+    await panel.close(owner,qcuContextId(`scope_${tag}_opaque-random`));
+    const stale=vi.fn();handler({url:`${origin}/api/task/latest`,webContentsId:contents.id,frame:contents.mainFrame,requestHeaders:{}},stale);
+    expect(stale).toHaveBeenCalledWith({cancel:true});
+  });
+  it('does not give unscoped predecessor occurrences a conversation result namespace', async () => {
+    await panel.open(owner,first,bounds);const contents=views[0]!.webContents;
+    const handler=browserSession.webRequest.onBeforeSendHeaders.mock.calls[0]![0]!;const callback=vi.fn();
+    handler({url:`${origin}/api/task/latest`,webContentsId:contents.id,frame:contents.mainFrame,requestHeaders:{'X-QCU-Task-Session':'forged'}},callback);
+    expect(callback).toHaveBeenCalledWith({requestHeaders:{}});
   });
 });

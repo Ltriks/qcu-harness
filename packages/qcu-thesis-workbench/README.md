@@ -10,9 +10,9 @@ Installing this bundle alone in ordinary DSH or CLI does not create that lifetim
 
 ## Dedicated profile requirement
 
-The bundle patch preserves all 28 original disabled-plugin policy rows, native tool presentation, the QCU preset, and the original r5 persona. This includes local file-reference resolution, attachment/reference UI, workspace files, terminals, plugin-manager surfaces, dynamic Cordis runners, telemetry, and default presets. This bundle retains the original global restriction to `qcu_thesis_open` and `qcu_thesis_check`. Install it only in a dedicated QCU profile. It deliberately blocks unrelated tools and DSH attachment admission; it is not an unrestricted office-profile add-on. Removing or unloading the bundle removes its own guards. The supported QCU Office launcher independently retains its exact two-name tool restriction, attachment denial, and fixed disabled rows; ordinary standalone DSH lacks that protection.
+The bundle patch preserves all 28 original disabled-plugin policy rows, native tool presentation, the QCU preset, and the QCU persona with native-panel guidance. This includes local file-reference resolution, attachment/reference UI, workspace files, terminals, plugin-manager surfaces, dynamic Cordis runners, telemetry, and default presets. This bundle retains the original global restriction to `qcu_thesis_open` and `qcu_thesis_check`. Install it only in a dedicated QCU profile. It deliberately blocks unrelated tools and DSH attachment admission; it is not an unrestricted office-profile add-on. Removing or unloading the bundle removes its own guards. The supported QCU Office launcher independently retains its exact two-name tool restriction, attachment denial, and fixed disabled rows; ordinary standalone DSH lacks that protection.
 
-The original `plugin/index.js` is copied byte-for-byte. Its two tool definitions, attachment checks, execution guard, and bounded model-visible results are unchanged. A Host admission guard also denies every tool while the local service is starting, stopped, or failed. Missing and invalid configuration, missing Python, startup failure, and later service failure leave both guards installed and produce only a fixed unavailable diagnostic.
+The two tool names, input schemas, attachment checks and execution guard are retained. Results now contain bounded counts and native-panel guidance instead of local URLs. Conversation checks obtain their scope from the official execution context, and the native panel retrieves only the matching authorized result. A Host admission guard also denies every tool while the local service is starting, stopped, or failed. Missing and invalid configuration, missing Python, startup failure, and later service failure leave both guards installed and produce only a fixed unavailable diagnostic.
 
 ## Explicit local runtime configuration
 
@@ -24,7 +24,7 @@ A resolved Cordis `fiber.dispose()` alone does not prove that native cleanup suc
 
 ## Local document privacy
 
-`runtime`, `rules`, the legacy tool plugin, packaged skill and native task-panel resources retain candidate bytes; the three legacy web files incorporate the reviewed Mac completion-feedback fix; `RESOURCE-SHA256.json` records their bytes. The local task panel keeps DOCX input, filenames, consent, detailed results, and reports inside the private local service. Its `local_task` grant is rejected by `/bridge/run` even if a caller knows the document ID. The Host never registers a publicClient/RPC endpoint for the native task surface and never serializes a service URL, bridge token, or document bytes to that surface.
+The runtime, tool plugin, packaged Skill and native task-panel resources include the reviewed saving and conversation-handoff changes; demo rules remain demo rules. `RESOURCE-SHA256.json` records the current resource bytes. The local task panel keeps DOCX input, filenames, consent, detailed results, and reports inside the private local service. Its `local_task` grant is rejected by `/bridge/run` even if a caller knows the document ID. The Host never registers a publicClient/RPC endpoint for the native task surface and never serializes a service URL, bridge token, or document bytes to that surface.
 
 The packaged `qcu-thesis-format-check` skill describes the separate, legacy two-tool workflow. It requires the user to authorize a document for the conversation and supply its identifiers. This is not the new local task-panel workflow, and local task selection never supplies those identifiers to a model. Skill discovery uses the official `skill-filesystem` provider with a package-specific provider name, `includeDefaultRoots: false`, the package's bundled root, and filesystem watching disabled. Unload removes the provider.
 
@@ -42,11 +42,11 @@ Run `npm run typecheck:host` and `npm run test:host` for the Host and process-ow
 
 ## Model experience
 
-The two tool names and input schemas are retained. Their outputs now contain only readiness/counts and fixed native-panel guidance: local workbench/report URLs are no longer model-facing results. The native control-channel target is never added to those outputs; No download URL is supplied to chat. No new model calls, prompt transcript fields, document excerpts, or token/KV-cache behavior are introduced. Skill loading follows the official mechanism.
+The two tool names and input schemas are retained. Their outputs now contain only readiness/counts and fixed native-panel guidance: local workbench/report URLs are no longer model-facing results. The native control-channel target is never added to those outputs. No download URL is supplied to chat. No new model calls, prompt transcript fields, document excerpts, or token/KV-cache behavior are introduced. Skill loading follows the official mechanism.
 
 ## Known limitations and deferred work
 
-The fixed companion Electron adapter and private IPC are implemented in the migration source; native GUI and real desktop/macOS acceptance remain separate. Availability stays false without that exact active binding. This is a private development package, not a published package or a claim of compatibility beyond the pinned official baseline. The original local runtime's report engine and privacy policy remain its own responsibility and are preserved unchanged here.
+The fixed companion Electron adapter and private IPC are implemented in the migration source; native GUI and real desktop/macOS acceptance remain separate. Availability stays false without that exact active binding. This is a private development package, not a published package or a claim of compatibility beyond the pinned official baseline. Runtime, tool, and Skill bytes have changed for report saving and scoped result handoff; their resource manifest must match the final candidate rather than the historical bundle.
 
 ## Trust and audit boundary
 

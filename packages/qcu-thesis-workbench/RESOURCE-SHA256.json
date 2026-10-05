@@ -1,14 +1,14 @@
 {
-  "plugin/index.js": "2621d474bb97655ee8288af5e9a5d721ad09d496cefa97a3c5bb4e8ec8e64187",
+  "plugin/index.js": "c6d59c53c76126b4b7079063e865e257a126545f20c36edf1aac30043e3fbf31",
   "rules/demo.json": "94dcd86228b78fb75908f89ab26e9104ea25c5419482eebd59b8c2210b79cb5b",
   "runtime/engine.py": "96b49a4dc6ab257f6bd94fbd9145276fd30b9cf2ba1172532ee4ab0fdb8d1601",
   "runtime/parent_lifetime.py": "21af20e2f08384060f3aa52293fc9234c2d807627a1b20627d2cff1a74317c68",
-  "runtime/server.py": "6ef1bd732e9468786603de503c8519f816bdf1c1237e6640365c6a0f5d65b9a0",
-  "skills/qcu-thesis-format-check/SKILL.md": "485264544d676e0edd5aba370f9ec4d37983b657df10b669023598ba8b2c91ef",
+  "runtime/server.py": "258e36419b38b3f28de378b9cd55822aadf3c12ca7ff3bccdcd7e1e4b9d84295",
+  "skills/qcu-thesis-format-check/SKILL.md": "a19c6703a21555cc5c7953453d3fd78797f98188d33f2a540390a94e97c8cc82",
   "web/app.css": "c4830357290940d343ea62ac5de3bb179a2dc74fac4f336ba3a36a16ca34ffc0",
   "web/app.js": "a64f7dea52c2dc49540716c52781a7a1b27dac5db1da963ae8b82b8f10927595",
   "web/index.html": "3c094047bb75683ad36d9f0c151c4d784f91f88db8fbbfe79e57f4381e63aa05",
   "web/task-panel.css": "805b4947f8b98875400a69ec4c5d4e7f519939c7656ed35e4d895c175c9a4e44",
-  "web/task-panel.html": "d8b877745ac5421f257eb0ddae0d44bc819a77564bb4e80afdeb15d410ac81d5",
-  "web/task-panel.js": "85f6a153ba78fc1b7fa3c4d3b0d29cb486d242f72c155944c509eab6c1189292"
+  "web/task-panel.html": "117faa07b17ce264f6cbe914534e73cce59d13583018df32794e799fd9df833e",
+  "web/task-panel.js": "c161b4bc1ecc268205f10e674d9b5d2bc74bc38ab4812c8886660094aebc008f"
 }

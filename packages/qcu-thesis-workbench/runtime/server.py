@@ -29,9 +29,10 @@ class Store:
     def __init__(self, home):
         self.home = Path(home).resolve()
         self.home.mkdir(parents=True, exist_ok=True, mode=0o700)
-        for folder in ('documents', 'reports', 'rules'):
+        for folder in ('documents', 'reports', 'rules', 'handoffs'):
             (self.home / folder).mkdir(exist_ok=True, mode=0o700)
         self.lock = threading.RLock()
+        self.completion_order = 0
 
     def path(self, folder, ident, suffix):
         if not isinstance(ident, str) or not ID.fullmatch(ident):
@@ -72,21 +73,57 @@ class Store:
                             **({'local_task': True} if local_task else {})))
         return dict(document_id=ident, overview=doc.overview(), chat_allowed=chat_allowed)
 
-    def run(self, document_id, rule_id, bridge=False):
+    def run(self, document_id, rule_id, bridge=False, session_tag=None):
         source = self.path('documents', document_id, '.docx')
         if not source.exists():
             raise InputError('文档编号不存在，请先在本机页面选择论文。')
         if bridge:
-            grant = json.loads(self.path('documents', document_id, '.json').read_text(encoding='utf-8'))
-            if grant.get('local_task') or not grant['chat_allowed'] or grant['expires'] < time.time():
-                raise InputError('该文档未授权对话检查或授权已过期，请在本机页面重新选择。')
+            if not isinstance(session_tag, str) or not re.fullmatch(r'[0-9a-f]{64}', session_tag):
+                raise InputError('对话检查缺少会话范围。')
+            with self.lock:
+                grant = json.loads(self.path('documents', document_id, '.json').read_text(encoding='utf-8'))
+                if (grant.get('local_task') or not grant.get('chat_allowed') or grant.get('expires', 0) < time.time()
+                        or grant.get('chat_session_tag', session_tag) != session_tag):
+                    raise InputError('该文档未授权当前对话检查或授权已过期，请在本机页面重新选择。')
+                grant['chat_session_tag'] = session_tag
+                self.path('documents', document_id, '.json').write_text(json.dumps(grant), encoding='utf-8')
         result = check(source.read_bytes(), self.rule(rule_id))
         report_id = secrets.token_hex(16)
         with self.lock:
+            self.completion_order = max(self.completion_order + 1, time.time_ns() // 1000000)
+            completed_at = self.completion_order
             write_json(self.path('reports', report_id, '.json'), result)
             self.path('reports', report_id, '.html').write_text(report_html(result, report_id), encoding='utf-8')
+            if bridge:
+                access = dict(session_tag=session_tag, document_id=document_id)
+                write_json(self.path('reports', report_id, '.access.json'), access)
+                summary = dict(report_id=report_id, counts=result['counts'], rule_source=result['rule']['source'], status='completed', completed_at=completed_at)
+                self.path('handoffs', session_tag, '.json').write_text(json.dumps({**access, **summary}), encoding='utf-8')
         # Only this bounded projection is allowed across the model-facing bridge.
-        return dict(report_id=report_id, counts=result['counts'], rule_source=result['rule']['source'], status='completed')
+        return dict(report_id=report_id, counts=result['counts'], rule_source=result['rule']['source'], status='completed', completed_at=completed_at)
+
+    def handoff_authorized(self, access, session_tag):
+        if not isinstance(session_tag, str) or not re.fullmatch(r'[0-9a-f]{64}', session_tag):
+            return False
+        try:
+            grant = json.loads(self.path('documents', access['document_id'], '.json').read_text(encoding='utf-8'))
+            return (access['session_tag'] == session_tag == grant.get('chat_session_tag')
+                    and grant.get('chat_allowed') is True and not grant.get('local_task')
+                    and grant.get('expires', 0) > time.time())
+        except (OSError, KeyError, ValueError, TypeError):
+            return False
+
+    def latest_handoff(self, session_tag):
+        if not isinstance(session_tag, str) or not re.fullmatch(r'[0-9a-f]{64}', session_tag):
+            raise InputError('当前页面没有对话结果范围。')
+        with self.lock:
+            path = self.path('handoffs', session_tag, '.json')
+            if not path.exists():
+                return dict(status='empty')
+            value = json.loads(path.read_text(encoding='utf-8'))
+            if not self.handoff_authorized(value, session_tag):
+                return dict(status='empty')
+            return {key: value[key] for key in ('status', 'report_id', 'counts', 'rule_source', 'completed_at')}
 
     def run_task(self, document_id, rule_id):
         if not isinstance(document_id, str) or not re.fullmatch(r'[0-9a-f]{32}', document_id):
@@ -157,8 +194,19 @@ def create_server(home, port=0):
             try:
                 if route == '/api/rules':
                     return self.send(200, store.rules())
+                if route == '/api/task/latest':
+                    scope = self.headers.get('X-QCU-Task-Session')
+                    if not scope or not re.fullmatch(r'[0-9a-f]{64}', scope):
+                        return self.send(403, {'error': '当前页面没有对话结果范围。'})
+                    value = store.latest_handoff(scope)
+                    if value['status'] == 'completed':
+                        value['report_url'] = '/reports/' + value['report_id']
+                    return self.send(200, value)
                 match = re.fullmatch(r'/reports/([0-9a-f]{32})(/download)?', route)
                 if match:
+                    access = store.path('reports', match[1], '.access.json')
+                    if access.exists() and not store.handoff_authorized(json.loads(access.read_text(encoding='utf-8')), self.headers.get('X-QCU-Task-Session')):
+                        return self.send(403, {'error': '该报告未授权当前对话面板。'})
                     page = store.path('reports', match[1], '.html').read_bytes()
                     # Older saved reports remain intact; add the online save control only to their viewing response.
                     if not match[2] and b'class="report-actions"' not in page:
@@ -217,9 +265,9 @@ def create_server(home, port=0):
                     result['report_url'] = '/reports/' + result['report_id']
                     return self.send(200, result)
                 if route in ('/api/run', '/bridge/run'):
-                    if not isinstance(data, dict) or set(data) != {'document_id', 'rule_id'}:
+                    if not isinstance(data, dict) or set(data) != ({'document_id', 'rule_id', 'session_tag'} if bridge else {'document_id', 'rule_id'}):
                         raise InputError('仅接受文档编号和规则编号。')
-                    result = store.run(data['document_id'], data['rule_id'], bridge)
+                    result = store.run(data['document_id'], data['rule_id'], bridge, data.get('session_tag'))
                     result['report_url'] = self.origin + '/reports/' + result['report_id']
                     return self.send(200, result)
                 return self.send(404, {'error': '没有此入口。'})

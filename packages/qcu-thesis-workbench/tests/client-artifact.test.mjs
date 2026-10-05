@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict'
 import { readFile } from 'node:fs/promises'
 import { test } from 'node:test'
+import { createHash, randomUUID } from 'node:crypto'
 import { JSDOM } from 'jsdom'
 import * as React from 'react'
 import { createRoot } from 'react-dom/client'
@@ -20,6 +21,8 @@ dom.window.HTMLDialogElement.prototype.close = function () { this.removeAttribut
 dom.window.HTMLElement.prototype.getBoundingClientRect = function () {
   return { x: 24, y: 140, width: 752, height: 460, top: 140, left: 24, right: 776, bottom: 600 }
 }
+// Keep React scheduling deterministic while using the standard SHA-256 implementation.
+Object.defineProperty(globalThis, 'crypto', {configurable: true, value:{randomUUID,subtle:{digest:async (_algorithm,bytes)=>Uint8Array.from(createHash('sha256').update(bytes).digest()).buffer}}})
 const { act } = React
 function deferred() { let resolve; const promise = new Promise(done => { resolve = done }); return { promise, resolve } }
 function materialize() {
@@ -211,7 +214,7 @@ test('real artifact requires an explicit click, suppresses duplicates, and sends
   await act(async () => { button('Thesis check').click(); button('Thesis check').click() })
   assert.equal(b.calls.filter(call => call[0] === 'open').length, 1)
   const open = b.calls[0]
-  assert.match(open[1], /^[0-9a-f-]{36}$/)
+  assert.match(open[1], /^scope_[0-9a-f]{64}_[0-9a-f-]{36}$/)
   assert.deepEqual(open[2], { x: 24, y: 140, width: 752, height: 460 })
   assert.equal(JSON.stringify(b.calls).includes('synthetic-session'), false)
   assert.equal(document.querySelector('[data-qcu-native-placeholder]').textContent, '')

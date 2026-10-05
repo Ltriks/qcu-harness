@@ -1,4 +1,4 @@
-/** Ephemeral native-view ownership; it never receives document or Session data. */
+/** Ephemeral native-view ownership; it never receives document content; an optional Session identity is hashed locally. */
 import { qcuContextId } from '../native-contract.ts'
 import type { QcuBounds, QcuContextId, QcuNativeBridge } from '../native-contract.ts'
 
@@ -10,7 +10,7 @@ export interface QcuEntryState {
 }
 
 interface Occurrence {
-  readonly id: QcuContextId
+  id: QcuContextId
   bounds: QcuBounds
   requested: boolean
 }
@@ -33,6 +33,7 @@ export class QcuPanelController {
     private readonly bridge: QcuNativeBridge | undefined,
     private readonly changed: (state: QcuEntryState) => void,
     private readonly createId: () => string = () => crypto.randomUUID(),
+    private readonly sessionKey?: string,
   ) {}
 
   /** @returns A stable snapshot until presentation state changes. */
@@ -87,6 +88,13 @@ export class QcuPanelController {
         this.active = undefined
         this.update({ availability: 'unavailable', phase: 'idle' })
         return
+      }
+      if (this.sessionKey !== undefined) {
+        if (!this.sessionKey || this.sessionKey.length > 256) throw new Error('Invalid QCU session')
+        const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(this.sessionKey))
+        if (this.active !== occurrence || this.disposed) return
+        const tag = Array.from(new Uint8Array(digest), value => value.toString(16).padStart(2, '0')).join('')
+        occurrence.id = qcuContextId(`scope_${tag}_${occurrence.id}`)
       }
       occurrence.requested = true
       await bridge.open(occurrence.id, occurrence.bounds)

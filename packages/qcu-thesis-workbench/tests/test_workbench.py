@@ -60,13 +60,13 @@ class ServerTests(unittest.TestCase):
         for allowed in [False,True]:
             doc=json.loads(self.req('/api/upload',fixture(),{'Content-Type':'application/octet-stream','X-QCU-Chat-Allowed':str(allowed).lower()})[0])
             args={'document_id':doc['document_id'],'rule_id':RULE['id']}
-            hdr={'X-QCU-Bridge':self.server.bridge['token']}
+            hdr={'X-QCU-Bridge':self.server.bridge['token'],'X-QCU-Task-Session':'a'*64}
             if not allowed:
-                with self.assertRaises(HTTPError):self.req('/bridge/run',args,hdr)
+                with self.assertRaises(HTTPError):self.req('/bridge/run',{**args,'session_tag':'a'*64},hdr)
                 continue
-            raw,_=self.req('/bridge/run',args,hdr);self.assertNotIn(b'CANARY',raw)
+            raw,_=self.req('/bridge/run',{**args,'session_tag':'a'*64},hdr);self.assertNotIn(b'CANARY',raw)
             result=json.loads(raw);local=json.loads(self.req('/api/run',args)[0]);self.assertEqual(result['counts'],local['counts'])
-            html,headers=self.req('/reports/'+result['report_id']+'/download');self.assertIn('attachment',headers['Content-Disposition'])
+            html,headers=self.req('/reports/'+result['report_id']+'/download',headers={'X-QCU-Task-Session':'a'*64});self.assertIn('attachment',headers['Content-Disposition'])
             self.assertIn(b'QCU',html)
     def test_report_save_route_is_present_and_repeatable(self):
         doc=json.loads(self.req("/api/task/upload",fixture(),{"Content-Type":"application/octet-stream"})[0])

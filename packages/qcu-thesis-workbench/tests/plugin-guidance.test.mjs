@@ -25,7 +25,7 @@ test('local tools give panel guidance without exposing report origins or downloa
     const opened = await rows.get('qcu_thesis_open').execute({});
     assert.equal(opened.workbench_access, 'native-panel');
     assert.equal(calls, 0);
-    const checked = await rows.get('qcu_thesis_check').execute({document_id: 'b'.repeat(32), rule_id: 'demo'});
+    const checked = await rows.get('qcu_thesis_check').execute({document_id: 'b'.repeat(32), rule_id: 'demo'}, {agent:{session:{id:'synthetic-conversation-a'}}});
     assert.equal(checked.report_access, 'native-panel');
     assert.deepEqual(checked.counts, {passed: 1, failed: 0, unknown: 2});
     for (const output of [opened, checked]) {

@@ -1,5 +1,6 @@
 import {readFile} from 'node:fs/promises';
 import {isAbsolute} from 'node:path';
+import {createHash} from 'node:crypto';
 export const name='qcu-thesis-workbench';
 export const inject=['tools'];
 const names=['qcu_thesis_open','qcu_thesis_check'];
@@ -50,6 +51,9 @@ export function apply(ctx,config={}){
       const b=await bridge();
       if(disposed||exec.signal?.aborted)throw new Error('Cancelled');
       if(!check)return {status:'ready',workbench_access:'native-panel',message:'请打开对话顶部“工具”中的“论文检查”面板选择文档和规则。'};
+      const sessionId=exec.agent?.session?.id;
+      if(typeof sessionId!=='string'||!sessionId||sessionId.length>256)throw new Error('Missing conversation scope');
+      const session_tag=createHash('sha256').update(sessionId).digest('hex');
       const abort=new AbortController();
       active.add(abort);
       const cancel=()=>abort.abort();
@@ -57,13 +61,13 @@ export function apply(ctx,config={}){
       exec.signal?.addEventListener('abort',cancel,{once:true});
       const timer=setTimeout(cancel,30000);
       try{
-        const response=await fetch(b.base_url+'/bridge/run',{method:'POST',redirect:'error',signal:abort.signal,headers:{'Content-Type':'application/json','X-QCU-Bridge':b.token},body:JSON.stringify(args)});
+        const response=await fetch(b.base_url+'/bridge/run',{method:'POST',redirect:'error',signal:abort.signal,headers:{'Content-Type':'application/json','X-QCU-Bridge':b.token},body:JSON.stringify({...args,session_tag})});
         if(!response.ok)throw new Error('Request failed');
         const value=await response.json();
         if(disposed||abort.signal.aborted)throw new Error('Cancelled');
         if(!/^[0-9a-f]{32}$/.test(value.report_id)||!['demo','personal','center'].includes(value.rule_source)||!['passed','failed','unknown'].every(k=>Number.isSafeInteger(value.counts?.[k])&&value.counts[k]>=0))throw new Error('Invalid response');
         // Reconstruct an allowlist: never forward excerpts, errors, tokens or paths.
-        return {status:'completed',report_access:'native-panel',message:'请在“论文检查”面板查看完整报告，进入报告后点击“保存 HTML 报告”；取消后可再次保存。不要把本机报告或下载地址写成聊天链接。',rule_source:value.rule_source,counts:Object.fromEntries(['passed','failed','unknown'].map(k=>[k,value.counts[k]]))};
+        return {status:'completed',report_access:'native-panel',message:'请在“论文检查”面板查看完整报告，若面板已打开，先点击“刷新对话检查结果”；进入报告后点击“保存 HTML 报告”；取消后可再次保存。不要把本机报告或下载地址写成聊天链接。',rule_source:value.rule_source,counts:Object.fromEntries(['passed','failed','unknown'].map(k=>[k,value.counts[k]]))};
       }finally{active.delete(abort);clearTimeout(timer);exec.signal?.removeEventListener('abort',cancel);}
     }catch{return {status:'unavailable',message:'请在本机页面确认服务、文档授权及规则；正文和详细错误不会传入对话。'};}
   }

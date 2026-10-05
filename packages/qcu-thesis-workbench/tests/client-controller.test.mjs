@@ -227,3 +227,14 @@ test('a late failed cleanup retires a newer occurrence instead of leaving a usab
   assert.ok(f.calls.some(call => call[0] === 'close' && call[1] === 'opaque-2'))
   assert.deepEqual(f.controller.getSnapshot(), { availability: 'unavailable', phase: 'idle', error: 'closeFailed' })
 })
+
+
+test('the native occurrence carries only a hashed conversation scope and remains fresh per open', async () => {
+  const {createHash} = await import('node:crypto'); const calls=[];
+  const bridge={available:async()=>true,open:async(...args)=>calls.push(args),close:async()=>{},setBounds:async()=>{},back:async()=>{},protocolVersion:1};
+  const controller=new QcuPanelController(bridge,()=>{},()=> 'opaque-random-1','synthetic-conversation-a');
+  await controller.open(bounds);
+  assert.equal(calls[0][0],`scope_${createHash('sha256').update('synthetic-conversation-a').digest('hex')}_opaque-random-1`);
+  assert.equal(JSON.stringify(calls).includes('synthetic-conversation-a'),false);
+  await controller.dispose();
+});

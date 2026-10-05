@@ -1,0 +1,45 @@
+{
+  "status": "source-validated-awaiting-independent-review",
+  "baselineCommit": "639ed015397290b3745d163aafe02ffee4aa3f84",
+  "predecessorCommit": "c623f2947d37a51971037ed9f1b8726601e6d5dd",
+  "tests": {
+    "clientControllerAndToolGuidance": 31,
+    "syntheticPythonEngineAndServer": 12,
+    "hostLifecycleAndDedicatedPolicy": 17,
+    "mockedElectronPanel": 73,
+    "realToolPythonAndPanelDOMIntegration": 1
+  },
+  "integrationCases": [
+    "old local summary replaced by matching conversation report",
+    "panel refresh and reopen locate matching report",
+    "newer local completion preserved on enter and explicit refresh",
+    "late conversation refresh discarded after local submission",
+    "missing completion order cannot replace a newer result",
+    "foreign conversation cannot claim a bound document or view/download its report",
+    "local-only document denied by conversation tool",
+    "expired grant hides handoff and denies report access",
+    "matching report route exposes saving control and accepts repeated HTTP downloads"
+  ],
+  "checks": {
+    "hostBuild": true,
+    "clientBuild": true,
+    "clientTypecheck": true,
+    "modifiedNativeOfficialStrictTypecheck": true,
+    "patchAppliesToBaseline": true,
+    "sourceSliceEqualFiles": 51,
+    "resourceHashCount": 12,
+    "canonicalSkillHashCount": 13,
+    "sensitiveScanBlockedFindings": 0
+  },
+  "boundaries": {
+    "nativeMethods": 5,
+    "newFixedRequestRoute": "GET /api/task/latest",
+    "rawSessionIdentityInNativeIPC": false,
+    "modelFacingReportURLOrBody": false,
+    "modelsInvoked": false,
+    "activeUserWindowRestarted": false,
+    "candidateDeployed": false,
+    "nativeGUIAcceptanceComplete": false,
+    "packageReady": false
+  }
+}

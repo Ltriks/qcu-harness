@@ -101,7 +101,7 @@ function NativeFrame({ controller, phase, close, failed, t }: Localized & {
   )
 }
 
-function MountedEntry({ t }: Localized) {
+function MountedEntry({ t, sessionKey }: Localized & { sessionKey: string }) {
   const [bridge] = React.useState(currentBridge)
   const [state, setState] = React.useState<QcuEntryState>({ availability: 'checking', phase: 'idle' })
   const [visible, setVisible] = React.useState(false)
@@ -116,7 +116,7 @@ function MountedEntry({ t }: Localized) {
         visibleRef.current = false
         setVisible(false)
       }
-    })
+    }, undefined, sessionKey)
     controller.current = owner
     void owner.checkAvailability()
     return () => {
@@ -124,7 +124,7 @@ function MountedEntry({ t }: Localized) {
       visibleRef.current = false
       void owner.dispose()
     }
-  }, [bridge])
+  }, [bridge, sessionKey])
 
   const close = React.useCallback(() => {
     visibleRef.current = false
@@ -188,5 +188,5 @@ function MountedEntry({ t }: Localized) {
  */
 export function QcuEntry({ sessionId, useSessionRetainInfo, t }: EntryProps) {
   const main = useSessionRetainInfo(info => (info?.retainedBy.mainView ?? 0) > 0)
-  return main ? <MountedEntry key={sessionId} t={t} /> : null
+  return main ? <MountedEntry key={sessionId} t={t} sessionKey={sessionId} /> : null
 }

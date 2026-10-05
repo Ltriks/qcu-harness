@@ -14,6 +14,7 @@ export type QcuTaskOwner = Pick<EventEmitter, 'on' | 'removeListener'> & {
 
 interface TaskDocument {
   readonly contextId: QcuContextId
+  readonly sessionTag?: string
   readonly owner: QcuTaskOwner
   bounds: QcuBounds
   opening: Promise<void>
@@ -196,7 +197,7 @@ class NativeTaskPanel {
     }
     void this.revoke()
     const document: TaskDocument = {
-      contextId, owner, bounds, opening: Promise.resolve(), releaseOwner: () => {},
+      contextId, ...( /^scope_([0-9a-f]{64})_[a-zA-Z0-9_-]{1,100}$/u.test(contextId) ? {sessionTag: contextId.slice(6, 70)} : {}), owner, bounds, opening: Promise.resolve(), releaseOwner: () => {},
       loaded: false, activationUntil: 0, printing: false, downloads: new Set(),
     }
     this.active = document
@@ -401,9 +402,20 @@ class NativeTaskPanel {
       const owned = document.contents !== undefined && !document.contents.isDestroyed()
         && document.contents.id === details.webContentsId && details.frame === document.contents.mainFrame
       const allowed = route !== undefined && (details.method === 'GET'
-        ? ['/task', '/task-panel.js', '/task-panel.css', '/api/rules'].includes(route) || REPORT.test(route) || DOWNLOAD.test(route)
+        ? ['/task', '/task-panel.js', '/task-panel.css', '/api/rules', '/api/task/latest'].includes(route) || REPORT.test(route) || DOWNLOAD.test(route)
         : details.method === 'POST' && ['/api/task/upload', '/api/task/run'].includes(route))
       callback({ cancel: !this.current(document) || !owned || !allowed || details.resourceType === 'subFrame' })
+    })
+    browserSession.webRequest.onBeforeSendHeaders((details, callback) => {
+      const owned = document.contents !== undefined && !document.contents.isDestroyed()
+        && document.contents.id === details.webContentsId && details.frame === document.contents.mainFrame
+      if (!this.current(document) || !owned || path(document, details.url) === undefined) { callback({cancel: true}); return }
+      const requestHeaders = {...details.requestHeaders}
+      for (const name of Object.keys(requestHeaders)) {
+        if (name.toLowerCase() === 'x-qcu-task-session') delete requestHeaders[name]
+      }
+      if (document.sessionTag !== undefined) requestHeaders['X-QCU-Task-Session'] = document.sessionTag
+      callback({requestHeaders})
     })
     browserSession.webRequest.onHeadersReceived((details, callback) => {
       callback({ cancel: !this.current(document) || (details.statusCode >= 300 && details.statusCode < 400) })

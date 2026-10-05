@@ -4,6 +4,7 @@
   const MAX_UPLOAD = 20 * 1024 * 1024;
   const SUMMARY_KEY = 'qcu-local-task-summary-v1';
   const sources = new Set(['demo', 'personal', 'center']);
+  let displayedSummary = null;
   const state = {file: null, documentId: null, rules: [], busy: false, loadingRules: true,
     disposed: false, revision: 0, operation: null, rulesRequest: null};
 
@@ -17,6 +18,7 @@
     $('task-run').disabled = state.busy || !ready || !$('local-authorized').checked;
     $('task-run').textContent = state.busy ? '正在本机处理…' : '开始本次本机检查';
     $('reload-rules').disabled = state.loadingRules || state.busy || state.disposed;
+    $('refresh-result').disabled = state.busy || state.disposed;
     $('task-form').setAttribute('aria-busy', String(state.busy));
   }
   function focusCard(card) {
@@ -25,6 +27,7 @@
   }
   function removeSummary() { try { sessionStorage.removeItem(SUMMARY_KEY); } catch {} }
   function clearFeedback() {
+    displayedSummary = null;
     $('task-progress').hidden = true;
     $('task-error').hidden = true;
     $('task-result').hidden = true;
@@ -34,6 +37,8 @@
     removeSummary();
   }
   function invalidate() {
+    handoffRevision++;
+    showingHandoff = false;
     const wasBusy = state.busy;
     state.revision++;
     state.operation?.abort();
@@ -68,7 +73,8 @@
   }
   function summaryValid(summary) {
     return summary && typeof summary === 'object' && !Array.isArray(summary)
-      && Object.keys(summary).sort().join(',') === 'counts,reportPath,ruleSource'
+      && ['counts,reportPath,ruleSource','completedAt,counts,reportPath,ruleSource'].includes(Object.keys(summary).sort().join(','))
+      && (!Object.hasOwn(summary, 'completedAt') || (Number.isSafeInteger(summary.completedAt) && summary.completedAt > 0))
       && /^\/reports\/[0-9a-f]{32}$/.test(summary.reportPath)
       && sources.has(summary.ruleSource)
       && summary.counts && typeof summary.counts === 'object'
@@ -76,6 +82,7 @@
       && ['passed', 'failed', 'unknown'].every(key => Number.isSafeInteger(summary.counts[key]) && summary.counts[key] >= 0);
   }
   function renderSummary(summary, restored = false) {
+    displayedSummary = summary;
     for (const key of ['passed', 'failed', 'unknown']) $('count-' + key).textContent = String(summary.counts[key]);
     $('result-scope').textContent = ruleDescription(summary.ruleSource);
     $('result-context').textContent = restored
@@ -100,6 +107,50 @@
     if (!response.ok) throw new Error(typeof data.error === 'string' ? data.error : '本机服务未完成请求，请重试。');
     return data;
   }
+
+  let handoffRevision = 0;
+  let showingHandoff = false;
+  async function refreshHandoff(initial = false) {
+    if (state.busy || state.disposed) return;
+    const revision = ++handoffRevision;
+    $('refresh-result').disabled = true;
+    try {
+      const result = await api('/api/task/latest');
+      if (revision !== handoffRevision || state.disposed || state.busy) return;
+      if (result.status === 'empty') {
+        if (showingHandoff) { clearFeedback(); showingHandoff = false; }
+        if (initial) restoreSummary();
+        if (!initial) $('task-notice').textContent = '当前对话没有仍获授权的检查结果。';
+        return;
+      }
+      const summary = {counts: result.counts, reportPath: result.report_url, ruleSource: result.rule_source, completedAt: result.completed_at};
+      if (result.status !== 'completed' || !/^[0-9a-f]{32}$/.test(result.report_id)
+          || result.report_url !== '/reports/' + result.report_id || !summaryValid(summary)) throw new Error('Invalid handoff');
+      let previous = displayedSummary;
+      if (initial) {
+        try {
+          const saved = JSON.parse(sessionStorage.getItem(SUMMARY_KEY));
+          if (summaryValid(saved) && (!previous || saved.completedAt > (previous.completedAt || 0))) previous = saved;
+        } catch {}
+      }
+      if (previous?.completedAt > summary.completedAt) {
+        if (initial) renderSummary(previous, true);
+        $('task-notice').textContent = '对话检查早于当前本机检查，保留更新的本机结果。';
+        return;
+      }
+      removeSummary();
+      renderSummary(summary);
+      showingHandoff = true;
+      $('result-context').textContent = '当前对话最新完成的检查结果，原始文档授权仍有效。保存前请进入完整报告。';
+      $('task-notice').textContent = '';
+    } catch {
+      if (revision !== handoffRevision || state.disposed || state.busy) return;
+      if (showingHandoff) { clearFeedback(); showingHandoff = false; }
+      if (initial) restoreSummary();
+      else $('task-notice').textContent = '无法读取当前对话结果，请确认授权后重试。';
+    } finally { if (revision === handoffRevision && !state.disposed) updateControls(); }
+  }
+  $('refresh-result').onclick = () => refreshHandoff();
 
   async function loadRules() {
     if (state.loadingRules && state.rulesRequest) return;
@@ -175,6 +226,8 @@
     event.preventDefault();
     const rule = selectedRule();
     if (state.disposed || state.busy || state.loadingRules || !state.file || !rule || !$('local-authorized').checked) return;
+    handoffRevision++;
+    showingHandoff = false;
     clearFeedback();
     state.busy = true;
     $('local-authorized').checked = false; // Consent covers exactly this attempt, including errors.
@@ -202,7 +255,7 @@
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({document_id: state.documentId, rule_id: rule.id, local_authorized: true})});
       if (!active()) return;
-      const summary = {counts: result.counts, reportPath: result.report_url, ruleSource: result.rule_source};
+      const summary = {counts: result.counts, reportPath: result.report_url, ruleSource: result.rule_source, completedAt: result.completed_at};
       if (result.status !== 'completed' || !/^[0-9a-f]{32}$/.test(result.report_id)
           || result.report_url !== '/reports/' + result.report_id || !summaryValid(summary)) {
         throw new Error('本机结果响应不完整，请重新勾选授权后重试。');
@@ -219,6 +272,7 @@
 
   function dispose() {
     state.disposed = true;
+    handoffRevision++;
     state.revision++;
     state.operation?.abort();
     state.rulesRequest?.abort();
@@ -240,12 +294,12 @@
       $('task-progress').hidden = true;
       $('task-error').hidden = true;
       $('file-state').textContent = '还没有选择文件';
-      restoreSummary();
+      refreshHandoff(true);
       if (!state.rules.length) loadRules();
     }
     updateControls();
   });
   $('local-authorized').checked = false;
-  restoreSummary();
+  refreshHandoff(true);
   loadRules();
 })();
