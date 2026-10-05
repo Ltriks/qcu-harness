@@ -756,3 +756,28 @@ it('prevents the download and emits only a fixed error when native save-dialog s
   expect(event.preventDefault).toHaveBeenCalledOnce()
   expect(onError).toHaveBeenCalledExactlyOnceWith(expect.objectContaining({ message: 'QCU report download failed' }))
 })
+
+
+describe('QCU cancelled-save retry', () => {
+  it('keeps the report loaded after cancel and requires a fresh click for every new save dialog', async () => {
+    const onError = vi.fn<(error: Error) => void>(); panel = createPanel({ ready: async () => origin, onError });
+    await panel.open(owner, first, bounds);
+    popup(views[0]!, report); await Promise.resolve();
+    const contents = views[0]!.webContents;
+    activate(); const firstSave = fakeDownload();
+    browserSession.emit('will-download', preventable(), firstSave, contents);
+    firstSave.emit('done', {}, 'cancelled');
+    expect(onError).not.toHaveBeenCalled();
+    expect(contents.getURL()).toBe(report);
+    const scriptedRetry = preventable(); browserSession.emit('will-download', scriptedRetry, fakeDownload(), contents);
+    expect(scriptedRetry.preventDefault).toHaveBeenCalledOnce();
+    activate(); const retry = fakeDownload(), confirmedRetry = preventable();
+    browserSession.emit('will-download', confirmedRetry, retry, contents);
+    expect(confirmedRetry.preventDefault).not.toHaveBeenCalled();
+    expect(retry.setSaveDialogOptions).toHaveBeenCalledOnce();
+    retry.emit('done', {}, 'completed');
+    expect(onError).not.toHaveBeenCalled();
+    await panel.close(owner, first);
+    expect(firstSave.cancel).not.toHaveBeenCalled(); expect(retry.cancel).not.toHaveBeenCalled();
+  });
+});

@@ -13,7 +13,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import urlsplit
 
-from engine import Document, InputError, MAX_UPLOAD, check, report_html, validate_rule
+from engine import Document, InputError, MAX_UPLOAD, check, report_html, report_save_controls, validate_rule
 from parent_lifetime import OwnedServiceFiles, ParentStdinLifetime
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -84,7 +84,7 @@ class Store:
         report_id = secrets.token_hex(16)
         with self.lock:
             write_json(self.path('reports', report_id, '.json'), result)
-            self.path('reports', report_id, '.html').write_text(report_html(result), encoding='utf-8')
+            self.path('reports', report_id, '.html').write_text(report_html(result, report_id), encoding='utf-8')
         # Only this bounded projection is allowed across the model-facing bridge.
         return dict(report_id=report_id, counts=result['counts'], rule_source=result['rule']['source'], status='completed')
 
@@ -159,8 +159,13 @@ def create_server(home, port=0):
                     return self.send(200, store.rules())
                 match = re.fullmatch(r'/reports/([0-9a-f]{32})(/download)?', route)
                 if match:
-                    return self.send(200, store.path('reports', match[1], '.html').read_bytes(),
-                                     'text/html; charset=utf-8', download=bool(match[2]))
+                    page = store.path('reports', match[1], '.html').read_bytes()
+                    # Older saved reports remain intact; add the online save control only to their viewing response.
+                    if not match[2] and b'class="report-actions"' not in page:
+                        heading = '<h1>QCU 论文格式检查报告</h1>'.encode()
+                        controls = (report_save_controls(match[1]) + '<style>@media print{.report-actions{display:none}}</style>').encode()
+                        page = page.replace(heading, heading + controls, 1)
+                    return self.send(200, page, 'text/html; charset=utf-8', download=bool(match[2]))
             except (OSError, ValueError):
                 return self.send(404, {'error': '内容不存在或无法读取。'})
             return self.send(404, {'error': '没有此入口。'})

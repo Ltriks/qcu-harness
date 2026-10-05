@@ -68,6 +68,28 @@ class ServerTests(unittest.TestCase):
             result=json.loads(raw);local=json.loads(self.req('/api/run',args)[0]);self.assertEqual(result['counts'],local['counts'])
             html,headers=self.req('/reports/'+result['report_id']+'/download');self.assertIn('attachment',headers['Content-Disposition'])
             self.assertIn(b'QCU',html)
+    def test_report_save_route_is_present_and_repeatable(self):
+        doc=json.loads(self.req("/api/task/upload",fixture(),{"Content-Type":"application/octet-stream"})[0])
+        result=json.loads(self.req("/api/task/run",{"document_id":doc["document_id"],"rule_id":RULE["id"],"local_authorized":True})[0])
+        route="/reports/"+result["report_id"]
+        page,_=self.req(route)
+        self.assertIn(('href="'+route+'/download"').encode(),page)
+        self.assertIn("保存 HTML 报告".encode(),page)
+        first,hdr=self.req(route+"/download")
+        second,_=self.req(route+"/download")
+        self.assertEqual(first,page);self.assertEqual(second,page)
+        self.assertIn("attachment",hdr["Content-Disposition"])
+        self.assertIn(b".report-actions{display:none}",page)
+        old_id='c'*32
+        old=report_html(check(fixture(),RULE)).encode()
+        self.server.store.path('reports',old_id,'.html').write_bytes(old)
+        viewed,_=self.req('/reports/'+old_id)
+        self.assertIn((f'href="/reports/{old_id}/download"').encode(),viewed)
+        exported,_=self.req('/reports/'+old_id+'/download')
+        self.assertEqual(exported,old)
+        self.assertEqual(self.server.store.path('reports',old_id,'.html').read_bytes(),old)
+        with self.assertRaises(InputError):report_html(check(fixture(),RULE),'../invalid')
+
     def test_rules_copy(self):
         saved=json.loads(self.req('/api/rules',RULE)[0]);self.assertEqual(saved['source'],'personal');self.assertNotEqual(saved['id'],RULE['id'])
         self.assertEqual(self.server.store.rule(RULE['id']),RULE)

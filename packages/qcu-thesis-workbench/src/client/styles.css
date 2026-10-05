@@ -13,3 +13,10 @@
 .qcu-panel-view { flex: 1; min-width: 1px; min-height: 1px; margin: 0 12px 12px; }
 .qcu-panel-status { padding: 12px; font-size: 13px; }
 @media (max-width: 480px) { .qcu-panel { left: 8px; right: 8px; bottom: 8px; } }
+
+/* One header entry owns named task choices; native tasks open only on selection. */
+.qcu-tools{position:relative}
+.qcu-tools>summary{cursor:pointer;list-style:none}
+.qcu-tools>summary::-webkit-details-marker{display:none}
+.qcu-tools-items{position:absolute;top:100%;right:0;z-index:20;display:flex;gap:6px;flex-direction:column;min-width:180px;padding:8px;background:var(--dsw-alias-bg-layer-2);border:1px solid var(--dsw-alias-border-l3);border-radius:8px;box-shadow:0 4px 16px #0002}
+.qcu-tools:not([open])>.qcu-tools-items{display:none}

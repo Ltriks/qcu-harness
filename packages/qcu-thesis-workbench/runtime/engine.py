@@ -289,7 +289,15 @@ def check(data, rule):
             else '仅覆盖报告列出的检查项，未知项需人工复核。')
 
 
-def report_html(result):
+def report_save_controls(report_id):
+    if not isinstance(report_id, str) or not re.fullmatch(r"[0-9a-f]{32}", report_id):
+        raise InputError("报告编号无效。")
+    return (f'<nav class="report-actions" style="margin:16px 0"><a href="/reports/{report_id}/download" download="qcu-thesis-report.html">保存 HTML 报告</a>'
+            '<p>取消保存后可再次点击。打印预览请按 ⌘P（Mac）或 Ctrl+P。</p></nav>')
+
+
+def report_html(result, report_id=None):
+    save_control = report_save_controls(report_id) if report_id is not None else ""
     esc = lambda value: html.escape(str(value) if value is not None else '无法判断')
     rows = ''.join('<tr>' + ''.join(f'<td>{esc(v)}</td>' for v in
         [dict(failed='不符合所选规则', unknown='需人工确认')[f['status']], f['location'], f['label'],
@@ -299,8 +307,8 @@ def report_html(result):
     distributions = ''.join(f'<h3>{esc(LABELS[key])}</h3><p>{esc(json.dumps(values, ensure_ascii=False))}</p>'
                             for key, values in result['format_distribution'].items())
     return f'''<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width">
-<title>QCU 论文格式检查报告</title><style>body{{font:16px/1.6 system-ui,sans-serif;color:#172b3a;max-width:1200px;margin:40px auto;padding:0 24px}}h1{{font-size:28px}}table{{width:100%;border-collapse:collapse}}td,th{{text-align:left;vertical-align:top;padding:10px;border:1px solid #d7e0e7;overflow-wrap:anywhere}}th{{background:#edf3f6}}.notice{{padding:16px;background:#fff5d9}}small{{overflow-wrap:anywhere}}@media print{{body{{margin:0;font-size:11px}}thead{{display:table-header-group}}tr{{break-inside:avoid}}}}</style>
-<h1>QCU 论文格式检查报告</h1><p class="notice">{esc(result['conclusion'])}</p>
+<title>QCU 论文格式检查报告</title><style>body{{font:16px/1.6 system-ui,sans-serif;color:#172b3a;max-width:1200px;margin:40px auto;padding:0 24px}}h1{{font-size:28px}}table{{width:100%;border-collapse:collapse}}td,th{{text-align:left;vertical-align:top;padding:10px;border:1px solid #d7e0e7;overflow-wrap:anywhere}}th{{background:#edf3f6}}.notice{{padding:16px;background:#fff5d9}}small{{overflow-wrap:anywhere}}@media print{{.report-actions{{display:none}}body{{margin:0;font-size:11px}}thead{{display:table-header-group}}tr{{break-inside:avoid}}}}</style>
+<h1>QCU 论文格式检查报告</h1>{save_control}<p class="notice">{esc(result['conclusion'])}</p>
 <p>规则：{esc(result['rule']['name'])} · 来源：{esc(result['rule']['source'])} · 版本：{esc(result['rule']['version'])}</p>
 <p>通过 {count['passed']} 项 · 不符合 {count['failed']} 项 · 需确认 {count['unknown']} 项（按属性检查计数，不等于段落数）</p>
 <p>所有原文仅在本机报告中展示，未自动修改论文。</p><h2>问题与待确认项</h2>

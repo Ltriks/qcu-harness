@@ -105,9 +105,9 @@ describe('external Host fail-closed lifecycle', () => {
     for (let iteration = 0; iteration < 2; iteration++) {
       const fiber = ctx.plugin(QcuHost, { localPython: { python, home: path, ...deadlines } })
       await fiber.await()
-      await vi.waitUntil(async () => (await run(ctx, 'qcu_thesis_open')).includes('workbench_url'), { timeout: 5000 })
+      await vi.waitUntil(async () => (await run(ctx, 'qcu_thesis_open')).includes('workbench_access'), { timeout: 5000 })
       const opened = await run(ctx, 'qcu_thesis_open')
-      expect(opened).toContain('workbench_url')
+      expect(opened).toContain('workbench_access')
       expect(await run(ctx, 'ordinary_tool')).toContain('permits only local thesis tools')
       const skills = await ctx.skills.list()
       expect(skills.map(skill => skill.name)).toContain('qcu-thesis-format-check')

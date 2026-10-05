@@ -49,7 +49,7 @@ export function apply(ctx,config={}){
       if(check&&(!/^[0-9a-f]{32}$/.test(args.document_id||'')||typeof args.rule_id!=='string'||!/^[a-zA-Z0-9-]{1,100}$/.test(args.rule_id)))throw new Error('Invalid input');
       const b=await bridge();
       if(disposed||exec.signal?.aborted)throw new Error('Cancelled');
-      if(!check)return {status:'ready',workbench_url:b.base_url};
+      if(!check)return {status:'ready',workbench_access:'native-panel',message:'请打开对话顶部“工具”中的“论文检查”面板选择文档和规则。'};
       const abort=new AbortController();
       active.add(abort);
       const cancel=()=>abort.abort();
@@ -63,12 +63,12 @@ export function apply(ctx,config={}){
         if(disposed||abort.signal.aborted)throw new Error('Cancelled');
         if(!/^[0-9a-f]{32}$/.test(value.report_id)||!['demo','personal','center'].includes(value.rule_source)||!['passed','failed','unknown'].every(k=>Number.isSafeInteger(value.counts?.[k])&&value.counts[k]>=0))throw new Error('Invalid response');
         // Reconstruct an allowlist: never forward excerpts, errors, tokens or paths.
-        return {status:'completed',report_url:b.base_url+'/reports/'+value.report_id,rule_source:value.rule_source,counts:Object.fromEntries(['passed','failed','unknown'].map(k=>[k,value.counts[k]]))};
+        return {status:'completed',report_access:'native-panel',message:'请在“论文检查”面板查看完整报告，进入报告后点击“保存 HTML 报告”；取消后可再次保存。不要把本机报告或下载地址写成聊天链接。',rule_source:value.rule_source,counts:Object.fromEntries(['passed','failed','unknown'].map(k=>[k,value.counts[k]]))};
       }finally{active.delete(abort);clearTimeout(timer);exec.signal?.removeEventListener('abort',cancel);}
     }catch{return {status:'unavailable',message:'请在本机页面确认服务、文档授权及规则；正文和详细错误不会传入对话。'};}
   }
   try{
-    for(const [index,id] of names.entries())disposers.push(ctx.tools.register({name:id,description:index?'仅在用户明确请求检查或继续已授权检查并提供文档和规则编号时调用；仅返回计数和本机报告链接。普通聊天和切换话题不调用。':'仅在用户明确要求打开论文工作台或开始论文格式检查时获取本机页面。普通问候、概念解释和其他话题直接回答，不调用本工具。打开页面不等于授权检查，不读取论文或报告。',parameters:index?object({document_id:{type:'string'},rule_id:{type:'string'}}):object({}),output:{schema:{type:'object'},render:(_args,value)=>[{type:'text',text:JSON.stringify(value)}]},execute:(args,exec)=>execute(args,exec,index===1)}));
+    for(const [index,id] of names.entries())disposers.push(ctx.tools.register({name:id,description:index?'仅在用户明确请求检查或继续已授权检查并提供文档和规则编号时调用；仅返回计数和原生面板操作说明，不返回本机 URL。普通聊天和切换话题不调用。':'仅在用户明确要求打开论文工作台或开始论文格式检查时确认本机面板就绪。普通问候、概念解释和其他话题直接回答，不调用本工具。打开页面不等于授权检查，不读取论文或报告。',parameters:index?object({document_id:{type:'string'},rule_id:{type:'string'}}):object({}),output:{schema:{type:'object'},render:(_args,value)=>[{type:'text',text:JSON.stringify(value)}]},execute:(args,exec)=>execute(args,exec,index===1)}));
   }catch(error){for(const dispose of disposers.reverse())dispose();throw error;}
   return ()=>{
     if(disposed)return;

@@ -82,7 +82,7 @@
       ? '上次已完成检查的摘要。文件选择和授权未保留；新的检查需重新选择并授权。'
       : '本次仅按所选规则检查。再次检查前请重新勾选授权。';
     $('task-report').setAttribute('href', summary.reportPath);
-    $('task-download').setAttribute('href', summary.reportPath + '/download');
+    $('task-download').setAttribute('href', summary.reportPath);
     $('task-progress').hidden = true;
     $('task-error').hidden = true;
     $('task-result').hidden = false;

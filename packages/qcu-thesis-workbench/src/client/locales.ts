@@ -3,13 +3,14 @@ export const NS = 'qcu-thesis-workbench'
 
 /** English copy contains no native errors or document-derived fields. */
 export const en = {
-  entry: 'QCU',
-  checking: 'QCU · checking',
-  unavailable: 'QCU · not enabled',
+  tools: 'Tools',
+  entry: 'Thesis check',
+  checking: 'Thesis check · checking',
+  unavailable: 'Thesis check · not enabled',
   unavailableDetail: 'The isolated QCU panel is not enabled in this desktop build',
-  notReady: 'QCU · not ready',
+  notReady: 'Thesis check · not ready',
   notReadyDetail: 'The isolated QCU panel may still be starting. Retry to check availability',
-  retry: 'Retry QCU',
+  retry: 'Retry thesis check',
   title: 'QCU thesis check',
   opening: 'Opening the isolated QCU panel…',
   back: 'Back',
@@ -25,13 +26,14 @@ export type QcuKey = keyof typeof en
 
 /** Chinese dictionary uses exactly the English dictionary keys. */
 export const zh: Record<QcuKey, string> = {
-  entry: 'QCU',
-  checking: 'QCU · 检查中',
-  unavailable: 'QCU · 未启用',
+  tools: '工具',
+  entry: '论文检查',
+  checking: '论文检查 · 检查中',
+  unavailable: '论文检查 · 未启用',
   unavailableDetail: '当前桌面版本尚未启用 QCU 隔离面板',
-  notReady: 'QCU · 尚未就绪',
+  notReady: '论文检查 · 尚未就绪',
   notReadyDetail: 'QCU 隔离面板可能仍在启动，请重试以检查是否就绪',
-  retry: '重试 QCU',
+  retry: '重试论文检查',
   title: 'QCU 论文检查',
   opening: '正在打开 QCU 隔离面板…',
   back: '返回',

@@ -106,6 +106,7 @@ function MountedEntry({ t }: Localized) {
   const [state, setState] = React.useState<QcuEntryState>({ availability: 'checking', phase: 'idle' })
   const [visible, setVisible] = React.useState(false)
   const visibleRef = React.useRef(false)
+  const menu = React.useRef<HTMLDetailsElement>(null)
   const controller = React.useRef<QcuPanelController>()
 
   React.useEffect(() => {
@@ -141,6 +142,13 @@ function MountedEntry({ t }: Localized) {
   return (
     <span className="qcu-entry" data-qcu-entry="">
       <style data-qcu-client-style="">{styles}</style>
+      <details ref={menu} className="qcu-tools" onKeyDown={event => {
+        if (event.key === 'Escape' && menu.current) menu.current.open = false
+      }} onBlur={event => {
+        if (!event.currentTarget.contains(event.relatedTarget as Node | null) && menu.current) menu.current.open = false
+      }}>
+      <summary className="qcu-entry-button">{t('tools')}</summary>
+      <span className="qcu-tools-items">
       <button
         className="qcu-entry-button"
         type="button"
@@ -150,6 +158,7 @@ function MountedEntry({ t }: Localized) {
         aria-expanded={visible}
         onClick={() => {
           if (disabled || visibleRef.current || !controller.current) return
+          if (menu.current) menu.current.open = false
           visibleRef.current = true
           setVisible(true)
         }}
@@ -164,6 +173,8 @@ function MountedEntry({ t }: Localized) {
           void owner.checkAvailability()
         }}
       >{t('retry')}</button>}
+      </span>
+      </details>
       {state.error && <span className="qcu-entry-error" role="alert">{t(state.error)}</span>}
       {visible && controller.current && <NativeFrame controller={controller.current} phase={state.phase} close={close} failed={failed} t={t} />}
     </span>

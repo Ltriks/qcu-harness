@@ -42,7 +42,7 @@ Run `npm run typecheck:host` and `npm run test:host` for the Host and process-ow
 
 ## Model experience
 
-The existing two-tool schemas and outputs are unchanged. Only the existing bounded results, including authorized legacy local workbench/report links and counts, can enter model-facing results. The native control-channel target is never added to those outputs; legacy URLs contain no bridge bearer credential. No new model calls, prompt transcript fields, document excerpts, or token/KV-cache behavior are introduced. Skill loading follows the official mechanism.
+The two tool names and input schemas are retained. Their outputs now contain only readiness/counts and fixed native-panel guidance: local workbench/report URLs are no longer model-facing results. The native control-channel target is never added to those outputs; No download URL is supplied to chat. No new model calls, prompt transcript fields, document excerpts, or token/KV-cache behavior are introduced. Skill loading follows the official mechanism.
 
 ## Known limitations and deferred work
 

@@ -86,9 +86,9 @@ async function click(element) { assert.ok(element); await act(async () => { elem
 
 test('built factory is lazy and actual React entry fails closed on pure official desktop', async () => {
   const f = await mounted(undefined)
-  assert.equal(button('QCU · not enabled').disabled, true)
-  assert.match(button('QCU · not enabled').title, /not enabled/)
-  assert.equal(button('Retry QCU'), undefined)
+  assert.equal(button('Thesis check · not enabled').disabled, true)
+  assert.match(button('Thesis check · not enabled').title, /not enabled/)
+  assert.equal(button('Retry thesis check'), undefined)
   assert.equal(document.querySelector('dialog'), null)
   assert.equal(document.querySelector('input[type=file], iframe, webview'), null)
   await f.unmount()
@@ -102,8 +102,8 @@ test('unversioned, wrong-version and expanded bridges never open or offer retry'
   const b = bridge()
   for (const invalid of [old, { ...b.value, protocolVersion: 2 }, { ...b.value, navigate() {} }]) {
     const f = await mounted(invalid)
-    assert.equal(button('QCU · not enabled').disabled, true)
-    assert.equal(button('Retry QCU'), undefined)
+    assert.equal(button('Thesis check · not enabled').disabled, true)
+    assert.equal(button('Retry thesis check'), undefined)
     assert.equal(document.querySelector('dialog'), null)
     await f.unmount()
   }
@@ -120,22 +120,22 @@ test('cold compatible bridge becomes ready by explicit retry without Session rem
   }
   const f = await mounted(b.value)
   const entry = document.querySelector('[data-qcu-entry]')
-  assert.equal(button('QCU · not ready').disabled, true)
-  assert.equal(button('Retry QCU').disabled, false)
+  assert.equal(button('Thesis check · not ready').disabled, true)
+  assert.equal(button('Retry thesis check').disabled, false)
   assert.equal(checks, 1)
-  const retry = button('Retry QCU')
+  const retry = button('Retry thesis check')
   await act(async () => { retry.click(); retry.click() })
   assert.equal(checks, 2)
-  assert.equal(button('QCU · checking').disabled, true)
+  assert.equal(button('Thesis check · checking').disabled, true)
   assert.equal(document.querySelector('dialog'), null)
   await act(async () => { pending.resolve(true); await pending.promise })
   assert.equal(document.querySelector('[data-qcu-entry]'), entry)
-  assert.equal(button('QCU').disabled, false)
-  assert.equal(button('Retry QCU'), undefined)
+  assert.equal(button('Thesis check').disabled, false)
+  assert.equal(button('Retry thesis check'), undefined)
   assert.equal(document.querySelector('dialog'), null)
   assert.equal(document.querySelector('input[type=file], iframe, webview'), null)
   assert.deepEqual(b.calls, [])
-  await click(button('QCU'))
+  await click(button('Thesis check'))
   assert.equal(checks, 3)
   assert.equal(b.calls.filter(call => call[0] === 'open').length, 1)
   assert.equal(JSON.stringify(b.calls).includes('synthetic-session'), false)
@@ -151,10 +151,10 @@ test('retry stays available after false or failed readiness without rendering na
     return false
   }
   const f = await mounted(b.value)
-  await click(button('Retry QCU'))
-  assert.equal(button('QCU · not ready').disabled, true)
-  await click(button('Retry QCU'))
-  assert.equal(button('Retry QCU').disabled, false)
+  await click(button('Retry thesis check'))
+  assert.equal(button('Thesis check · not ready').disabled, true)
+  await click(button('Retry thesis check'))
+  assert.equal(button('Retry thesis check').disabled, false)
   assert.equal(checks, 3)
   assert.equal(document.body.textContent.includes('synthetic-private'), false)
   assert.equal(document.querySelector('dialog'), null)
@@ -169,8 +169,8 @@ test('unmount retires pending initial and retry availability without reviving th
     let checks = 0
     b.value.available = () => ++checks === 1 && retrying ? Promise.resolve(false) : pending.promise
     const f = await mounted(b.value)
-    if (retrying) await click(button('Retry QCU'))
-    assert.equal(button('QCU · checking').disabled, true)
+    if (retrying) await click(button('Retry thesis check'))
+    assert.equal(button('Thesis check · checking').disabled, true)
     await f.unmount()
     assert.equal(document.getElementById('test-root').innerHTML, '')
     const next = bridge()
@@ -179,8 +179,8 @@ test('unmount retires pending initial and retry availability without reviving th
     const entry = document.querySelector('[data-qcu-entry]')
     await act(async () => { pending.resolve(true); await pending.promise })
     assert.equal(document.querySelector('[data-qcu-entry]'), entry)
-    assert.equal(button('QCU · not ready').disabled, true)
-    assert.equal(button('QCU'), undefined)
+    assert.equal(button('Thesis check · not ready').disabled, true)
+    assert.equal(button('Thesis check'), undefined)
     assert.equal(document.querySelector('dialog'), null)
     assert.deepEqual(b.calls, [])
     assert.deepEqual(next.calls, [])
@@ -194,10 +194,10 @@ test('a native close failure keeps restart-required lockout and never offers ret
   const b = bridge()
   b.value.close = async () => { throw new Error('synthetic-private-close-details') }
   const f = await mounted(b.value)
-  await click(button('QCU'))
+  await click(button('Thesis check'))
   await click(button('Close panel'))
-  assert.equal(button('QCU · not enabled').disabled, true)
-  assert.equal(button('Retry QCU'), undefined)
+  assert.equal(button('Thesis check · not enabled').disabled, true)
+  assert.equal(button('Retry thesis check'), undefined)
   assert.match(document.querySelector('[role=alert]').textContent, /Restart the desktop app/)
   assert.equal(document.body.textContent.includes('synthetic-private'), false)
   assert.equal(document.querySelector('dialog'), null)
@@ -208,7 +208,7 @@ test('real artifact requires an explicit click, suppresses duplicates, and sends
   const b = bridge()
   const f = await mounted(b.value)
   assert.deepEqual(b.calls, [])
-  await act(async () => { button('QCU').click(); button('QCU').click() })
+  await act(async () => { button('Thesis check').click(); button('Thesis check').click() })
   assert.equal(b.calls.filter(call => call[0] === 'open').length, 1)
   const open = b.calls[0]
   assert.match(open[1], /^[0-9a-f-]{36}$/)
@@ -230,18 +230,18 @@ test('cancel, Session changes and unmount retire pending and open occurrences', 
   const pending = deferred()
   b.value.open = (...args) => { b.calls.push(['open', ...args]); return pending.promise }
   const f = await mounted(b.value)
-  await click(button('QCU'))
+  await click(button('Thesis check'))
   await click(button('Cancel opening'))
   assert.equal(document.querySelector('dialog'), null)
   await act(async () => { pending.resolve(); await pending.promise })
   assert.equal(document.querySelector('dialog'), null)
   b.value.open = async (...args) => { b.calls.push(['open', ...args]) }
-  await click(button('QCU'))
+  await click(button('Thesis check'))
   const second = b.calls.findLast(call => call[0] === 'open')[1]
   await f.rerender({ sessionId: 'synthetic-session-2' })
   assert.equal(document.querySelector('dialog'), null)
   assert.ok(b.calls.some(call => call[0] === 'close' && call[1] === second))
-  await click(button('QCU'))
+  await click(button('Thesis check'))
   const third = b.calls.findLast(call => call[0] === 'open')[1]
   await f.unmount()
   assert.ok(b.calls.some(call => call[0] === 'close' && call[1] === third))
@@ -251,7 +251,7 @@ test('cancel, Session changes and unmount retire pending and open occurrences', 
 test('main-view retain loss closes the view even if the Session remains retained', async () => {
   const b = bridge()
   const f = await mounted(b.value)
-  await click(button('QCU'))
+  await click(button('Thesis check'))
   await f.rerender({ useSessionRetainInfo: selector => selector({ retainedBy: { mainView: 0, background: 1 } }) })
   assert.equal(document.querySelector('[data-qcu-entry]'), null)
   assert.equal(b.calls.at(-1)[0], 'close')
@@ -261,7 +261,7 @@ test('main-view retain loss closes the view even if the Session remains retained
 test('Escape-style cancel event closes the native occurrence and local dialog', async () => {
   const b = bridge()
   const f = await mounted(b.value)
-  await click(button('QCU'))
+  await click(button('Thesis check'))
   await act(async () => { document.querySelector('dialog').dispatchEvent(new dom.window.Event('cancel', { cancelable: true, bubbles: true })) })
   assert.equal(document.querySelector('dialog'), null)
   assert.equal(b.calls.at(-1)[0], 'close')
@@ -274,7 +274,7 @@ test('a missing native-dialog browser primitive fails before opening and removes
   const b = bridge()
   const f = await mounted(b.value)
   try {
-    await click(button('QCU'))
+    await click(button('Thesis check'))
     assert.equal(document.querySelector('dialog'), null)
     assert.match(document.querySelector('[role=alert]').textContent, /could not be opened/)
     assert.deepEqual(b.calls, [])
@@ -284,3 +284,19 @@ test('a missing native-dialog browser primitive fails before opening and removes
     await f.unmount()
   }
 })
+
+
+test('one Tools selector names the business and opening the selector never opens a native task', async () => {
+  const b = bridge(); const f = await mounted(b.value);
+  const menu = document.querySelector('details.qcu-tools');
+  assert.equal(document.querySelectorAll('summary').length, 1);
+  assert.equal(menu.querySelector('summary').textContent, 'Tools');
+  assert.equal(menu.open, false);
+  await act(async () => { menu.open = true; menu.dispatchEvent(new dom.window.Event('toggle')); });
+  assert.deepEqual(b.calls, []);
+  assert.equal(document.querySelector('dialog'), null);
+  await click(button('Thesis check'));
+  assert.equal(menu.open, false);
+  assert.equal(b.calls.filter(call => call[0] === 'open').length, 1);
+  await f.unmount();
+});
