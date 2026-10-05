@@ -85,8 +85,9 @@ class Store:
                 if (grant.get('local_task') or not grant.get('chat_allowed') or grant.get('expires', 0) < time.time()
                         or grant.get('chat_session_tag', session_tag) != session_tag):
                     raise InputError('该文档未授权当前对话检查或授权已过期，请在本机页面重新选择。')
-                grant['chat_session_tag'] = session_tag
-                self.path('documents', document_id, '.json').write_text(json.dumps(grant), encoding='utf-8')
+                if 'chat_session_tag' not in grant:
+                    grant['chat_session_tag'] = session_tag
+                    self.path('documents', document_id, '.json').write_text(json.dumps(grant), encoding='utf-8')
         result = check(source.read_bytes(), self.rule(rule_id))
         report_id = secrets.token_hex(16)
         with self.lock:

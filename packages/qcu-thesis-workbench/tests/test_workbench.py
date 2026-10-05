@@ -2,6 +2,7 @@ import io, json, sys, tempfile, threading, unittest, zipfile
 from pathlib import Path
 from urllib.request import Request, urlopen
 from urllib.error import HTTPError
+from unittest.mock import patch
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'runtime'))
 from engine import Document, InputError, check, report_html
 from server import create_server
@@ -89,6 +90,61 @@ class ServerTests(unittest.TestCase):
         self.assertEqual(exported,old)
         self.assertEqual(self.server.store.path('reports',old_id,'.html').read_bytes(),old)
         with self.assertRaises(InputError):report_html(check(fixture(),RULE),'../invalid')
+
+    def test_repeat_bridge_keeps_existing_report_available_during_concurrent_http(self):
+        doc=json.loads(self.req('/api/upload',fixture(),{'Content-Type':'application/octet-stream','X-QCU-Chat-Allowed':'true'})[0])
+        args={'document_id':doc['document_id'],'rule_id':RULE['id'],'session_tag':'a'*64}
+        bridge_headers={'X-QCU-Bridge':self.server.bridge['token']}
+        view_headers={'X-QCU-Task-Session':'a'*64}
+        first=json.loads(self.req('/bridge/run',args,bridge_headers)[0])
+        route='/reports/'+first['report_id']
+        expected=self.req(route,headers=view_headers)[0]
+        grant_path=self.server.store.path('documents',doc['document_id'],'.json')
+        in_flight=threading.Event();release=threading.Event();outcome=[]
+        original_write=Path.write_text
+
+        def wait_for_reader():
+            in_flight.set()
+            if not release.wait(3):raise RuntimeError('Concurrent regression did not release request')
+
+        def slow_check(data,rule):
+            wait_for_reader()
+            return check(data,rule)
+
+        def slow_grant_write(path,*values,**options):
+            if path==grant_path:
+                # Pause exactly in the former write_text truncation window.
+                # Fixed repeated checks reach slow_check without rewriting this file.
+                with path.open('w',encoding='utf-8'):pass
+                wait_for_reader()
+            return original_write(path,*values,**options)
+
+        def repeat():
+            try:outcome.append(json.loads(self.req('/bridge/run',args,bridge_headers)[0]))
+            except Exception as error:outcome.append(error)
+
+        with patch('server.check',slow_check),patch.object(Path,'write_text',slow_grant_write):
+            worker=threading.Thread(target=repeat);worker.start()
+            try:
+                self.assertTrue(in_flight.wait(3),'Repeat request did not enter the bounded overlap')
+                self.assertEqual(self.req(route,headers=view_headers)[0],expected)
+                downloaded,headers=self.req(route+'/download',headers=view_headers)
+                self.assertEqual(downloaded,expected)
+                self.assertIn('attachment',headers['Content-Disposition'])
+                with self.assertRaises(HTTPError) as denied:self.req(route,headers={'X-QCU-Task-Session':'b'*64})
+                self.assertEqual(denied.exception.code,403)
+            finally:
+                release.set();worker.join(4)
+            self.assertFalse(worker.is_alive())
+        self.assertEqual(len(outcome),1)
+        self.assertIsInstance(outcome[0],dict)
+        self.assertEqual(outcome[0]['status'],'completed')
+        self.assertEqual(self.req(route,headers=view_headers)[0],expected)
+        grant=json.loads(grant_path.read_text());grant['expires']=0
+        grant_path.write_text(json.dumps(grant),encoding='utf-8')
+        for suffix in ['', '/download']:
+            with self.assertRaises(HTTPError) as denied:self.req(route+suffix,headers=view_headers)
+            self.assertEqual(denied.exception.code,403)
 
     def test_rules_copy(self):
         saved=json.loads(self.req('/api/rules',RULE)[0]);self.assertEqual(saved['source'],'personal');self.assertNotEqual(saved['id'],RULE['id'])

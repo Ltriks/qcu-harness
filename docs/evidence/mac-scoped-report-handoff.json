@@ -4,7 +4,7 @@
   "predecessorCommit": "c623f2947d37a51971037ed9f1b8726601e6d5dd",
   "tests": {
     "clientControllerAndToolGuidance": 31,
-    "syntheticPythonEngineAndServer": 12,
+    "syntheticPythonEngineAndServer": 13,
     "hostLifecycleAndDedicatedPolicy": 17,
     "mockedElectronPanel": 73,
     "realToolPythonAndPanelDOMIntegration": 1
@@ -41,5 +41,15 @@
     "candidateDeployed": false,
     "nativeGUIAcceptanceComplete": false,
     "packageReady": false
+  },
+  "grantRewriteRaceRegression": {
+    "predecessorCommit": "13f85a6cd23a6005df204da2ef0b8fbec589078c",
+    "predecessorConcurrentReportGET": 403,
+    "fixedConcurrentReportGET": 200,
+    "fixedConcurrentReportDownload": 200,
+    "foreignScopeDenied": true,
+    "expiredGrantViewAndDownloadDenied": true,
+    "fix": "Write conversation binding only when it is absent; matching repeated checks retain grant bytes.",
+    "negativeControl": "Same real-HTTP regression fails on copied predecessor runtime with HTTP 403."
   }
 }
