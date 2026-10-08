@@ -77,7 +77,7 @@
     "pageErrors": []
   },
   "browserSelectorCorrection": "Scoped section selector after restored normal UI added a second section; no product change",
-  "nativeUserManualEvidenceScope": "prototype.7 historical three checks; not generalized to prototype.8",
+  "nativeUserManualEvidenceScope": "prototype.7 historical CSV three checks; prototype.8 native New Session and greeting/reply reported passed at 09:01Z; each version separately scoped",
   "nativeGUIValidated": false,
   "realApprovalUiVerified": false,
   "secondMacValidated": false,
@@ -86,6 +86,23 @@
   "modelApiKeysReadOrCopied": false,
   "authorizedLocalBrowserAuthEntryUsed": true,
   "authEntryIncludedInDeliverables": false,
-  "nativeNewSessionButtonVerified": false,
-  "nativeFilePanelVerified": false
+  "nativeNewSessionButtonVerified": true,
+  "nativeFilePanelVerified": false,
+  "nativeUserManualReports": [
+    {
+      "atUtc": "2026-10-08T09:01:00Z",
+      "source": "User report relayed by parent after requested native New Session and greeting test",
+      "text": "ok 可以对话了",
+      "scope": [
+        "prototype.8 native New Session button",
+        "native greeting and model reply"
+      ],
+      "result": "user-manual-passed",
+      "automatedNativeControl": false
+    }
+  ],
+  "nativeDialogueUserManualPassed": true,
+  "nativeDialogueUserManualAtUtc": "2026-10-08T09:01:00Z",
+  "automatedNativeGUIValidated": false,
+  "nativeAcceptanceScope": "User manual: prototype.8 New Session and greeting/reply; overall native GUI remains partial"
 }
