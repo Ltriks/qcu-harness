@@ -43,7 +43,6 @@
     "dedicated DSH_HOME/skills and DSH_AGENTS_HOME/skills",
     "official bundled Skill roots"
   ],
-  "credentialsReadOrCopied": false,
   "permissionDirectoriesAdded": false,
   "tarball": {
     "bytes": 26560,
@@ -83,5 +82,10 @@
   "realApprovalUiVerified": false,
   "secondMacValidated": false,
   "dialogueInstallValidated": false,
-  "formalReleaseValidated": false
+  "formalReleaseValidated": false,
+  "modelApiKeysReadOrCopied": false,
+  "authorizedLocalBrowserAuthEntryUsed": true,
+  "authEntryIncludedInDeliverables": false,
+  "nativeNewSessionButtonVerified": false,
+  "nativeFilePanelVerified": false
 }

@@ -1,13 +1,13 @@
 {
   "version": "0.2.0-prototype.8",
   "kit": "QCU-AppleSilicon-Pilot-prototype8.zip",
-  "bytes": 45345,
-  "sha256": "c13c9b383985f9021cdc4d10d232e9fd25f98fde3cca386af6a42d18915899ed",
+  "bytes": 45406,
+  "sha256": "48a49ffcd6433d8352278eb7ef223d1a791c40132f0eaef4b294d7c3a3d30c67",
   "files": 14,
   "fileManifest": {
     "LOCAL-MAC-ACCEPTANCE.json": {
-      "bytes": 3287,
-      "sha256": "f8ad9301483184a653cc9fdec4261280df7016ece4617b0cdc9975325762e029"
+      "bytes": 3458,
+      "sha256": "524d8a20dcf4dc56b677670436567bdcdb021cbdf0f4e142661f63c9a0fb4754"
     },
     "LOCAL-PORTABLE-SELF-CHECK.json": {
       "bytes": 890,
