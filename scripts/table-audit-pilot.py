@@ -11,9 +11,9 @@ import subprocess
 import sys
 import tarfile
 
-VERSION = '0.2.0-prototype.7'
-PACKAGE_SHA256 = 'c1192607639435922fe48216030b2507e77f372240be57c80031a0ff84382305'
-CONFIG_SHA256 = '0a60b42e614e15a6e781165f61f5652e0465d1254e687b51d5fafcdadd52649d'
+VERSION = '0.2.0-prototype.8'
+PACKAGE_SHA256 = '5ce56b3ca4d22b72348ae3ba7f33ba8e96f5d76ef9be8bb9c5f9db720088a219'
+CONFIG_SHA256 = 'b94652ac4dfb17a5b1736a84585fd10a63d371e97940ce70b24800e083bb5c6b'
 MARKER = '.qcu-csv-pilot-owned.json'
 PURPOSE = 'QCU synthetic CSV isolated pilot'
 
@@ -30,7 +30,7 @@ def verify_kit(kit):
     package = kit / ('qcu-table-audit-' + VERSION + '.tgz')
     if hashlib.sha256(package.read_bytes()).hexdigest() != PACKAGE_SHA256:
         fail('Plugin SHA256 mismatch; do not install.')
-    if hashlib.sha256((kit / 'csv-native-candidate.patch.json').read_bytes()).hexdigest() != CONFIG_SHA256:
+    if hashlib.sha256((kit / 'csv-standard-pilot.patch.json').read_bytes()).hexdigest() != CONFIG_SHA256:
         fail('Candidate configuration SHA256 mismatch.')
     with tarfile.open(package) as archive:
         members = archive.getmembers()
@@ -67,7 +67,7 @@ def app_resources(app):
 
 
 def configuration(kit, resources, home):
-    rows = json.loads((kit / 'csv-native-candidate.patch.json').read_text())
+    rows = json.loads((kit / 'csv-standard-pilot.patch.json').read_text())
     for row in rows:
         if row['id'] == 'qcu-table-audit-task':
             row['config']['python'] = str(resources / 'runtime/primary-runtime/dependencies/python/bin/python3.12')
@@ -93,7 +93,7 @@ def prepare(kit, resources, home):
         os.chmod(home, 0o700)
         (home / MARKER).write_text(json.dumps({'purpose': PURPOSE, 'version': VERSION}) + '\n')
     managed_home(home)
-    for name in ['work', 'shell-empty', 'agents']:
+    for name in ['work', 'workspace', 'shell-empty', 'agents']:
         directory = home / name
         if directory.is_symlink():
             fail('Refusing a symlink pilot directory.')
@@ -152,7 +152,7 @@ def install(kit, package, resources, app, home):
         filename.write_text(json.dumps(manifest, indent=2) + '\n')
     patch = profile / 'cordis.patch.yml'
     text = patch.read_text() if patch.exists() else '[]\n'
-    stamp = '# QCU isolated prototype.7 CSV pilot'
+    stamp = '# QCU isolated prototype.8 Standard and CSV pilot'
     if stamp not in text:
         # Normalize the empty array before appending YAML entries; retain other official user patches.
         meaningful = '\n'.join(line for line in text.splitlines() if line.strip() and not line.lstrip().startswith('#'))

@@ -1,6 +1,8 @@
 # qcu-table-audit 开发原型
 
-当前源码版本为 **0.2.0-prototype.7 开发候选**。新增默认关闭的专用 CSV WebSocket，使用官方 `webServer.registerUpgrade`，不使用 Operator/Gateway 或缺失 Origin 放行。尚未安装到任何现有 profile；此前 CLI/Chrome 安装验收属于 prototype.6，不能转记为 .7 原生验收。
+当前源码版本为 **0.2.0-prototype.8 开发候选**。本版把全局工具拒绝收窄到表格插件自身：非表格调用继续走官方政策，表格工具体仍拒绝所有Agent调用（包括别名/嵌套/直接调用）。Standard个人试用配置见 `examples/csv-standard-pilot.patch.json`；仅恢复官方Standard及常规UI/工具、默认Skill发现，保留workspace-write+ask，其他preset和Plugin Manager工具仍禁用。没有读取或迁移模型凭据。此前受限CSV配置仍保留为历史测试用途，不能当日常版。
+
+prototype.7历史传输实现：新增默认关闭的专用 CSV WebSocket，使用官方 `webServer.registerUpgrade`，不使用 Operator/Gateway 或缺失 Origin 放行。prototype.7已在独立官方Desktop安装并完成CSV三项用户手测；这些结果不能转记为.8新配置全验收。
 
 `websocketEnabled: true` 仅用于已审查的独立合成 profile，并要求官方 webServer 绑定 127.0.0.1。见 [原生传输约束与验收](../../docs/TABLE-AUDIT-NATIVE-TRANSPORT.md) 和仅供候选测试的 [配置](examples/csv-native-candidate.patch.json)。默认 Bundle 及原 HTTP 示例保持原设置。原生客户端只使用官方 `__DSH_TRANSPORT__.streamBaseUrl` 选择固定 socket 路径；该值不是认证证明，握手仍要求官方 Cookie、精确且非缺失的 Origin/Host 和固定子协议。普通 Web 保持原 HTTP 路径。
 

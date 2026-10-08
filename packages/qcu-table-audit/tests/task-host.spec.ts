@@ -1,6 +1,6 @@
 /** Real Cordis, official signed-cookie/Origin admission and canonical Python, synthetic bytes only. */
 import { Context } from '@deepseek-ai/cordis'
-import ToolRuntime from '@deepseek-ai/dsh-tools'
+import ToolRuntime, { defineTool } from '@deepseek-ai/dsh-tools'
 import SystemPrompt from '@deepseek-ai/dsh-system-prompt'
 import { HostConnectionService } from '@deepseek-ai/dsh-client-connection'
 import { BrowserAuth } from '@deepseek-ai/dsh-client-connection/src/browser-auth.ts'
@@ -79,6 +79,53 @@ it('keeps the default disabled entry inert', async () => {
   const f = await fixture({ enabled: false })
   expect((await f.shared.fetch(new Request(origin + path, { method: 'POST' }))).status).toBe(404)
   expect(f.ctx.tools.schemas().map(value => value.name)).not.toContain('qcu_table_audit')
+})
+it('leaves ordinary Host and Agent tools usable while retaining other monotonic denials', async () => {
+  const f = await fixture()
+  const agent = {} as never
+  const body = vi.fn(async () => 'ordinary synthetic tool')
+  f.ctx.tools.register(defineTool({ name: 'ordinary_probe', description: 'Synthetic ordinary tool', parameters: {},
+    output: { schema: { type: 'string' }, render: (_args, result) => [{ type: 'text', text: String(result) }] }, execute: body }))
+  const run = (caller?: typeof agent) => f.ctx.tools.execute({ name: 'ordinary_probe', arguments: {}, agent: caller,
+    signal: new AbortController().signal, callId: 'ordinary-probe' as never })
+  expect((await run()).isError).toBe(false)
+  expect((await run(agent)).isError).toBe(false)
+  expect(body).toHaveBeenCalledTimes(2)
+  const remove = f.ctx.tools.guard(exec => exec.name === 'ordinary_probe' ? 'Synthetic separate policy denial' : undefined)
+  expect((await run(agent)).isError).toBe(true)
+  expect(body).toHaveBeenCalledTimes(2)
+  remove()
+})
+it('preserves official ask fail-closed behavior for unrelated tools', async () => {
+  const f = await fixture(); const body = vi.fn(async () => 'must not run')
+  f.ctx.tools.register(defineTool({ name: 'ordinary_approval_probe', description: 'Synthetic approval probe', parameters: {},
+    output: { schema: { type: 'string' }, render: (_args, result) => [{ type: 'text', text: String(result) }] }, execute: body }))
+  f.ctx.on('tools/pre-execute', async (exec, next) => exec.name === 'ordinary_approval_probe'
+    ? { kind: 'ask', reason: 'Synthetic per-call approval; no answerer composed' } : next())
+  const answer = await f.ctx.tools.execute({ name: 'ordinary_approval_probe', arguments: {}, agent: {} as never,
+    signal: new AbortController().signal, callId: 'approval-probe' as never })
+  expect(answer.isError).toBe(true); expect(body).not.toHaveBeenCalled()
+})
+it('rejects direct, nested and aliased Agent CSV entry even with a valid page grant', async () => {
+  const f = await fixture(); const page = await f.open(); const grant = await f.authorize(page)
+  const args = { table_id: grant.value.taskId }; const agent = {} as never
+  const definition = f.ctx.tools.get('qcu_table_audit')!
+  f.ctx.tools.register({ ...definition, name: 'synthetic_csv_alias' })
+  for (const name of ['qcu_table_audit', 'synthetic_csv_alias']) {
+    expect((await f.ctx.tools.execute({ name, arguments: args, agent,
+      callId: 'csv-model-probe' as never, signal: new AbortController().signal })).isError).toBe(true)
+  }
+  await expect(definition.execute(args, { name: 'synthetic_csv_direct', arguments: args, agent,
+    signal: new AbortController().signal } as never)).rejects.toThrow()
+  f.ctx.tools.register(defineTool({ name: 'ordinary_nested_probe', description: 'Synthetic wrapper', parameters: {},
+    output: { schema: { type: 'boolean' }, render: (_args, result) => [{ type: 'text', text: String(result) }] },
+    execute: async (_args, exec) => (await f.ctx.tools.execute({ name: 'qcu_table_audit', arguments: args, agent: exec.agent,
+      callId: 'csv-nested-probe' as never, rootCallId: exec.rootCallId, parent: exec.token, signal: exec.signal })).isError }))
+  const nested = await f.ctx.tools.execute({ name: 'ordinary_nested_probe', arguments: {}, agent,
+    callId: 'nested-wrapper' as never, signal: new AbortController().signal })
+  expect(nested.isError).toBe(false); expect(nested.content).toEqual([{ type: 'text', text: 'true' }])
+  expect(await readdir(f.home)).toEqual([])
+  expect((await f.api({ operation: 'check', taskId: grant.value.taskId }, page)).status).toBe(200)
 })
 it('authorizes one explicit snapshot and repeats safe diagnosis without a Session', async () => {
   const f = await fixture(); const page = await f.open(); const grant = await f.authorize(page)

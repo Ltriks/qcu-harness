@@ -1,0 +1,146 @@
+[
+  {
+    "id": "preset-standard",
+    "disabled": false
+  },
+  {
+    "id": "preset-ptc",
+    "disabled": true
+  },
+  {
+    "id": "preset-minimal",
+    "disabled": true
+  },
+  {
+    "id": "preset-cordis",
+    "disabled": true
+  },
+  {
+    "id": "session-title-llm",
+    "disabled": true
+  },
+  {
+    "id": "session-telemetry-otel",
+    "disabled": true
+  },
+  {
+    "id": "product-analytics",
+    "disabled": true
+  },
+  {
+    "id": "command-feedback",
+    "disabled": true
+  },
+  {
+    "id": "message-feedback",
+    "disabled": true
+  },
+  {
+    "id": "ui-message-feedback",
+    "disabled": true
+  },
+  {
+    "id": "file-reference-local",
+    "disabled": false
+  },
+  {
+    "id": "ui-reference",
+    "disabled": false
+  },
+  {
+    "id": "ui-attachment",
+    "disabled": false
+  },
+  {
+    "id": "ui-sidebar-files",
+    "disabled": false
+  },
+  {
+    "id": "ui-sidebar-terminal",
+    "disabled": false
+  },
+  {
+    "id": "ui-sidebar-documentpreview",
+    "disabled": false
+  },
+  {
+    "id": "workspace-files",
+    "disabled": false
+  },
+  {
+    "id": "terminal-controller",
+    "disabled": false
+  },
+  {
+    "id": "cordis-host-runner",
+    "disabled": true
+  },
+  {
+    "id": "cordis-client-runner",
+    "disabled": true
+  },
+  {
+    "id": "cordis-inspect-providers",
+    "disabled": true
+  },
+  {
+    "id": "hmr",
+    "disabled": true
+  },
+  {
+    "id": "ui-deliverables",
+    "disabled": false
+  },
+  {
+    "id": "ui-cordis",
+    "disabled": true
+  },
+  {
+    "id": "skill-filesystem",
+    "config": {
+      "includeDefaultRoots": true,
+      "watch": true
+    }
+  },
+  {
+    "id": "qcu-table-audit-task",
+    "disabled": false,
+    "config": {
+      "enabled": true,
+      "mode": "isolated-local-csv",
+      "python": "/absolute/path/to/python3",
+      "workRoot": "/absolute/path/to/owned-csv-work",
+      "maxInputBytes": 1048576,
+      "maxRuleBytes": 65536,
+      "maxReportBytes": 1048576,
+      "timeoutMs": 10000,
+      "terminateMs": 1000,
+      "maxConcurrentRuns": 2,
+      "grantMs": 300000,
+      "maxPages": 16,
+      "maxRows": 10000,
+      "maxColumns": 128,
+      "maxIssues": 10000,
+      "websocketEnabled": true
+    }
+  },
+  {
+    "id": "qcu-table-audit-guidance",
+    "disabled": false,
+    "config": {
+      "enabled": true
+    }
+  },
+  {
+    "id": "sandbox-policy",
+    "config": {
+      "mode": "workspace-write"
+    }
+  },
+  {
+    "id": "approval",
+    "config": {
+      "policy": "ask"
+    }
+  }
+]

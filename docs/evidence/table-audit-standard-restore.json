@@ -1,0 +1,87 @@
+{
+  "checkedUtc": "2026-10-08T08:34:48.621037+00:00",
+  "version": "0.2.0-prototype.8",
+  "changes": {
+    "configuration": "Enable official Standard and normal file/terminal/reference/deliverables UI; restore default per-agent Skill discovery; explicit workspace-write+ask",
+    "pluginCode": "Restrict global denial to qcu_table_audit Agent calls; same tool body rejects aliases/direct/nested Agent dispatch"
+  },
+  "officialDshSourceModified": false,
+  "tests": {
+    "files": 7,
+    "total": 78,
+    "passed": 78,
+    "failed": 0,
+    "newBoundaryTests": 3
+  },
+  "hostAndClientTypesPassed": true,
+  "officialNodeBuildsPassed": true,
+  "initialWebSocketSandboxFailure": "listen EPERM; authorized localhost rerun passed 22/22",
+  "independentReview": {
+    "completed": true,
+    "passed": 78,
+    "blockedFindings": [],
+    "scope": "temporary independent copy; no App or credentials touched"
+  },
+  "preserved": [
+    "exact nonmissing Origin/Host",
+    "official authentication",
+    "byte-only snapshot and explicit consent",
+    "purpose",
+    "page/carrier binding",
+    "expiry/revocation",
+    "shared concurrency and cleanup"
+  ],
+  "notEnabled": [
+    "Creator",
+    "other presets",
+    "Standard plugin-manager tool",
+    "Full Access",
+    "auto approval"
+  ],
+  "defaultSkillDiscoveryImpact": [
+    "project .dsh/skills and .agents/skills",
+    "dedicated DSH_HOME/skills and DSH_AGENTS_HOME/skills",
+    "official bundled Skill roots"
+  ],
+  "credentialsReadOrCopied": false,
+  "permissionDirectoriesAdded": false,
+  "tarball": {
+    "bytes": 26560,
+    "sha256": "5ce56b3ca4d22b72348ae3ba7f33ba8e96f5d76ef9be8bb9c5f9db720088a219"
+  },
+  "nativeUIControlled": false,
+  "newSessionVerified": true,
+  "modelDialogueVerified": true,
+  "packageReady": false,
+  "reviewedFileHashes": {
+    "packages/qcu-table-audit/src/task-host.ts": "fef4450773db49b53ccc53f98f20147601f967040e53dcf6c6ed4f8b31b47bff",
+    "packages/qcu-table-audit/tests/task-host.spec.ts": "942fa469d196df64f03c4b493c787183e9a58515fd8f5cc66c08ca4fb34b9ed7",
+    "packages/qcu-table-audit/examples/csv-standard-pilot.patch.json": "b94652ac4dfb17a5b1736a84585fd10a63d371e97940ce70b24800e083bb5c6b"
+  },
+  "normalQuitAndRestartCompleted": true,
+  "officialCliExit": 0,
+  "installedFilesMatchTarball": 20,
+  "protocolRestoredAndReadBack": true,
+  "ownWorkspaceUsed": true,
+  "newSessionVerifiedSurface": "Official authenticated session API; browser New Session control usable; native renderer not controlled",
+  "modelDialogueSurface": "Normal official session API, one synthetic plain-text exchange",
+  "permissionProjection": "workspace-write",
+  "approvalConfiguration": "ask",
+  "csvBrowserRegression": {
+    "rows": 4,
+    "issues": 7,
+    "repetitions": 2,
+    "countOnlyExport": true,
+    "cancelRevokePassed": true,
+    "workEmpty": true,
+    "syntheticCsvUnchanged": true,
+    "pageErrors": []
+  },
+  "browserSelectorCorrection": "Scoped section selector after restored normal UI added a second section; no product change",
+  "nativeUserManualEvidenceScope": "prototype.7 historical three checks; not generalized to prototype.8",
+  "nativeGUIValidated": false,
+  "realApprovalUiVerified": false,
+  "secondMacValidated": false,
+  "dialogueInstallValidated": false,
+  "formalReleaseValidated": false
+}

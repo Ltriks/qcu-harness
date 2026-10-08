@@ -1,52 +1,53 @@
 {
-  "kit": "QCU-AppleSilicon-Pilot-prototype7.zip",
-  "bytes": 43488,
-  "sha256": "3483750c314638031b82427bb3bf0a2bf958877ddfa98cee3f1ca2619c9e685d",
+  "version": "0.2.0-prototype.8",
+  "kit": "QCU-AppleSilicon-Pilot-prototype8.zip",
+  "bytes": 45345,
+  "sha256": "c13c9b383985f9021cdc4d10d232e9fd25f98fde3cca386af6a42d18915899ed",
   "files": 14,
   "fileManifest": {
     "LOCAL-MAC-ACCEPTANCE.json": {
-      "bytes": 2616,
-      "sha256": "f7089bb06385c4ca05eb61679782a52d1196a8c21306603d84911d18baf59011"
+      "bytes": 3287,
+      "sha256": "f8ad9301483184a653cc9fdec4261280df7016ece4617b0cdc9975325762e029"
     },
     "LOCAL-PORTABLE-SELF-CHECK.json": {
-      "bytes": 756,
-      "sha256": "657eb03d696290f74a41c98b96ea7a752deab0a292e92785dbabd8d77a864fc1"
+      "bytes": 890,
+      "sha256": "a63e14f79a48e58af741deca6af4bda18e6133e83cd85dbc3fd876c646489d3d"
     },
     "NO-MODEL-INTEGRATION-EVIDENCE.json": {
       "bytes": 1450,
       "sha256": "cd0af0b57569c129c2e934da0ee34f6993e4da1717e2f024a33ebb78c83941ec"
     },
     "README.zh-CN.txt": {
-      "bytes": 8813,
-      "sha256": "d3c440cf385835db1d03d6f5cf4c340b0d0c146b284847cc8b3a62ffcaf11a7e"
+      "bytes": 10185,
+      "sha256": "b2f088bec8d1fa5e205f387a835aed39c81f48ca4fcc8e97c85a32a44495482f"
     },
     "SECOND-MAC-CHECKLIST.txt": {
-      "bytes": 896,
-      "sha256": "801984dd3033fcf0327c21d2cbe6c1939eae11e03376f4d30a4408cc90bef796"
+      "bytes": 1277,
+      "sha256": "4813e9f4e1ca49fe371eeed705b3fa4aa106c5cf1e9bbf7e6948be343a1f0c6d"
     },
     "VERSION-AND-SOURCES.json": {
-      "bytes": 1300,
-      "sha256": "1c7df179cf9b38b348e98206cd288be48fde16b3033fb287ac0c968fec3e7903"
+      "bytes": 1389,
+      "sha256": "29226c8f3369b3e82874414cd00e11f15ea14780102d895144229c1ad8d0938f"
     },
     "bundle-default-disabled.json": {
       "bytes": 386,
       "sha256": "29a87ab1dccafa979812a2f0793f457d88cb3234d70e998c66d57d51abe92750"
     },
-    "csv-native-candidate.patch.json": {
-      "bytes": 2255,
-      "sha256": "0a60b42e614e15a6e781165f61f5652e0465d1254e687b51d5fafcdadd52649d"
+    "csv-standard-pilot.patch.json": {
+      "bytes": 2429,
+      "sha256": "b94652ac4dfb17a5b1736a84585fd10a63d371e97940ce70b24800e083bb5c6b"
     },
     "pilot.py": {
-      "bytes": 9769,
-      "sha256": "f8dcc61bcea6baf388cfcfa87223e1b89d6282965f417e0e93f80d915a4491c6"
+      "bytes": 9791,
+      "sha256": "a009bf291627fd6615ec705d23a157bb334d9ac786d8a8644c60704e836a5a28"
     },
     "qcu-csv-readonly-task.SKILL.md": {
       "bytes": 1377,
       "sha256": "87ae4ab11eabbe71546215dda2b5becd00f07ea39e7cf0de1b448805d6afb235"
     },
-    "qcu-table-audit-0.2.0-prototype.7.tgz": {
-      "bytes": 26068,
-      "sha256": "c1192607639435922fe48216030b2507e77f372240be57c80031a0ff84382305"
+    "qcu-table-audit-0.2.0-prototype.8.tgz": {
+      "bytes": 26560,
+      "sha256": "5ce56b3ca4d22b72348ae3ba7f33ba8e96f5d76ef9be8bb9c5f9db720088a219"
     },
     "synthetic-personal-rules.json": {
       "bytes": 303,
@@ -57,16 +58,19 @@
       "sha256": "25304bd4e8e4353350222957967ca41907e4100a1e05a3c0b3ff6fc7088d43ee"
     }
   },
-  "scanTextFilesIncludingNestedTgz": 32,
+  "scanTextFilesIncludingNestedTgz": 33,
   "blockedFindings": [],
   "officialRuntimeIncluded": false,
   "modelCredentialsIncluded": false,
-  "localNativeCoreFlowUserManualPassed": true,
   "localPortableSelfCheckPassed": true,
+  "officialStandardSessionCreated": true,
+  "localModelDialogueVerified": true,
+  "localCsvBrowserRegressionPassed": true,
+  "nativeGuiControlledThisVersion": false,
   "secondMacValidated": false,
+  "realApprovalUiVerified": false,
   "dialogueInstallValidated": false,
   "formalReleaseValidated": false,
   "packageReady": false,
-  "dailyDialogueProfileReady": false,
-  "observedChatBlocker": "agent-preset/not-found: Unknown agent preset: standard"
+  "supersedes": "prototype.7 restricted CSV kit; historical file retained locally and in Library version history"
 }

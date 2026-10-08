@@ -78,7 +78,9 @@ export async function apply(ctx: Context, config: Config): Promise<void> {
     await release?.(); await unguard?.()
   }
   try {
-  unguard = ctx.root.tools.guard(exec => exec.name !== 'qcu_table_audit' || exec.agent !== undefined
+  // Deny only this plugin's model entry. Other tools retain official policy.
+  // The body also rejects Agent callers, including aliases and direct dispatch.
+  unguard = ctx.root.tools.guard(exec => exec.name === 'qcu_table_audit' && exec.agent !== undefined
     ? 'Isolated CSV tasks admit only explicitly authorized local diagnosis.' : undefined)
   release = connection.fetch.register({ path: TASK_PATH, methods: ['POST'], requestBody: 'streaming',
     fetch: async request => {

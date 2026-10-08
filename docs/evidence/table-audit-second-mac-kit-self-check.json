@@ -17,5 +17,8 @@
     "syntheticCsvUnchanged": true
   },
   "completed": true,
-  "officialSignedAppReadOnlyVerifyPassed": true
+  "version": "0.2.0-prototype.8",
+  "profileScope": "official Standard + bounded synthetic CSV",
+  "officialSignedAppReadOnlyVerifyPassed": true,
+  "workspaceDirectoryPrivate": true
 }
