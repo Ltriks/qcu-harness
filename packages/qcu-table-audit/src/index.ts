@@ -30,6 +30,7 @@ export interface Config {
   readonly authority: CsvAuthority
   readonly maxInputBytes: number
   readonly maxRuleBytes: number
+  /** Read limit after generation; not a disk quota for the trusted engine. */
   readonly maxReportBytes: number
   readonly timeoutMs: number
   readonly terminateMs: number
@@ -117,9 +118,10 @@ async function execute(config: Config, directory: string, signal: AbortSignal): 
 }
 
 /** Per-plugin ownership, authorization checks and quiescent teardown. */
+interface OwnedRun { controller: AbortController; done: Promise<void>; directory?: string }
 export class CsvAuditRunner {
   private closed = false
-  private readonly active = new Set<{ controller: AbortController; done: Promise<void> }>()
+  private readonly active = new Set<OwnedRun>()
   constructor(private readonly config: Config) {}
 
   /** Run only a CSV grant belonging to the configured trusted owner. */
@@ -132,7 +134,7 @@ export class CsvAuditRunner {
     signal.addEventListener('abort', abort, { once: true })
     let finish = (): void => {}
     const done = new Promise<void>(resolve => { finish = resolve })
-    const operation = { controller, done }
+    const operation: OwnedRun = { controller, done }
     this.active.add(operation)
     let directory: string | undefined
     try {
@@ -143,6 +145,7 @@ export class CsvAuditRunner {
       if (csv.length === 0 || csv.length > this.config.maxInputBytes || rules.length > this.config.maxRuleBytes) fail()
       cancelled(controller.signal)
       directory = await mkdtemp(join(this.config.workRoot, 'run-'))
+      operation.directory = directory
       await chmod(directory, 0o700)
       await writeFile(join(directory, 'input.csv'), csv, { flag: 'wx', mode: 0o600 })
       await writeFile(join(directory, 'rules.json'), rules, { flag: 'wx', mode: 0o600 })
@@ -158,6 +161,7 @@ export class CsvAuditRunner {
       // publish its already-selected value even if cancellation arrives in rm().
       await rm(directory, { recursive: true, force: true })
       directory = undefined
+      operation.directory = undefined
       cancelled(controller.signal)
       const finalGrant = await interruptible(this.config.authority.resolve(tableId, rulesId, caller, controller.signal), controller.signal)
       this.authorized(finalGrant, caller)
@@ -167,9 +171,13 @@ export class CsvAuditRunner {
     } catch (_error) {
       throw new Error(ERROR)
     } finally {
-      try { if (directory !== undefined) await rm(directory, { recursive: true, force: true }) }
+      try {
+        if (directory !== undefined) await rm(directory, { recursive: true, force: true })
+        operation.directory = undefined
+        this.active.delete(operation)
+      }
       catch (_cleanupError) { throw new Error(ERROR) }
-      finally { signal.removeEventListener('abort', abort); this.active.delete(operation); finish() }
+      finally { signal.removeEventListener('abort', abort); finish() }
     }
   }
 
@@ -184,6 +192,12 @@ export class CsvAuditRunner {
     const work = [...this.active]
     for (const item of work) item.controller.abort()
     await Promise.all(work.map(item => item.done))
+    const cleanup = await Promise.allSettled(work.map(async item => {
+      if (item.directory !== undefined) await rm(item.directory, { recursive: true, force: true })
+      item.directory = undefined
+      this.active.delete(item)
+    }))
+    if (cleanup.some(item => item.status === 'rejected')) fail()
   }
 }
 

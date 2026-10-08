@@ -1,47 +1,56 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "scope": "isolated programmatic CSV Host prototype; synthetic fixtures only",
+  "reviewedBaseCommit": "b4e0f51828aa8575d2864cf2e92a33a33d53cdc3",
   "checks": [
     {
       "check": "build",
       "exit": 0,
-      "seconds": 0.5
+      "seconds": 0.66
     },
     {
       "check": "types",
       "exit": 0,
-      "seconds": 0.56
+      "seconds": 0.59
     },
     {
       "check": "tests",
       "exit": 0,
-      "seconds": 5.58
+      "seconds": 7.72
     },
     {
       "check": "concurrent-a",
       "exit": 0,
-      "seconds": 5.96
+      "seconds": 8.35
     },
     {
       "check": "concurrent-b",
       "exit": 0,
-      "seconds": 5.45
+      "seconds": 8.88
     }
   ],
-  "testsPerProcess": 19,
+  "testsPerProcess": 24,
   "concurrentIndependentProcesses": 2,
-  "oldCleanupRegression": {
+  "independentReadOnlyReviewers": 2,
+  "reviewFoundCleanupOwnershipDefect": true,
+  "baselineCleanupFailureRegression": {
     "exit": 1,
-    "cases": 4,
+    "cases": 1,
     "expectedFailure": true
   },
+  "cleanupFailureRetainsOwnershipAndDisposeRejects": true,
+  "cleanupRetryAfterRecoveryVerified": true,
+  "sensitiveAuthorityExceptionAndActualStderrExcluded": true,
+  "ignoredSigtermForcedExitVerified": true,
+  "sameOwnerTwoSnapshotIsolationAndThirdRunLimitVerified": true,
+  "sameOwnerTwoSuccessfulReportsRemainDistinct": true,
   "canonicalEngineByteEqual": true,
   "publicSource": {
     "blockedFindings": 0,
     "canonicalSkillsVerified": 13,
     "resourceHashesVerified": 12
   },
-  "newDocRelativeLinksChecked": 11,
+  "newDocRelativeLinksChecked": 15,
   "acceptedCandidateResourcesUnchanged": 12,
   "originalRepositoryClean": true,
   "originalRepositoryHead": "756b7331b2eaf91aff5340c62cedaf5261af7876",
@@ -49,6 +58,9 @@
   "actualExistingLaunchPolicyDeniesNewTool": true,
   "cleanupCancelUnloadExpiryRevocationRegression": true,
   "childExitAndTemporaryCleanupVerified": true,
+  "reportLimitIsPostGenerationReadLimit": true,
+  "hardGenerationDiskQuotaImplemented": false,
+  "productionCordisUnloadRecoveryIntegrated": false,
   "rawCsvRulesPathsOrStderrReturned": false,
   "modelsInvoked": false,
   "externalServicesUsed": false,

@@ -13,13 +13,14 @@ import * as Adapter from '../lib/index.js'
 import type { Config, AuthorizedCsv, AuditScope } from '../lib/index.js'
 import { installQcuLaunchPolicy } from '../../../upstream/source/apps/desktop-host/src/qcu-policy.ts'
 
-const cleanup = vi.hoisted(() => ({ root: '', reached: false, wait: Promise.resolve(), release: () => {} }))
+const cleanup = vi.hoisted(() => ({ root: '', reached: false, fail: false, wait: Promise.resolve(), release: () => {} }))
 vi.mock('node:fs/promises', async importOriginal => {
   const actual = await importOriginal<typeof import('node:fs/promises')>()
   return { ...actual, rm: async (...args: Parameters<typeof actual.rm>) => {
     if (cleanup.root && String(args[0]).startsWith(`${cleanup.root}/run-`)) {
       cleanup.reached = true
       await cleanup.wait
+      if (cleanup.fail) throw new Error('synthetic cleanup denied')
     }
     return actual.rm(...args)
   } }
@@ -41,7 +42,7 @@ async function fixture() {
   const csv = await readFile(source)
   const rules: unknown = JSON.parse(await readFile(resolve('../../skills/qcu-table-audit/examples/rules.json'), 'utf8'))
   const grant: AuthorizedCsv = { format: 'csv', purpose: 'diagnose-csv', scope, expiresAt: Date.now() + 60000, csv, rules }
-  const authority = { resolve: vi.fn(async () => grant as AuthorizedCsv | null) }
+  const authority = { resolve: vi.fn(async (_tableId: string, _rulesId: string, _scope: AuditScope, _signal: AbortSignal) => grant as AuthorizedCsv | null) }
   const config: Config = { python: python!, workRoot: home, scope, authority, maxInputBytes: 100000,
     maxRuleBytes: 10000, maxReportBytes: 1000000, timeoutMs: 10000, terminateMs: 500, maxConcurrentRuns: 2 }
   return { home, source, csv, grant, authority, config }
@@ -70,12 +71,13 @@ function exited(pid: number): void {
 }
 
 /** Readiness is an external file written only after the child starts; no fixed sleep. */
-async function pausedPython(home: string) {
+async function pausedPython(home: string, ignoreTermination = false) {
   const ready = join(home, 'fixture-ready.json')
   const executable = join(home, 'fixture-python')
-  await writeFile(executable, `#!${process.execPath}\nconst fs=require('node:fs');fs.writeFileSync(${JSON.stringify(ready)},JSON.stringify({pid:process.pid,temporary:require('node:path').dirname(process.argv[4])}));setInterval(()=>{},1000);\n`, { mode: 0o700 })
+  const ignored = join(home, 'fixture-term-observed')
+  await writeFile(executable, `#!${process.execPath}\nconst fs=require('node:fs'),path=require('node:path');${ignoreTermination ? `process.on('SIGTERM',()=>fs.writeFileSync(${JSON.stringify(ignored)},'observed'));` : ''}const temporary=path.dirname(process.argv[4]),record=JSON.stringify({pid:process.pid,temporary});fs.writeFileSync(path.join(temporary,'fixture-ready.json'),record);fs.writeFileSync(${JSON.stringify(ready)},record);setInterval(()=>{},1000);\n`, { mode: 0o700 })
   await chmod(executable, 0o700)
-  return { executable, ready, observe: async () => {
+  return { executable, ready, ignored, observe: async () => {
     await vi.waitUntil(() => existsSync(ready), { timeout: 5000 })
     const value: { pid: number; temporary: string } = JSON.parse(await readFile(ready, 'utf8'))
     return value
@@ -83,13 +85,105 @@ async function pausedPython(home: string) {
 }
 
 afterEach(async () => {
-  cleanup.release(); cleanup.root = ''; cleanup.reached = false
+  cleanup.release(); cleanup.root = ''; cleanup.reached = false; cleanup.fail = false
+  cleanup.wait = Promise.resolve()
   for (const ctx of contexts.splice(0)) await ctx.fiber.dispose()
   for (const runner of runners.splice(0)) await runner.dispose()
   for (const root of roots.splice(0)) await rm(root, { recursive: true, force: true })
 })
 
 describe('minimal CSV Host adapter', () => {
+  it('reports failed cleanup on unload and retains the owned directory for a successful retry', async () => {
+    const f = await fixture(); cleanup.root = f.home; cleanup.fail = true
+    const runner = new Adapter.CsvAuditRunner(f.config); runners.push(runner)
+    await expect(runner.run(tableId, 'demo', scope, new AbortController().signal)).rejects.toThrow('CSV diagnosis unavailable')
+    const names = await readdir(f.home)
+    expect(names).toHaveLength(1)
+    expect(names[0]).toMatch(/^run-/)
+    await expect(runner.dispose()).rejects.toThrow('CSV diagnosis unavailable')
+    expect(await readdir(f.home)).toEqual(names)
+    cleanup.fail = false
+    await runner.dispose()
+    expect(await readdir(f.home)).toEqual([])
+    await expect(runner.run(tableId, 'demo', scope, new AbortController().signal)).rejects.toThrow('CSV diagnosis unavailable')
+  })
+
+  it('keeps sensitive authority exceptions and child stderr out of complete error output', async () => {
+    const f = await fixture(); const marker = 'SYNTHETIC-PRIVATE-VALUE'
+    f.authority.resolve.mockRejectedValueOnce(new Error(`${marker}:${f.home}`))
+    const { ctx } = await host(f.config)
+    const first = await run(ctx)
+    expect(first.isError).toBe(true)
+    const executable = join(f.home, 'fixture-failing-python')
+    const stderrReady = join(f.home, 'fixture-stderr-observed')
+    await writeFile(executable, `#!${process.execPath}\nprocess.stderr.write(${JSON.stringify(marker)},()=>{require('node:fs').writeFileSync(${JSON.stringify(stderrReady)},'executed');process.exit(2)});\n`, { mode: 0o700 })
+    const secondHost = await host({ ...f.config, python: executable })
+    const second = await run(secondHost.ctx)
+    expect(second.isError).toBe(true)
+    expect(existsSync(stderrReady)).toBe(true)
+    for (const result of [first, second]) {
+      const output = JSON.stringify(result)
+      expect(output).toContain('CSV diagnosis unavailable')
+      for (const value of [marker, f.home, 'input.csv', '示例甲']) expect(output).not.toContain(value)
+    }
+  })
+
+  it('forces only its owned child to exit after ignored SIGTERM, then removes its directory', async () => {
+    const f = await fixture(); const childFixture = await pausedPython(f.home, true)
+    const runner = new Adapter.CsvAuditRunner({ ...f.config, python: childFixture.executable }); runners.push(runner)
+    const abort = new AbortController()
+    const pending = runner.run(tableId, 'demo', scope, abort.signal)
+    const rejected = expect(pending).rejects.toThrow('CSV diagnosis unavailable')
+    const child = await childFixture.observe()
+    abort.abort()
+    await rejected
+    expect(existsSync(childFixture.ignored)).toBe(true)
+    exited(child.pid)
+    expect(existsSync(child.temporary)).toBe(false)
+  })
+
+  it('isolates two simultaneous runs in one owner and refuses a third before authorization', async () => {
+    const f = await fixture(); const childFixture = await pausedPython(f.home)
+    const otherId = '4'.repeat(32)
+    const otherCsv = Buffer.from(f.csv.toString().replaceAll('示例甲', '示例丙'))
+    f.authority.resolve.mockImplementation(async id => id === tableId ? f.grant : { ...f.grant, csv: otherCsv })
+    const runner = new Adapter.CsvAuditRunner({ ...f.config, python: childFixture.executable }); runners.push(runner)
+    const a = new AbortController(); const b = new AbortController()
+    const first = runner.run(tableId, 'demo', scope, a.signal)
+    const second = runner.run(otherId, 'demo', scope, b.signal)
+    const firstFailure = expect(first).rejects.toThrow('CSV diagnosis unavailable')
+    const secondFailure = expect(second).rejects.toThrow('CSV diagnosis unavailable')
+    await vi.waitUntil(async () => (await readdir(f.home)).filter(name => name.startsWith('run-')).length === 2)
+    const directories = (await readdir(f.home)).filter(name => name.startsWith('run-'))
+    expect(new Set(directories).size).toBe(2)
+    await expect(runner.run(tableId, 'demo', scope, new AbortController().signal)).rejects.toThrow('CSV diagnosis unavailable')
+    expect(f.authority.resolve).toHaveBeenCalledTimes(2)
+    // Wait for both snapshots, not a fixed sleep, and verify each independently.
+    await vi.waitUntil(() => directories.every(name => existsSync(join(f.home, name, 'fixture-ready.json'))), { timeout: 5000 })
+    const snapshots = await Promise.all(directories.map(name => readFile(join(f.home, name, 'input.csv'), 'utf8')))
+    expect(snapshots.sort()).toEqual([f.csv.toString(), otherCsv.toString()].sort())
+    const children = await Promise.all(directories.map(async name => JSON.parse(await readFile(join(f.home, name, 'fixture-ready.json'), 'utf8')) as { pid: number }))
+    a.abort(); b.abort()
+    await Promise.all([firstFailure, secondFailure])
+    for (const child of children) exited(child.pid)
+    expect((await readdir(f.home)).filter(name => name.startsWith('run-'))).toEqual([])
+  })
+
+  it('returns distinct successful reports for concurrent differently authorized CSV snapshots', async () => {
+    const f = await fixture(); const otherId = '4'.repeat(32)
+    const otherCsv = Buffer.from(f.csv.toString().trimEnd().split('\n').slice(0, -1).join('\n') + '\n')
+    f.authority.resolve.mockImplementation(async id => id === tableId ? f.grant : { ...f.grant, csv: otherCsv })
+    const runner = new Adapter.CsvAuditRunner(f.config); runners.push(runner)
+    const [first, second] = await Promise.all([
+      runner.run(tableId, 'demo', scope, new AbortController().signal),
+      runner.run(otherId, 'demo', scope, new AbortController().signal),
+    ])
+    expect(first).toMatchObject({ status: 'completed', rows: 4, issues: 7, counts: { required_missing: 1 } })
+    expect(second).toMatchObject({ status: 'completed', rows: 3, issues: 6, counts: { required_missing: 0 } })
+    expect(f.authority.resolve).toHaveBeenCalledTimes(6)
+    expect(await readdir(f.home)).toEqual([])
+  })
+
   for (const mode of ['cancel', 'unload', 'expiry', 'revocation'] as const) it(`does not publish counts after ${mode} during successful-run cleanup`, async () => {
     const f = await fixture()
     cleanup.root = f.home
