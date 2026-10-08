@@ -3,7 +3,16 @@ import * as React from 'react'
 import { createRoot } from 'react-dom/client'
 import { JSDOM } from 'jsdom'
 import { expect, it, vi } from 'vitest'
-import { TaskPage, apply } from '../lib/client.js'
+import { readFile } from 'node:fs/promises'
+let registration
+const code = await readFile(new URL('../lib/client.js', import.meta.url), 'utf8')
+// Execute the actual loader registration, then materialize its lazy factory with shared React.
+Function('window', code)({ __ModuleLoader__: { load: value => { registration = value } } })
+expect(registration.id).toBe('qcu-table-audit')
+const { TaskPage, apply } = registration.factory(specifier => {
+  if (specifier !== 'react') throw new Error('Unexpected synthetic module request.')
+  return React
+})
 it('contributes a root task panel instead of a Session-header entry', () => {
   const seats = []
   const ctx = { slots: { inject: (name, factory) => { seats.push(name); factory() }, register: () => () => {} } }

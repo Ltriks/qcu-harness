@@ -1,0 +1,140 @@
+{
+  "dateUtc": "2026-10-08",
+  "scope": "isolated Apple Silicon official Web profile, synthetic CSV only",
+  "sourceBaseBeforeChanges": "7ec93e2049fa3eab97d389c673349d74060f6cde",
+  "officialCheckout": {
+    "commit": "639ed015397290b3745d163aafe02ffee4aa3f84",
+    "workingTreeClean": true
+  },
+  "registryRuntime": {
+    "dsh": "0.2.0-rc.2",
+    "web": "0.2.0-rc.2",
+    "cordis": "4.0.4",
+    "registry": "https://registry.npmjs.org/",
+    "gitHeadUnavailable": true,
+    "exactTarballCommitCorrespondenceVerified": false,
+    "sourcePatchesApplied": false,
+    "node": "24.21.0",
+    "python": "3.12.14",
+    "pnpm": "11.7"
+  },
+  "artifact": {
+    "name": "qcu-table-audit-0.2.0-prototype.5.tgz",
+    "bytes": 21701,
+    "sha256": "5fb55b69ce45947d29b113ccfcd67bb9b313a2ff9017491c28e678c943e76114",
+    "entries": 16,
+    "includesDependencies": false,
+    "defaultEnabled": false
+  },
+  "tests": {
+    "vitestPassed": 53,
+    "hostStrictTypes": true,
+    "clientStrictTypes": true
+  },
+  "browserWorkflow": {
+    "environment": "real Chrome and unmodified official Web runtime; synthetic CSV only",
+    "steps": [
+      "official first-run dialogs handled if present; no model credentials supplied",
+      "root task entry opened without creating a Session",
+      "browser file-chooser empty selection leaves task idle",
+      "synthetic bytes admitted only after explicit per-file consent",
+      "demo diagnosis returned four rows and seven issues",
+      "download cancel requested; actual failure result recorded separately",
+      "second export saved safe count-only JSON",
+      "same-file reselection and explicit personal rules diagnosed successfully",
+      "repeated check completed",
+      "navigation unmounted task, revoked authority and left no owned temporary directories"
+    ],
+    "operations": [
+      "open",
+      "cancel",
+      "cancel",
+      "authorize",
+      "check",
+      "cancel",
+      "cancel",
+      "authorize",
+      "check",
+      "check",
+      "cancel",
+      "close"
+    ],
+    "pageErrors": [],
+    "nativeOsDialogsTested": false,
+    "csvHttpStatuses": [
+      200,
+      200,
+      200,
+      200,
+      200,
+      200,
+      200,
+      200,
+      200,
+      200,
+      200,
+      200
+    ],
+    "downloadCancelResult": null,
+    "sourceCsvHashUnchanged": true,
+    "completed": true
+  },
+  "nativeOsDialogsTested": false,
+  "downloadCancellation": {
+    "requested": true,
+    "latestFailureResult": null,
+    "latestActualCancellationProven": false,
+    "retryExportSucceeded": true,
+    "note": "Small count-only download completed before cancellation in the final artifact run; null is not cancellation success."
+  },
+  "unload": {
+    "liveBundleTogglePassed": false,
+    "cause": "HMR disabled in the isolated profile. Official manager reports application restart-required; switching Bundle selection persists configuration without unloading current fibers.",
+    "officialRemoveAndNormalRestart": {
+      "officialRemove": true,
+      "restartApplied": true,
+      "csvEntryCount": 0,
+      "taskHttpStatus": 404,
+      "ownedWorkEmpty": true
+    },
+    "finalOfficialPackageRestored": true,
+    "restoredEntryVerified": true,
+    "restoredTaskHttpStatus": 200,
+    "restoredPageErrorCount": 0
+  },
+  "localHub": {
+    "localOnly": true,
+    "publicRelease": false,
+    "actualExistingHubPage": true,
+    "browserDownloadSucceeded": true,
+    "pluginHashMatchesCatalog": true,
+    "pageErrors": [],
+    "artifactVersion": "0.2.0-prototype.5",
+    "officialCliInstalledInSecondProfile": true,
+    "readonlySkillInstalledByExistingInstaller": true,
+    "skillAlias": "chengyuan-csv-readonly-task",
+    "publicCatalogPublished": false
+  },
+  "thesisInstanceModified": false,
+  "originalRepositoryModified": false,
+  "pausedProjectTouched": false,
+  "privateCsvUsed": false,
+  "modelCredentialsProvided": false,
+  "packageReady": false,
+  "remaining": [
+    "macOS native file/save dialogs",
+    "latest tiny download cancellation not proven",
+    "single-toggle live unload with HMR disabled requires normal restart",
+    "another Apple Silicon Mac manual acceptance",
+    "private CSV approval not provided"
+  ],
+  "sensitiveLogsIncluded": false,
+  "thesisPreservationCheck": {
+    "port19387ListenerPresent": true,
+    "restartOrStopPerformed": false
+  },
+  "originalRepositoryCheck": {
+    "head": "756b7331b2eaf91aff5340c62cedaf5261af7876",
+    "workingTreeClean": true
+  }
+}

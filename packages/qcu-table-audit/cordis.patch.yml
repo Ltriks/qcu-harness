@@ -3,9 +3,15 @@
     "insert": [
       {
         "id": "qcu-table-audit-task",
-        "name": "qcu-table-audit/task-host",
+        "name": "qcu-table-audit",
         "disabled": true,
         "config": { "enabled": false, "mode": "isolated-local-csv" }
+      },
+      {
+        "id": "qcu-table-audit-guidance",
+        "name": "qcu-table-audit/guidance",
+        "disabled": true,
+        "config": { "enabled": false }
       }
     ]
   }

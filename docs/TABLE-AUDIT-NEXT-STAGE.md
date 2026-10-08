@@ -1,19 +1,20 @@
-# 下一最小可体验阶段
+# 表格体检隔离试用
 
-2026-10-08：下列 1–4 的源码及合成验证已完成，5 的默认关闭 Bundle patch 和 Host/Client 导出已完成；未安装或启用隔离 profile。证据见 [任务阶段验证](evidence/table-audit-task-validation.json)。真实 CSV 批准、完整官方 Client 挂载及系统对话框仍待完成。以下切片保留为实现约束及安装验收清单。
+2026-10-08 用户已批准合成 CSV 的独立官方 DSH 安装验收。实现与真实浏览器结果见 [安装验收](TABLE-AUDIT-INSTALL-VALIDATION.md)，此前“未安装”的任务证据是历史状态。DSH 源码不改，论文候选及其配置不改；这次授权不包含私人 CSV、正式发布、Windows 或系统权限扩展。
 
-建议先做隔离的 CSV 专用开发 profile 和单功能页面，不替换已验收的论文候选，不先固定主导航位置。采用官方 package.json 的 dsh.bundle.patch、Cordis Host/Client 导出和固定依赖；安装验收与 Hub 分发分开。源文件和合成测试可继续在独立开发目录实现，当前没有安装或启用新权限。
+Apple Silicon Mac 使用官方 DSH/Web 0.2.0-rc.2、Cordis 4.0.4、Node ^22.19.0 或 >=24、Python 3.10+。本次实际 Python 3.12.14、Node 24.21.0、pnpm 11.7。不要对正在运行的 profile 执行包管理；专用 profile 正常退出后再安装。本例关闭 HMR，管理页停用只保存配置，须正常退出并重启才应用；卸载先用官方 CLI remove qcu-table-audit，再移除用户层 qcu 的两项配置，重启验证入口消失。
 
-具体切片：
+```sh
+# 先核对下载包 SHA256 与随包的验收记录；不得启用不明包。
+DSH_HOME=/absolute/path/to/isolated-home dsh plugin --profile csv-pilot add ./qcu-table-audit-0.2.0-prototype.5.tgz --ignore-scripts
+```
 
-1. 可信 Host task owner 接受页面显式选择的一个 CSV 快照和明确个人/演示规则。逐次确认只读 diagnose-csv 用途，由 Host 创建短期 local-task scope 和不透明 ID；绑定已认证的本地任务页面及 owner，拒绝其他页面/会话复用。模型不能创建 scope 或传路径。文件原名仅在任务 UI 本地显示，不进入模型或工具输出。
-2. 页面使用标准文件选择，无目录扫描、通用路径接口或聊天附件上传。设置、撤销及关闭动作管理授权，重新选择文件撤销旧授权。取消/关闭/卸载终止 owned 任务并等待清理；清理失败须显式显示失败并提供受控重试，不能清空所有权后声称退出成功。Python、工作目录等配置只由可信 Host 解析。
-3. 页面提供文件选择、受限规则编辑、检查/取消、计数结果和仅计数摘要导出。保留演示标记，不清理源 CSV、不显示或导出原始行。参数/文件/报告在任务页和 Host 之间处理，禁止进入主聊天或外部服务。第一切片不提供完整行级报告、批量、XLSX、模型和永久授权。
-4. 真实文件接入前给唯一 canonical 引擎补可选生成预算及明确行/列/问题上限，生成超限须在写完整报告前拒绝，配合输入、报告读取及并发限制。先补合成超限回归，不宣称 OS 磁盘配额或同权限进程沙箱。
-5. 在新隔离 profile 中使用显式 CSV 专用 admission 和可信 task 调用。不能通过追加旧论文白名单、复用论文 Native v1、打开其文件上传路由或从旁路绕过旧策略启用 CSV。先审查新 profile 的确切能力，再启用；生产 Native 协议和 Hub 安装留在后续。
+安装只加入依赖和 Bundle，默认两个组件都关闭。专用 profile 的 `package.json` 的 `dsh.profile.bundles` 应包含已安装的 `@deepseek-ai/dsh-base`、`@deepseek-ai/dsh-web-app` 和 `qcu-table-audit`。在该 profile 的 `cordis.patch.yml` 用户层显式启用 `qcu-table-audit-task` 和 `qcu-table-audit-guidance`，并为任务配置受信任的绝对 Python 路径、专用 owned 目录（当前 UID、0700、非符号链接）、有限输入/规则/报告/生成及并发预算。配置范例见包内 `examples/csv-pilot.patch.json`，替换两个路径占位符后才能使用。不可追加到旧论文 profile，不能把本例当作永久或私人数据授权。
 
-验收完成条件：无须先建会话即可发现任务入口；合成 CSV/个人规则从选择到摘要导出完成；取消选择和取消导出后能重试；切换文件、到期、撤销、取消/卸载、删除失败恢复均正确；两个同时完成的不同 CSV 报告互不串用；无授权/跨 task/跨会话/任意路径请求拒绝；源文件哈希不变；主聊天及模型输出不含数据；官方 profile 重建和资源检查通过。API/DOM 通过和真实浏览器/原生对话框通过分别记录，控制工具不可用时不伪称 GUI 通过。
+该专用合成测试 profile 关闭模型 presets、遥测/反馈、聊天附件、本地文件引用、workspace files/terminal 及不需要的 inspector Host/Client 对；说明 Skill 只读包内目录且 includeDefaultRoots=false/watch=false。配置只是官方可变 profile 用户层，不是改 DSH 或绕过 launch policy。没有提供模型凭据、广泛磁盘权限、开机启动或新增系统安全设置。
 
-权限边界：标准浏览器文件选择只授权用户选中的文件，不需要新建广泛磁盘权限、开机启动或安全设置。代码实现、隔离配置和合成自动验证在现有工程范围内；实际安装并启用一个可接收真实 CSV 的新 profile 是新的应用能力，而当前指令明确禁止部署和扩大权限，应在源码可审查后取得批准。现有 Native v1 只有论文面板能力，不能当作 CSV 授权通道。签名、Windows、正式分发和 Hub 无需为这一切片提前决定。
+使用官方入口 `DSH_HOME=... DSH_AGENTS_HOME=... dsh --profile csv-pilot --host 127.0.0.1 --port <独立空闲端口>`。启动器在本机浏览器中打开认证入口，不复制带凭据 URL 到说明或聊天。侧栏 CSV 只读诊断无需新建 Session；只选择仓库合成 input.csv，选择演示或明确个人 rules.json，勾选逐文件确认，授权并检查。仅计数摘要不含路径或原始行。取消后可重选同文件，退出页撤销授权。演示/个人规则不是学校正式规范。
 
-到安装验收前，最小决策是：是否批准在新的隔离开发 profile 启用“用户逐次选择单个 CSV，仅用于只读诊断”的能力？推荐先采用受支持的本地任务页面、仅计数摘要；批准不包含通用文件访问或替换论文候选。当前只提出方案，没有执行安装。
+本机 Hub 保留原站页面，在 loopback 隔离目录提供包下载和只读说明 Skill 的安装链；它不是公开目录发布。现有城院 installer 的 id 前缀要求使 standalone 说明 Skill 使用 chengyuan-csv-readonly-task 别名，包内名称仍是 qcu-csv-readonly-task，正文相同，均不包含清洗脚本或新授权。
+
+下一边界：原生系统文件对话框、人手打开浏览器后的操作体验和另一台 Apple Silicon Mac 尚未验收；真实私人 CSV 仍需要明确授权。当前不推进签名、正式安装包、Intel/Windows、行级输出或跨进程崩溃残留恢复。

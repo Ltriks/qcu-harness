@@ -11,3 +11,5 @@ await copyFile('../../skills/qcu-table-audit/scripts/audit.py', 'lib/audit.py')
 await copyFile('../../skills/qcu-table-audit/examples/rules.json', 'lib/demo-rules.json')
 await build({ entryPoints: ['src/task-host.ts'], outfile: 'lib/task-host.js', bundle: true,
   platform: 'node', format: 'esm', target: 'node22', packages: 'external', sourcemap: false })
+await build({ entryPoints: ['src/guidance.ts'], outfile: 'lib/guidance.js', bundle: true,
+  platform: 'node', format: 'esm', target: 'node22', packages: 'external', sourcemap: false })

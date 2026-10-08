@@ -81,8 +81,15 @@ export async function apply(ctx: Context, config: Config): Promise<void> {
     fetch: async request => {
       try {
         const url = new URL(request.url)
-        if (!['http:', 'https:'].includes(url.protocol) || !['127.0.0.1', 'localhost', '[::1]'].includes(url.hostname)
-          || url.search || request.headers.get('origin') !== url.origin || connection.requestRejection(request) !== undefined) return json({ error: TASK_ERROR }, 403)
+        // Official HTTP bridging uses dsh.internal for Request.url. Bind
+        // authority to the wire Host and exact browser Origin, then retain
+        // the official authenticated request fence. Never trust forwarded hosts.
+        const origin = request.headers.get('origin') ?? ''
+        if (!URL.canParse(origin)) return json({ error: TASK_ERROR }, 403)
+        const browser = new URL(origin)
+        if (!['http:', 'https:'].includes(browser.protocol) || !['127.0.0.1', 'localhost', '[::1]'].includes(browser.hostname)
+          || browser.origin !== origin || browser.host !== request.headers.get('host')
+          || url.search || connection.requestRejection(request) !== undefined) return json({ error: TASK_ERROR }, 403)
         const value = await body(new Request(request, { signal: owner.stopped ? request.signal :
           AbortSignal.any([request.signal, lifetime.signal]) }), owner.stopped ? 256 :
           Math.ceil(config.maxInputBytes / 3) * 4 + config.maxRuleBytes * 6 + 4096)

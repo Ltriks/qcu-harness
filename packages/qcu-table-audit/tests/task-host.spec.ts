@@ -63,6 +63,18 @@ async function fixture(overrides: Partial<Config> = {}, protectedProfile = false
 }
 afterEach(async () => { cleanup.fail = false; for (const clean of cleanupTasks.splice(0)) await clean() })
 
+it('admits official HTTP bridge URLs while binding exact wire Host and Origin', async () => {
+  const f = await fixture()
+  const request = (originHeader: string, hostHeader = new URL(origin).host) => new Request('http://dsh.internal' + path, {
+    method: 'POST', body: JSON.stringify({ operation: 'open' }),
+    headers: { host: hostHeader, origin: originHeader, cookie: f.cookie, 'content-type': 'application/json' },
+  })
+  expect((await f.shared.fetch(request(origin))).status).toBe(200)
+  for (const invalid of [origin + '/', 'https://example.invalid', 'null']) {
+    expect((await f.shared.fetch(request(invalid))).status).toBe(403)
+  }
+  expect((await f.shared.fetch(request(origin, 'example.invalid'))).status).toBe(403)
+})
 it('keeps the default disabled entry inert', async () => {
   const f = await fixture({ enabled: false })
   expect((await f.shared.fetch(new Request(origin + path, { method: 'POST' }))).status).toBe(404)
