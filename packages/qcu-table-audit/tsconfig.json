@@ -4,5 +4,5 @@
     "strict": true, "noUncheckedIndexedAccess": true, "noEmit": true,
     "allowImportingTsExtensions": true, "types": ["node"], "skipLibCheck": true
   },
-  "include": ["src/index.ts", "src/task-*.ts", "src/guidance.ts", "tests/adapter.spec.ts", "tests/task-host.spec.ts", "tests/guidance.spec.ts"]
+  "include": ["src/index.ts", "src/task-*.ts", "src/guidance.ts", "tests/adapter.spec.ts", "tests/task-host.spec.ts", "tests/task-socket.spec.ts", "tests/guidance.spec.ts"]
 }

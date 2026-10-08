@@ -1,5 +1,9 @@
 # qcu-table-audit 开发原型
 
+当前源码版本为 **0.2.0-prototype.7 开发候选**。新增默认关闭的专用 CSV WebSocket，使用官方 `webServer.registerUpgrade`，不使用 Operator/Gateway 或缺失 Origin 放行。尚未安装到任何现有 profile；此前 CLI/Chrome 安装验收属于 prototype.6，不能转记为 .7 原生验收。
+
+`websocketEnabled: true` 仅用于已审查的独立合成 profile，并要求官方 webServer 绑定 127.0.0.1。见 [原生传输约束与验收](../../docs/TABLE-AUDIT-NATIVE-TRANSPORT.md) 和仅供候选测试的 [配置](examples/csv-native-candidate.patch.json)。默认 Bundle 及原 HTTP 示例保持原设置。原生客户端只使用官方 `__DSH_TRANSPORT__.streamBaseUrl` 选择固定 socket 路径；该值不是认证证明，握手仍要求官方 Cookie、精确且非缺失的 Origin/Host 和固定子协议。普通 Web 保持原 HTTP 路径。
+
 版本 0.2.0-prototype.6 是树外 Bundle/Host/Client 包。包根默认导出任务 Host；原程序化 adapter 改从 `qcu-table-audit/adapter` 导入，`./task-host` 仍保留。官方 Client loader 要求 Bundle 的主 Host row 使用精确包名，因此不再用 `/task-host` 子路径作为该 row 名。`./client` 是官方 ModuleLoader 的 CJS factory，只有 React 外置；`./guidance` 注册包内只读说明 Skill，关闭个人与项目 Skill 根扫描。Bundle patch 的两项组件默认均关闭。
 
 已在独立 profile 上通过官方 CLI 安装及真实 Chrome 页面验收，使用未修改的官方 npm DSH/Web 0.2.0-rc.2 和固定源码基线 639ed015397290b3745d163aafe02ffee4aa3f84。只使用合成 CSV，未替换论文候选，旧论文策略仍拒绝 CSV 工具。

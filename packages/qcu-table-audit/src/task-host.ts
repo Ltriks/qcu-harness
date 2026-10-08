@@ -7,11 +7,15 @@ import { lstat, readFile } from 'node:fs/promises'
 import { isAbsolute } from 'node:path'
 import { CsvTaskOwner } from './task-owner.ts'
 import type { TaskConfig } from './task-owner.ts'
-import { parseSummary, PURPOSE, TASK_ERROR, TASK_PATH, ISSUE_CODES } from './task-protocol.ts'
+import { parseSummary, TASK_ERROR, TASK_PATH, ISSUE_CODES } from './task-protocol.ts'
+
+import { dispatch, exact } from './task-dispatch.ts'
+import { registerTaskSocket } from './task-socket.ts'
 
 export const name = 'qcu-table-audit-task'
 export const inject = ['connection', 'tools']
 export interface Config extends Omit<TaskConfig, 'demoRules'> {
+  readonly websocketEnabled?: boolean
   readonly enabled: boolean
   readonly mode: 'isolated-local-csv'
 }
@@ -40,13 +44,10 @@ async function body(request: Request, maxBytes: number): Promise<Record<string, 
   if (!value || typeof value !== 'object' || Array.isArray(value)) fail()
   return value as Record<string, unknown>
 }
-function exact(value: Record<string, unknown>, keys: readonly string[]): void {
-  if (Object.keys(value).sort().join(',') !== [...keys].sort().join(',')) fail()
-}
 
 export async function apply(ctx: Context, config: Config): Promise<void> {
   if (config?.enabled === false) return
-  if (config?.enabled !== true || config.mode !== 'isolated-local-csv'
+  if (config?.enabled !== true || (config.websocketEnabled !== undefined && typeof config.websocketEnabled !== 'boolean') || config.mode !== 'isolated-local-csv'
     || !isAbsolute(config.python) || !isAbsolute(config.workRoot)
     || [config.maxInputBytes, config.maxRuleBytes, config.maxReportBytes, config.timeoutMs,
       config.terminateMs, config.maxConcurrentRuns, config.grantMs, config.maxPages,
@@ -61,6 +62,7 @@ export async function apply(ctx: Context, config: Config): Promise<void> {
   const connection = ctx.root.connection
   const lifetime = new AbortController()
   let release: (() => Promise<void>) | undefined
+  let sockets: ReturnType<typeof registerTaskSocket> | undefined
   let unguard: (() => void) | undefined
   const execute = async (tableId: string, signal: AbortSignal) => {
     const answer = await ctx.tools.execute({ name: 'qcu_table_audit', arguments: { table_id: tableId }, signal,
@@ -71,7 +73,8 @@ export async function apply(ctx: Context, config: Config): Promise<void> {
   }
   const dispose = async (): Promise<void> => {
     // The root-owned route and guard remain reachable if private cleanup fails.
-    lifetime.abort(); await owner.dispose()
+    lifetime.abort(); sockets?.stop(); await owner.dispose()
+    await sockets?.release()
     await release?.(); await unguard?.()
   }
   try {
@@ -101,27 +104,11 @@ export async function apply(ctx: Context, config: Config): Promise<void> {
         if (owner.stopped) fail()
         const page = request.headers.get('x-qcu-page') ?? ''
         if (value.operation === 'open') { exact(value, ['operation']); return json(owner.open()) }
-        if (value.operation === 'authorize') {
-          exact(value, ['operation', 'revision', 'purpose', 'format', 'consent', 'csv', 'ruleKind', 'rules'])
-          if (value.format !== 'csv' || value.purpose !== PURPOSE || typeof value.csv !== 'string'
-            || !['demo', 'personal'].includes(String(value.ruleKind))) fail()
-          if (typeof value.revision !== 'number') fail()
-          return json(await owner.authorize(page, value.revision, value.csv, value.rules, value.ruleKind as 'demo' | 'personal', value.consent, value.purpose))
-        }
-        if (value.operation === 'check') {
-          exact(value, ['operation', 'taskId']); if (typeof value.taskId !== 'string') fail()
-          return json(await owner.check(page, value.taskId, request.signal, execute))
-        }
-        if (value.operation === 'cancel' || value.operation === 'retry' || value.operation === 'close') {
-          exact(value, ['operation', 'revision']); if (typeof value.revision !== 'number') fail()
-          if (value.operation === 'close' || value.operation === 'retry') await owner.close(page, value.revision)
-          else await owner.cancel(page, value.revision)
-          return json({ cleared: true })
-        }
-        fail()
+        return json(await dispatch(owner, value, page, AbortSignal.any([request.signal, lifetime.signal]), execute))
       } catch (_error) { return json({ error: TASK_ERROR }, 400) }
     },
   })
+  if (config.websocketEnabled) sockets = registerTaskSocket(ctx.root, config, owner, execute, lifetime.signal)
   ctx.effect(() => {
     ctx.tools.register(defineTool({ name: 'qcu_table_audit', description: 'Explicit local CSV task; safe counts only. No model calls.',
       parameters: { table_id: { type: 'string', required: true } },

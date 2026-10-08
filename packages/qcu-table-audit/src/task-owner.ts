@@ -15,7 +15,7 @@ interface Task {
   runner: CsvAuditRunner; abort: AbortController; running: boolean
   timer: ReturnType<typeof setTimeout>; cleanupFailed: boolean
 }
-interface Page { epoch: number; revision: number; closing: boolean; task?: Task; lease?: ReturnType<typeof setTimeout> }
+interface Page { binding?: object; epoch: number; revision: number; closing: boolean; task?: Task; lease?: ReturnType<typeof setTimeout> }
 const opaque = () => randomBytes(16).toString('hex')
 function fail(): never { throw new Error(TASK_ERROR) }
 export type TaskExecute = (tableId: string, signal: AbortSignal) => Promise<AuditSummary>
@@ -28,9 +28,9 @@ export class CsvTaskOwner {
     if ([config.grantMs, config.maxPages].some(value => !Number.isSafeInteger(value) || value <= 0)
       || config.grantMs > 2147483647) fail()
   }
-  open(): OpenedPage {
+  open(binding?: object): OpenedPage {
     if (this.closed || this.pages.size >= this.config.maxPages) fail()
-    const key = opaque(); const page: Page = { epoch: 0, revision: 0, closing: false }
+    const key = opaque(); const page: Page = { binding, epoch: 0, revision: 0, closing: false }
     this.pages.set(key, page); this.lease(key, page)
     return { page: key, limits: { maxInputBytes: this.config.maxInputBytes, maxRuleBytes: this.config.maxRuleBytes } }
   }
@@ -44,9 +44,9 @@ export class CsvTaskOwner {
     }, this.config.grantMs)
     page.lease.unref?.()
   }
-  private page(key: string): Page {
+  private page(key: string, binding?: object): Page {
     const page = /^[0-9a-f]{32}$/.test(key) ? this.pages.get(key) : undefined
-    if (!page) fail()
+    if (!page || page.binding !== binding) fail()
     return page
   }
   private advance(page: Page, revision: number): number {
@@ -54,8 +54,8 @@ export class CsvTaskOwner {
     page.revision = revision
     return ++page.epoch
   }
-  async authorize(key: string, revision: number, csvBase64: string, rules: unknown, ruleKind: 'demo' | 'personal', consent: unknown, purpose: unknown): Promise<TaskReceipt> {
-    const page = this.page(key)
+  async authorize(key: string, revision: number, csvBase64: string, rules: unknown, ruleKind: 'demo' | 'personal', consent: unknown, purpose: unknown, binding?: object): Promise<TaskReceipt> {
+    const page = this.page(key, binding)
     if (this.closed || page.closing || consent !== true || purpose !== PURPOSE
       || !['demo', 'personal'].includes(ruleKind) || typeof csvBase64 !== 'string'
       || csvBase64.length > Math.ceil(this.config.maxInputBytes / 3) * 4
@@ -85,21 +85,21 @@ export class CsvTaskOwner {
     this.lease(key, page)
     return { taskId: id, expiresAt }
   }
-  private task(key: string, id: string): { page: Page; task: Task } {
-    const page = this.page(key); const task = page.task
+  private task(key: string, id: string, binding?: object): { page: Page; task: Task } {
+    const page = this.page(key, binding); const task = page.task
     if (this.closed || page.closing || !task || task.id !== id || !task.grant
       || task.cleanupFailed || task.grant.expiresAt <= Date.now()) fail()
     return { page, task }
   }
-  async check(key: string, id: string, signal: AbortSignal, execute: TaskExecute): Promise<AuditSummary> {
-    const { page, task } = this.task(key, id)
+  async check(key: string, id: string, signal: AbortSignal, execute: TaskExecute, binding?: object): Promise<AuditSummary> {
+    const { page, task } = this.task(key, id, binding)
     if (task.running || signal.aborted) fail()
     task.running = true
     this.lease(key, page)
     try {
       const result = await execute(id, AbortSignal.any([signal, task.abort.signal]))
       if (page.task !== task || task.abort.signal.aborted) fail()
-      this.task(key, id)
+      this.task(key, id, binding)
       return result
     } finally { task.running = false }
   }
@@ -123,20 +123,28 @@ export class CsvTaskOwner {
       if (page.task === task) page.task = undefined
     } catch (_error) { task.cleanupFailed = true; fail() }
   }
-  async cancel(key: string, revision: number): Promise<void> {
-    const page = this.page(key); this.advance(page, revision)
+  async cancel(key: string, revision: number, binding?: object): Promise<void> {
+    const page = this.page(key, binding); this.advance(page, revision)
     if (page.task) await this.retire(page, page.task)
     if (page.closing) { clearTimeout(page.lease); this.pages.delete(key) }
     else this.lease(key, page)
   }
-  async close(key: string, revision: number): Promise<void> {
-    const page = this.page(key); this.advance(page, revision); page.closing = true; clearTimeout(page.lease)
+  async close(key: string, revision: number, binding?: object): Promise<void> {
+    const page = this.page(key, binding); this.advance(page, revision); page.closing = true; clearTimeout(page.lease)
+    if (page.task) await this.retire(page, page.task)
+    this.pages.delete(key)
+  }
+  /** Trusted carrier teardown; independent of client revision delivery/exhaustion. */
+  async disconnect(key: string, binding: object): Promise<void> {
+    if (!this.pages.has(key)) return
+    const page = this.page(key, binding)
+    page.closing = true; ++page.epoch; clearTimeout(page.lease)
     if (page.task) await this.retire(page, page.task)
     this.pages.delete(key)
   }
   /** Retry only revoked/closing pages; never cancel another page's live grant. */
-  async recover(): Promise<void> {
-    const work = [...this.pages.entries()].filter(([, page]) => page.closing || page.task?.cleanupFailed)
+  async recover(binding?: object): Promise<void> {
+    const work = [...this.pages.entries()].filter(([, page]) => (binding === undefined || page.binding === binding) && (page.closing || page.task?.cleanupFailed))
     const results = await Promise.allSettled(work.map(async ([key, page]) => {
       if (page.task) await this.retire(page, page.task)
       if (page.closing) { clearTimeout(page.lease); this.pages.delete(key) }

@@ -1,6 +1,8 @@
 /** Browser-safe protocol; filenames, raw records and paths are not response fields. */
 import type { AuditSummary } from './index.ts'
 export const TASK_PATH = '/api/qcu-csv-task'
+export const TASK_WS_PATH = '/api/qcu-csv-task-ws'
+export const TASK_WS_PROTOCOL = 'qcu.csv.v1'
 export const TASK_ERROR = 'CSV task unavailable; check authorization or retry cleanup.'
 export const PURPOSE = 'diagnose-csv'
 export const ISSUE_CODES = ['blank', 'surrounding_whitespace', 'duplicate_row', 'duplicate_key',

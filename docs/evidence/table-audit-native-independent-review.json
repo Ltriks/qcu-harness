@@ -1,0 +1,40 @@
+{
+  "checkedAtUtc": "2026-10-08T06:45:11.161485+00:00",
+  "candidate": "0.2.0-prototype.7",
+  "outcome": "passed",
+  "testFiles": 7,
+  "testsPassed": 75,
+  "testsFailed": 0,
+  "socketTestsPassed": 22,
+  "originalSourceChangedDuringReview": [],
+  "testMode": "Temporary copy, existing dependency links, no-cache; synthetic loopback server and owned temporary workers only",
+  "node": "25.8.1",
+  "python": "official rc.2 bundled Python 3.12.14",
+  "previousFinding": "Handshake-only authentication expiry",
+  "findingResolution": "Message and response authentication revalidation plus 1000 ms idle/active recheck; expired or withdrawn-cookie connection is torn down, pending work aborted, owned files cleared.",
+  "newBlockingFindings": [],
+  "scopeLimits": [
+    "No native Desktop GUI acceptance",
+    "Human-click or Desktop-exclusive attestation not claimed",
+    "Credential-file editing is not a live-revocation promise",
+    "No source edits, no real profile or protocol changes"
+  ],
+  "testReportSha256": "7e20d8ddf739be9ff9f4ac93f9f3f9c9afe422409ee83e5c841f8a0ee87a8a33",
+  "reviewArtifactSha256": "0ea0bdab3de686ee9fc2fd6cec6108f06c5058478b44ad70b49346b87f388a84",
+  "reviewedSourceSha256": {
+    "docs/TABLE-AUDIT-NATIVE-TRANSPORT.md": "d66d47131785f027ea994b839ba4cd63e69eb906ce53f71cdc6f66735e042566",
+    "docs/evidence/table-audit-native-transport-validation.json": "35ea018bf5c750c0793cc6e9eff6b2137a319f1752cc95cd3051276df38e5739",
+    "packages/qcu-table-audit/README.md": "abb2203174aeb1d7d946f8c0e93bc917c840a989a86840a2230e948ccd014fd3",
+    "packages/qcu-table-audit/package.json": "d55bbb5f6803f55e0f8f190f93f6823e38acd11cb5a5812b20150b3734e7f1af",
+    "packages/qcu-table-audit/tsconfig.json": "eab399bea0559f110b6a1ee1131e5e5d6ee8ff136e9bc83fbecfe79fa90e83aa",
+    "packages/qcu-table-audit/examples/csv-native-candidate.patch.json": "0a60b42e614e15a6e781165f61f5652e0465d1254e687b51d5fafcdadd52649d",
+    "packages/qcu-table-audit/src/task-protocol.ts": "3ee82e7378eebbdba275048d5e377067f8e3b79ec39ffa88fa7be729555ddf30",
+    "packages/qcu-table-audit/src/task-owner.ts": "ea0a6cc134f286ee402106c0ed72696d4acc51ff3430069ddfa295a6fe0e9984",
+    "packages/qcu-table-audit/src/task-host.ts": "0e2ffbd5aba8500ecace98177573bbeba3ec97c85f4e8012a31695cfa7a882c0",
+    "packages/qcu-table-audit/src/task-dispatch.ts": "ea187b87a5f1ea4c2fc7c794573544853afd99cfb3749edc77726806f6b5853f",
+    "packages/qcu-table-audit/src/task-socket.ts": "787bfe95fea7995f2106be5cdbb24a5efbf602a98d40d42275d2ad52aec0b5b3",
+    "packages/qcu-table-audit/src/client/controller.ts": "b3937597cad65a9ef4a24f62e7798feeeb9ac0f51d0c86588f29b308773cf07a",
+    "packages/qcu-table-audit/src/client/socket-transport.ts": "272ef26106139ec800a0506668f74b7417dbfa31e859b582bddca207eb86df48",
+    "packages/qcu-table-audit/tests/task-socket.spec.ts": "47b9c5d7e9a1dae30d5bc9b3d17d00a96c90236f57c0f3d26b32538114a62c53"
+  }
+}

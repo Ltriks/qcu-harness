@@ -2,8 +2,12 @@
 import { countExport, parseSummary, PURPOSE, TASK_ERROR, TASK_PATH } from '../task-protocol.ts'
 import type { OpenedPage, TaskReceipt } from '../task-protocol.ts'
 import type { AuditSummary } from '../index.ts'
+import { nativeTaskTransport } from './socket-transport.ts'
 export interface CsvChoice { name: string; size: number; arrayBuffer(): Promise<ArrayBuffer> }
-export type TaskTransport = (body: Record<string, unknown>, page?: string, signal?: AbortSignal) => Promise<unknown>
+export interface TaskTransport {
+  (body: Record<string, unknown>, page?: string, signal?: AbortSignal): Promise<unknown>
+  dispose?(): void
+}
 export interface TaskState {
   phase: 'opening' | 'idle' | 'selected' | 'authorizing' | 'ready' | 'checking' | 'complete' | 'clearing' | 'failed' | 'closed'
   filename?: string; summary?: AuditSummary; error?: string; expiresAt?: number
@@ -28,7 +32,7 @@ export class CsvTaskController {
   private receipt?: TaskReceipt
   private abort?: AbortController
   private disposed = false
-  constructor(private readonly api: TaskTransport = browserTransport()) {}
+  constructor(private readonly api: TaskTransport = nativeTaskTransport() ?? browserTransport()) {}
   getSnapshot = (): TaskState => this.state
   subscribe = (listener: () => void): (() => void) => { this.listeners.add(listener); return () => { this.listeners.delete(listener) } }
   private publish(state: TaskState): void {
@@ -110,7 +114,7 @@ export class CsvTaskController {
   }
   async dispose(): Promise<void> {
     this.disposed = true; ++this.epoch; this.abort?.abort(); this.file = undefined; this.receipt = undefined
-    if (this.page) await this.api({ operation: 'close', revision: ++this.revision }, this.page)
-    this.listeners.clear()
+    try { if (this.page) await this.api({ operation: 'close', revision: ++this.revision }, this.page) }
+    finally { this.api.dispose?.(); this.listeners.clear() }
   }
 }

@@ -1,6 +1,6 @@
 {
   "name": "qcu-table-audit",
-  "version": "0.2.0-prototype.6",
+  "version": "0.2.0-prototype.7",
   "private": true,
   "type": "module",
   "main": "lib/task-host.js",
@@ -51,7 +51,8 @@
     "@deepseek-ai/dsh-client-ui-renderer": "0.2.0-rc.2",
     "@deepseek-ai/dsh-client-ui-sidebar": "0.2.0-rc.2",
     "@deepseek-ai/dsh-client-ui-layout": "0.2.0-rc.2",
-    "react": "18.3.1"
+    "react": "18.3.1",
+    "@deepseek-ai/dsh-host-webserver": "0.2.0-rc.2"
   },
   "devDependencies": {
     "@deepseek-ai/cordis": "4.0.4",
@@ -67,6 +68,10 @@
     "@types/react": "18.3.31",
     "@types/react-dom": "18.3.7",
     "jsdom": "29.1.1",
-    "@deepseek-ai/dsh-client-modules": "0.2.0-rc.2"
+    "@deepseek-ai/dsh-client-modules": "0.2.0-rc.2",
+    "@types/ws": "8.18.1"
+  },
+  "dependencies": {
+    "ws": "8.21.0"
   }
 }
