@@ -1,0 +1,57 @@
+{
+  "checkedAtUtc": "2026-10-08T07:38:07.478217+00:00",
+  "version": "0.2.0-prototype.7",
+  "sourceCommit": "4be7a5de2839dae03c2d807330dce06d5b5ee127",
+  "officialBundledCliExit": 0,
+  "installedFilesMatchTarball": 19,
+  "tarballSha256": "c1192607639435922fe48216030b2507e77f372240be57c80031a0ff84382305",
+  "isolatedOfficialAppLaunched": true,
+  "isolatedUserDataVerified": true,
+  "ownedVisibleWindowVerified": true,
+  "signedAppOrOfficialSourceModified": false,
+  "remoteDebugPortsAdded": false,
+  "surface": "Isolated Chrome against actual official Desktop Host, explicit stream endpoint hint",
+  "dedicatedCsvSocketVerified": true,
+  "personalRulesRepeatedCheck": {
+    "rows": 4,
+    "issues": 7,
+    "repetitions": 2
+  },
+  "countOnlyExport": {
+    "filename": "qcu-csv-count-summary.json",
+    "rows": 4,
+    "issues": 7
+  },
+  "cancelRevokePassed": true,
+  "ownedWorkEmpty": true,
+  "syntheticCsvUnchanged": true,
+  "pageErrors": [],
+  "qcuInventory": {
+    "httpStatus": 200,
+    "rows": [
+      {
+        "entryId": "include:qcu-table-audit-task",
+        "moduleName": "qcu-table-audit",
+        "fiberPhase": "active",
+        "enabled": true
+      },
+      {
+        "entryId": "include:qcu-table-audit-guidance",
+        "moduleName": "qcu-table-audit/guidance",
+        "fiberPhase": "active",
+        "enabled": true
+      }
+    ]
+  },
+  "protocolRestoredAndReadBack": true,
+  "protocolRestoredTarget": "com.deepseek.harness.dev.f6dc30071e31",
+  "nativeUIControlled": false,
+  "nativeFilePickerVerified": false,
+  "nativeSaveCancellationVerified": false,
+  "nativeQuitRestartVerified": false,
+  "blocker": "No native window-control tool; AXIsProcessTrusted returned false without requesting a prompt. Minimal user native action requested.",
+  "userManualNativeResult": "pending",
+  "modelCredentialsSubmitted": false,
+  "privateDocumentsUsed": false,
+  "packageReady": false
+}

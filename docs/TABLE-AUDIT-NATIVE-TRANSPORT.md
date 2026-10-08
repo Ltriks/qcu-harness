@@ -39,3 +39,12 @@ feature 退出会先停止 socket、撤销 owner 再释放路由。私有文件�
 5. 验证关闭 CSV 页面、App 正常退出/重启后旧授权失效、自有 worker/临时目录清空；重新选择并明确确认后才能检查。工具不可控制原生对话框时，仅记录此具体阻塞，不宣称通过。
 
 插件实现本身不要求协议关联变化；它使用 App 已有的 stream endpoint 和公开 upgrade API。若某一具体官方启动入口依赖 dsh:// 且当前默认处理器指向另一 App，这是另一个启动现场问题，须独立核实，不在本轮更改。
+
+
+## 官方 Desktop 安装后的实测
+
+prototype.7 已通过官方自带 CLI 安装到自有独立 Desktop Home，退出 0，19 个包内文件与 tarball 逐字节一致；没有重复安装核心依赖、修改签名或官方源码。独立 App 实际启动，其 executable、独立 userData、Host 监听和自有可见窗口均经只读核验。未增加调试端口或权限，没有使用用户新安装的另一份官方 App。
+
+在该真实 Desktop Host 上，用隔离 Chrome 和显式 stream endpoint 提示验证专用 CSV WebSocket：个人规则连续两次为 4 行/7 问题，纯计数 JSON 导出及取消撤销通过，工作目录为空、合成 CSV 哈希未改，page error 为 0。Task/Guidance 的官方 inventory 为 enabled/active。此结果属于实际 Host 的浏览器业务兼容，**不是原生窗口或系统文件/保存对话框通过**。
+
+App 临时注册的 dsh:// 映射已经恢复到本轮启动前的开发版，setter 状态 0，系统级再次读回一致。原生辅助控制的无提示检查返回未授权，当前工具没有原生窗口控制；没有申请权限或用新调试口绕过。独立窗口暂为用户原生验收保留，尚未取得其操作结果。下次须先识别当前自有进程和用户状态，不能盲目退出或重复启动。证据见 `evidence/table-audit-official-desktop-prototype7.json`。
