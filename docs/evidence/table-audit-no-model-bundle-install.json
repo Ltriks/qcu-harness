@@ -1,0 +1,26 @@
+{
+  "scope": "No-model official tool integration in temporary synthetic context; not production approval or actual Hub",
+  "outcome": "passed",
+  "officialRuntimeVersion": "0.2.0-rc.2",
+  "testsPassed": 1,
+  "checks": [
+    "local synthetic catalog selected exact published version; draft refused; TGZ SHA-256 matched",
+    "rejected official approval: complete synthetic home file snapshot unchanged and permission mode unchanged",
+    "allow-once test stub: real offline pnpm install succeeded; exact version persisted; startup profile reports restart-required; permission mode unchanged",
+    "test context reboot: installed plugin active; registered Skill provider discoverable; packaged Skill body read exactly"
+  ],
+  "approval": "Official ApprovalService with explicit reject/allow-once fixture stubs",
+  "fixtureVersion": "0.0.1-test.1",
+  "fixtureTgzSha256": "2eb2010491238830cfb26cde832d5c5dfe9df3ef788010e0f525e01507998aac",
+  "realOfflinePnpmExit": 0,
+  "applicationAfterInstall": "restart-required",
+  "permissionModeRetained": "workspace-write",
+  "pluginActiveAfterTestContextReboot": true,
+  "bundledSkillBodyMatched": true,
+  "modelsInvoked": false,
+  "naturalLanguageVerified": false,
+  "realHubVerified": false,
+  "desktopApprovalUIVerified": false,
+  "rawEvidenceSha256": "757cd4c56a87162cb905106a7afec24e3c7e355c5dba33c23a2d6220fceaafa4",
+  "rawVitestSha256": "fa369a2b42bd80c6cb51c99a5df7a7753bb31404c9c3fccbea8add51a393cf95"
+}

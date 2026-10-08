@@ -48,3 +48,12 @@ prototype.7 已通过官方自带 CLI 安装到自有独立 Desktop Home，退�
 在该真实 Desktop Host 上，用隔离 Chrome 和显式 stream endpoint 提示验证专用 CSV WebSocket：个人规则连续两次为 4 行/7 问题，纯计数 JSON 导出及取消撤销通过，工作目录为空、合成 CSV 哈希未改，page error 为 0。Task/Guidance 的官方 inventory 为 enabled/active。此结果属于实际 Host 的浏览器业务兼容，**不是原生窗口或系统文件/保存对话框通过**。
 
 App 临时注册的 dsh:// 映射已经恢复到本轮启动前的开发版，setter 状态 0，系统级再次读回一致。原生辅助控制的无提示检查返回未授权，当前工具没有原生窗口控制；没有申请权限或用新调试口绕过。独立窗口暂为用户原生验收保留，尚未取得其操作结果。下次须先识别当前自有进程和用户状态，不能盲目退出或重复启动。证据见 `evidence/table-audit-official-desktop-prototype7.json`。
+
+
+## 本机原生核心流程用户手测收尾
+
+2026-10-08 07:49 UTC，用户在实际独立官方 Desktop 窗口确认“记录：4；问题：7”。随后要求文件选择先取消再重选、摘要保存先取消再重试；07:50 UTC 用户反馈“都没有问题”。这三项计为用户手测通过，并保留其验收方式；没有转换为自动 GUI 通过，也没有用直接下载替代保存取消。当前窗口、profile、安装包及协议映射保持不动。
+
+本机 prototype.7 官方 Desktop 的上述核心流程完成。第二台 Apple Silicon、通过模型对话安装、正式发布及本轮原生正常退出/重启仍未由这些反馈证明。下一阶段仅用最小受控试用包验证第二台机器，见 `TABLE-AUDIT-SECOND-MAC-PILOT.md`；不使用旧 Hub 自定义 Skill 安装器，也不把源码 ZIP 当安装程序。
+
+现场后续反馈：受限CSV验收profile的新建聊天显示 `agent-preset/not-found: Unknown agent preset: standard`。CSV三项用户手测通过不代表日常对话通过；完整日常对话profile仍需单独最小修复及权限核查。本阶段不修改运行配置、不复制凭据。

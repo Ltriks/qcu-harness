@@ -1,0 +1,21 @@
+{
+  "scope": "This Mac temporary directories; config/install guards + canonical worker, no fresh Desktop instance or second machine",
+  "officialCLIInvokedInSmoke": false,
+  "appOrLiveProfileModified": false,
+  "secondMacValidated": false,
+  "privateHomeAndPortableRuntimeConfiguration": true,
+  "foreignNonemptyHomeRefused": true,
+  "runningAppGuardRefused": true,
+  "lockedProfileRefusedWithoutDeletingLock": true,
+  "emptyJsonAndExistingYamlPatchesPreservedAndParseable": true,
+  "matchingInstalledFilesAvoidRepeatedCLI": true,
+  "tamperedPluginRefused": true,
+  "canonicalWorker": {
+    "rows": 4,
+    "issues": 7,
+    "cleanApplied": false,
+    "syntheticCsvUnchanged": true
+  },
+  "completed": true,
+  "officialSignedAppReadOnlyVerifyPassed": true
+}

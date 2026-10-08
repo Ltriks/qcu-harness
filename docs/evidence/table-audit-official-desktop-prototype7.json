@@ -46,12 +46,36 @@
   "protocolRestoredAndReadBack": true,
   "protocolRestoredTarget": "com.deepseek.harness.dev.f6dc30071e31",
   "nativeUIControlled": false,
-  "nativeFilePickerVerified": false,
-  "nativeSaveCancellationVerified": false,
+  "nativeFilePickerVerified": true,
+  "nativeSaveCancellationVerified": true,
   "nativeQuitRestartVerified": false,
-  "blocker": "No native window-control tool; AXIsProcessTrusted returned false without requesting a prompt. Minimal user native action requested.",
-  "userManualNativeResult": "pending",
+  "blocker": null,
+  "userManualNativeResult": "three requested core-flow checks user-reported passed",
   "modelCredentialsSubmitted": false,
   "privateDocumentsUsed": false,
-  "packageReady": false
+  "packageReady": false,
+  "nativeCoreFlowUserManualPassed": true,
+  "automatedNativeGUIValidated": false,
+  "secondMacValidated": false,
+  "dialogueInstallValidated": false,
+  "formalReleaseValidated": false,
+  "nativeUserManualReports": [
+    {
+      "atUtc": "2026-10-08T07:49Z",
+      "text": "记录：4；问题：7",
+      "scope": "native core check"
+    },
+    {
+      "atUtc": "2026-10-08T07:50Z",
+      "text": "都没有问题",
+      "scope": [
+        "file picker cancel/reselect",
+        "summary save cancel/retry"
+      ]
+    }
+  ],
+  "dailyDialogueProfileReady": false,
+  "observedChatBlocker": "agent-preset/not-found: Unknown agent preset: standard",
+  "chatFailureEvidence": "User screenshot relayed by parent; no credentials inspected; running configuration unchanged",
+  "chatFixUnderSeparateReview": true
 }
