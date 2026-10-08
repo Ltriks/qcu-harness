@@ -1,6 +1,6 @@
 .DS_Store
 Thumbs.db
-node_modules/
+node_modules
 __pycache__/
 *.pyc
 .venv/
@@ -20,6 +20,7 @@ coverage/
 *.exe
 *.app/
 packages/qcu-thesis-workbench/lib/
+packages/qcu-table-audit/lib/
 hub/serve/
 /profiles/
 /session-data/

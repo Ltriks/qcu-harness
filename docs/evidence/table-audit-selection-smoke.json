@@ -1,0 +1,27 @@
+{
+  "sourceCommit": "cd5f5320b409888c43ea2c5797c44f5f638c67ac",
+  "scope": "existing qcu-table-audit engine only; no plugin installation or GUI work",
+  "pythonVersion": "Python 3.12.14",
+  "engineTestsPassed": 8,
+  "syntheticCliExit": 0,
+  "rows": 4,
+  "issueCounts": {
+    "surrounding_whitespace": 2,
+    "invalid_date": 1,
+    "invalid_number": 1,
+    "duplicate_row": 1,
+    "duplicate_key": 1,
+    "required_missing": 1
+  },
+  "sourceUnchanged": true,
+  "leadingZeroPreserved": true,
+  "cleanApplied": false,
+  "cleanedCopyCreated": false,
+  "existingOutputOverwriteRefused": true,
+  "officialPluginRegistrationTested": false,
+  "nativeGuiTested": false,
+  "externalServicesUsed": false,
+  "modelsInvoked": false,
+  "runtimeCandidateModified": false,
+  "packageReady": false
+}

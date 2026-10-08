@@ -1,0 +1,26 @@
+{
+  "name": "qcu-table-audit",
+  "version": "0.1.0-prototype.1",
+  "private": true,
+  "type": "module",
+  "main": "lib/index.js",
+  "exports": { ".": "./lib/index.js" },
+  "files": ["lib", "README.md"],
+  "scripts": {
+    "build": "node scripts/build-host.mjs",
+    "typecheck": "tsc --project tsconfig.json --noEmit",
+    "test": "vitest run --config vitest.config.mjs"
+  },
+  "engines": { "node": "^22.19.0 || >=24.0.0" },
+  "peerDependencies": { "@deepseek-ai/cordis": "4.0.4", "@deepseek-ai/dsh-tools": "0.2.0-rc.2" },
+  "devDependencies": {
+    "@deepseek-ai/cordis": "4.0.4",
+    "@deepseek-ai/dsh-tools": "0.2.0-rc.2",
+    "@deepseek-ai/dsh-system-prompt": "0.2.0-rc.2",
+    "@deepseek-ai/dsh-llm": "0.2.0-rc.2",
+    "@types/node": "22.20.0",
+    "esbuild": "0.25.12",
+    "typescript": "6.0.3",
+    "vitest": "4.1.8"
+  }
+}

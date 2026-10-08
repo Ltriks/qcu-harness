@@ -1,0 +1,61 @@
+{
+  "schemaVersion": 1,
+  "scope": "isolated programmatic CSV Host prototype; synthetic fixtures only",
+  "checks": [
+    {
+      "check": "build",
+      "exit": 0,
+      "seconds": 0.5
+    },
+    {
+      "check": "types",
+      "exit": 0,
+      "seconds": 0.56
+    },
+    {
+      "check": "tests",
+      "exit": 0,
+      "seconds": 5.58
+    },
+    {
+      "check": "concurrent-a",
+      "exit": 0,
+      "seconds": 5.96
+    },
+    {
+      "check": "concurrent-b",
+      "exit": 0,
+      "seconds": 5.45
+    }
+  ],
+  "testsPerProcess": 19,
+  "concurrentIndependentProcesses": 2,
+  "oldCleanupRegression": {
+    "exit": 1,
+    "cases": 4,
+    "expectedFailure": true
+  },
+  "canonicalEngineByteEqual": true,
+  "publicSource": {
+    "blockedFindings": 0,
+    "canonicalSkillsVerified": 13,
+    "resourceHashesVerified": 12
+  },
+  "newDocRelativeLinksChecked": 11,
+  "acceptedCandidateResourcesUnchanged": 12,
+  "originalRepositoryClean": true,
+  "originalRepositoryHead": "756b7331b2eaf91aff5340c62cedaf5261af7876",
+  "actualToolRuntime": true,
+  "actualExistingLaunchPolicyDeniesNewTool": true,
+  "cleanupCancelUnloadExpiryRevocationRegression": true,
+  "childExitAndTemporaryCleanupVerified": true,
+  "rawCsvRulesPathsOrStderrReturned": false,
+  "modelsInvoked": false,
+  "externalServicesUsed": false,
+  "runtimeCandidateModified": false,
+  "prototypeInstalled": false,
+  "nativeGuiValidated": false,
+  "hubInstallChainValidated": false,
+  "officialRootDocSyncRun": false,
+  "packageReady": false
+}

@@ -2,7 +2,7 @@
 
 QCU Office、城院 Skill 目录站、插件及办公 Skills 的独立源码仓库。基于固定官方 DeepSeek Harness，保留官方 Bundle/Host/Client/Skill 机制。
 
-这是开发候选，不是已签名或已发布的安装包。尚未部署到用户 Mac；原稳定开发版保持独立。自有材料采用 [MIT](LICENSE)，第三方版权及许可按 [NOTICE](NOTICE.md) 保留；公开推送另行确认。
+这是开发候选，不是已签名或已发布的安装包。cd5f532 已在独立 Mac 候选中加载，工具入口与报告保存获用户人工复测通过；见 [人工验收范围](docs/MAC-USER-ACCEPTANCE.md)。后续源码增量不自动部署。自有材料采用 [MIT](LICENSE)，第三方版权及许可按 [NOTICE](NOTICE.md) 保留。
 
 | 路径 | 用途 |
 | --- | --- |
@@ -18,3 +18,5 @@ QCU Office、城院 Skill 目录站、插件及办公 Skills 的独立源码仓�
 当前开发增量的父进程退出清理与复现证据见 [生命周期说明](docs/HOST-LIFECYCLE.md) 和 [验证记录](docs/LIFECYCLE-VALIDATION.md)。
 
 独立 Mac 合成候选的真实启动已验证；重建须包含官方 Web 静态页面。参见 [Mac 启动验收](docs/MAC-STARTUP-VALIDATION.md) 与 [重建步骤](docs/REBUILD.md)。原生文件选择、下载取消及重试、打印预览仍未验收。
+
+新增功能遵循 [插件接入约定](docs/PLUGIN-INTEGRATION.md)。第二功能的 [CSV Host 原型](docs/SECOND-FEATURE-TABLE-AUDIT.md) 仅在隔离回归中验证，不替换已验收候选。

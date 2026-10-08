@@ -30,7 +30,7 @@ def verify():
     files = []
     for p in ROOT.rglob('*'):
         relative = p.relative_to(ROOT)
-        if any(x in EXCLUDED for x in relative.parts) or str(relative).startswith('packages/qcu-thesis-workbench/lib/'):
+        if any(x in EXCLUDED for x in relative.parts) or str(relative).startswith(('packages/qcu-thesis-workbench/lib/', 'packages/qcu-table-audit/lib/')):
             continue
         if not p.is_file(): continue
         assert not p.is_symlink(), str(relative)
