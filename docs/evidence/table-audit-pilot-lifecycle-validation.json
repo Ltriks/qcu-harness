@@ -1,0 +1,309 @@
+{
+  "dateUtc": "2026-10-08",
+  "scope": "synthetic-only Apple Silicon official Web profile; thesis untouched",
+  "previousCommit": "740788357cd72ff5b5f051533d5e69b22f9225ec",
+  "hmrEnabled": false,
+  "bundleSwitchAndRestart": {
+    "dateUtc": "2026-10-08",
+    "phase": "switch and normal restart complete",
+    "switchOff": {
+      "mode": "toggle-off",
+      "pageErrors": [],
+      "nativeOsDialogsTested": false,
+      "style": {
+        "preference": "dark",
+        "dark": true,
+        "fontSize": "15px"
+      },
+      "switchBefore": "true",
+      "switchAfter": "false",
+      "restartNoticeVisible": true,
+      "entryBeforeRestart": true,
+      "taskHttpBeforeRestart": 200,
+      "ownedWorkEmpty": true,
+      "sourceCsvUnchanged": true,
+      "completed": true
+    },
+    "afterOffRestart": {
+      "mode": "probe-off",
+      "pageErrors": [],
+      "nativeOsDialogsTested": false,
+      "style": {
+        "preference": "dark",
+        "dark": true,
+        "fontSize": "15px"
+      },
+      "entryVisible": false,
+      "taskHttpStatus": 404,
+      "ownedWorkEmpty": true,
+      "sourceCsvUnchanged": true,
+      "completed": true
+    },
+    "switchOn": {
+      "mode": "toggle-on",
+      "pageErrors": [],
+      "nativeOsDialogsTested": false,
+      "style": {
+        "preference": "dark",
+        "dark": true,
+        "fontSize": "15px"
+      },
+      "switchBefore": "false",
+      "switchAfter": "true",
+      "restartNoticeVisible": true,
+      "entryBeforeRestart": false,
+      "taskHttpBeforeRestart": 404,
+      "ownedWorkEmpty": true,
+      "sourceCsvUnchanged": true,
+      "completed": true
+    },
+    "afterOnRestart": {
+      "mode": "probe-on",
+      "pageErrors": [],
+      "nativeOsDialogsTested": false,
+      "style": {
+        "preference": "dark",
+        "dark": true,
+        "fontSize": "15px"
+      },
+      "personalRulesDiagnosis": {
+        "rows": 4,
+        "issues": 7
+      },
+      "entryVisible": true,
+      "taskHttpStatus": 200,
+      "ownedWorkEmpty": true,
+      "sourceCsvUnchanged": true,
+      "completed": true
+    },
+    "packageRemovalUsed": false,
+    "thesisModified": false
+  },
+  "switchMechanism": "Real official Plugins Bundle switch, normal SIGTERM of verified owned process, official CLI restart. No package removal or manual Bundle/config rewrite in this switch round.",
+  "upgradeRollback": [
+    {
+      "stage": "upgrade",
+      "fromVersion": "0.2.0-prototype.5",
+      "toVersion": "0.2.0-prototype.6",
+      "artifactSha256": "467235b554175755c738503d997ef57748174ff581f28b8a5cd367b29d7ab46b",
+      "dataConfigurationAndStylePreserved": true,
+      "snapshot": {
+        "csvSha256": "25304bd4e8e4353350222957967ca41907e4100a1e05a3c0b3ff6fc7088d43ee",
+        "rulesSha256": "0b97609070d2aa5119785d1ef26f91ef8d05ff5703d4248208b93794a8864fce",
+        "configurationSha256": "f876b5f0b927ce35f5844912f76fdcfb69dac84ce432f0f785f5a95da0862e87",
+        "style": {
+          "preference": "dark",
+          "fontSize": 15
+        }
+      },
+      "browser": {
+        "mode": "probe-on",
+        "pageErrors": [],
+        "nativeOsDialogsTested": false,
+        "style": {
+          "preference": "dark",
+          "dark": true,
+          "fontSize": "15px"
+        },
+        "personalRulesDiagnosis": {
+          "rows": 4,
+          "issues": 7
+        },
+        "entryVisible": true,
+        "taskHttpStatus": 200,
+        "ownedWorkEmpty": true,
+        "sourceCsvUnchanged": true,
+        "completed": true
+      }
+    },
+    {
+      "stage": "rollback",
+      "fromVersion": "0.2.0-prototype.6",
+      "toVersion": "0.2.0-prototype.5",
+      "artifactSha256": "5fb55b69ce45947d29b113ccfcd67bb9b313a2ff9017491c28e678c943e76114",
+      "dataConfigurationAndStylePreserved": true,
+      "snapshot": {
+        "csvSha256": "25304bd4e8e4353350222957967ca41907e4100a1e05a3c0b3ff6fc7088d43ee",
+        "rulesSha256": "0b97609070d2aa5119785d1ef26f91ef8d05ff5703d4248208b93794a8864fce",
+        "configurationSha256": "f876b5f0b927ce35f5844912f76fdcfb69dac84ce432f0f785f5a95da0862e87",
+        "style": {
+          "preference": "dark",
+          "fontSize": 15
+        }
+      },
+      "browser": {
+        "mode": "probe-on",
+        "pageErrors": [],
+        "nativeOsDialogsTested": false,
+        "style": {
+          "preference": "dark",
+          "dark": true,
+          "fontSize": "15px"
+        },
+        "personalRulesDiagnosis": {
+          "rows": 4,
+          "issues": 7
+        },
+        "entryVisible": true,
+        "taskHttpStatus": 200,
+        "ownedWorkEmpty": true,
+        "sourceCsvUnchanged": true,
+        "completed": true
+      }
+    },
+    {
+      "stage": "restore-latest",
+      "fromVersion": "0.2.0-prototype.5",
+      "toVersion": "0.2.0-prototype.6",
+      "artifactSha256": "467235b554175755c738503d997ef57748174ff581f28b8a5cd367b29d7ab46b",
+      "dataConfigurationAndStylePreserved": true,
+      "snapshot": {
+        "csvSha256": "25304bd4e8e4353350222957967ca41907e4100a1e05a3c0b3ff6fc7088d43ee",
+        "rulesSha256": "0b97609070d2aa5119785d1ef26f91ef8d05ff5703d4248208b93794a8864fce",
+        "configurationSha256": "f876b5f0b927ce35f5844912f76fdcfb69dac84ce432f0f785f5a95da0862e87",
+        "style": {
+          "preference": "dark",
+          "fontSize": 15
+        }
+      },
+      "browser": {
+        "mode": "probe-on",
+        "pageErrors": [],
+        "nativeOsDialogsTested": false,
+        "style": {
+          "preference": "dark",
+          "dark": true,
+          "fontSize": "15px"
+        },
+        "personalRulesDiagnosis": {
+          "rows": 4,
+          "issues": 7
+        },
+        "entryVisible": true,
+        "taskHttpStatus": 200,
+        "ownedWorkEmpty": true,
+        "sourceCsvUnchanged": true,
+        "completed": true
+      }
+    }
+  ],
+  "upgradeMechanism": "Official dsh plugin CLI add exact local versioned tgz with lifecycle scripts disabled, only after verified owned process exits. No package removal; configuration and Skill directories retained.",
+  "finalVersion": "0.2.0-prototype.6",
+  "artifact": {
+    "name": "qcu-table-audit-0.2.0-prototype.6.tgz",
+    "bytes": 21984,
+    "sha256": "467235b554175755c738503d997ef57748174ff581f28b8a5cd367b29d7ab46b",
+    "productionPackageReady": false
+  },
+  "persistenceScope": {
+    "syntheticCsvFile": true,
+    "syntheticPersonalRulesFile": true,
+    "hostConfiguration": true,
+    "officialTestThemeAndFont": true,
+    "ruleEditorDraftPersisted": false,
+    "authorizationPersisted": false,
+    "taskResultsPersisted": false,
+    "note": "Page-local rule editing, selected file and per-file consent are ephemeral. Rules file/config survive; each browser reselects the synthetic file, re-enters that rules file and explicitly authorizes again."
+  },
+  "tests": {
+    "vitestPassed": 53,
+    "hostStrictTypes": true,
+    "clientStrictTypes": true
+  },
+  "sourceEvidence": {
+    "officialRepository": "https://github.com/deepseek-ai/deepseek-harness",
+    "officialTagRef": "dsh-v0.2.0-rc.2",
+    "officialTagApi": "https://api.github.com/repos/deepseek-ai/deepseek-harness/git/ref/tags/dsh-v0.2.0-rc.2",
+    "officialTagObject": {
+      "sha": "639ed015397290b3745d163aafe02ffee4aa3f84",
+      "type": "commit",
+      "url": "https://api.github.com/repos/deepseek-ai/deepseek-harness/git/commits/639ed015397290b3745d163aafe02ffee4aa3f84"
+    },
+    "fixedCheckoutCommit": "639ed015397290b3745d163aafe02ffee4aa3f84",
+    "registryMetadata": [
+      {
+        "name": "@deepseek-ai/dsh",
+        "version": "0.2.0-rc.2",
+        "gitHead": null,
+        "repository": {
+          "url": "git+https://github.com/deepseek-ai/deepseek-harness.git",
+          "type": "git",
+          "directory": "apps/cli"
+        },
+        "dist": {
+          "integrity": "sha512-EAJ3gPNcVt/uv8X19PMm9NkVhWgT7xXNMk0UKCVm+IQ5rpSQOcsMUa0HWlnYYVybKMsccjcRB21vVVsaXQ6IdA==",
+          "tarball": "https://registry.npmjs.org/@deepseek-ai/dsh/-/dsh-0.2.0-rc.2.tgz",
+          "attestations": null,
+          "signatures": [
+            {
+              "sig": "MEYCIQD+tQwM0+pnVWktN+MLjWdOZ1lTF+vCLbvDxO/xeneU6QIhAIdUAlWtUAje0+eg006foqUS6zwCA2axW6RCMTAQEFX5",
+              "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+            },
+            {
+              "sig": "MEUCIQDS3oN9bKpfh9Ept+c6YgUvrYs2fgfRpzUrFczwHztswAIgce17yg4V3pHzBuJIz+Y3X0vsY+opVfb9lWGIGCGY9SU=",
+              "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+            }
+          ]
+        }
+      },
+      {
+        "name": "@deepseek-ai/dsh-web-app",
+        "version": "0.2.0-rc.2",
+        "gitHead": null,
+        "repository": {
+          "url": "git+https://github.com/deepseek-ai/deepseek-harness.git",
+          "type": "git",
+          "directory": "packages/bundle/web-app"
+        },
+        "dist": {
+          "integrity": "sha512-pCIMPLfTKVfY942dP4eJSDVw7iUw86pemzfOr/e5DWP7CdCKTfvA82kP0RJAKJcyKJd8s679hqtCue/p4P20Dg==",
+          "tarball": "https://registry.npmjs.org/@deepseek-ai/dsh-web-app/-/dsh-web-app-0.2.0-rc.2.tgz",
+          "attestations": null,
+          "signatures": [
+            {
+              "sig": "MEYCIQDi4i5zPm4MkHmgvxQYhsnYXkI3t18gWORbH/cey6Ug5gIhAMbxBFC4NgPCWrUGdH9KSXW5JtIfWjor8Hayv9T7shn/",
+              "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+            },
+            {
+              "sig": "MEYCIQDeKVT2ov+O2nppVmLsKX8p0RXCkbWl5Em6yOGndAMQFQIhAMgYMsEp4zbRItp+FAYj7Gve8khbIexpiKCVuD0IbJaJ",
+              "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+            }
+          ]
+        }
+      }
+    ],
+    "npmRegistrySignaturesPresent": true,
+    "npmRegistrySignaturesCryptographicallyVerified": false,
+    "registryGitHeadProvided": false,
+    "registrySourceAttestationProvided": false,
+    "exactTarballBuildCommitProven": false,
+    "runtimeOrDshSourceModified": false,
+    "webBundlePatchBytesMatchFixedCheckout": true,
+    "webBundlePatchSha256": "df7653ee4c324dca706034631926c86f13a2cf17c280cc018f8c070a0aaad19e"
+  },
+  "nativeDialogsPassed": false,
+  "latestDownloadCancellationPassed": false,
+  "secondMacTested": false,
+  "privateCsvUsed": false,
+  "pendingUserScope": [
+    "native macOS file/save dialog cancellation and retry using synthetic fixture",
+    "second Apple Silicon Mac smoke check"
+  ],
+  "packageReady": false,
+  "thesisPort19387StillListening": true,
+  "originalRepositoryStillClean": true,
+  "prototype6VisibleProductGuidance": {
+    "mode": "probe-guide",
+    "pageErrors": [],
+    "nativeOsDialogsTested": false,
+    "style": {
+      "preference": "dark",
+      "dark": true,
+      "fontSize": "15px"
+    },
+    "restartGuidanceVisible": true,
+    "ownedWorkEmpty": true,
+    "sourceCsvUnchanged": true,
+    "completed": true
+  }
+}

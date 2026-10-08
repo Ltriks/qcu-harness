@@ -1,6 +1,6 @@
 # qcu-table-audit 开发原型
 
-版本 0.2.0-prototype.5 是树外 Bundle/Host/Client 包。包根默认导出任务 Host；原程序化 adapter 改从 `qcu-table-audit/adapter` 导入，`./task-host` 仍保留。官方 Client loader 要求 Bundle 的主 Host row 使用精确包名，因此不再用 `/task-host` 子路径作为该 row 名。`./client` 是官方 ModuleLoader 的 CJS factory，只有 React 外置；`./guidance` 注册包内只读说明 Skill，关闭个人与项目 Skill 根扫描。Bundle patch 的两项组件默认均关闭。
+版本 0.2.0-prototype.6 是树外 Bundle/Host/Client 包。包根默认导出任务 Host；原程序化 adapter 改从 `qcu-table-audit/adapter` 导入，`./task-host` 仍保留。官方 Client loader 要求 Bundle 的主 Host row 使用精确包名，因此不再用 `/task-host` 子路径作为该 row 名。`./client` 是官方 ModuleLoader 的 CJS factory，只有 React 外置；`./guidance` 注册包内只读说明 Skill，关闭个人与项目 Skill 根扫描。Bundle patch 的两项组件默认均关闭。
 
 已在独立 profile 上通过官方 CLI 安装及真实 Chrome 页面验收，使用未修改的官方 npm DSH/Web 0.2.0-rc.2 和固定源码基线 639ed015397290b3745d163aafe02ffee4aa3f84。只使用合成 CSV，未替换论文候选，旧论文策略仍拒绝 CSV 工具。
 
@@ -24,4 +24,4 @@ node node_modules/vitest/vitest.mjs run --config vitest.config.mjs
 
 canonical 引擎仅在 skills/qcu-table-audit/scripts/audit.py 编辑，构建复制到 lib。测试针对生成后的 lib，使用真实工具运行时、实际 Connection/BrowserAuth、Python 子进程和合成文件。React DOM/StrictMode 使用 JSDOM；真实官方 Client 挂载及浏览器业务流程另有独立证据。浏览器自动文件选择不等同原生系统文件对话框验收。生成目录及本机依赖链接不提交。清理屏障仅拦截自身 run 目录的 rm，其余文件操作及子进程保持真实。
 
-当前安装及浏览器结果见 [安装验收](../../docs/TABLE-AUDIT-INSTALL-VALIDATION.md) 与 [脱敏证据](../../docs/evidence/table-audit-install-validation.json)。此前 [任务阶段](../../docs/evidence/table-audit-task-validation.json) 和 [Host 阶段](../../docs/evidence/table-audit-host-validation.json) 属历史证据。当前真实私人 CSV 未获授权；本机 Hub 是下载→哈希→官方 CLI 安装的隔离测试，非公开发布。安装配置见 [试用说明](../../docs/TABLE-AUDIT-NEXT-STAGE.md)。不支持清理、TSV/XLSX、批量、行级导出、外部模型或永久授权；packageReady=false。
+当前安装及浏览器结果见 [安装验收](../../docs/TABLE-AUDIT-INSTALL-VALIDATION.md) 与 [脱敏证据](../../docs/evidence/table-audit-install-validation.json)。此前 [任务阶段](../../docs/evidence/table-audit-task-validation.json) 和 [Host 阶段](../../docs/evidence/table-audit-host-validation.json) 属历史证据。关闭 HMR 的测试 profile 在管理页开关变更后需要正常退出并重启才能应用；当前任务先用“取消并撤销”立即撤销，不能把保存配置当作即时关闭。当前真实私人 CSV 未获授权；本机 Hub 是下载→哈希→官方 CLI 安装的隔离测试，非公开发布。安装配置见 [试用说明](../../docs/TABLE-AUDIT-NEXT-STAGE.md)。不支持清理、TSV/XLSX、批量、行级导出、外部模型或永久授权；packageReady=false。

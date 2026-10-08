@@ -20,6 +20,7 @@ function TaskView({ controller }: { controller: CsvTaskController }) {
     <h1>CSV 只读诊断</h1>
     <p>每次仅选择一个 CSV。本机诊断，不改原件、不上传表格内容到外部服务。摘要只包含计数。</p>
     <p>演示和个人规则不代表学校正式规范。</p>
+    <p>若插件页提示“下次启动生效”，关闭开关不会立即撤销当前任务。停止使用请先“取消并撤销”，再正常退出并重启；重启后确认入口消失。</p>
     <label>选择 CSV <input ref={picker} type="file" accept=".csv,text/csv" disabled={busy || state.phase === 'failed'}
       onChange={event => { setConsent(false); void controller.select(event.currentTarget.files?.[0]) }} /></label>
     {state.filename && <p>当前文件：{state.filename}</p>}

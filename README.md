@@ -22,3 +22,5 @@ QCU Office、城院 Skill 目录站、插件及办公 Skills 的独立源码仓�
 2026-10-08 已重新核实进程并启动同一候选，当前证据与原生阻塞见 [本轮 Mac 验收](docs/MAC-CURRENT-ACCEPTANCE.md)。
 
 新增功能遵循 [插件接入约定](docs/PLUGIN-INTEGRATION.md)。第二功能的 [CSV 任务原型](docs/SECOND-FEATURE-TABLE-AUDIT.md) 已在未修改的官方 DSH/Web 独立 profile 中安装并通过合成 CSV 的真实 Chrome 流程，含逐文件授权、计数导出及清理恢复；见 [安装验收](docs/TABLE-AUDIT-INSTALL-VALIDATION.md)。不替换论文候选，不启用私人 CSV；当前 Hub 仅本机安装链测试。
+
+表格试用的 [开关重启与版本升级/回退验收](docs/TABLE-AUDIT-PILOT-LIFECYCLE.md) 已完成，最终版本 prototype.6。关闭 HMR 时先撤销当前任务，开关保存后正常退出重启；没有把热停用或原生保存取消标为通过。

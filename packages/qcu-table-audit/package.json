@@ -1,6 +1,6 @@
 {
   "name": "qcu-table-audit",
-  "version": "0.2.0-prototype.5",
+  "version": "0.2.0-prototype.6",
   "private": true,
   "type": "module",
   "main": "lib/task-host.js",
