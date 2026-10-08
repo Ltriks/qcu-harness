@@ -30,11 +30,14 @@ export interface Config {
   readonly authority: CsvAuthority
   readonly maxInputBytes: number
   readonly maxRuleBytes: number
-  /** Read limit after generation; not a disk quota for the trusted engine. */
+  /** Report read cap; the engine also caps aggregate generated report bytes. */
   readonly maxReportBytes: number
   readonly timeoutMs: number
   readonly terminateMs: number
   readonly maxConcurrentRuns: number
+  readonly maxRows?: number
+  readonly maxColumns?: number
+  readonly maxIssues?: number
 }
 
 const codes = ['blank', 'surrounding_whitespace', 'duplicate_row', 'duplicate_key',
@@ -87,7 +90,9 @@ async function execute(config: Config, directory: string, signal: AbortSignal): 
   const environment = Object.fromEntries(Object.entries(process.env).filter(([key]) =>
     ['PATH', 'LANG', 'LC_ALL', 'SYSTEMROOT', 'WINDIR', 'TMPDIR', 'TEMP', 'TMP'].includes(key)))
   const child = spawn(config.python, ['-B', engine, join(directory, 'input.csv'), '--rules', join(directory, 'rules.json'),
-    '--out', join(directory, 'report')], { cwd: directory, env: environment, stdio: 'ignore' })
+    '--out', join(directory, 'report'), '--max-rows', String(config.maxRows ?? 10000),
+    '--max-columns', String(config.maxColumns ?? 128), '--max-issues', String(config.maxIssues ?? 10000),
+    '--max-report-bytes', String(config.maxReportBytes)], { cwd: directory, env: environment, stdio: 'ignore' })
   let stopped = false
   let ended = false
   let forced: ReturnType<typeof setTimeout> | undefined
@@ -213,6 +218,8 @@ export async function apply(ctx: Context, config: Config): Promise<void> {
     || !(config.scope.kind === 'local-task' ? /^[0-9a-f]{32}$/ : /^[0-9a-f]{64}$/).test(config.scope.id)
     || [config.maxInputBytes, config.maxRuleBytes, config.maxReportBytes, config.timeoutMs,
       config.terminateMs, config.maxConcurrentRuns].some(value => !Number.isSafeInteger(value) || value <= 0)) fail()
+  if ([config.maxRows, config.maxColumns, config.maxIssues, config.maxReportBytes].some(value =>
+    value !== undefined && (!Number.isInteger(value) || value <= 0 || value > 2147483647))) fail()
   const directory = await lstat(config.workRoot)
   if (!directory.isDirectory() || directory.isSymbolicLink()
     || (process.platform !== 'win32' && (directory.uid !== process.getuid?.() || (directory.mode & 0o077) !== 0))) fail()

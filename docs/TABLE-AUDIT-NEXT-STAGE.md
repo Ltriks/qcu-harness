@@ -1,5 +1,7 @@
 # 下一最小可体验阶段
 
+2026-10-08：下列 1–4 的源码及合成验证已完成，5 的默认关闭 Bundle patch 和 Host/Client 导出已完成；未安装或启用隔离 profile。证据见 [任务阶段验证](evidence/table-audit-task-validation.json)。真实 CSV 批准、完整官方 Client 挂载及系统对话框仍待完成。以下切片保留为实现约束及安装验收清单。
+
 建议先做隔离的 CSV 专用开发 profile 和单功能页面，不替换已验收的论文候选，不先固定主导航位置。采用官方 package.json 的 dsh.bundle.patch、Cordis Host/Client 导出和固定依赖；安装验收与 Hub 分发分开。源文件和合成测试可继续在独立开发目录实现，当前没有安装或启用新权限。
 
 具体切片：

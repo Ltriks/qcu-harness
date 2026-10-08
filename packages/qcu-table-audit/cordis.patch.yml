@@ -1,0 +1,12 @@
+[
+  {
+    "insert": [
+      {
+        "id": "qcu-table-audit-task",
+        "name": "qcu-table-audit/task-host",
+        "disabled": true,
+        "config": { "enabled": false, "mode": "isolated-local-csv" }
+      }
+    ]
+  }
+]

@@ -1,0 +1,105 @@
+{
+  "schemaVersion": 1,
+  "observedAtUTC": "2026-10-08",
+  "scope": "source and synthetic isolated CSV task tests only",
+  "sourceBaseCommit": "96fb707a37e0470999b6c29e039747bb03c17f2e",
+  "packageVersion": "0.2.0-prototype.0",
+  "checks": [
+    {
+      "check": "hostbuild",
+      "exitCode": 0,
+      "seconds": 1.09
+    },
+    {
+      "check": "clientbuild",
+      "exitCode": 0,
+      "seconds": 0.08
+    },
+    {
+      "check": "hosttypes",
+      "exitCode": 0,
+      "seconds": 0.99
+    },
+    {
+      "check": "clienttypes",
+      "exitCode": 0,
+      "seconds": 1.05
+    },
+    {
+      "check": "tests",
+      "exitCode": 0,
+      "seconds": 7.97
+    },
+    {
+      "check": "python",
+      "exitCode": 0,
+      "seconds": 0.18
+    },
+    {
+      "check": "concurrent-a",
+      "exitCode": 0,
+      "seconds": 8.66
+    },
+    {
+      "check": "concurrent-b",
+      "exitCode": 0,
+      "seconds": 10.18
+    },
+    {
+      "check": "strengthened-cancel-dom",
+      "exitCode": 0,
+      "tests": 2
+    }
+  ],
+  "vitestTestsPerProcess": 49,
+  "pythonTests": 16,
+  "concurrentIndependentVitestProcesses": 2,
+  "independentReadOnlyReviewers": 2,
+  "actualCordisToolRuntime": true,
+  "actualConnectionAndBrowserAuth": true,
+  "syntheticSignedCookieFixture": true,
+  "controllerToAuthenticatedHostToCanonicalPython": true,
+  "integrationTransport": "in-memory connection calls; not browser TCP",
+  "actualPythonChildrenAndOwnedCleanup": true,
+  "rootOwnedCordisUnloadFailureRecovery": true,
+  "sharedHostChildBudget": true,
+  "abandonedPageLeaseRecovery": true,
+  "staleCloseRejectedBeforeSideEffects": true,
+  "canonicalGenerationLimits": [
+    "rows",
+    "columns",
+    "issues",
+    "aggregate report UTF-8 bytes before output directory creation"
+  ],
+  "reactStrictMode": true,
+  "domEnvironment": "JSDOM; synthetic file object and nonempty input value sentinel",
+  "clientSlotContribution": "test double; official full Client mounting not verified",
+  "bundleDefaultDisabled": true,
+  "existingThesisPolicyStillDeniesCsv": true,
+  "realCsvPermissionReceived": false,
+  "prototypeInstalled": false,
+  "acceptedCandidateRebuiltOrReplaced": false,
+  "nativeGuiValidated": false,
+  "browserGuiValidated": false,
+  "modelsInvoked": false,
+  "externalDataServicesUsed": false,
+  "crossProcessResidualRecoveryImplemented": false,
+  "operatingSystemSandboxOrDiskQuotaImplemented": false,
+  "officialRootDocSyncRun": false,
+  "hubInstallChainValidated": false,
+  "packageReady": false,
+  "canonicalEngineCopyByteEqual": true,
+  "demoRulesCopyByteEqual": true,
+  "packageExportsExist": true,
+  "clientNodeImportsAbsent": true,
+  "newDocRelativeLinksChecked": 32,
+  "publicSource": {
+    "blockedFindings": 0,
+    "resourceHashesVerified": 12,
+    "canonicalSkillsVerified": 13
+  },
+  "originalRepositoryClean": true,
+  "originalRepositoryHead": "756b7331b2eaf91aff5340c62cedaf5261af7876",
+  "acceptedCandidateResourceHashesMatch": 12,
+  "historicalHostEvidenceSha256": "d0cbf3fa3bfedffcdbcddc01b9a86e3eb9e8b1bfd233df6c4d8401e4873a654f"
+}

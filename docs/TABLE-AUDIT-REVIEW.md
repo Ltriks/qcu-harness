@@ -1,5 +1,15 @@
 # CSV Host 原型独立复核
 
+## S2 任务页面与授权所有者（2026-10-08）
+
+两位既有 reviewer 继续只读复核任务页、授权与回归。修正：跨页面并发改为 Host 统一预算；遗失空页面和授权页面以 lease 回收；旧 close revision 在改变 closing 前拒绝；卸载失败恢复捕获 root Connection，避免访问已 dispose 的 feature Context；清理重试清空文件选择器并重新打开新页面。reviewer 的内存模拟仅核查状态机，主回归另使用实际 Cordis、Connection、BrowserAuth 及 canonical Python。
+
+最终 49 项 Vitest、16 项 Python 通过，两个独立 Vitest 进程各 49 项通过。新增 Controller→认证 Host→Python→计数导出合成管线，transport 为内存调用，不是浏览器 TCP。React StrictMode 验证确认前不读取及失败后的清理重试；非空 picker.value synthetic sentinel 消除空值断言假阳性。slots 使用 test double，页面使用 JSDOM，不等同原生验收。结果见 [任务阶段证据](evidence/table-audit-task-validation.json)。
+
+新增 canonical 生成预算在输出前拒绝超限。旧论文策略、已验收 Mac 候选及生产 Native 协议未改。完整官方 Client、真实文件启用、跨进程残留恢复及原生对话框未验收；packageReady=false。
+
+## S1 程序化 adapter 历史记录
+
 两位独立 reviewer 对 b4e0f51828aa8575d2864cf2e92a33a33d53cdc3 做只读复核，分别检查权限/生命周期与测试/证据。没有运行用户应用或更改论文功能。19 项通过及两组独立并行进程记录、旧行为下四项清理屏障失败均经核对。
 
 确认一个 P2 缺陷：删除连续失败后，旧 finally 丢弃 active 所有权并完成 done；dispose 成功但私有目录残留。主代理用真实合成引擎、只在其 owned rm 注入失败复现，旧行为下回归失败。现在目录记录保留到清理成功，dispose 重试并在持续失败时拒绝，故障解除后再次 dispose 清理成功。reviewer 对修复再次只读复核，并用内存模拟核对两次并发 dispose 失败与恢复；无新增阻塞问题。

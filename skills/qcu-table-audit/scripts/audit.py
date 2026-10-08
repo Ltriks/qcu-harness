@@ -11,14 +11,26 @@ from decimal import Decimal, InvalidOperation
 from pathlib import Path
 
 
-def load_table(path):
+def budget(limits):
+    if limits is None:
+        return
+    keys = {'rows', 'columns', 'issues', 'report_bytes'}
+    if not isinstance(limits, dict) or set(limits) != keys or any(
+            type(v) is not int or not 0 < v <= 2147483647 for v in limits.values()):
+        raise ValueError('Invalid diagnosis generation budget.')
+
+
+def load_table(path, limits=None):
     path = Path(path)
     if path.suffix.lower() not in {'.csv', '.tsv'}:
         raise ValueError('Only UTF-8 CSV/TSV is supported.')
     raw = path.read_bytes()
     delimiter = '\t' if path.suffix.lower() == '.tsv' else ','
-    rows = list(csv.reader(io.StringIO(raw.decode('utf-8-sig'), newline=''),
-                           delimiter=delimiter, strict=True))
+    rows = []
+    for row in csv.reader(io.StringIO(raw.decode('utf-8-sig'), newline=''), delimiter=delimiter, strict=True):
+        if limits and (len(row) > limits['columns'] or len(rows) > limits['rows']):
+            raise ValueError('Diagnosis generation budget exceeded.')
+        rows.append(row)
     if not rows or not rows[0] or any(not h.strip() for h in rows[0]):
         raise ValueError('A nonempty header with nonblank column names is required.')
     headers = rows[0]
@@ -77,12 +89,14 @@ def valid_type(value, spec):
     return True
 
 
-def inspect(headers, rows, rules, row_numbers=None):
+def inspect(headers, rows, rules, row_numbers=None, max_issues=None):
     issues = []
     row_numbers = row_numbers if row_numbers is not None else list(range(2, len(rows) + 2))
     exact_seen, key_seen = {}, {}
     for number, row in zip(row_numbers, rows):
         def add(code, column=None, **extra):
+            if max_issues is not None and len(issues) >= max_issues:
+                raise ValueError('Diagnosis generation budget exceeded.')
             issues.append(dict(row=number, column=column, code=code, **extra))
         signature = tuple(row)
         if signature in exact_seen:
@@ -113,14 +127,17 @@ def inspect(headers, rows, rules, row_numbers=None):
     return issues
 
 
-def audit(source, out, rules=None, clean=False):
+def audit(source, out, rules=None, clean=False, limits=None):
     source, out = Path(source), Path(out)
-    headers, rows, delimiter, digest = load_table(source)
+    budget(limits)
+    if limits and clean:
+        raise ValueError('Generation budgets support read-only diagnosis only.')
+    headers, rows, delimiter, digest = load_table(source, limits)
     rules = {} if rules is None else rules
     validate_rules(rules, headers)
     if out.exists():
         raise ValueError('Output directory must not exist; choose a new path.')
-    issues = inspect(headers, rows, rules)
+    issues = inspect(headers, rows, rules, max_issues=limits['issues'] if limits else None)
     result_rows, numbers, changes, seen = [], [], [], set()
     for number, original in enumerate(rows, 2):
         # Only byte-for-byte equivalent logical records may be removed.
@@ -151,17 +168,28 @@ def audit(source, out, rules=None, clean=False):
     report = dict(source=source.name, source_sha256=digest, rows=len(rows),
                   output_rows=len(result_rows), columns=headers, clean_applied=clean,
                   rules=rules, issues=issues, counts=dict(Counter(i['code'] for i in issues)),
-                  changes=changes, remaining_issues=inspect(headers, result_rows, remaining_rules, numbers),
+                  changes=changes, remaining_issues=inspect(headers, result_rows, remaining_rules, numbers,
+                                                          limits['issues'] if limits else None),
                   limitations=['CSV/TSV only; no business scoring.', 'Record numbers are logical CSV rows.',
                                'Formula-like text is flagged but not evaluated or modified.'])
-    out.mkdir(parents=True, exist_ok=False)
-    (out / 'report.json').write_text(json.dumps(report, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+    parts, encoded_bytes = [], 1
+    for part in json.JSONEncoder(ensure_ascii=False, indent=2).iterencode(report):
+        encoded_bytes += len(part.encode('utf-8'))
+        if limits and encoded_bytes > limits['report_bytes']:
+            raise ValueError('Diagnosis generation budget exceeded.')
+        parts.append(part)
     lines = ['# 表格体检报告', '', f'原始记录：{len(rows)}；输出记录：{len(result_rows)}。',
              f'清洗模式：{clean}；变更：{len(changes)}。', '', '问题分类：', '']
     lines += [f'- {key}: {count}' for key, count in report['counts'].items()] or ['- 未发现本工具覆盖的问题。']
     lines += ['', '详见 report.json 中的原始记录号、问题和逐项变更。业务正确性未检查。',
               'CSV/TSV 请以文本类型导入标识符列；公式样文本未执行或改写。', '']
-    (out / 'report.md').write_text('\n'.join(lines), encoding='utf-8')
+    markdown = '\n'.join(lines)
+    if limits and encoded_bytes + len(markdown.encode('utf-8')) > limits['report_bytes']:
+        raise ValueError('Diagnosis generation budget exceeded.')
+    # All bounded generation checks precede creation of either report file.
+    out.mkdir(parents=True, exist_ok=False)
+    (out / 'report.json').write_text(''.join(parts) + '\n', encoding='utf-8')
+    (out / 'report.md').write_text(markdown, encoding='utf-8')
     if clean:
         target = out / ('cleaned.tsv' if delimiter == '\t' else 'cleaned.csv')
         with target.open('x', encoding='utf-8-sig', newline='') as stream:
@@ -177,10 +205,14 @@ def main():
     parser.add_argument('--out', required=True)
     parser.add_argument('--rules')
     parser.add_argument('--clean', action='store_true')
+    for key in ('rows', 'columns', 'issues', 'report-bytes'):
+        parser.add_argument('--max-' + key, type=int)
     args = parser.parse_args()
     try:
         rules = json.loads(Path(args.rules).read_text(encoding='utf-8')) if args.rules else {}
-        result = audit(args.input, args.out, rules, args.clean)
+        values = [args.max_rows, args.max_columns, args.max_issues, args.max_report_bytes]
+        limits = dict(zip(('rows', 'columns', 'issues', 'report_bytes'), values)) if any(v is not None for v in values) else None
+        result = audit(args.input, args.out, rules, args.clean, limits)
     except (ValueError, OSError, csv.Error) as exc:
         parser.exit(2, f'Error: {exc}\n')
     print(json.dumps({'rows': result['rows'], 'issues': len(result['issues']), 'out': args.out}, ensure_ascii=False))

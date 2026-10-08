@@ -1,18 +1,20 @@
 {
   "name": "qcu-table-audit",
-  "version": "0.1.0-prototype.1",
+  "version": "0.2.0-prototype.0",
   "private": true,
   "type": "module",
   "main": "lib/index.js",
-  "exports": { ".": "./lib/index.js" },
-  "files": ["lib", "README.md"],
+  "exports": { ".": "./lib/index.js", "./task-host": "./lib/task-host.js", "./client": "./lib/client.js", "./package.json": "./package.json", "./cordis.patch.yml": "./cordis.patch.yml" },
+  "dsh": { "bundle": { "patch": "./cordis.patch.yml" }, "client": { "inject": ["@deepseek-ai/dsh-client-ui-renderer", "@deepseek-ai/dsh-client-ui-sidebar"], "platform": "web" } },
+  "files": ["lib", "README.md", "cordis.patch.yml"],
   "scripts": {
-    "build": "node scripts/build-host.mjs",
+    "build": "node scripts/build-host.mjs && node scripts/build-client.mjs",
     "typecheck": "tsc --project tsconfig.json --noEmit",
+    "typecheck:client": "tsc --project tsconfig.client.json --noEmit",
     "test": "vitest run --config vitest.config.mjs"
   },
   "engines": { "node": "^22.19.0 || >=24.0.0" },
-  "peerDependencies": { "@deepseek-ai/cordis": "4.0.4", "@deepseek-ai/dsh-tools": "0.2.0-rc.2" },
+  "peerDependencies": { "@deepseek-ai/cordis": "4.0.4", "@deepseek-ai/dsh-tools": "0.2.0-rc.2", "@deepseek-ai/dsh-llm": "0.2.0-rc.2", "@deepseek-ai/dsh-client-connection": "0.2.0-rc.2", "@deepseek-ai/dsh-client-ui-renderer": "0.2.0-rc.2", "@deepseek-ai/dsh-client-ui-sidebar": "0.2.0-rc.2", "@deepseek-ai/dsh-client-ui-layout": "0.2.0-rc.2", "react": "18.3.1" },
   "devDependencies": {
     "@deepseek-ai/cordis": "4.0.4",
     "@deepseek-ai/dsh-tools": "0.2.0-rc.2",
@@ -21,6 +23,7 @@
     "@types/node": "22.20.0",
     "esbuild": "0.25.12",
     "typescript": "6.0.3",
-    "vitest": "4.1.8"
+    "vitest": "4.1.8",
+    "react": "18.3.1", "react-dom": "18.3.1", "@types/react": "18.3.31", "@types/react-dom": "18.3.7", "jsdom": "29.1.1"
   }
 }
