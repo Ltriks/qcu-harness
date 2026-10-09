@@ -1,6 +1,6 @@
 # 城院 Hub：局域网目录分发与 Mac mini 迁移准备
 
-当前已完成源码准备、合成验证、mini严格SSH预检和独立暂存分发核验；尚未启动mini局域网目录站。DSH 源码零修改，packageReady=false。第二台 test.1 的用户人工安装/启用/停用/移除及重启验收已经独立记录；它不证明真实 Hub 在线。
+当前已完成源码准备、合成验证、mini严格SSH预检、独立暂存分发及获准后的只读LAN试用站启动。20项真实LAN HTTP验收通过，GUI未验；站点保持可访问。DSH 源码零修改，packageReady=false。第二台 test.1 的用户人工安装/启用/停用/移除及重启验收已经独立记录；它不证明真实 Hub 在线。
 
 ## 查明的实际位置和差距
 
@@ -58,7 +58,7 @@ node hub/release/catalog.mjs fetch "$TRUSTED_ORIGIN" "$TRUSTED_CATALOG_SHA256" p
 
 11项新增Node测试通过：draft/未审/版本范围/路径拒绝、确定性校验及新目录不覆盖、链接拒绝、受信固定下载、目录与包篡改及兼容失败不写入、HTTP origin及重定向拒绝、超量流中止、固定更新/回退与同版改写拒绝、真实临时回环HTTP传输、服务只读白名单/Host/HEAD、整批大小限制。测试包为不安装的合成字节；另用已交付真实test.1 TGZ验证离线stage，1279字节及固定包哈希一致，目录哈希记录在 evidence/hub-lan-preparation.json。所有测试监听都只在本机随机回环端口，并已关闭。
 
-mini预检及新目录暂存分发已完成，实际LAN启动需确认下节的具体目录、端口和进程方式，再验客户端可达性；没有覆盖旧目录，也不宣称未知旧站数据已备份。公网、校外访问、正式签名发布和Windows不在本轮范围。
+mini预检、新目录暂存分发及具体LAN启动授权均已完成，实际可达性和固定字节检查通过，见最新验收。没有覆盖旧目录，也不宣称未知旧站数据已备份。公网、校外访问、正式签名发布和Windows不在本轮范围。
 
 ## mini既有SSH预检及暂存分发（2026-10-09）
 
@@ -70,4 +70,12 @@ mini严格known_hosts校验通过，个人机身份与既有记录一致：arm64
 
 已获准暂存分发7文件、39621字节：canonical index.html/themes.html、schemaVersion1合成catalog、固定test.1 TGZ、Python助手、README和manifest。远端目录由mktemp新建、本人拥有、0700，没有采用旧目录。远端验证所有文件通过，serviceStarted=false，8080/8081仍无监听。manifest SHA256：0e5b2eed25f902fff08a77d43b0c143f6fed610d76515ab1c9dc17a837791492。精确路径只写本地收据，不入Git；未带旧安装器、课程材料、DSH Home或凭据。完整旧站尚未恢复上线。
 
-下一项待确认动作：在已核验独立目录，以本人账户运行Python只读服务，绑定192.168.1.68:8080，前台管理，Ctrl+C停止，不开机自启、不改防火墙、不停止其他服务。获准后若端口占用即停，不抢占；从MacBook核验/themes.html、catalog、固定包哈希、只读拒绝和停止清理。首次目录只有合成探针；正式Skill/插件分发仍需明确审阅版本、来源及升级许可。
+上述启动范围已获用户明确批准（Sentinel_dd623789b488819198004433af620e0c）；启动前再验端口、所有者和manifest。为保持用户试用入口，采用本次PID管理的独立用户进程，SSH结束后仍运行；没有launchd或开机自启，不改防火墙、不停止其他服务。首次目录只有合成探针；正式Skill/插件分发仍需明确审阅版本、来源及升级许可。
+
+## 当前可访问站点与生命周期
+
+试用页面：http://192.168.1.68:8080/themes.html；目录首页：http://192.168.1.68:8080/。从MacBook实际LAN HTTP验证20项通过：canonical首页/themes逐字节一致、目录和固定包SHA256一致、HEAD、POST/PUT/DELETE拒绝、原始及编码穿越路径拒绝、未知查询/目录拒绝、外国Host拒绝、manifest/README/助手/日志/PID管理文件拒绝；写请求后目录哈希未变。没有浏览器控制工具，未把HTTP结果记为GUI像素或交互验收。没有调用DSH安装或升级。
+
+保留用户获准试用服务；不在验收末尾自动停止或删除暂存。停止操作必须从拥有的启动记录读取当前PID，并核对进程UID、启动时间及完整参数，匹配后仅发送该进程SIGTERM；已通过只读控制检查，实际停止未执行，以保持用户可查看。不能使用历史文档PID或全局kill。精确路径、PID和操作助手只存本地分发收据；公开Git证据中的PID仅为当时观察值，不能直接拿来停止。用户需要停止时由执行代理再次检查后处理。该进程不依赖SSH会话，但mini重启或进程退出后不会自动恢复，需要显式重启操作；没改电源、网络或系统启动设置。
+
+此页仍是canonical网页搭配私有合成目录，完整历史Skill目录恢复、实际插件升级/回退、正式分发与GUI验收未通过。详见[evidence/hub-mini-lan-acceptance.json](evidence/hub-mini-lan-acceptance.json)。

@@ -1,0 +1,130 @@
+{
+  "recordedDateUtc": "2026-10-09",
+  "approvalSourceMessageId": "Sentinel_dd623789b488819198004433af620e0c",
+  "approvalScope": "Own-account read-only trial service on 192.168.1.68:8080, no autostart/firewall/other-service changes",
+  "origin": "http://192.168.1.68:8080",
+  "preStart": {
+    "strictSSHHostKeyCheck": true,
+    "ownerAndWifiAddressRechecked": true,
+    "manifestAndAllFilesReverified": true,
+    "port8080NoListenerObserved": true
+  },
+  "process": {
+    "kind": "Detached own-account process, independent of SSH session",
+    "ownedPidAtVerification": 13034,
+    "ownershipStartTimeAndFullArgumentsVerified": true,
+    "stopControlDryRunPassed": true,
+    "actualStopNotPerformedToKeepTrialAvailable": true,
+    "systemServiceOrAutostartInstalled": false,
+    "automaticRestartAfterReboot": false
+  },
+  "http": {
+    "method": "Real LAN HTTP from MacBook to personal mini; no browser GUI control available",
+    "checksPassed": 20,
+    "checks": [
+      {
+        "path": "/index.html",
+        "status": 200,
+        "bytes": 18385,
+        "sha256Matched": true
+      },
+      {
+        "path": "/themes.html",
+        "status": 200,
+        "bytes": 10308,
+        "sha256Matched": true
+      },
+      {
+        "path": "/catalog.json",
+        "status": 200,
+        "bytes": 1359,
+        "sha256Matched": true
+      },
+      {
+        "path": "/plugins/qcu-dialogue-install-probe-0.0.1-test.1-8b8ad2afc154278eb835a48305ce54c01d4ccc733b8f1896f807aa06dd00632e.tgz",
+        "status": 200,
+        "bytes": 1279,
+        "sha256Matched": true
+      },
+      {
+        "path": "/",
+        "status": 200,
+        "canonicalHtmlMatched": true
+      },
+      {
+        "path": "/themes.html",
+        "method": "HEAD",
+        "status": 200
+      },
+      {
+        "path": "/manifest.json",
+        "status": 404
+      },
+      {
+        "path": "/README.txt",
+        "status": 404
+      },
+      {
+        "path": "/serve-hub.py",
+        "status": 404
+      },
+      {
+        "path": "/service.log",
+        "status": 404
+      },
+      {
+        "path": "/launch-owned.json",
+        "status": 404
+      },
+      {
+        "path": "/plugins/",
+        "status": 404
+      },
+      {
+        "path": "/catalog.json?query=1",
+        "status": 404
+      },
+      {
+        "path": "/plugins/../README.txt",
+        "status": 404
+      },
+      {
+        "path": "/%2e%2e/README.txt",
+        "status": 404
+      },
+      {
+        "path": "/../.ssh/authorized_keys",
+        "status": 404
+      },
+      {
+        "path": "/catalog.json",
+        "method": "POST",
+        "status": 405
+      },
+      {
+        "path": "/catalog.json",
+        "method": "PUT",
+        "status": 501
+      },
+      {
+        "path": "/catalog.json",
+        "method": "DELETE",
+        "status": 501
+      },
+      {
+        "path": "/catalog.json",
+        "foreignHost": true,
+        "status": 403
+      }
+    ],
+    "canonicalPagesAndPackageSha256Matched": true,
+    "catalogUnchangedAfterWriteRejection": true
+  },
+  "serviceKeptRunning": true,
+  "guiVerified": false,
+  "fullHistoricalHubRestored": false,
+  "actualDSHInstallOrUpgradePerformed": false,
+  "manifestSha256": "0e5b2eed25f902fff08a77d43b0c143f6fed610d76515ab1c9dc17a837791492",
+  "operatorFilesOrDirectoryOutsideWhitelistExposed": false,
+  "packageReady": false
+}

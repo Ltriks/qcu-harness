@@ -45,5 +45,12 @@
     "firewallNetworkAndAutostart",
     "otherServices"
   ],
-  "packageReady": false
+  "packageReady": false,
+  "currentApprovedLanTrialAcceptance": {
+    "reference": "hub-mini-lan-acceptance.json",
+    "serviceStarted": true,
+    "lanHttpChecksPassed": 20,
+    "guiVerified": false
+  },
+  "historicalScope": "Original pre-start staging record; serviceStarted=false and approvalPending=true above describe that phase only"
 }
