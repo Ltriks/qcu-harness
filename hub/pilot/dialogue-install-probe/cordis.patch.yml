@@ -1,0 +1,15 @@
+[
+  {
+    "insert": [
+      {
+        "id": "qcu-dialogue-install-probe",
+        "name": "qcu-dialogue-install-probe",
+        "disabled": true,
+        "config": {
+          "enabled": true
+        }
+      }
+    ]
+  }
+]
+

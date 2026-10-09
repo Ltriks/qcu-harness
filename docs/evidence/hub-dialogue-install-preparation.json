@@ -1,0 +1,64 @@
+{
+  "recordedAtUtc": "2026-10-09T02:03:01Z",
+  "scope": "Read-only Hub inspection and source-only preparation, no user profile changes",
+  "liveHub": {
+    "readOnlyGetCatalogStatus": 200,
+    "originKind": "existing local loopback fixture",
+    "port": 19390,
+    "plugin": "qcu-table-audit",
+    "version": "0.2.0-prototype.5",
+    "sha256": "5fb55b69ce45947d29b113ccfcd67bb9b313a2ff9017491c28e678c943e76114",
+    "fixturePublishedNotPublicRelease": true,
+    "changed": false
+  },
+  "sourceCatalog": {
+    "status": "all entries draft",
+    "installableExactRc2ProbeAvailable": false,
+    "changed": false
+  },
+  "officialTool": {
+    "module": "@deepseek-ai/dsh-plugin-manager/tools",
+    "name": "plugin_manager",
+    "approvalBeforeManagerCall": true,
+    "allActionsRequireDangerFullAccessOrOneCallApproval": true,
+    "persistentSessionModeChange": false,
+    "profileWidePersistentChanges": true,
+    "hostCodeOutsideWorkspaceSandbox": true,
+    "hashArgumentSupported": false,
+    "CreatorRequired": false
+  },
+  "preparedFixture": {
+    "name": "qcu-dialogue-install-probe",
+    "version": "0.0.1-test.1",
+    "bytes": 1279,
+    "sha256": "8b8ad2afc154278eb835a48305ce54c01d4ccc733b8f1896f807aa06dd00632e",
+    "defaultDisabled": true,
+    "noDependenciesOrLifecycleScripts": true,
+    "noNetworkFileToolOrChildActions": true
+  },
+  "tests": {
+    "nodePassed": 4,
+    "pythonPassed": 2,
+    "approvalAndManager": "explicit test stubs, not actual UI or installation",
+    "lifecycle": "real Cordis/Skill context disposal and recreation, not App process restart",
+    "packing": "deterministic TGZ, exact members and SHA256, existing/symlink output preservation"
+  },
+  "notPerformed": {
+    "appStartStop": true,
+    "profileChange": true,
+    "toolEnablement": true,
+    "packageInstallation": true,
+    "modelCall": true,
+    "publicHubPublication": true
+  },
+  "pending": [
+    "user review of independent profile tool visibility and per-call escalation",
+    "second-Mac private catalog route",
+    "real model/UI reject and allow-once management install",
+    "real test App restart and Skill availability",
+    "disable/remove and restart"
+  ],
+  "naturalLanguageInstallVerified": false,
+  "realHubDialogueInstallVerified": false,
+  "packageReady": false
+}
