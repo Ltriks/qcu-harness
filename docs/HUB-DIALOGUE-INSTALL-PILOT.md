@@ -46,3 +46,14 @@ scripts/stage-dialogue-install-probe.py 只在新目录生成确定性 TGZ、私
 
 详见 evidence/hub-dialogue-install-preparation.json 和 hub/pilot/dialogue-install-profile-proposal.json。
 
+
+
+## 已获批准后的可执行小包（2026-10-09）
+
+用户 Sentinel_39d91b10056c8191a969d4f2296536c8 明确“同意”新独立第二台配置、Standard 官方管理工具、本机回环合成目录和固定包试验；实际每次管理提升仍由本人审阅。无需再重复询问该范围。说明与操作见 [第二台执行步骤](HUB-DIALOGUE-INSTALL-SECOND-MAC.md)。
+
+实际官方 App 标识为 preset-standard.config.plugins，配置替换不深度合并；先前纯提案的 selector 已修正。新生成器从签名 rc.2 App 读取完整配置、只启用 tool-plugin-manager、保留19个顶层条目和所有平台表达式，通过官方 composeEntries 及 YAML 序列化回读比对。没有修改 DSH 源码或预制 reserved desktop profile；用户通过官方 App 初始化新 Home。
+
+新增助手在临时新 Home 通过签名/Gatekeeper及真实 Node-only配置生成、只回环随机端口目录、固定下载和SHA256、未知路径/查询/Host拒绝检查。8项Python用例通过，覆盖旧CSV Home/链接拒绝、配置不覆盖、拒绝安装状态比对、已安装包禁止作拒绝基线、安装字节核验和篡改拒绝。没有打开GUI、实际安装插件、调用模型或修改已验收profile。测试snapshot只证明安装元数据/合成包状态无变更，不宣称聊天记录等整个Home不变。
+
+HMR关闭时，新安装后先正常重启才能得到真实插件entryId；启用精确row后再次正常重启才验证标记。移除前必须先set_bundle(false)并正常重启，解除startedBundles；否则官方管理器可能拒绝stop-profile。不能用shell强删或放宽门槛。当前包只验证回环下载核验加模型官方管理动作，不声称真实城院Hub上线或模型自主检索下载通过。

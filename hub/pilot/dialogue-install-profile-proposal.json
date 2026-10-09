@@ -1,6 +1,6 @@
 {
   "scope": "New independent internal test Home/profile only; not current accepted CSV Home",
-  "status": "review-only-not-applied",
+  "status": "user-approved-for-new-independent-profile; not applied to a user App by this agent",
   "officialBaseline": {
     "app": "0.2.0-rc.2",
     "sourceCommit": "639ed015397290b3745d163aafe02ffee4aa3f84",
@@ -8,7 +8,7 @@
   },
   "changes": [
     {
-      "selector": "agent-preset-standard.config.compose.tool-plugin-manager",
+      "selector": "preset-standard.config.plugins.tool-plugin-manager",
       "module": "@deepseek-ai/dsh-plugin-manager/tools",
       "field": "disabled",
       "from": true,
@@ -57,10 +57,17 @@
     "dependencies": [],
     "installationScripts": []
   },
-  "awaitingUserDecision": [
-    "new independent profile and visibility of official plugin_manager",
-    "explicit one-call management escalation for bounded pilot actions",
-    "private catalog route for second Mac, preferably own loopback fixture; no public publication"
-  ],
-  "applyAutomatically": false
+  "awaitingUserDecision": [],
+  "applyAutomatically": false,
+  "userAuthorization": {
+    "sourceMessageId": "Sentinel_39d91b10056c8191a969d4f2296536c8",
+    "quote": "同意",
+    "scope": "New second-Mac independent profile, official Standard management tool, own loopback fixture, fixed synthetic package; each actual approval reviewed by user"
+  },
+  "pendingManualActions": [
+    "initialize new independent App Home",
+    "configure model privately if needed",
+    "personally review every management approval",
+    "normal Quit/restart of trial App and actual tool-result checks"
+  ]
 }

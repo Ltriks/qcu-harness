@@ -51,6 +51,25 @@ def stage(destination):
     destination.mkdir(parents=True, mode=0o700)
     (destination / 'plugins').mkdir(mode=0o700)
     (destination / 'plugins' / filename).write_bytes(payload)
+    helper_hashes = {}
+    for name in ['dialogue-pilot.py', 'make-dialogue-profile.mjs']:
+        data = (ROOT / 'hub/pilot' / name).read_bytes()
+        (destination / name).write_bytes(data)
+        helper_hashes[name] = hashlib.sha256(data).hexdigest()
+    (destination / 'README.zh-CN.md').write_bytes((ROOT / 'docs/HUB-DIALOGUE-INSTALL-SECOND-MAC.md').read_bytes())
+    (destination / 'CHECKLIST.txt').write_text('QCU dialogue-install test.1: PASS / FAIL / not tested\n'
+        'Official rc.2; new independent Home; accepted CSV Home unchanged: \n'
+        'Standard plugin_manager visible; real list approval allowed once: \n'
+        'Fixed loopback catalog and downloaded TGZ SHA256: \n'
+        'Install rejected; check-rejected passes: \n'
+        'Install allowed once; check-installed passes; fixed version: \n'
+        'Normal restart; default fixture row disabled: \n'
+        'Exact row explicitly enabled; normal restart; actual skill marker: \n'
+        'Session remains workspace-write+ask: \n'
+        'Bundle disabled; normal restart; marker absent: \n'
+        'Optional removal; check-removed; normal restart; marker absent: \n'
+        'No build approval/version exemption/permanent Full Access: \n'
+        'Do not include auth URLs, keys, logs, personal paths or screenshot originals.\n')
     catalog = {'title': 'Private synthetic dialogue-install probe', 'localOnly': True,
                'publicRelease': False, 'compatible_dsh': '0.2.0-rc.2', 'skills': [],
                'plugins': [{'id': NAME, 'name': NAME, 'version': VERSION,
@@ -59,6 +78,7 @@ def stage(destination):
     (destination / 'catalog.json').write_text(json.dumps(catalog, indent=2) + '\n')
     receipt = {'fixture': NAME, 'version': VERSION, 'sha256': digest, 'bytes': len(payload),
                'sourceFileSha256': {name: hashlib.sha256(data).hexdigest() for name, data in contents.items()},
+               'helperFileSha256': helper_hashes,
                'localOnly': True, 'publicRelease': False, 'appOrProfileModified': False,
                'serverStarted': False, 'installed': False, 'modelInvoked': False,
                'defaultDisabled': True, 'packageReady': False}

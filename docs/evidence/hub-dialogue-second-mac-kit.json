@@ -1,0 +1,73 @@
+{
+  "recordedAtUtc": "2026-10-09T02:45:30Z",
+  "scope": "Executable second-Mac kit; preparation and isolated validation on original development Mac only",
+  "authorization": {
+    "sourceMessageId": "Sentinel_39d91b10056c8191a969d4f2296536c8",
+    "newIndependentProfile": true,
+    "officialStandardManagementTool": true,
+    "ownLoopbackCatalog": true,
+    "fixedSyntheticProbe": true,
+    "actualPerCallApprovalsMustBeReviewedByUser": true
+  },
+  "fixture": {
+    "name": "qcu-dialogue-install-probe",
+    "version": "0.0.1-test.1",
+    "bytes": 1279,
+    "sha256": "8b8ad2afc154278eb835a48305ce54c01d4ccc733b8f1896f807aa06dd00632e",
+    "defaultDisabled": true
+  },
+  "officialConfiguration": {
+    "source": "user fixed signed App packaged config, Node-only mode",
+    "appVersion": "0.2.0-rc.2",
+    "actualSelector": "preset-standard.config.plugins.tool-plugin-manager",
+    "wholeConfigReplacementNotDeepMerge": true,
+    "yamlPlatformExpressionsPreserved": true,
+    "officialComposeAndYamlRoundTripPassed": true,
+    "persistentFullAccess": false,
+    "automaticApproval": false,
+    "CreatorEnabled": false,
+    "hmrEnabled": false,
+    "sessionMode": "workspace-write",
+    "approval": "ask",
+    "standardTopLevelEntryCount": 19,
+    "otherEntriesUnchanged": true
+  },
+  "validation": {
+    "pythonTestsPassed": 8,
+    "signedAppVerifyAndGatekeeper": true,
+    "newTemporaryHomePrepare": true,
+    "realTemporaryLoopbackDownload": true,
+    "fixedTgzSha256Matched": true,
+    "unknownTraversalQueryRoutesRejected": true,
+    "foreignHostRejected": true,
+    "helperStateChecksUnitTested": true,
+    "oldCsvHomeAndSymlinkNotAdopted": true,
+    "existingConfigNotOverwritten": true,
+    "installedProbeNotAcceptedAsRejectionBaseline": true
+  },
+  "boundaries": {
+    "secondMacRemotelyAccessed": false,
+    "acceptedProfilesModified": false,
+    "officialSourceModified": false,
+    "guiAppOpened": false,
+    "modelCalled": false,
+    "packageActuallyInstalled": false,
+    "approvalsAutomaticallyClicked": false,
+    "publicHubPublished": false,
+    "realModelInstallationPassed": false,
+    "realCityHubPassed": false,
+    "packageReady": false
+  },
+  "lifecycle": {
+    "installationRestartBeforeEntryLookup": true,
+    "activationRestartBeforeSkillCheck": true,
+    "bundleDeselectAndRestartBeforeRemoval": true,
+    "officialStopProfileGateNotBypassed": true
+  },
+  "privacy": {
+    "screenshotsOrSerialIncluded": false,
+    "modelSettingsRead": false,
+    "authUrlsLogsOrTokensIncluded": false,
+    "personalAbsolutePathsIncluded": false
+  }
+}
