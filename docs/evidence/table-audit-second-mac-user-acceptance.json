@@ -1,0 +1,99 @@
+{
+  "recordedAtUtc": "2026-10-09T02:03:01Z",
+  "scope": "Second Apple Silicon Mac internal prototype.8 pilot; user manual reports relayed by parent",
+  "officialAppVersion": "0.2.0-rc.2",
+  "pluginVersion": "0.2.0-prototype.8",
+  "device": {
+    "model": "Mac mini 2024",
+    "chip": "Apple M4 Pro",
+    "memoryGB": 48,
+    "macOS": "Tahoe 26.7.1",
+    "evidence": "Parent inspected model screenshot; serial number and screenshot original excluded"
+  },
+  "userManualPassed": {
+    "dedicatedHomeInitialized": true,
+    "normalQuitBeforeOfficialCliInstall": true,
+    "officialCliInstall": true,
+    "independentWorkspaceStandardSession": true,
+    "workspaceWriteAsk": true,
+    "minimalModelDialogue": true,
+    "nativeCsvRepeatedCheck": {
+      "rows": 4,
+      "issues": 7,
+      "repetitions": 2
+    },
+    "nativeFilePickerCancelReselect": true,
+    "nativeCountSummarySaveCancelRetry": true,
+    "summaryOnlyStatusRowsIssuesCounts": true,
+    "revokeRequiresNewConsent": true,
+    "normalQuitRestartInvalidatesOldConsent": true,
+    "toolApproval": {
+      "triggeredUi": true,
+      "rejectedOperationCreatesNoFile": true,
+      "allowedOnceOperationSucceeds": true,
+      "restoredWorkspaceWriteAsk": true,
+      "sourceMessageId": "Sentinel_4c03299e714481919c81f11cf6ea0fdc",
+      "quote": "已经完成3步验证，123步都预期完成",
+      "evidence": "User reports completing rejection, allow once and restore steps; not automated native control"
+    }
+  },
+  "skillEvidence": {
+    "bundledGuidanceShouldHaveSeparateSidebarItem": false,
+    "assistantReplyBodyAndFullGuidanceVisible": true,
+    "actualSkillToolCallUiVisible": true,
+    "bundledSkillRealLoadVerified": true,
+    "defaultSkillAllRootsDiscoveryVerified": false,
+    "note": "Earlier screenshot only showed assistant reply. Later expanded actual tool call inspected by parent confirmed loaded skill name, skill_content block and bundled guidance body.",
+    "configuredDiscoveryRoots": [
+      "project .dsh/skills",
+      "project .agents/skills",
+      "dedicated DSH_HOME/skills",
+      "dedicated DSH_AGENTS_HOME/skills",
+      "official bundled skills"
+    ],
+    "configurationEnabledDoesNotProveActualDiscovery": true,
+    "actualToolEvidence": {
+      "sourceMessageId": "Sentinel_38c1abf96edc8191823d78f534519d5a",
+      "source": "User screenshot; pixels inspected by parent, not native automation",
+      "card": "加载技能 · qcu-csv-readonly-task",
+      "returnedSkillContentName": "qcu-csv-readonly-task",
+      "relativeResourceBase": "profiles/desktop/node_modules/qcu-table-audit/skills/qcu-csv-readonly-task",
+      "fullGuidanceBodyVisible": true,
+      "screenshotOrPersonalAbsolutePathIncluded": false
+    }
+  },
+  "installEvidence": {
+    "prepareAndInstallUserReportedSuccessful": true,
+    "sourceDefinedChecks": [
+      "native Darwin arm64",
+      "fixed App identifier/version",
+      "codesign --verify --deep --strict",
+      "official TeamIdentifier NAN929V4UM",
+      "Gatekeeper spctl --assess",
+      "bundled Python/Node/CLI existence",
+      "plugin SHA256",
+      "configuration SHA256",
+      "archive entry and package identity/dependency/install-hook checks",
+      "dedicated Home ownership/private permissions and stopped profile",
+      "installed plugin files compared byte for byte"
+    ],
+    "secondMacRawCommandOutputsCollected": false,
+    "originalOfficialDownloadZipSha512Compared": false,
+    "safariAutomaticExtractionReported": true
+  },
+  "boundaries": {
+    "secondMacNativeCoreFlowUserManualPassed": true,
+    "secondMacToolApprovalUserManualPassed": true,
+    "automatedNativeControl": false,
+    "fullSecondMacAcceptanceValidated": false,
+    "dialogueInstallValidated": false,
+    "hubAvailabilityValidated": false,
+    "formalReleaseValidated": false,
+    "packageReady": false,
+    "screenshotsOrSerialIncluded": false,
+    "modelApiKeysOrTokensIncluded": false,
+    "privateDocumentsUsed": false,
+    "secondMacBundledSkillUserManualPassed": true,
+    "secondMacCoreAcceptanceUserManualPassed": true
+  }
+}

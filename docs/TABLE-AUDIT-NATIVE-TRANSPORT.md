@@ -59,3 +59,8 @@ App 临时注册的 dsh:// 映射已经恢复到本轮启动前的开发版，se
 现场后续反馈：受限CSV验收profile的新建聊天显示 `agent-preset/not-found: Unknown agent preset: standard`。CSV三项用户手测通过不代表日常对话通过；完整日常对话profile仍需单独最小修复及权限核查。本阶段不修改运行配置、不复制凭据。
 
 2026-10-08 09:01 UTC：用户按要求在当前prototype.8原生窗口点击New Session、发送“你好”后反馈“ok 可以对话了”。此为用户手动完成的新建会话与原生对话通过；之前的API/浏览器创建和合成回复证据保持独立。不是自动原生GUI操控，也不代表Files面板、真实审批、对话安装、第二台Mac或全功能验收通过。仅追加证据，保留当前窗口，没有再修改profile、重启、启用Creator/Plugin Manager或重新打包。
+
+
+## 第二台 prototype.8 人工收尾
+
+2026-10-09 记录：用户在第二台 Mac mini / M4 Pro 上确认原生 CSV 两次 4 行/7 问题、文件选择取消重选、摘要保存取消重试、仅计数字段、撤销重授权和正常退出重启旧授权失效；Standard 最小对话及审批拒绝/仅允许一次/恢复 workspace-write+ask 也人工通过。没有自动控制第二台原生窗口。早期 Skill 截图仅显示助手正文，不作为加载证据；后续展开真实工具调用截图由主对话核实，附带 qcu-csv-readonly-task 加载及正文现记用户人工通过。默认全部 Skill 目录发现、对话安装、Hub 及正式发布仍未验证。此前本机历史记录按版本和方式保留。详见 [第二台试用最新记录](TABLE-AUDIT-SECOND-MAC-PILOT.md) 及 [结构化人工证据](evidence/table-audit-second-mac-user-acceptance.json)。

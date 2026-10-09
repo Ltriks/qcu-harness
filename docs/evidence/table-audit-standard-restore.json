@@ -104,5 +104,12 @@
   "nativeDialogueUserManualPassed": true,
   "nativeDialogueUserManualAtUtc": "2026-10-08T09:01:00Z",
   "automatedNativeGUIValidated": false,
-  "nativeAcceptanceScope": "User manual: prototype.8 New Session and greeting/reply; overall native GUI remains partial"
+  "nativeAcceptanceScope": "User manual: prototype.8 New Session and greeting/reply; overall native GUI remains partial",
+  "secondMacAcceptanceEvidence": "table-audit-second-mac-user-acceptance.json",
+  "secondMacCoreFlowUserManualPassed": true,
+  "secondMacToolApprovalUserManualPassed": true,
+  "secondMacValidatedScope": "Legacy false flag denotes full acceptance; core CSV, Standard, approval branches and bundled Skill loading separately user-manual passed. Default all-root discovery remains unverified.",
+  "realApprovalUiVerifiedScope": "Legacy false flag is local automated evidence; second Mac user reports rejection, allow once and restore passed.",
+  "secondMacBundledSkillUserManualPassed": true,
+  "secondMacCoreAcceptanceUserManualPassed": true
 }

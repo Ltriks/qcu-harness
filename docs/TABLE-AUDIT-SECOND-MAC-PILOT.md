@@ -4,14 +4,14 @@ QCU Apple Silicon 内部合成 CSV 试用 — prototype.8
 
 这是插件/样例/说明的小型内部试用包，不是官方 App 安装程序，也不是正式发布包。源码 ZIP 不能用来安装。固定官方基线为 DeepSeek Harness 0.2.0-rc.2 / Apple Silicon，插件版本 0.2.0-prototype.8。仅试用合成 CSV；CSV流程不使用学生或教师私人材料，不把CSV数据交给模型。Standard最小文字测试只用无私人数据的句子。
 
-本机已完成：官方 CLI 安装及20个文件比对、真实 Desktop Host 的专用WebSocket、78项自动回归与独立复测。prototype.7历史用户原生手测：检查显示4行/7问题，文件选择取消后重选、计数摘要保存取消后重试均反馈通过。用户手测不是自动GUI测试。第二台Mac、模型对话安装和正式发布尚未通过。
+本机已完成：官方 CLI 安装及20个文件比对、真实 Desktop Host 的专用WebSocket、78项自动回归与独立复测。prototype.7历史用户原生手测：检查显示4行/7问题，文件选择取消后重选、计数摘要保存取消后重试均反馈通过。用户手测不是自动GUI测试。第二台 Mac 的原生核心流程及审批分支已有用户人工通过反馈，详见文末最新记录；附带 Skill 真实加载也已补证；全部默认目录发现、模型对话安装和正式发布仍未验证。
 
 
 配置范围与历史问题
 本版只恢复官方Standard及其常规文件/终端/网页工具与配套UI。Creator、其他preset和Standard的Plugin Manager工具继续关闭；不修改官方DSH源码。运行权限固定workspace-write+ask，需审批的动作仍走官方逐次审批；不新增目录许可，不启用FullAccess/自动批准。标准工具目录本身不等于已批准每次执行。
 prototype.7旧包是受限CSV验收配置，New Session曾报standard preset缺失，不能当日常版；它保留为历史证据。本版prototype.8收窄插件guard，不再拦普通工具，但表格Agent直接、嵌套和别名调用仍拒绝；逐文件页面授权不能由聊天替代。
 恢复默认Skill发现意味着官方Standard可发现项目.dsh/skills、.agents/skills，以及专用DSH_HOME/skills、DSH_AGENTS_HOME/skills和官方内置Skill。小助手不复制其他profile、Skill目录或APIKey；每台Mac只在自己的官方设置中私下配置模型。
-本机prototype.8已通过78项回归、独立78项复测、官方CLI安装20文件比对，正常退出重启后实际Desktop Host Standard会话创建与最小纯文字对话通过。浏览器/API证据不是原生GUI操控；prototype.7的三个原生用户手测不能泛化为prototype.8全验收。第二台Mac/真实审批UI/自然语言安装仍未验收。
+本机prototype.8已通过78项回归、独立78项复测、官方CLI安装20文件比对，正常退出重启后实际Desktop Host Standard会话创建与最小纯文字对话通过。浏览器/API证据不是原生GUI操控；prototype.7的三个原生用户手测不能泛化为prototype.8全验收。第二台原生核心及审批分支现已用户人工通过；附带 Skill 真实加载已补证，全部默认目录发现及自然语言安装仍待验证，详见文末记录。
 
 1. 从官方固定来源下载并正常安装 App
 https://download.deepseek.com/dsh-desk/bin/mac-arm64/deepseek-harness-0.2.0-rc.2-mac-arm64.zip
@@ -67,3 +67,18 @@ VERSION-AND-SOURCES.json、LOCAL-MAC-ACCEPTANCE.json：固定来源和已完成/
 SHA256SUMS：本包内文件完整性清单（不含清单自身）；只在受信任来源取得包后进行比较。
 
 补充工程证据：NO-MODEL-INTEGRATION-EVIDENCE.json记录官方工具在临时合成context中的拒绝/单次允许测试桩、真实离线pnpm安装和重建context后的Skill读取；不是用户真实审批、真实Hub上线或模型自然语言安装。LOCAL-PORTABLE-SELF-CHECK.json记录本机临时目录的配置生成、停机/锁/哈希保护及真实引擎4/7，未启动第二个Desktop实例、未再次安装或修改当前环境。
+
+
+## 第二台 Mac 最新人工验收（2026-10-09 记录）
+
+用户在固定官方 rc.2 / prototype.8 上报告：独立 Home 初始化、正常 Quit 后官方 CLI 安装、独立 workspace 的 Standard 会话、workspace-write+ask、自己配置模型后的最小文字对话均通过。原生 CSV 连续两次均显示 4 行/7 问题；系统文件选择取消重选、计数摘要保存取消重试、摘要只有 status/rows/issues/counts、撤销后重新授权、正常退出重启旧授权失效均由用户人工确认通过。没有把此反馈转换为代理自动 GUI 验收。
+
+用户消息 Sentinel_4c03299e714481919c81f11cf6ea0fdc 明确反馈“已经完成3步验证，123步都预期完成”，对应先拒绝确认文件未创建、重试仅允许一次确认成功、恢复 workspace-write+ask。这三项记为第二台真实审批的用户人工通过；未启用 Full Access 或自动批准。本机早先的审批模拟桩及本机未控原生记录保持独立。
+
+主对话查看型号截图确认：Mac mini 2024、Apple M4 Pro、48 GB、macOS Tahoe 26.7.1。仅记录这四项通用环境信息，不提交截图原件、序列号、个人目录、模型凭据或认证地址。
+
+Skill 截图可见的是助手回复正文，含“工具卡片：Load skill qcu-csv-readonly-task”文字及完整只读指引；没有展示真实工具调用区域。该早期截图不能用作真实加载证据。用户随后提供展开的真实工具调用截图（Sentinel_38c1abf96edc8191823d78f534519d5a），主对话查看像素确认“加载技能 · qcu-csv-readonly-task”卡片、返回 skill_content 的确切名称及完整指引正文，资源位于独立 Home 内的相对路径 profiles/desktop/node_modules/qcu-table-audit/skills/qcu-csv-readonly-task。附带 Skill 真实加载现记为用户人工通过；不提交截图、个人绝对目录或思考正文。CSV 侧栏注册的是任务页，附带 Skill 本身不注册另一个侧栏入口。默认 Skill 发现开关开启，也不意味着新独立 Home 会复制其他 profile 的 Skill，或凭空出现新条目；附带指引可读也不能单独证明所有项目/用户默认目录的发现均已通过。
+
+成功 prepare/install 的源码路径执行 App 严格签名验证、官方 Team ID、Gatekeeper、插件与配置 SHA256 和安装文件逐字节比较等检查；此为安装助手定义及用户成功反馈的结合，不是代理收集到第二台原始命令输出。Safari 自动解压不取消 App 签名检查，但原始官方下载 ZIP 的 SHA512 比较仍未证明。
+
+第二台原生核心、审批分支及附带 Skill 真实加载已人工通过；全部默认 Skill 根目录发现、模型对话安装、Hub 可达性与正式分发仍未验证，packageReady=false。机器可用性反馈不扩大为这些事项通过。结构化证据见 [第二台人工验收](evidence/table-audit-second-mac-user-acceptance.json)。
