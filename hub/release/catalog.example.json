@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "revision": "pilot-test1",
+  "title": "城院 Hub · 内部合成验证",
+  "tagline": "局域网部署准备，尚未上线",
+  "updated_at": "2026-10-09",
+  "compatible_dsh": "以条目 dshVersions 精确版本为准，仍须官方兼容检查",
+  "install_hint": "从独立受信渠道取得目录 SHA256，由助手下载核验后再逐次批准官方管理动作。",
+  "skill_hint": "Skill 与插件通道分开；本例没有单独 Skill ZIP。",
+  "plugin_hint": "默认关闭，正常重启后才核验启用；不自动更新、不豁免版本。",
+  "audience": "lan-private",
+  "publicRelease": false,
+  "skills": [],
+  "plugins": [
+    {
+      "id": "qcu-dialogue-install-probe",
+      "name": "对话安装合成探针",
+      "category": "内部合成",
+      "version": "0.0.1-test.1",
+      "risk": "合成测试",
+      "summary": "只注册内存标记 Skill，不是学校规范或正式生产插件。",
+      "status": "published",
+      "review": "approved",
+      "synthetic": true,
+      "defaultDisabled": true,
+      "bytes": 1279,
+      "sha256": "8b8ad2afc154278eb835a48305ce54c01d4ccc733b8f1896f807aa06dd00632e",
+      "file": "qcu-dialogue-install-probe-0.0.1-test.1-8b8ad2afc154278eb835a48305ce54c01d4ccc733b8f1896f807aa06dd00632e.tgz",
+      "dshVersions": [
+        "0.2.0-rc.2"
+      ]
+    }
+  ]
+}

@@ -273,17 +273,18 @@
         items.filter(s => active === "全部" || s.category === active).forEach(s => {
           const el = document.createElement("article");
           const canDownload = s.file && s.status === "published";
-          const installCmd = tab === "skills"
+          const installCmd = data.schemaVersion === 1 ? "" : tab === "skills"
             ? `node bin/chengyuan-skill.js install ${s.id}`
             : (s.install || "");
 
           const row = document.createElement("div");
           row.className = "row";
-          row.innerHTML = `
-            <span class="pill">${s.category || "—"}</span>
-            <span class="pill risk-${s.risk || ""}">风险 ${s.risk || "—"}</span>
-            <span class="pill">v${s.version || "?"}</span>
-            <span class="pill">${s.status || "planned"}</span>`;
+          for (const label of [s.category || "—", "风险 " + (s.risk || "—"), "v" + (s.version || "?"), s.status || "planned"]) {
+            const pill = document.createElement("span");
+            pill.className = "pill";
+            pill.textContent = label;
+            row.appendChild(pill);
+          }
           el.appendChild(row);
 
           const h2 = document.createElement("h2");
@@ -301,6 +302,12 @@
             el.appendChild(notes);
           }
 
+          if (data.schemaVersion === 1) {
+            const integrity = document.createElement("p");
+            integrity.className = "notes";
+            integrity.textContent = "SHA256: " + (s.sha256 || "缺失") + " · DSH: " + (s.dshVersions || []).join(", ") + (s.synthetic ? " · 合成测试包" : "") + ". 下载后由受信助手校验；本站哈希本身不证明来源。插件需逐次审批及正常重启。";
+            el.appendChild(integrity);
+          }
           if (installCmd) {
             const cmd = document.createElement("div");
             cmd.className = "cmd";

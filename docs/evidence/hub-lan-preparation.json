@@ -1,0 +1,43 @@
+{
+  "recordedDateUtc": "2026-10-09",
+  "scope": "Original Mac source development and temporary loopback tests; no Mac mini deployment",
+  "lanOnlyUserSourceMessageId": "Sentinel_e35f583492f88191a1ac6d3bbc2a9311",
+  "readOnlyObservedLocalHub": {
+    "port19390CatalogHttpStatus": 200,
+    "plugin": "qcu-table-audit",
+    "version": "0.2.0-prototype.5",
+    "syntheticFixtureNotFormalWebsite": true,
+    "port8080Status": "ECONNREFUSED",
+    "sourceCatalogAllEntriesDraft": true,
+    "formalDeploymentLocationVerified": false
+  },
+  "preparation": {
+    "strictSchemaVersion": 1,
+    "fixedHashFilenameAndExactCompatibility": true,
+    "independentlyTrustedCatalogPinRequired": true,
+    "catalogSignatureImplemented": false,
+    "freshReleaseDirectoryOnly": true,
+    "readOnlyServerDefaultLoopback": true,
+    "updateRollbackPlanningOnly": true,
+    "profileDataRollbackVerified": false,
+    "nodeTestsPassed": 11,
+    "actualTemporaryLoopbackTransportPassed": true,
+    "temporaryServersClosed": true,
+    "actualFixedProbeOfflineStagePassed": true,
+    "probeBytes": 1279,
+    "probeSha256": "8b8ad2afc154278eb835a48305ce54c01d4ccc733b8f1896f807aa06dd00632e",
+    "catalogSha256": "c863e193ede1e7eaacfc911938500261b2a1246986f9b11545db337947704973"
+  },
+  "notPerformed": {
+    "miniConnectionOrNetworkProbe": true,
+    "remoteDataMigrationOrServiceInstallation": true,
+    "existingHubOrOtherServicesModification": true,
+    "lanListenerStarted": true,
+    "pluginInstallOrUpgrade": true,
+    "dshSourceModification": true,
+    "firewallDnsRouterOrAutostartChange": true,
+    "publicRelease": true
+  },
+  "privacy": { "credentialsOrRawLogsIncluded": false, "privateDocumentsOrScreenshotsIncluded": false },
+  "packageReady": false
+}
