@@ -1,0 +1,12 @@
+{
+  "canonicalCommit": "756b7331b2eaf91aff5340c62cedaf5261af7876",
+  "canonicalRelativePath": "skills/chengyuan-study-coach/SKILL.md",
+  "skillName": "chengyuan-study-coach",
+  "skillSha256": "dfd2fac7624c2f46f0bdcb15c7ea475156082d538b44d023f39b7e445e42de32",
+  "skillBytes": 1437,
+  "providerName": "qcu-study-coach",
+  "providerVersion": "0.1.0-pilot.1",
+  "scope": "Private offline pilot; canonical generic study guidance, not official school rules",
+  "sourceReviewed": true,
+  "realInstallationApproved": false
+}
