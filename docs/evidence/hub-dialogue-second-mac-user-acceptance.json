@@ -1,0 +1,50 @@
+{
+  "recordedAtUtc": "2026-10-09T07:19:00Z",
+  "sourceMessageId": "Sentinel_4d1e96e3bcd88191a2ca045f4d176a19",
+  "sourceLocalTime": "2026-10-09 15:19 Asia/Shanghai",
+  "evidenceMethod": "Second-Mac user manual checklist completion relayed by parent, not agent GUI automation",
+  "userStatement": "我做完了测试。",
+  "scope": "Local loopback synthetic catalog, explicit helper download/hash check, model calling official plugin_manager; not real City Hub discovery or online distribution",
+  "appVersion": "0.2.0-rc.2",
+  "fixture": {
+    "name": "qcu-dialogue-install-probe",
+    "version": "0.0.1-test.1",
+    "bytes": 1279,
+    "sha256": "8b8ad2afc154278eb835a48305ce54c01d4ccc733b8f1896f807aa06dd00632e",
+    "skillMarker": "QCU_INSTALL_PROBE_TEST_1"
+  },
+  "userReportedPassed": {
+    "newIndependentHome": true,
+    "acceptedCsvHomeUnchanged": true,
+    "standardPluginManagerVisible": true,
+    "realListApprovedOnce": true,
+    "fixedLoopbackCatalogAndDownloadHash": true,
+    "installationRejected": true,
+    "rejectionStateCheck": true,
+    "installationAllowedOnce": true,
+    "installedBytesAndExactVersion": true,
+    "normalRestartDefaultRowDisabled": true,
+    "exactRowEnabledThenNormalRestart": true,
+    "actualSkillMarker": true,
+    "sessionRemainedWorkspaceWriteAndAsk": true,
+    "bundleDisabledThenNormalRestartMarkerAbsent": true,
+    "optionalRemovalAndStateCheck": true,
+    "normalRestartAfterRemovalMarkerAbsent": true,
+    "noBuildApprovalOrVersionExemptionOrPermanentFullAccess": true
+  },
+  "remainingUnverified": {
+    "actualCityHubOnline": true,
+    "modelAutonomousCatalogDiscoveryAndDownload": true,
+    "realRemoteDistribution": true,
+    "automaticUpgradeAndRollback": true,
+    "fullDefaultSkillRootsDiscovery": true,
+    "formalRelease": true
+  },
+  "agentRemotelyAccessedSecondMac": false,
+  "packageReady": false,
+  "privacy": {
+    "screenshotsOrSerialIncluded": false,
+    "personalAbsolutePathsIncluded": false,
+    "credentialsOrRawLogsIncluded": false
+  }
+}

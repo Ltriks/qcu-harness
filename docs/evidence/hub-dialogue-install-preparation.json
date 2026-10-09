@@ -60,5 +60,12 @@
   ],
   "naturalLanguageInstallVerified": false,
   "realHubDialogueInstallVerified": false,
-  "packageReady": false
+  "packageReady": false,
+  "historicalEvidenceScope": "Original development-Mac preparation only; original false/notPerformed/pending fields retained as contemporaneous evidence, not current second-Mac status",
+  "currentSecondMacUserAcceptance": {
+    "reference": "hub-dialogue-second-mac-user-acceptance.json",
+    "loopbackFixedPackageModelInstallationAndLifecyclePassed": true,
+    "actualCityHubOnlineVerified": false,
+    "packageReady": false
+  }
 }

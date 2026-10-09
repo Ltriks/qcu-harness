@@ -48,7 +48,7 @@ App将自行初始化profiles/desktop。之后从应用菜单正常Quit（Cmd+Q�
 5. 再执行步骤3中的相同启动命令，做真正第二台原生验收
 先点击New Session，确认官方Standard会话可创建。若已在官方设置私下配置可用模型，可发送“只回复：QCU 对话测试通过，不要调用工具”；没配置则记未测，不向任何人提供APIKey。然后点击侧栏“CSV只读诊断”。只选择本包synthetic-user.csv；先取消文件选择，再重选。选择演示规则（本包个人规则与演示相同，可另切换验证），勾选本文件只读授权，点击“授权本次文件”和“检查/再次检查”。应显示记录4、问题7，重复检查相同。
 点击“导出仅计数摘要”，先取消系统保存，再重试保存。若直接下载没有保存对话框，报告“直接下载”，不能计为保存取消通过。JSON只能包含status/rows/issues/counts，不能有原始行、文件名或路径。取消并撤销后重选需要重新授权。
-Task/Guidance与包内只读Skill provider一同交付；Skill正文只是操作指引，不替代逐文件确认。不要用旧Hub自定义Skill复制/安装器，不通过聊天工具绕过任务页面。官方Plugin Manager可作为正常管理入口；自然语言对话安装尚未验通，Creator/Standard默认能力不同，不能声称已支持。Hub catalog/上线可达性也未由本包证明。
+Task/Guidance与包内只读Skill provider一同交付；Skill正文只是操作指引，不替代逐文件确认。不要用旧Hub自定义Skill复制/安装器，不通过聊天工具绕过任务页面。官方Plugin Manager可作为正常管理入口；本 CSV 小包交付时自然语言对话安装尚未验通；后续独立 test.1 的限定人工验收见文末，Creator/Standard默认能力仍不同。Hub catalog/上线可达性也未由本包证明。
 CSV试用不需要模型APIKey。若今后试验模型功能，每人只在自己的官方App私下配置；不要发给试点负责人、填入包或反馈记录。
 
 第二台通过标准与反馈
@@ -81,4 +81,4 @@ Skill 截图可见的是助手回复正文，含“工具卡片：Load skill qcu
 
 成功 prepare/install 的源码路径执行 App 严格签名验证、官方 Team ID、Gatekeeper、插件与配置 SHA256 和安装文件逐字节比较等检查；此为安装助手定义及用户成功反馈的结合，不是代理收集到第二台原始命令输出。Safari 自动解压不取消 App 签名检查，但原始官方下载 ZIP 的 SHA512 比较仍未证明。
 
-第二台原生核心、审批分支及附带 Skill 真实加载已人工通过；全部默认 Skill 根目录发现、模型对话安装、Hub 可达性与正式分发仍未验证，packageReady=false。机器可用性反馈不扩大为这些事项通过。结构化证据见 [第二台人工验收](evidence/table-audit-second-mac-user-acceptance.json)。
+第二台原生核心、审批分支及附带 Skill 真实加载已人工通过。后续用户 Sentinel_4d1e96e3bcd88191a2ca045f4d176a19 确认独立 test.1 的回环固定包模型安装、启用/停用/移除及正常重启全链路 PASS，见 [对话安装人工证据](evidence/hub-dialogue-second-mac-user-acceptance.json)。全部默认 Skill 根目录发现、模型自主检索下载、实际 Hub 可达性与正式分发仍未验证，packageReady=false。机器可用性反馈不扩大为这些事项通过。结构化证据见 [第二台人工验收](evidence/table-audit-second-mac-user-acceptance.json)。
