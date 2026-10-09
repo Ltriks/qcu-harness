@@ -1,0 +1,49 @@
+{
+  "recordedDateUtc": "2026-10-09",
+  "authorizationSourceMessageId": "Sentinel_8dd40b7a7d4c81919739d1248a6ba8f6",
+  "sourceBaseline": "canonical qcu-harness/hub",
+  "ssh": {
+    "existingConnectionUsed": true,
+    "strictHostKeyChecking": true,
+    "existingRecordedEd25519FingerprintMatched": true,
+    "hostIdentityMatchedPersonalMini": true,
+    "newKeysOrSecurityChanges": false
+  },
+  "preflight": {
+    "architecture": "arm64",
+    "macOS": "26.7.1",
+    "wifiIPv4": "192.168.1.68",
+    "wiredDhcpIPv4": "192.168.1.30",
+    "availableDiskGiBApprox": 872,
+    "homeOwnerVerified": true,
+    "ports8080And8081ListenersObserved": false,
+    "fourExactHubCandidatesFound": false,
+    "relatedLaunchctlLabelsFound": false,
+    "nodeDockerColimaAtCheckedPathsFound": false,
+    "existingPython": "3.9.6"
+  },
+  "staging": {
+    "freshUserOwnedDirectory": true,
+    "directoryMode": "0700",
+    "personalAbsolutePathInGit": false,
+    "files": 7,
+    "bytes": 39621,
+    "canonicalHtmlBytesMatch": true,
+    "syntheticProbeOnly": true,
+    "oldInstallerOrCourseMaterialsTransferred": false,
+    "manifestSha256": "0e5b2eed25f902fff08a77d43b0c143f6fed610d76515ab1c9dc17a837791492",
+    "remoteAllFilesVerified": true,
+    "serviceStarted": false
+  },
+  "newPythonTestsPassed": 6,
+  "guiOrLanHttpAcceptancePassed": false,
+  "lanServiceApprovalPending": true,
+  "notChanged": [
+    "oldDirectories",
+    "DSHProfiles",
+    "keysAndSSHSettings",
+    "firewallNetworkAndAutostart",
+    "otherServices"
+  ],
+  "packageReady": false
+}

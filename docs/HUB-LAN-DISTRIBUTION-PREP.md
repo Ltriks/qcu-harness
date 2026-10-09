@@ -1,12 +1,12 @@
 # 城院 Hub：局域网目录分发与 Mac mini 迁移准备
 
-当前已完成源码准备及本机合成验证，未部署到 Mac mini。DSH 源码零修改，packageReady=false。第二台 test.1 的用户人工安装/启用/停用/移除及重启验收已经独立记录；它不证明真实 Hub 在线。
+当前已完成源码准备、合成验证、mini严格SSH预检和独立暂存分发核验；尚未启动mini局域网目录站。DSH 源码零修改，packageReady=false。第二台 test.1 的用户人工安装/启用/停用/移除及重启验收已经独立记录；它不证明真实 Hub 在线。
 
 ## 查明的实际位置和差距
 
-本项目中的 Hub 是 hub/web、hub/data/catalog.json、hub/nginx 及 hub/scripts 的静态目录站源码。2026-10-09 本轮只读检查：本机 127.0.0.1:19390/catalog.json 返回 HTTP 200，插件只有旧 qcu-table-audit 0.2.0-prototype.5 合成 fixture；127.0.0.1:8080 拒绝连接。源码目录包含10个 Skill、4个插件，全部 draft，未带本阶段所需固定受审文件、SHA256及 rc.2 精确兼容声明。没有发现正式网站域名、已部署主机路径或 Mac mini 连接配置；不能将 fixture 认作正式城院 Hub。
+本项目中的 Hub 是 hub/web、hub/data/catalog.json、hub/nginx 及 hub/scripts 的静态目录站源码。2026-10-09 本轮只读检查：本机 127.0.0.1:19390/catalog.json 返回 HTTP 200，插件只有旧 qcu-table-audit 0.2.0-prototype.5 合成 fixture；127.0.0.1:8080 拒绝连接。源码目录包含10个 Skill、4个插件，全部 draft，未带本阶段所需固定受审文件、SHA256及 rc.2 精确兼容声明。后续在历史Agent-Learning-Hub/infra/skill-catalog-mvp资料确认旧站地址192.168.1.17:8080和同步目标~/skill-catalog-mvp；它保存10个published Skill ZIP及1个安装器TGZ。QCU导入副本刻意去掉包并改为draft，不能把副本状态概括成旧网站不存在；19390仍只是fixture。
 
-用户已选择先局域网使用，拟主机192.168.1.68（Sentinel_e35f583492f88191a1ac6d3bbc2a9311）。本轮环境仍只有原开发 Mac，未探测、SSH、安装或改动 mini。现有部署脚本会尝试启动 Colima、切换 Docker context、重建容器并按旧 PID 停服务；未执行。旧 nginx:alpine 未固定镜像摘要，原 compose 端口绑定没有明确限定局域网接口，这些历史配置不等于已验收的迁移方案。
+用户已选择先局域网使用，拟主机192.168.1.68（Sentinel_e35f583492f88191a1ac6d3bbc2a9311）。用户随后授权既有SSH分发检测（Sentinel_8dd40b7a7d4c81919739d1248a6ba8f6），现已严格核验主机并完成个人mini只读预检；未安装或更改安全设置。现有部署脚本会尝试启动 Colima、切换 Docker context、重建容器并按旧 PID 停服务；未执行。旧 nginx:alpine 未固定镜像摘要，原 compose 端口绑定没有明确限定局域网接口，这些历史配置不等于已验收的迁移方案。
 
 静态网站可迁到 mini；迁移对象只应是审阅后的网页、目录和对应包，不是用户 DSH Home、模型设置、聊天数据或 API Key。网页只分发，DSH及审批仍在使用者自己的官方 App 内。
 
@@ -58,4 +58,16 @@ node hub/release/catalog.mjs fetch "$TRUSTED_ORIGIN" "$TRUSTED_CATALOG_SHA256" p
 
 11项新增Node测试通过：draft/未审/版本范围/路径拒绝、确定性校验及新目录不覆盖、链接拒绝、受信固定下载、目录与包篡改及兼容失败不写入、HTTP origin及重定向拒绝、超量流中止、固定更新/回退与同版改写拒绝、真实临时回环HTTP传输、服务只读白名单/Host/HEAD、整批大小限制。测试包为不安装的合成字节；另用已交付真实test.1 TGZ验证离线stage，1279字节及固定包哈希一致，目录哈希记录在 evidence/hub-lan-preparation.json。所有测试监听都只在本机随机回环端口，并已关闭。
 
-mini部署仍需：将该机作为明确授权执行环境连接（无需发送密码或私钥）；只读确认当前局域网IP/8080占用/现有网站与服务/运行时能力/磁盘；如已有网站，先列出要保留的数据并取得备份证据。然后确认限定部署目录、首个分发包及访问人群、只读服务进程管理和停止/恢复方式。未连接前不能承诺端口空闲、备份完成、服务自动清理或LAN可达。公网、校外访问、正式签名发布和Windows均不在本轮范围。
+mini预检及新目录暂存分发已完成，实际LAN启动需确认下节的具体目录、端口和进程方式，再验客户端可达性；没有覆盖旧目录，也不宣称未知旧站数据已备份。公网、校外访问、正式签名发布和Windows不在本轮范围。
+
+## mini既有SSH预检及暂存分发（2026-10-09）
+
+canonical qcu-harness/hub 为唯一源码基准，main为756b7331b2eaf91aff5340c62cedaf5261af7876，开发分支包含此导入提交，28个原Hub文件全部保留。历史infra只作部署和资源参考；旧安装器同为0.1.0但8个文件中5个与canonical不同，不能直接当新版分发。10份Skill正文匹配，course-qa还有3个未收录资源，本次不转移这些材料。
+
+mini严格known_hosts校验通过，个人机身份与既有记录一致：arm64、macOS26.7.1、Wi-Fi192.168.1.68、有线DHCP192.168.1.30。可用磁盘约872GiB，Home所有者已确认。8080/8081未发现监听，四个明确Hub候选目录及相关launchctl标签未发现；没有全盘扫描。已查路径未发现Node/Docker/Colima，系统Python3.9.6可用。没有新增密钥、放宽主机校验或读取私密数据。
+
+新增release/serve-hub.py仅用已有Python标准库。准备阶段仍由同一源码的Node校验器检查完整schema；Python校验独立受信manifest及文件字节，并提供只读snapshot服务。默认只验证，只有--serve才监听；私网监听另需--lan-approved，全接口和公网地址拒绝。不列目录、不记请求，不公开助手、manifest或README。6项Python检查通过，含真实临时回环HTTP路由、Host、写请求及路径/链接/篡改拒绝；测试服务已关闭。
+
+已获准暂存分发7文件、39621字节：canonical index.html/themes.html、schemaVersion1合成catalog、固定test.1 TGZ、Python助手、README和manifest。远端目录由mktemp新建、本人拥有、0700，没有采用旧目录。远端验证所有文件通过，serviceStarted=false，8080/8081仍无监听。manifest SHA256：0e5b2eed25f902fff08a77d43b0c143f6fed610d76515ab1c9dc17a837791492。精确路径只写本地收据，不入Git；未带旧安装器、课程材料、DSH Home或凭据。完整旧站尚未恢复上线。
+
+下一项待确认动作：在已核验独立目录，以本人账户运行Python只读服务，绑定192.168.1.68:8080，前台管理，Ctrl+C停止，不开机自启、不改防火墙、不停止其他服务。获准后若端口占用即停，不抢占；从MacBook核验/themes.html、catalog、固定包哈希、只读拒绝和停止清理。首次目录只有合成探针；正式Skill/插件分发仍需明确审阅版本、来源及升级许可。
