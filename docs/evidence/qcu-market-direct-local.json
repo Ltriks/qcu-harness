@@ -1,0 +1,42 @@
+{
+  "status": "local-only-explicit-user-confirmation",
+  "market": {
+    "package": "qcu-market",
+    "version": "0.1.0-pilot.4",
+    "file": "qcu-market-0.1.0-pilot.4.tgz",
+    "bytes": 16100,
+    "sha256": "5e482830baaf6ebfb64f48901b32e09c161ab90b28a205ff4a6ead1c7d2f5b88"
+  },
+  "coach": {
+    "id": "qcu-study-coach",
+    "version": "0.1.0-pilot.2",
+    "skill": "qcu-study-coach",
+    "skillSha256": "80ebebe91ae9edd71670cf22f7e5c7880d527e39c483fa193e6e819e8cd7ef4b",
+    "provider": "qcu-study-coach@0.1.0-pilot.2",
+    "origin": "http://192.168.1.68:8080",
+    "file": "qcu-study-coach-0.1.0-pilot.2-4ac9b2489ece90098faea5f5d0cf79c6efb2989214eaf74f4e38c4841c2eb060.tgz",
+    "bytes": 3445,
+    "sha256": "4ac9b2489ece90098faea5f5d0cf79c6efb2989214eaf74f4e38c4841c2eb060",
+    "runtime": "0.2.0-rc.2",
+    "releaseStatus": "local-candidate-not-published",
+    "license": "MIT"
+  },
+  "tests": {
+    "historical": 14,
+    "boundedDownloadAndDirectFlow": 31,
+    "confirmationComponent": 2,
+    "officialRegistriesGatewayParserSkillsAndUI": 5,
+    "passed": 52
+  },
+  "modelRequiredForInstallation": false,
+  "defaultInstallEnabled": false,
+  "independentActivationConfirmations": true,
+  "runtimeDeployments": 0,
+  "realManagementOperations": 0,
+  "notTested": [
+    "live Mini install/activation/restart",
+    "live Hub transfer",
+    "visual acceptance",
+    "teaching model quality"
+  ]
+}

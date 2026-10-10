@@ -1,0 +1,4 @@
+// Explicit public Typert descriptors, shared by Host and Client. No private renderer/controller imports.
+const uuidCodec={mode:'strict',typeSymbol:'qcu-market#ReceiptId',create:()=>({parse(value){if(typeof value!=='string'||!/^([a-f0-9]{8}-)([a-f0-9]{4}-){3}[a-f0-9]{12}$/i.test(value))throw new Error('Expected receipt UUID');return value}})}
+const resultCodec={mode:'strict',typeSymbol:'qcu-market#JsonReply',create:()=>({parse(value){if(typeof value!=='string'||value.length>16384)throw new Error('Invalid QCU reply');JSON.parse(value);return value}})}
+export const remoteContribution={package:'qcu-market',descriptors:['prepare','verify','cancel'].map(method=>({id:`qcu-market#qcuMarket/${method}`,service:'qcuMarket',namespace:'qcuMarket',method,invocation:{kind:'direct'},parameters:[{name:'id',wire:'id',source:'json',codec:uuidCodec}],...(method==='cancel'?{}:{cancellation:{parameter:'signal'}}),result:resultCodec}))}

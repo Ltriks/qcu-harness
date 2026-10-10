@@ -3,9 +3,9 @@ import assert from 'node:assert/strict'
 import { mkdtemp, readFile, readdir, rm, symlink, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { tmpdir } from 'node:os'
-import { digest, validateRelease, fetchPinned, inspectCoach, MarketOperations } from '../hub/plugins/qcu-market/src/host-core.mjs'
+import { digest, validateRelease, fetchPinned, PackagePreparation } from '../hub/plugins/qcu-market/src/host-core.mjs'
 import { release } from '../hub/plugins/qcu-market/src/trusted-release.mjs'
-import { MarketFlow } from '../hub/plugins/qcu-market/src/flow.mjs'
+import { DirectMarketFlow, readCoach } from '../hub/plugins/qcu-market/src/direct-flow.mjs'
 const bytes=Buffer.from('bounded immutable fixture'),sha=digest(bytes)
 const entry={...release,bytes:bytes.length,sha256:sha,file:`qcu-study-coach-0.1.0-pilot.2-${sha}.tgz`}
 const agent={session:{id:'test',header:{cwd:'/synthetic'}}}
@@ -30,55 +30,84 @@ test('abort and symlink cache fail closed',async t=>{
  const target=join(root,'target');await writeFile(target,bytes);await symlink(target,join(root,entry.file))
  await assert.rejects(fetchPinned({entry,root,fetcher:()=>{throw new Error('must not fetch')}}),/Unsafe cached/)
 })
-test('status requires exact bundle, active row and winning session skill; restart discovery simulation',async()=>{
- const body=await readFile(new URL('../skills/qcu-study-coach/SKILL.md',import.meta.url),'utf8')
- let bundles=[],rows=[],skill
- const inspect=()=>inspectCoach({manager:{listBundles:()=>bundles,listPlugins:()=>rows},skills:{get:async(name,options)=>{assert.equal(name,release.skill);assert.equal(options.scope,agent);return skill}},agent})
- assert.equal((await inspect()).state,'not-installed')
- bundles=[{name:release.id,installed:true,version:release.version,enabled:false}];assert.equal((await inspect()).state,'installed-disabled')
- bundles[0].enabled=true;assert.equal((await inspect()).state,'activation-required')
- rows=[{moduleName:release.id,entryId:'exact:row',enabled:true,fiberPhase:'active'}];assert.equal((await inspect()).state,'skill-unavailable')
- // Simulates discovery after fresh runtime composition, not a real App restart.
- skill={provider:release.provider,content:body};assert.equal((await inspect()).state,'ready')
- skill={provider:'shadow',content:body};assert.equal((await inspect()).state,'conflict')
- skill={provider:release.provider,content:body+'changed'};assert.equal((await inspect()).state,'conflict')
- skill=undefined;rows[0].fiberPhase='failed';assert.equal((await inspect()).state,'failed')
- bundles[0].version='0.1.0-pilot.1';assert.equal((await inspect()).state,'conflict')
+const id='12345678-1234-1234-1234-123456789012'
+const tick=()=>new Promise(r=>setImmediate(r))
+const ok=value=>({ok:true,value})
+function fixture(){
+ const calls=[],mutations=[];let n=0,bundles=[],rows=[],listener
+ const receipt={id,path:'/cache/'+release.file,entry:release,expiresAt:1000000}
+ const inspection={status:'accepted',kind:'tarball',bundle:null,registry:null}
+ const manager={listBundles:async()=>{calls.push('listBundles');return ok(bundles)},listPlugins:async()=>{calls.push('listPlugins');return ok(rows)},inspect:async()=>{calls.push('inspect');return ok(inspection)},installBundle:async(path,options)=>{mutations.push({kind:'install',path,options});bundles=[{name:release.id,version:release.version,installed:true,enabled:false}];return ok({application:'applied',stage:'install',bundle:release.id,changed:true})},cancelInstall:async()=>ok({status:'cancelled'}),waitForInstall:async()=>ok(null),setBundleEnabled:async(name,enabled)=>{mutations.push({kind:'bundle',name,enabled});bundles[0].enabled=true;return ok({application:'applied'})},setPluginEnabled:async(entryId,enabled)=>{mutations.push({kind:'row',entryId,enabled});rows[0].enabled=true;rows[0].fiberPhase='active';return ok({application:'applied'})}}
+ const remote={pluginManager:manager,qcuMarket:{prepare:async()=>{calls.push('prepare');return ok(JSON.stringify(receipt))},verify:async()=>{calls.push('verify');return ok(JSON.stringify(receipt))},cancel:async()=>{calls.push('cancel-preparation');return ok('{}')}},$on:(_,fn)=>{listener=fn;return()=>{listener=null}}}
+ const flow=new DirectMarketFlow(remote,{now:()=>0,uuid:()=>n++?id.replace('12345678','22345678'):id})
+ return {flow,manager,remote,receipt,inspection,calls,mutations,setBundles:b=>bundles=b,setRows:r=>rows=r,progress:p=>listener?.(p)}
+}
+test('Host receipts expire, cancellation revokes them, no manager or session dependency',async()=>{
+ let now=0;const p=new PackagePreparation({now:()=>now,download:async()=>'/fixed',verify:async()=>{}})
+ const receipt=JSON.parse(await p.prepare(id));assert.equal(receipt.path,'/fixed');assert.equal(JSON.parse(await p.verify(id)).id,id)
+ p.cancel(id);await assert.rejects(p.verify(id),/expired or cancelled/)
+ await p.prepare(id);now=300001;await assert.rejects(p.verify(id),/expired or cancelled/);p.dispose()
 })
-test('Host duplicate and cancellation guard; no arbitrary installation operation',async()=>{
- let calls=0,started
- const start=new Promise(r=>started=r)
- const ops=new MarketOperations({inspect:async()=>({state:'not-installed'}),download:({signal})=>{calls++;started();return new Promise((resolve,reject)=>{signal.addEventListener('abort',()=>reject(new Error('cancelled')),{once:true})})}})
- const pending=ops.run('prepare',agent);await start
- await assert.rejects(ops.run('prepare',agent),/progress/);assert.equal(calls,1)
- await ops.run('cancel',agent);await assert.rejects(pending,/cancelled/)
- await assert.rejects(ops.run('install',agent),/Unsupported/);await assert.rejects(ops.run('verify',agent),/No prepared/)
- ops.dispose()
+test('Host duplicate preparation and disposal abort download',async()=>{
+ let started;const start=new Promise(r=>started=r);const p=new PackagePreparation({download:({signal})=>new Promise((resolve,reject)=>{started();signal.addEventListener('abort',()=>reject(Error('aborted')),{once:true})})})
+ const running=p.prepare(id);await start;await assert.rejects(p.prepare(id),/running/);p.dispose();await assert.rejects(running,/aborted/)
 })
-test('Host verify binds prepared file to session and requires approval-compatible policy',async()=>{
- let allowed=true;const ops=new MarketOperations({inspect:async()=>({state:'not-installed'}),authorize:()=>{if(!allowed)throw new Error('policy')},download:async()=>'/fixed/cache.tgz',verify:async path=>assert.equal(path,'/fixed/cache.tgz')})
- const result=await ops.run('prepare',agent);assert.equal(result.state,'prepared');assert.match(result.prompt,/enabled=false/)
- assert.equal((await ops.run('verify',agent)).state,'verified')
- await assert.rejects(ops.run('verify',{session:{id:'other'}}),/No prepared/)
- allowed=false;await assert.rejects(ops.run('prepare',agent),/policy/);await assert.rejects(ops.run('verify',agent),/policy/)
- assert.equal((await ops.run('status',agent)).state,'not-installed');await ops.run('cancel',agent);allowed=true;await assert.rejects(ops.run('verify',agent),/No prepared/);ops.dispose()
+test('download review performs zero mutations; decline means no installation and no automatic retry',async()=>{
+ const f=fixture();await f.flow.prepare();assert.equal(f.flow.state.phase,'review');assert.equal(f.mutations.length,0)
+ await f.flow.decline();assert.equal(f.flow.state.phase,'declined');await assert.rejects(f.flow.confirmInstall(),/先查看/);assert.equal(f.mutations.length,0)
 })
-function context(){const calls=[],state={draft:'',phase:'plain',attachmentIds:[],queue:[]};let releases=0
- const ctx={sessions:{create:async()=>{calls.push('create');return 'market-session'},retain:(id,options)=>{assert.equal(options.source,'qcu-market');return {sessionId:id,ready:Promise.resolve({sessionId:id,ctx:{synthetic:true}}),release:()=>releases++}}},remote:{commands:{execute:async(id,line)=>{calls.push(line);return {ok:true,value:{result:{kind:'success',text:JSON.stringify({state:'not-installed'})}}}}}},conversation:{input:{for:()=>({state:{getSnapshot:()=>state},setDraft:text=>{state.draft=text;calls.push('draft')},submit:()=>{throw new Error('MUST NEVER SUBMIT')}})}},uiWorkspace:{openSession:()=>calls.push('open')},layout:{selectPanel:id=>calls.push(id)}}
- return {ctx,calls,state,releases:()=>releases}}
-test('Client uses actual command envelope, preserves draft/attachments, never submits, releases scope',async()=>{
- const c=context(),flow=new MarketFlow(c.ctx);assert.equal((await flow.run('status')).state,'not-installed')
- c.state.attachmentIds=['local'];await assert.rejects(flow.draft('task'),/clear/);c.state.attachmentIds=[]
- await flow.draft('task');assert.equal(c.state.draft,'task');await assert.rejects(flow.draft('second'),/clear/)
- assert.deepEqual(c.calls,['create','/qcu-market status','draft','open',null]);flow.dispose();assert.equal(c.releases(),1)
+test('only explicit confirmation installs disabled once, without script grants, version exemptions or automatic enablement',async()=>{
+ const f=fixture();await f.flow.prepare();const running=f.flow.confirmInstall();await assert.rejects(f.flow.confirmInstall(),/进行中/);await running
+ assert.equal(f.mutations.length,1);assert.deepEqual(f.mutations[0],{kind:'install',path:f.receipt.path,options:{enabled:false,requestId:id.replace('12345678','22345678'),registry:null}})
+ assert.equal(f.flow.state.phase,'installed');assert.equal(f.flow.state.status.state,'installed-disabled')
 })
-test('Client cancel before asynchronous session creation never starts prepare',async()=>{
- const c=context();let resolve;c.ctx.sessions.create=()=>new Promise(r=>resolve=r)
- const flow=new MarketFlow(c.ctx),pending=flow.run('prepare');await flow.cancel();resolve('market-session')
- await assert.rejects(pending,/cancelled/);assert.equal(c.calls.length,0);flow.dispose();assert.equal(c.releases(),1)
+for(const [label,change] of Object.entries({source:f=>{f.flow.entry={...release,origin:'https://changed.invalid'}},manifest:f=>{f.receipt.entry={...release,sha256:'0'.repeat(64)}},expiry:f=>{f.flow.now=()=>1000001},registry:f=>{f.manager.inspect=async()=>ok({...f.inspection,registry:'https://changed.invalid'})},installed:f=>{f.setBundles([{name:release.id,version:release.version,installed:true,enabled:false}])},connection:f=>{f.flow.invalidate()}}))test(`confirmation invalidated by ${label} performs no installation`,async()=>{
+ const f=fixture();await f.flow.prepare();change(f);await f.flow.confirmInstall().catch(()=>{});assert.equal(f.mutations.length,0);assert.equal(f.flow.state.review,null)
 })
-test('Client repeated click rejects, Host errors propagate without success',async()=>{
- const c=context();let resolve;c.ctx.remote.commands.execute=()=>new Promise(r=>resolve=r)
- const flow=new MarketFlow(c.ctx),pending=flow.run('status');await assert.rejects(flow.run('prepare'),/progress/)
- await new Promise(r=>setImmediate(r));resolve({ok:false,error:{message:'offline'}});await assert.rejects(pending,/offline/);flow.dispose()
+test('cancel during verification prevents late installation',async()=>{
+ const f=fixture();await f.flow.prepare();let resolve;f.remote.qcuMarket.verify=()=>new Promise(r=>resolve=r)
+ const pending=f.flow.confirmInstall();await tick();await f.flow.cancel();resolve(ok(JSON.stringify(f.receipt)));await pending;assert.equal(f.mutations.length,0);assert.equal(f.flow.state.phase,'cancelled')
+})
+test('download/official inspection refusal never reaches review or install',async()=>{
+ const f=fixture();f.manager.inspect=async()=>ok({status:'refused',problem:'incompatible-version',reason:'not allowed'});await f.flow.prepare();assert.equal(f.flow.state.phase,'error');assert.equal(f.mutations.length,0)
+})
+test('official failure preserves pending build names without approval or retry',async()=>{
+ const f=fixture();let count=0;f.manager.installBundle=async()=>{count++;return ok({application:'failed',error:{code:'builds-pending'},pendingBuilds:['blocked-script']})}
+ await f.flow.prepare();await f.flow.confirmInstall();assert.equal(count,1);assert.equal(f.flow.state.phase,'error');assert.deepEqual(f.flow.state.result.pendingBuilds,['blocked-script']);assert.equal(f.flow.state.review,null)
+})
+test('reply loss and null reconciliation remain unconfirmed; duplicate install blocked',async()=>{
+ const f=fixture();let count=0;f.manager.installBundle=async()=>{count++;return {ok:false,error:{message:'reply lost'}}}
+ await f.flow.prepare();await f.flow.confirmInstall();await f.flow.reconcile();assert.equal(f.flow.state.phase,'unconfirmed');await assert.rejects(f.flow.prepare(),/进行中/);assert.equal(count,1)
+})
+test('early cancellation not-running retried only on official acknowledgement; no reinstall',async()=>{
+ const f=fixture();let finish,cancels=0,installed=0;f.manager.installBundle=()=>{installed++;return new Promise(r=>finish=r)};f.manager.cancelInstall=async()=>ok({status:++cancels===1?'not-running':'cancelled'})
+ await f.flow.prepare();const pending=f.flow.confirmInstall();await tick();await f.flow.cancel();assert.equal(f.flow.state.phase,'unconfirmed')
+ f.progress({requestId:f.flow.request.id,phase:'installing'});await tick();assert.equal(f.flow.state.phase,'cancelled');assert.equal(cancels,2);assert.equal(installed,1)
+ finish(ok({application:'cancelled'}));await pending
+})
+test('too-late cancellation never claims cancelled; official outcome reconciled without reinstall',async()=>{
+ const f=fixture();let finish;f.manager.installBundle=()=>new Promise(r=>finish=r);f.manager.cancelInstall=async()=>ok({status:'too-late'})
+ await f.flow.prepare();const pending=f.flow.confirmInstall();await tick();await f.flow.cancel();assert.equal(f.flow.state.phase,'applying')
+ finish(ok({application:'failed',error:{code:'stopped'}}));await pending;assert.equal(f.flow.state.phase,'error')
+})
+test('success response must match bundle and fresh installed state',async()=>{
+ const f=fixture();f.manager.installBundle=async()=>ok({application:'applied',stage:'install',bundle:'other'})
+ await f.flow.prepare();await f.flow.confirmInstall();assert.equal(f.flow.state.phase,'unconfirmed')
+})
+test('bundle and exact row activation each need independent confirmation; restart never automated',async()=>{
+ const f=fixture();await f.flow.prepare();await f.flow.confirmInstall();f.setRows([{moduleName:release.id,entryId:'exact:row',enabled:false,fiberPhase:'pending'}])
+ await f.flow.reviewEnable('bundle');assert.equal(f.mutations.length,1);await f.flow.confirmEnable();assert.equal(f.mutations.length,2);assert.equal(f.flow.state.status.state,'row-disabled')
+ await f.flow.reviewEnable('row');assert.equal(f.mutations.length,2);await f.flow.confirmEnable();assert.equal(f.mutations[2].entryId,'exact:row');assert.equal(f.flow.state.status.state,'component-active')
+ const g=fixture();g.setBundles([{name:release.id,version:release.version,installed:true,enabled:false}]);g.manager.setBundleEnabled=async()=>ok({application:'restart-required'});await g.flow.reviewEnable('bundle');await g.flow.confirmEnable();assert.match(g.flow.state.message,/正常重启/)
+})
+test('changed row identity invalidates activation confirmation',async()=>{
+ const f=fixture();f.setBundles([{name:release.id,version:release.version,installed:true,enabled:true}]);f.setRows([{moduleName:release.id,entryId:'row1',enabled:false}]);await f.flow.reviewEnable('row');f.setRows([{moduleName:release.id,entryId:'row2',enabled:false}]);await f.flow.confirmEnable();assert.equal(f.mutations.length,0)
+})
+test('metadata status never reads skill body or starts a session; missing bundle skips row inventory',async()=>{
+ const f=fixture();assert.equal((await readCoach(f.manager)).state,'not-installed');assert.deepEqual(f.calls,['listBundles'])
+ f.setBundles([{name:release.id,version:'old',installed:true}]);assert.equal((await readCoach(f.manager)).state,'conflict')
+})
+test('dispose releases subscriptions and requests cancellation, ignores late success',async()=>{
+ const f=fixture();let finish;f.manager.installBundle=()=>new Promise(r=>finish=r);let cancelled=0;f.manager.cancelInstall=async()=>{cancelled++;return ok({status:'cancelled'})}
+ await f.flow.prepare();const pending=f.flow.confirmInstall();await tick();const before=f.flow.state;f.flow.dispose();finish(ok({application:'applied',stage:'install',bundle:release.id}));await pending;assert.equal(cancelled,1);assert.equal(f.flow.state,before)
 })

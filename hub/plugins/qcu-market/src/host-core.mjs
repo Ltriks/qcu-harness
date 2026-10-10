@@ -65,50 +65,21 @@ export async function fetchPinned({ entry = release, fetcher = fetch, signal, ro
     } finally { await file?.close(); await unlink(temp).catch(e => { if (e.code !== 'ENOENT') throw e }) }
   } finally { if (response.body && !response.body.locked) await response.body.cancel().catch(() => {}) }
 }
-export async function inspectCoach({ manager, skills, agent, entry = release }) {
-  const [bundles, rows, skill] = await Promise.all([
-    manager.listBundles(), manager.listPlugins(),
-    skills.get(entry.skill, { cwd: agent.session.header.cwd, scope: agent }),
-  ])
-  const bundle = bundles.find(b => b.name === entry.id)
-  const named = rows.filter(r => r.moduleName === entry.id)
-  const expectedSkill = skill?.provider === entry.provider && digest(skill.content) === entry.skillSha256
-  if (skill && !expectedSkill) return { state: 'conflict', reason: 'A different skill wins this name in the selected session; no overwrite.' }
-  if (!bundle?.installed) return { state: skill ? 'conflict' : 'not-installed' }
-  if (bundle.version !== entry.version) return { state: 'conflict', reason: 'Another package version is installed; explicit upgrade review required.' }
-  if (bundle.error || named.some(r => r.fiberPhase === 'failed')) return { state: 'failed', reason: 'Official loader reports a failure; inspect plugin details.' }
-  if (!bundle.enabled) return { state: 'installed-disabled', version: bundle.version }
-  if (named.length !== 1 || !named[0].enabled || named[0].fiberPhase !== 'active') return { state: 'activation-required', rowIds: named.map(r => r.entryId) }
-  if (!expectedSkill) return { state: 'skill-unavailable', reason: 'Installed and active, but the exact skill is not visible; restart or resolve composition.' }
-  return { state: 'ready', version: bundle.version, skill: entry.skill, provider: entry.provider }
-}
-export function installRequest(path, entry = release) {
-  return `请仅安装并启用 QCU 学习方法教练 ${entry.id}@${entry.version}。市场已校验固定包大小 ${entry.bytes} 字节，SHA256 ${entry.sha256}。本机文件：${JSON.stringify(path)}。\n保持需要逐次审批的会话权限模式；若处于全权限模式则停止并请我手动调整，不更改权限。先调用 qcu_market action=verify 复核该固定缓存，再使用官方 plugin_manager；每次管理调用保留官方审批，拒绝或取消立即停止，不换工具、不用shell安装、不重试授权。先 list_bundles/list_plugins 检查同名；若已有其他版本或同名技能则停止，不覆盖。以 install_bundle target=上述绝对文件路径 enabled=false 安装，不传 approvedBuilds、不豁免版本、不改权限模式。仅成功后逐次审批 set_bundle enabled=true，再重新 list_plugins 获取精确组件entryId并 set_plugin enabled=true。若返回 restart-required 告知我正常重启，不冒充已运行。出现失败或未知结果先停止核对，不重复安装。最后调用 qcu_market action=status；只有 ready 才报告技能可用。不要开始学习或发送额外任务。`
-}
-export class MarketOperations {
-  constructor({ inspect, download = fetchPinned, verify = verifyFile, entry = release, authorize = () => {} }) { this.authorize = authorize; this.inspect = inspect; this.download = download; this.verify = verify; this.entry = entry; this.pending = new Map(); this.prepared = new Map() }
-  async run(action, agent, signal) {
-    check(['status', 'prepare', 'verify', 'cancel'].includes(action), 'Unsupported action; no management endpoint')
-    const key = agent.session.id
-    if (action === 'cancel') { this.pending.get(key)?.abort(); this.prepared.delete(key); return { state: 'cancelled' } }
-    if (action === 'status') return this.inspect(agent)
-    await this.authorize(agent)
-    if (action === 'verify') {
-      const path = this.prepared.get(key)
-      check(path, 'No prepared package in this session; prepare again')
-      await this.verify(path, this.entry); return { state: 'verified', path, sha256: this.entry.sha256 }
-    }
-    check(!this.pending.has(key), 'Preparation already in progress')
-    const controller = new AbortController(); this.pending.set(key, controller)
-    try {
-      const current = await this.inspect(agent)
-      check(current.state === 'not-installed', `Preparation blocked: ${current.state}; use official details for activation or review`)
-      const combined = AbortSignal.any([controller.signal, ...(signal ? [signal] : [])])
-      combined.throwIfAborted()
-      const path = await this.download({ entry: this.entry, signal: combined })
-      combined.throwIfAborted(); this.prepared.set(key, path)
-      return { state: 'prepared', version: this.entry.version, sha256: this.entry.sha256, prompt: installRequest(path, this.entry) }
-    } finally { this.pending.delete(key) }
+// Receipts bind a fixed reviewed release to bytes, not user authority.
+export class PackagePreparation {
+  constructor({download=fetchPinned,verify=verifyFile,entry=release,now=()=>Date.now()}={}) { this.download=download;this.verifyBytes=verify;this.entry=entry;this.now=now;this.pending=new Map();this.receipts=new Map() }
+  prune(){for(const [id,r] of this.receipts)if(r.expiresAt<=this.now())this.receipts.delete(id)}
+  async prepare(id,signal){
+    this.prune();check(!this.pending.has(id),'Preparation already running');check(this.pending.size<1,'Another preparation is running');check(this.receipts.size<16,'Too many outstanding receipts')
+    const controller=new AbortController();this.pending.set(id,controller)
+    try{
+      const combined=AbortSignal.any([controller.signal,...(signal?[signal]:[])]);combined.throwIfAborted()
+      const path=await this.download({entry:this.entry,signal:combined});combined.throwIfAborted()
+      const receipt={id,path,entry:this.entry,expiresAt:this.now()+5*60*1000}
+      this.receipts.set(id,receipt);return JSON.stringify(receipt)
+    }finally{this.pending.delete(id)}
   }
-  dispose() { for (const c of this.pending.values()) c.abort(); this.pending.clear(); this.prepared.clear() }
+  async verify(id,signal){this.prune();const receipt=this.receipts.get(id);check(receipt,'Receipt expired or cancelled');signal?.throwIfAborted();check(JSON.stringify(receipt.entry)===JSON.stringify(this.entry),'Release changed');await this.verifyBytes(receipt.path,this.entry);signal?.throwIfAborted();check(this.receipts.get(id)===receipt&&receipt.expiresAt>this.now(),'Receipt expired or cancelled');return JSON.stringify(receipt)}
+  cancel(id){this.pending.get(id)?.abort();this.receipts.delete(id);return JSON.stringify({state:'cancelled'})}
+  dispose(){for(const c of this.pending.values())c.abort();this.pending.clear();this.receipts.clear()}
 }

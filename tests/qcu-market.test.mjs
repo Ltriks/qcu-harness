@@ -53,7 +53,7 @@ test('compiled Client registers lazy factory with only host React; Host exposes 
   assert.deepEqual(imports,['react']); assert.deepEqual(Array.from(p.inject),['slots','layout'])
   const host=await read('hub/plugins/qcu-market/index.js')
   assert.doesNotMatch(host,/installBundle|setBundleEnabled|setPluginEnabled|removeBundle/)
-  assert.match(host,/qcu_market/)
+  assert.match(host,/PackagePreparation/)
 })
 test('missing dependencies fail explicitly and only approved slots are requested', () => {
   const p=createMarketPlugin({createElement(){}},{kind:'bundled',value:catalog})
@@ -86,7 +86,7 @@ test('copy button coalesces rapid clicks and ignores async completion after unmo
   resolveCopy();await first
   assert.equal(writes,1)
 })
-test('bundle defaults disabled, export closure exists and no executable installer surface is included', async () => {
+test('bundle defaults disabled, export closure exists and no embedded installer scripts, network primitives or model credentials', async () => {
   const pkg=JSON.parse(await read('hub/plugins/qcu-market/package.json'))
   const patch=JSON.parse(await read('hub/plugins/qcu-market/cordis.patch.yml'))
   assert.equal(patch[0].insert[0].disabled,true)
@@ -137,7 +137,7 @@ test('p2 styles are locally scoped, semantic-token based, focusable and network 
   const selectors=marketStyles.split('{').slice(0,-1).map(x=>x.slice(x.lastIndexOf('}')+1).trim()).filter(x=>x&&!x.startsWith('@media'))
   assert.ok(selectors.every(x=>x.startsWith('.qcu-market')))
   const pkg=JSON.parse(await read('hub/plugins/qcu-market/package.json'))
-  assert.equal(pkg.version,'0.1.0-pilot.3.1')
+  assert.equal(pkg.version,'0.1.0-pilot.4')
   assert.equal(pkg.icon,'./icon.svg')
   const svg=await read('hub/plugins/qcu-market/icon.svg')
   assert.match(svg,/<svg/);assert.doesNotMatch(svg,/<script|href=|onload=|<foreignObject/)

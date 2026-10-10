@@ -1,3 +1,5 @@
+> 历史记录：本文描述不可变 pilot.3.1 对话桥接。现行 pilot.4 无模型安装实现见 [qcu-market-direct-install.md](qcu-market-direct-install.md)，不再建议试用对话桥接。
+
 # QCU学习教练市场原型：实际边界与验收
 
 ## 结论

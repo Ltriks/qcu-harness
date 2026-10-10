@@ -1,6 +1,6 @@
 {
   "meta": {
     "title": "QCU市场",
-    "description": "准备固定学习教练包，在官方审批后核验技能可用性。"
+    "description": "Fixed package installation with explicit local user confirmation; no model required."
   }
 }
