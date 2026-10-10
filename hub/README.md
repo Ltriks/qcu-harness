@@ -1,5 +1,7 @@
 # 城院 Skill 目录站
 
+当前 .68 局域网学习教练固定包已发布，用户确认条目可见且可下载。新版可复制官方安装/启用/调用指令与 HTTP 剪贴板降级已在开发分支准备，**尚未发布**；见 [安装体验、短指南与两文件发布白名单](../docs/HUB-INSTALL-EXPERIENCE.md)。不自动安装，也不把下载当安装验收。下文旧准备记录保留其历史范围。
+
 保留本机目录站的产品源码，不含学习资料、内部计划、已部署环境或安装包。默认示例目录站改为 http://127.0.0.1:8080；跨机器使用时显式设置 CHENGYUAN_CATALOG_URL。运行 home、模型密钥均由用户本机配置。
 
 Skill 唯一源码位于 ../skills；scripts/batch-publish-skills.sh 按此路径构建。插件源码在 plugins/chengyuan-skill-installer。data/catalog.json 暂为 draft，data/skills 和 data/plugins 的 ZIP/TGZ 在审查发布前重建且不提交 Git。部署脚本会操作 Docker 或系统软件；本次仅检查语法，未执行部署或安装。

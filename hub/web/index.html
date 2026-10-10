@@ -170,6 +170,20 @@
     }
     .tabs button:active, .filters button:active, a.btn:active, button.btn:enabled:active { transform: translate(2px, 2px); box-shadow: none; }
     footer { margin-top: 40px; padding-top: 20px; border-top: var(--border) solid var(--line); color: var(--muted); font-size: 0.85rem; line-height: 1.8; }
+    .install-guide { margin-top: 16px; border-top: 1px solid var(--line); padding-top: 14px; }
+    .install-guide summary { cursor: pointer; font-weight: 700; }
+    .install-guide ol { padding-left: 22px; line-height: 1.7; }
+    .install-guide label { display: block; margin-top: 12px; }
+    .install-guide input, .copy-text {
+      width: 100%; min-width: 0; padding: 10px; margin-top: 6px;
+      color: var(--text); background: var(--inset); border: 1px solid var(--line);
+      font: 0.85rem var(--code); border-radius: var(--radius);
+    }
+    .copy-text { min-height: 112px; resize: vertical; }
+    .copy-group { margin-top: 12px; }
+    .copy-group button { margin-top: 8px; }
+    .copy-status { min-height: 1.7em; font-size: 0.85rem; }
+    .path-error { color: var(--text); }
     @media (max-width: 700px) {
       main { padding: 20px 16px 40px; }
       .hero { padding: 22px 18px; }
@@ -213,6 +227,7 @@
   <script>
     async function main() {
       const res = await fetch("./catalog.json", { cache: "no-store" });
+      if (!res.ok) throw new Error("HTTP " + res.status);
       const data = await res.json();
       document.getElementById("title").textContent = data.title || "城院 DSH 目录站";
       document.getElementById("tagline").textContent = data.tagline || "";
@@ -225,7 +240,7 @@
       document.getElementById("skillCount").textContent = String(skills.length);
       document.getElementById("pluginCount").textContent = String(plugins.length);
 
-      let tab = "skills";
+      let tab = skills.length ? "skills" : plugins.length ? "plugins" : "skills";
       let active = "全部";
       const filters = document.getElementById("filters");
       const list = document.getElementById("list");
@@ -235,14 +250,112 @@
         return tab === "skills" ? skills : plugins;
       }
 
-      function copyText(text, btn) {
-        navigator.clipboard.writeText(text).then(() => {
-          const old = btn.textContent;
-          btn.textContent = "已复制";
-          setTimeout(() => { btn.textContent = old; }, 1200);
-        }).catch(() => {
-          prompt("复制下面命令：", text);
+      function copyGroup(parent, title, initialText, key) {
+        const group = document.createElement("div");
+        group.className = "copy-group";
+        group.dataset.copy = key;
+        const label = document.createElement("label");
+        label.textContent = title;
+        const output = document.createElement("textarea");
+        output.className = "copy-text";
+        output.readOnly = true;
+        output.value = initialText;
+        output.setAttribute("aria-label", title);
+        label.appendChild(output);
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "btn";
+        btn.textContent = "复制" + title;
+        const status = document.createElement("p");
+        status.className = "copy-status";
+        status.setAttribute("role", "status");
+        status.setAttribute("aria-live", "polite");
+        btn.addEventListener("click", async () => {
+          const text = output.value;
+          btn.disabled = true;
+          try {
+            if (typeof navigator.clipboard?.writeText !== "function") throw new Error("clipboard unavailable");
+            await navigator.clipboard.writeText(text);
+            status.textContent = output.value === text ? "已复制，请粘贴到 DSH。" : "指令已更新，请重新复制。";
+          } catch (_) {
+            if (!output.value) { status.textContent = "请先修正文件路径，再复制。"; return; }
+            output.focus();
+            output.select();
+            status.textContent = "自动复制不可用；文本已选中，请按 ⌘C / Ctrl+C 手动复制。";
+          } finally { btn.disabled = !output.value; }
         });
+        group.append(label, btn, status);
+        parent.appendChild(group);
+        return { output, btn, status };
+      }
+
+      function reviewedPlugin(s) {
+        return data.schemaVersion === 1 && /^[a-z][a-z0-9-]{0,79}$/.test(s.id || "")
+          && /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-[a-zA-Z0-9]+(?:[.-][a-zA-Z0-9]+)*)?$/.test(s.version || "")
+          && /^[a-f0-9]{64}$/.test(s.sha256 || "") && Number.isSafeInteger(s.bytes) && s.bytes > 0 && s.bytes <= 32 * 1024 * 1024
+          && s.file === `${s.id}-${s.version}-${s.sha256}.tgz`
+          && s.status === "published" && s.review === "approved" && s.defaultDisabled === true
+          && typeof s.synthetic === "boolean"
+          && Array.isArray(s.dshVersions) && s.dshVersions.length > 0 && s.dshVersions.length <= 10
+          && s.dshVersions.every(version => /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-[a-zA-Z0-9]+(?:[.-][a-zA-Z0-9]+)*)?$/.test(version));
+      }
+
+      function pluginGuide(parent, s) {
+        const guide = document.createElement("details");
+        guide.className = "install-guide";
+        const summary = document.createElement("summary");
+        summary.textContent = "安装到官方 DSH：分步指令";
+        guide.appendChild(summary);
+        const steps = document.createElement("ol");
+        for (const text of [
+          "下载上方固定版本 TGZ；下载完成不代表已安装。",
+          "将 SHA256 与独立收到的可信哈希对照，再由 DSH 工具核验实际文件。",
+          "复制下方校验/安装指令到官方 DSH；审阅每次真实工具卡，只允许一次，拒绝就停止。",
+          "安装完成后正常退出并重启 DSH；默认插件 row 仍停用。",
+          "复制重启后查询/启用指令，取得真实完整 entryId 后逐次批准启用，再正常重启。",
+          "真实调用 Skill 或插件功能，展开工具结果；助手口头说成功不算调用证据。"
+        ]) { const li = document.createElement("li"); li.textContent = text; steps.appendChild(li); }
+        guide.appendChild(steps);
+        const note = document.createElement("p");
+        note.textContent = "保持 workspace-write+ask，不授予永久权限或版本豁免。网页不会安装插件，也无法读取你的下载目录。";
+        guide.appendChild(note);
+        copyGroup(guide, "SHA256", s.sha256, "hash");
+        const label = document.createElement("label");
+        label.textContent = "可选：粘贴已下载文件的完整本机路径";
+        const input = document.createElement("input");
+        input.type = "text";
+        input.autocomplete = "off";
+        input.spellcheck = false;
+        input.setAttribute("aria-label", "已下载 TGZ 的完整本机路径");
+        input.placeholder = "Mac：Finder 选中文件，按 ⌥⌘C 复制路径后粘贴";
+        label.appendChild(input);
+        guide.appendChild(label);
+        const hint = document.createElement("p");
+        hint.textContent = "路径只在本页生成指令，不上传或保存。留空时，DSH 必须先取得你选定文件的真实路径；无法取得就询问，不猜目录。";
+        guide.appendChild(hint);
+        const error = document.createElement("p");
+        error.className = "path-error";
+        error.setAttribute("role", "status");
+        guide.appendChild(error);
+        const install = copyGroup(guide, "校验/安装指令", "", "install");
+        const update = () => {
+          const path = input.value.trim();
+          const valid = !/[\x00-\x1f\x7f]/.test(input.value) && (!path || (path.startsWith("/") && !path.startsWith("//")) || /^[A-Za-z]:[\\/]/.test(path));
+          error.textContent = valid ? "" : "请粘贴完整本机路径；不接受 URL、相对路径或换行。";
+          install.output.value = valid
+            ? `保持 workspace-write+ask。${path ? "仅核验本机 TGZ " + JSON.stringify(path) : "先取得我选定的 TGZ 的真实本机绝对路径；可在已授权范围用现有文件工具定位，找不到请问我，不猜下载目录"}：包 ${s.id}@${s.version}，${s.bytes} 字节，SHA256 ${s.sha256}。只有实际文件哈希和版本一致，才用官方 plugin_manager(action=install_bundle,target=${path ? JSON.stringify(path) : "工具确认的完整本机绝对路径"},enabled=true)。每次管理动作显示真实审批，只允许一次；拒绝、无法校验或权限不足就停止。工具缺失就报告，不擅自开启。不要把 URL 直接传作安装目标，不用 shell 管道执行，不 approvedBuilds、版本豁免或永久 Full Access。不要启用 row；报告实际工具结果及正常重启要求。`
+            : "";
+          install.btn.disabled = !valid;
+          install.status.textContent = "";
+        };
+        input.addEventListener("input", update);
+        update();
+        copyGroup(guide, "重启后查询/启用指令", `仅在正常重启后，用官方 list_plugins/list_bundles 查 ${s.id}@${s.version}。确认来源一致、row 唯一，用真实返回的完整 entryId 请求 set_plugin(enabled=true)，保留每次真实审批，只允许一次；不猜标识，拒绝就停止。报告实际工具结果，然后由我正常退出并再次重启。`, "enable");
+        const skill = { "qcu-study-coach@0.1.0-pilot.1": "chengyuan-study-coach", "qcu-dialogue-install-probe@0.0.1-test.1": "qcu-dialogue-install-probe" }[`${s.id}@${s.version}`];
+        copyGroup(guide, "再次重启后调用指令", skill
+          ? `只在启用后正常重启完成时，通过官方 Skill 工具真实调用 ${skill}，展开工具结果。缺失就报告未生效，不口头宣称成功；仅用合成任务，不读取私人材料。`
+          : "仅在启用后正常重启完成时，通过该插件提供的实际工具验证功能；报告真实工具结果，不以安装成功或助手自述替代调用证据。", "call");
+        parent.appendChild(guide);
       }
 
       function render() {
@@ -272,10 +385,11 @@
         list.innerHTML = "";
         items.filter(s => active === "全部" || s.category === active).forEach(s => {
           const el = document.createElement("article");
-          const canDownload = s.file && s.status === "published";
+          const approved = tab === "plugins" && reviewedPlugin(s);
+          const canDownload = s.file && s.status === "published" && (tab !== "plugins" || approved);
           const installCmd = data.schemaVersion === 1 ? "" : tab === "skills"
             ? `node bin/chengyuan-skill.js install ${s.id}`
-            : (s.install || "");
+            : "";
 
           const row = document.createElement("div");
           row.className = "row";
@@ -305,7 +419,7 @@
           if (data.schemaVersion === 1) {
             const integrity = document.createElement("p");
             integrity.className = "notes";
-            integrity.textContent = "SHA256: " + (s.sha256 || "缺失") + " · DSH: " + (s.dshVersions || []).join(", ") + (s.synthetic ? " · 合成测试包" : "") + ". 下载后由受信助手校验；本站哈希本身不证明来源。插件需逐次审批及正常重启。";
+            integrity.textContent = "SHA256: " + (s.sha256 || "缺失") + " · DSH: " + (Array.isArray(s.dshVersions) ? s.dshVersions.join(", ") : "缺少精确兼容声明") + (s.synthetic ? " · 合成测试包" : "") + ". 下载后由受信助手校验；本站哈希本身不证明来源。插件需逐次审批及正常重启。";
             el.appendChild(integrity);
           }
           if (installCmd) {
@@ -313,12 +427,6 @@
             cmd.className = "cmd";
             cmd.textContent = installCmd;
             el.appendChild(cmd);
-          }
-          if (tab === "plugins" && s.cli_alt) {
-            const alt = document.createElement("div");
-            alt.className = "cmd";
-            alt.textContent = s.cli_alt;
-            el.appendChild(alt);
           }
 
           const actions = document.createElement("div");
@@ -344,19 +452,15 @@
             actions.appendChild(a);
           }
           if (installCmd) {
-            const btn = document.createElement("button");
-            btn.type = "button";
-            btn.className = "btn";
-            btn.textContent = tab === "skills" ? "复制安装命令" : "复制安装命令";
-            btn.addEventListener("click", () => copyText(installCmd, btn));
-            actions.appendChild(btn);
-          } else if (tab === "plugins") {
+            copyGroup(el, "安装命令", installCmd, "legacy-skill");
+          } else if (tab === "plugins" && !approved) {
             const span = document.createElement("span");
             span.className = "btn disabled";
-            span.textContent = "无安装命令";
+            span.textContent = "缺少受审固定包信息，暂不提供安装指令";
             actions.appendChild(span);
           }
           el.appendChild(actions);
+          if (approved) pluginGuide(el, s);
           list.appendChild(el);
         });
       }
@@ -373,6 +477,10 @@
         });
       });
 
+      document.querySelectorAll(".tabs button").forEach(button => {
+        button.classList.toggle("active", button.dataset.tab === tab);
+        button.setAttribute("aria-pressed", String(button.dataset.tab === tab));
+      });
       render();
     }
     main().catch(err => {

@@ -1,0 +1,158 @@
+{
+  "schemaVersion": 1,
+  "observedUtc": "2026-10-10T01:07:11.866846+00:00",
+  "userConfirmedExistingPageAndDownload": {
+    "messageId": "Sentinel_32362695629081918632b28a1f348d98",
+    "scope": "Existing published coach entry visible and download succeeds; not new UX or DSH install acceptance"
+  },
+  "offlineDOMTests": {
+    "passed": 9,
+    "failed": 0,
+    "skipped": 0,
+    "engine": "Existing jsdom 29.1.1; Node 25.8.1",
+    "actualPageJavaScriptExecuted": true,
+    "catalogAndClipboardMocked": true,
+    "cases": [
+      "fixed identity and default plugin tab",
+      "explicit real-path quoting, no upload or directory guessing",
+      "clipboard absent manual selection",
+      "clipboard rejected and fulfilled feedback",
+      "path change during pending copy",
+      "invalid path clears stale prompt",
+      "malformed package metadata refuses actions",
+      "normal restarts, real row and skill evidence gates",
+      "HTTP error and HTML injection refusal"
+    ]
+  },
+  "loopbackHttp": {
+    "scope": "temporary loopback only; no live site operations",
+    "passed": true,
+    "httpChecks": 11,
+    "checks": [
+      {
+        "path": "/index.html",
+        "status": 200,
+        "sha256": "020f88bb7c185b6fe658c158108d7e68813e7e6d67f86cc192e8744697f8c4e1"
+      },
+      {
+        "path": "/themes.html",
+        "status": 200,
+        "sha256": "5e400f184335b684375419d83e7690668314334b2d478fb668406c831cec9819"
+      },
+      {
+        "path": "/catalog.json",
+        "status": 200,
+        "sha256": "bee1c76a3dfa67355b9ddab977da3940d4c878845cbea17854fbf455d541bfbf"
+      },
+      {
+        "path": "/plugins/qcu-dialogue-install-probe-0.0.1-test.1-8b8ad2afc154278eb835a48305ce54c01d4ccc733b8f1896f807aa06dd00632e.tgz",
+        "status": 200,
+        "sha256": "8b8ad2afc154278eb835a48305ce54c01d4ccc733b8f1896f807aa06dd00632e"
+      },
+      {
+        "path": "/plugins/qcu-study-coach-0.1.0-pilot.1-76ed55721d7a78237af6b05bca683a045fb232374c3d869af3676f90368c4f6c.tgz",
+        "status": 200,
+        "sha256": "76ed55721d7a78237af6b05bca683a045fb232374c3d869af3676f90368c4f6c"
+      },
+      {
+        "path": "/",
+        "status": 200,
+        "sha256": "020f88bb7c185b6fe658c158108d7e68813e7e6d67f86cc192e8744697f8c4e1"
+      },
+      {
+        "path": "/manifest.json",
+        "status": 404
+      },
+      {
+        "path": "/serve-hub.py",
+        "status": 404
+      },
+      {
+        "path": "/README.txt",
+        "status": 404
+      },
+      {
+        "path": "/plugins/",
+        "status": 404
+      },
+      {
+        "path": "/catalog.json?x=1",
+        "status": 404
+      }
+    ],
+    "nativeGUIValidated": false,
+    "remoteChanged": false,
+    "manifestPinVerified": "d14de7a7aa49c7b9ebda2946f7426b5d1f2e3b84459dfe2d39284ee6f07b9fdf",
+    "serverPreserved": true
+  },
+  "releasePlan": {
+    "preparedOnly": true,
+    "remoteChanged": false,
+    "priorManifestSha256": "b32b40409bd2673b6cbf5a21e83333d661afc1c5577ff72d949c165892e42411",
+    "newManifestSha256": "d14de7a7aa49c7b9ebda2946f7426b5d1f2e3b84459dfe2d39284ee6f07b9fdf",
+    "replaced": [
+      {
+        "path": "index.html",
+        "bytes": 27123,
+        "sha256": "020f88bb7c185b6fe658c158108d7e68813e7e6d67f86cc192e8744697f8c4e1"
+      },
+      {
+        "path": "manifest.json",
+        "bytes": 1167,
+        "sha256": "d14de7a7aa49c7b9ebda2946f7426b5d1f2e3b84459dfe2d39284ee6f07b9fdf"
+      }
+    ],
+    "unchanged": [
+      {
+        "path": "themes.html",
+        "bytes": 10308,
+        "sha256": "5e400f184335b684375419d83e7690668314334b2d478fb668406c831cec9819"
+      },
+      {
+        "path": "catalog.json",
+        "bytes": 2420,
+        "sha256": "bee1c76a3dfa67355b9ddab977da3940d4c878845cbea17854fbf455d541bfbf"
+      },
+      {
+        "path": "serve-hub.py",
+        "bytes": 7085,
+        "sha256": "8153e989daa6422fa5eb99afa02744f248a6c535a1622099287307e698da206e"
+      },
+      {
+        "path": "README.txt",
+        "bytes": 455,
+        "sha256": "ddc5266070e8cf036897eac855f302e5028b3b4757d1959a7aad0d391debe867"
+      },
+      {
+        "path": "plugins/qcu-dialogue-install-probe-0.0.1-test.1-8b8ad2afc154278eb835a48305ce54c01d4ccc733b8f1896f807aa06dd00632e.tgz",
+        "bytes": 1279,
+        "sha256": "8b8ad2afc154278eb835a48305ce54c01d4ccc733b8f1896f807aa06dd00632e"
+      },
+      {
+        "path": "plugins/qcu-study-coach-0.1.0-pilot.1-76ed55721d7a78237af6b05bca683a045fb232374c3d869af3676f90368c4f6c.tgz",
+        "bytes": 3331,
+        "sha256": "76ed55721d7a78237af6b05bca683a045fb232374c3d869af3676f90368c4f6c"
+      }
+    ],
+    "newPublicRoutes": [],
+    "processChange": "After separate approval only: identity-checked owned normal reload needed for immutable in-memory snapshot; preserve current private LAN bind and repaired server.",
+    "nativeGUIValidated": false,
+    "installedToDSH": false
+  },
+  "sourceHashes": {
+    "hub/web/index.html": "020f88bb7c185b6fe658c158108d7e68813e7e6d67f86cc192e8744697f8c4e1",
+    "tests/hub-web-install.test.mjs": "6bbc54db250b8673ab5678cfc9fab8b41b314dd4bf2bee34656bef8db67ba5cc"
+  },
+  "fixedPackageChanged": false,
+  "serverChanged": false,
+  "remoteChanged": false,
+  "DSHChanged": false,
+  "nativeGUIValidated": false,
+  "realClipboardTested": false,
+  "DSHModelOrInstallCalled": false,
+  "needsSeparatePublicationApproval": true,
+  "officialSourceChecks": [
+    "Pinned rc.2 packages/boot/plugin-manager/src/tools.ts uses per-call approval for all operations and target strings for local install specs",
+    "No browser API used to discover a download directory; selected local path must be supplied or obtained by supported authorized DSH tools before installation"
+  ]
+}
