@@ -1,13 +1,14 @@
 {
   "name": "qcu-market",
-  "version": "0.1.0-pilot.1",
+  "version": "0.1.0-pilot.2",
   "private": true,
   "type": "module",
   "license": "MIT",
   "exports": {
     ".": "./index.js",
     "./client": "./client.js",
-    "./package.json": "./package.json"
+    "./package.json": "./package.json",
+    "./locale/*.json": "./locale/*.json"
   },
   "dsh": {
     "bundle": {
@@ -32,6 +33,11 @@
     "client.js",
     "cordis.patch.yml",
     "README.md",
-    "LICENSE"
-  ]
+    "LICENSE",
+    "icon.svg",
+    "locale/zh.json",
+    "locale/en.json"
+  ],
+  "description": "QCU teaching capability guides and skill drafts; browsing only",
+  "icon": "./icon.svg"
 }

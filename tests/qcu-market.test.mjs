@@ -76,7 +76,7 @@ test('copy button coalesces rapid clicks and ignores async completion after unmo
   let Main
   p.apply({layout:{selectPanel(){}},slots:{inject:(name,fn)=>fn(),register:(o,c)=>{if(o.name==='main')Main=c;return ()=>{}}}})
   const flatten=n=>!n||typeof n!=='object'?[]:[n,...n.children.flatMap(flatten)]
-  const cardElement=flatten(Main({onBack(){}})).find(n=>typeof n.type==='function')
+  const cardElement=flatten(Main({onBack(){}})).find(n=>typeof n.type==='function'&&n.props.entry)
   const card=cardElement.type(cardElement.props)
   const button=flatten(card).find(n=>n.type==='button'&&n.children.includes('复制示例'))
   const first=button.props.onClick();await button.props.onClick()
@@ -89,8 +89,56 @@ test('bundle defaults disabled, export closure exists and no executable installe
   const pkg=JSON.parse(await read('hub/plugins/qcu-market/package.json'))
   const patch=JSON.parse(await read('hub/plugins/qcu-market/cordis.patch.yml'))
   assert.equal(patch[0].insert[0].disabled,true)
-  for(const p of Object.values(pkg.exports))await read('hub/plugins/qcu-market/'+p)
+  for(const p of Object.values(pkg.exports)){
+    if(p.includes('*')){for(const language of ['zh','en'])await read('hub/plugins/qcu-market/'+p.replace('*',language))}
+    else await read('hub/plugins/qcu-market/'+p)
+  }
   for(const p of pkg.files)await read('hub/plugins/qcu-market/'+p)
   const code=await read('hub/plugins/qcu-market/client.js')
   assert.doesNotMatch(code,/fetch\(|XMLHttpRequest|WebSocket|eval\(|innerHTML|child_process|apiKey|modelKey/)
+})
+test('p2 separates official usage from drafts and removes fake installation controls', async () => {
+  // Structural component test independent of optional renderer availability.
+  const React={createElement:(type,props,...children)=>({type,props:props??{},children}),Fragment:'fragment',useState:v=>[v,()=>{}],useRef:v=>({current:v}),useEffect(){}}
+  let Main
+  createMarketPlugin(React,{kind:'bundled',value:catalog}).apply({layout:{selectPanel(){}},slots:{inject:(_,fn)=>fn(),register:(o,c)=>{if(o.name==='main')Main=c;return ()=>{}}}})
+  const expand=n=>!n||typeof n!=='object'?n:typeof n.type==='function'?expand(n.type(n.props)):{...n,children:n.children.map(expand)}
+  const tree=expand(Main({onBack(){}}))
+  const flat=n=>!n||typeof n!=='object'?[]:[n,...n.children.flatMap(flat)]
+  const nodes=flat(tree)
+  assert.equal(nodes.filter(n=>n.type==='summary'&&n.children.includes('查看用法')).length,3)
+  assert.equal(nodes.filter(n=>n.type==='summary'&&n.children.includes('了解草案')).length,5)
+  assert.equal(nodes.filter(n=>n.type==='button'&&n.props.disabled).length,0)
+  assert.ok(!JSON.stringify(tree).includes('安装 / 启用 / 升级'))
+  assert.ok(nodes.filter(n=>n.type==='svg').length>=16)
+  assert.ok(nodes.filter(n=>n.type==='svg').every(n=>n.props['aria-hidden']===true&&n.props.focusable===false))
+  assert.equal(nodes.filter(n=>n.type==='article'&&n.props['aria-labelledby']).length,8)
+  assert.equal(nodes.filter(n=>n.type==='style').length,1)
+})
+test('scene filters update visible cards and retain native keyboard button semantics', () => {
+  let category='全部',Main
+  const React={createElement:(type,props,...children)=>({type,props:props??{},children}),Fragment:'fragment',useState:()=>[category,v=>{category=v}]}
+  createMarketPlugin(React,{kind:'bundled',value:catalog}).apply({layout:{selectPanel(){}},slots:{inject:(_,fn)=>fn(),register:(o,c)=>{if(o.name==='main')Main=c;return ()=>{}}}})
+  const flat=n=>!n||typeof n!=='object'?[]:[n,...n.children.flatMap(flat)]
+  let nodes=flat(Main({onBack(){}}))
+  nodes.find(n=>n.type==='button'&&n.children.includes('课件制作')).props.onClick()
+  nodes=flat(Main({onBack(){}}))
+  assert.equal(nodes.filter(n=>n.props.entry).length,1)
+  assert.equal(nodes.find(n=>n.props.entry).props.entry.id,'office-pptx')
+  assert.equal(nodes.find(n=>n.type==='button'&&n.children.includes('课件制作')).props['aria-pressed'],true)
+})
+test('p2 styles are locally scoped, semantic-token based, focusable and network free; package icon metadata exists', async () => {
+  const {marketStyles}=await import('../hub/plugins/qcu-market/src/styles.mjs')
+  assert.match(marketStyles,/:focus-visible/)
+  assert.match(marketStyles,/--dsw-alias-bg-base/)
+  assert.match(marketStyles,/--dsw-alias-label-primary/)
+  assert.doesNotMatch(marketStyles,/#(?:[a-fA-F0-9]{3})\b|rgba?\(|url\(|@import|@font-face|:root|document\.body/)
+  const selectors=marketStyles.split('{').slice(0,-1).map(x=>x.slice(x.lastIndexOf('}')+1).trim()).filter(x=>x&&!x.startsWith('@media'))
+  assert.ok(selectors.every(x=>x.startsWith('.qcu-market')))
+  const pkg=JSON.parse(await read('hub/plugins/qcu-market/package.json'))
+  assert.equal(pkg.version,'0.1.0-pilot.2')
+  assert.equal(pkg.icon,'./icon.svg')
+  const svg=await read('hub/plugins/qcu-market/icon.svg')
+  assert.match(svg,/<svg/);assert.doesNotMatch(svg,/<script|href=|onload=|<foreignObject/)
+  for(const lang of ['zh','en'])assert.ok(JSON.parse(await read(`hub/plugins/qcu-market/locale/${lang}.json`)).meta.title)
 })

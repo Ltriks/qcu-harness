@@ -7,15 +7,16 @@ args = parser.parse_args()
 root = Path(__file__).resolve().parent
 manifest = json.loads((root / 'package.json').read_text())
 assert manifest['name'] == 'qcu-market'
-assert manifest['version'] == '0.1.0-pilot.1'
+assert manifest['version'] in ['0.1.0-pilot.1','0.1.0-pilot.2']
 assert 'scripts' not in manifest
 assert not any(manifest.get(k) for k in ['dependencies', 'optionalDependencies', 'bundledDependencies'])
 assert manifest['peerDependencies'] == {'@deepseek-ai/cordis':'4.0.4', '@deepseek-ai/dsh-client-ui-layout':'0.2.0-rc.2', '@deepseek-ai/dsh-client-ui-sidebar':'0.2.0-rc.2'}
 assert json.loads((root/'cordis.patch.yml').read_text())[0]['insert'] == [{'id':'qcu-market','name':'qcu-market','disabled':True}]
 files = sorted(['package.json', *manifest['files']])
-assert len(files) == len(set(files)) == 6
+assert len(files) == len(set(files))
+assert set(files) == ({'package.json','index.js','client.js','cordis.patch.yml','README.md','LICENSE'} | ({'icon.svg','locale/zh.json','locale/en.json'} if manifest['version']=='0.1.0-pilot.2' else set()))
 for path in manifest['exports'].values():
-    assert path.removeprefix('./') in files
+    assert all(path.removeprefix('./').replace('*',language) in files for language in ['zh','en'])
 assert manifest['dsh']['bundle']['patch'].removeprefix('./') in files
 args.output.mkdir(parents=True, exist_ok=True)
 payload = io.BytesIO()
@@ -30,7 +31,7 @@ with tarfile.open(fileobj=payload, mode='w', format=tarfile.USTAR_FORMAT) as arc
         archive.addfile(entry,io.BytesIO(data))
         records.append({'path':entry.name,'bytes':len(data),'sha256':hashlib.sha256(data).hexdigest(),'mode':'0644'})
 compressed=gzip.compress(payload.getvalue(),mtime=0)
-filename='qcu-market-0.1.0-pilot.1.tgz'
+filename=f"qcu-market-{manifest['version']}.tgz"
 path=args.output/filename
 if path.exists() and path.read_bytes()!=compressed:
     raise SystemExit('Refusing to replace different bytes at the same pilot artifact path')
