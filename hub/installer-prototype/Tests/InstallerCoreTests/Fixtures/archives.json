@@ -1,0 +1,292 @@
+{
+  "fixed-study-coach": {
+    "archiveFormat": "tgz",
+    "kind": "plugin",
+    "packageID": "qcu-study-coach",
+    "version": "0.1.0-pilot.1",
+    "sha256": "76ed55721d7a78237af6b05bca683a045fb232374c3d869af3676f90368c4f6c",
+    "bytes": 3331,
+    "files": [
+      {
+        "path": "package/README.md",
+        "sha256": "fb7de0a3c443ea2fe8815dc975029b4d7a2a61d6a38f568db8e909c40ab00701",
+        "bytes": 1479
+      },
+      {
+        "path": "package/SOURCE.json",
+        "sha256": "3fa19020091b4f346b8e0a62fe5700440408cef4c1f1e124913839475f5f339f",
+        "bytes": 518
+      },
+      {
+        "path": "package/cordis.patch.yml",
+        "sha256": "31c48d98144596188b81ef359a7033a5d7426484217e7924ca681b633fa08482",
+        "bytes": 200
+      },
+      {
+        "path": "package/index.js",
+        "sha256": "1ab715baabee23aa653220355616e6012db002cc8a7b1d68b8e209f2cf5fbc6d",
+        "bytes": 302
+      },
+      {
+        "path": "package/package.json",
+        "sha256": "7d526007abe82b2f01d574adc4e6f1c5c53e45bbc35575e6a61450d3c2d16daf",
+        "bytes": 618
+      },
+      {
+        "path": "package/provider.js",
+        "sha256": "21c7fb3254c040c4c6c2cac781a8e8919fb9be03537da83d8ad10bfbdf9a8d66",
+        "bytes": 1057
+      },
+      {
+        "path": "package/skill-content.js",
+        "sha256": "94c101dba57b9846b1f28c452e3eec232a850b434f84e8a3ba09b4eed0abd4df",
+        "bytes": 1505
+      },
+      {
+        "path": "package/skills/chengyuan-study-coach/SKILL.md",
+        "sha256": "dfd2fac7624c2f46f0bdcb15c7ea475156082d538b44d023f39b7e445e42de32",
+        "bytes": 1437
+      }
+    ]
+  },
+  "good-tgz": {
+    "archiveFormat": "tgz",
+    "kind": "skill",
+    "packageID": "chengyuan-study-demo",
+    "version": "0.1.0-test.1",
+    "sha256": "ec7075cd46cab4c641061b7a9199d7f06ab479e7ee65ed4c90a9ca1111db4f40",
+    "bytes": 173,
+    "files": [
+      {
+        "path": "SKILL.md",
+        "sha256": "fc3618ea6aac53f26dac6803242077518681a167e33c624b1c334d94625511f3",
+        "bytes": 91
+      }
+    ]
+  },
+  "tgz-traversal": {
+    "archiveFormat": "tgz",
+    "kind": "skill",
+    "packageID": "chengyuan-study-demo",
+    "version": "0.1.0-test.1",
+    "sha256": "02265cc5730c90ebbc35620a767489b653e1ef8dafda9056328fbda9aa8eb49b",
+    "bytes": 176,
+    "files": [
+      {
+        "path": "SKILL.md",
+        "sha256": "fc3618ea6aac53f26dac6803242077518681a167e33c624b1c334d94625511f3",
+        "bytes": 91
+      }
+    ]
+  },
+  "tgz-link": {
+    "archiveFormat": "tgz",
+    "kind": "skill",
+    "packageID": "chengyuan-study-demo",
+    "version": "0.1.0-test.1",
+    "sha256": "fc2cec3be781e6ce342def7504c20a981d5b3d093e316a081af2c2385ed62598",
+    "bytes": 106,
+    "files": [
+      {
+        "path": "SKILL.md",
+        "sha256": "fc3618ea6aac53f26dac6803242077518681a167e33c624b1c334d94625511f3",
+        "bytes": 91
+      }
+    ]
+  },
+  "tgz-hardlink": {
+    "archiveFormat": "tgz",
+    "kind": "skill",
+    "packageID": "chengyuan-study-demo",
+    "version": "0.1.0-test.1",
+    "sha256": "231088e9a9de04c5c5b9e73e8a60100af4ccc6ad0c8ee6129c054a2ec7e8af03",
+    "bytes": 106,
+    "files": [
+      {
+        "path": "SKILL.md",
+        "sha256": "fc3618ea6aac53f26dac6803242077518681a167e33c624b1c334d94625511f3",
+        "bytes": 91
+      }
+    ]
+  },
+  "tgz-bomb": {
+    "archiveFormat": "tgz",
+    "kind": "skill",
+    "packageID": "chengyuan-study-demo",
+    "version": "0.1.0-test.1",
+    "sha256": "6e9313eaf92d5e811980506f3ba422e9e5fba810b1b6048486b4137993625b02",
+    "bytes": 9269,
+    "files": [
+      {
+        "path": "SKILL.md",
+        "sha256": "fc3618ea6aac53f26dac6803242077518681a167e33c624b1c334d94625511f3",
+        "bytes": 91
+      }
+    ]
+  },
+  "tgz-truncated": {
+    "archiveFormat": "tgz",
+    "kind": "skill",
+    "packageID": "chengyuan-study-demo",
+    "version": "0.1.0-test.1",
+    "sha256": "a61e4967c65bbd8443f5252b0b7bbdb1e0decb348627d230476d2a6501dbf520",
+    "bytes": 168,
+    "files": [
+      {
+        "path": "SKILL.md",
+        "sha256": "fc3618ea6aac53f26dac6803242077518681a167e33c624b1c334d94625511f3",
+        "bytes": 91
+      }
+    ]
+  },
+  "tgz-concatenated": {
+    "archiveFormat": "tgz",
+    "kind": "skill",
+    "packageID": "chengyuan-study-demo",
+    "version": "0.1.0-test.1",
+    "sha256": "db8ae2ce2026d15d8c8b88e92385d344935d7d9f51d63ae4837b7a14802ae6b1",
+    "bytes": 346,
+    "files": [
+      {
+        "path": "SKILL.md",
+        "sha256": "fc3618ea6aac53f26dac6803242077518681a167e33c624b1c334d94625511f3",
+        "bytes": 91
+      }
+    ]
+  },
+  "tgz-bad-crc": {
+    "archiveFormat": "tgz",
+    "kind": "skill",
+    "packageID": "chengyuan-study-demo",
+    "version": "0.1.0-test.1",
+    "sha256": "272f218605afafa1a014b3437394b55c51a0492795744d867e3269742b162126",
+    "bytes": 173,
+    "files": [
+      {
+        "path": "SKILL.md",
+        "sha256": "fc3618ea6aac53f26dac6803242077518681a167e33c624b1c334d94625511f3",
+        "bytes": 91
+      }
+    ]
+  },
+  "good-zip": {
+    "archiveFormat": "zip",
+    "kind": "skill",
+    "packageID": "chengyuan-study-demo",
+    "version": "0.1.0-test.1",
+    "sha256": "6ad5c5e2f0e68f454dcaf470bf569b169de3fd7ba2f0836256e515fc47202891",
+    "bytes": 195,
+    "files": [
+      {
+        "path": "SKILL.md",
+        "sha256": "fc3618ea6aac53f26dac6803242077518681a167e33c624b1c334d94625511f3",
+        "bytes": 91
+      }
+    ]
+  },
+  "stored-zip": {
+    "archiveFormat": "zip",
+    "kind": "skill",
+    "packageID": "chengyuan-study-demo",
+    "version": "0.1.0-test.1",
+    "sha256": "299292e5ac441d516e83a864f3e07ce5d28de30d35a3919f65c6b539b005982e",
+    "bytes": 205,
+    "files": [
+      {
+        "path": "SKILL.md",
+        "sha256": "fc3618ea6aac53f26dac6803242077518681a167e33c624b1c334d94625511f3",
+        "bytes": 91
+      }
+    ]
+  },
+  "zip-traversal": {
+    "archiveFormat": "zip",
+    "kind": "skill",
+    "packageID": "chengyuan-study-demo",
+    "version": "0.1.0-test.1",
+    "sha256": "9dbb8591310c453a63c03e593f7657030f386d79fd4e7396d9009e7430ac218a",
+    "bytes": 201,
+    "files": [
+      {
+        "path": "SKILL.md",
+        "sha256": "fc3618ea6aac53f26dac6803242077518681a167e33c624b1c334d94625511f3",
+        "bytes": 91
+      }
+    ]
+  },
+  "zip-link": {
+    "archiveFormat": "zip",
+    "kind": "skill",
+    "packageID": "chengyuan-study-demo",
+    "version": "0.1.0-test.1",
+    "sha256": "25e4b873e711edbe7b0da2222f218d66f0b086441e7561cd89f768a73113e6f4",
+    "bytes": 126,
+    "files": [
+      {
+        "path": "SKILL.md",
+        "sha256": "fc3618ea6aac53f26dac6803242077518681a167e33c624b1c334d94625511f3",
+        "bytes": 91
+      }
+    ]
+  },
+  "zip-bomb": {
+    "archiveFormat": "zip",
+    "kind": "skill",
+    "packageID": "chengyuan-study-demo",
+    "version": "0.1.0-test.1",
+    "sha256": "dcc3c78811ac0cacca8adc79e14dd3d6c7b8e9c2deff6cd755f11b3a96e781c3",
+    "bytes": 9301,
+    "files": [
+      {
+        "path": "SKILL.md",
+        "sha256": "fc3618ea6aac53f26dac6803242077518681a167e33c624b1c334d94625511f3",
+        "bytes": 91
+      }
+    ]
+  },
+  "zip-truncated": {
+    "archiveFormat": "zip",
+    "kind": "skill",
+    "packageID": "chengyuan-study-demo",
+    "version": "0.1.0-test.1",
+    "sha256": "2d83ae6cdb6d8303cd4ad6b18302cd219340ea84360345cf6fb3d24e4b031e3f",
+    "bytes": 190,
+    "files": [
+      {
+        "path": "SKILL.md",
+        "sha256": "fc3618ea6aac53f26dac6803242077518681a167e33c624b1c334d94625511f3",
+        "bytes": 91
+      }
+    ]
+  },
+  "zip-bad-deflate": {
+    "archiveFormat": "zip",
+    "kind": "skill",
+    "packageID": "chengyuan-study-demo",
+    "version": "0.1.0-test.1",
+    "sha256": "d9e49a4d4162186485bacdff7d3b34d11195708498199c5b44e6af6028ab5d60",
+    "bytes": 195,
+    "files": [
+      {
+        "path": "SKILL.md",
+        "sha256": "fc3618ea6aac53f26dac6803242077518681a167e33c624b1c334d94625511f3",
+        "bytes": 91
+      }
+    ]
+  },
+  "zip-bomb-forged-size": {
+    "archiveFormat": "zip",
+    "kind": "skill",
+    "packageID": "chengyuan-study-demo",
+    "version": "0.1.0-test.1",
+    "sha256": "a4caea7769aa463522465525ba4d2c320a6c54a1d74f2ad1193aeeaf9e7960df",
+    "bytes": 9301,
+    "files": [
+      {
+        "path": "SKILL.md",
+        "sha256": "fc3618ea6aac53f26dac6803242077518681a167e33c624b1c334d94625511f3",
+        "bytes": 91
+      }
+    ]
+  }
+}

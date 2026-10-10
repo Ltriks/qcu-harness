@@ -56,7 +56,7 @@ struct InstallerView: View {
                 Text(status).textSelection(.enabled)
                 if !root.isEmpty { Text("合成目录：\(root)").font(.caption.monospaced()).textSelection(.enabled) }
                 if !plan.isEmpty { Text(plan).font(.caption.monospaced()).textSelection(.enabled) }
-                Text("真实接入尚未实现：网络下载、系统 scheme 注册、真实 DSH Home 写入、CLI 执行、重启及调用验证。")
+                Text("下载核心已在临时 loopback 验证，此窗口仍使用内存测试包。系统 scheme、真实 Home、CLI 执行、重启及调用验证尚未接通。")
                     .font(.caption).foregroundStyle(.secondary)
                 Button("清理本次会话全部合成目录") { cleanup() }.disabled(environments.isEmpty)
             }.padding(26)

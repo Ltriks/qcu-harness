@@ -1,15 +1,51 @@
 import Foundation
+import SystemZlib
 
 func validatePath(_ path: String) throws {
     try require(path.utf8.count <= 100 && matches(path, "^[A-Za-z0-9_-][A-Za-z0-9_./-]*$")
                 && path.split(separator: "/", omittingEmptySubsequences: false).allSatisfy { !$0.isEmpty && $0 != "." && $0 != ".." }, "unsafe-archive-path")
 }
 
-/// Deliberately narrow POSIX ustar: regular files only, no compression, links,
-/// directory entries, devices, PAX/GNU extensions or executable permissions.
-/// Parse and validate the complete bounded archive before any filesystem write.
+/// Every format is fully bounded and verified before filesystem extraction.
 func unpack(_ bytes: Data, manifest: ReleaseManifest) throws -> [String: Data] {
     try require(bytes.count == manifest.bytes && digest(bytes) == manifest.sha256, "archive-integrity")
+    switch manifest.archiveFormat {
+    case .tar: return try unpackTar(bytes, manifest: manifest)
+    case .tgz: return try unpackTar(inflateBounded(bytes, windowBits: 31, limit: 8 * 1024 * 1024), manifest: manifest)
+    case .zip: return try unpackZIP(bytes, manifest: manifest)
+    }
+}
+
+/// System zlib handles deflate/gzip, including gzip CRC/trailer validation.
+/// Refuse excess output, truncation, concatenated members and trailing data.
+func inflateBounded(_ data: Data, windowBits: Int32, limit: Int) throws -> Data {
+    var stream = z_stream()
+    try require(inflateInit2_(&stream, windowBits, ZLIB_VERSION, Int32(MemoryLayout<z_stream>.size)) == Z_OK, "inflate-init")
+    defer { inflateEnd(&stream) }
+    var input = [UInt8](data)
+    return try input.withUnsafeMutableBufferPointer { inputBuffer in
+        stream.next_in = inputBuffer.baseAddress; stream.avail_in = uInt(inputBuffer.count)
+        var result = Data()
+        var buffer = [UInt8](repeating: 0, count: 32 * 1024)
+        while true {
+            let code = buffer.withUnsafeMutableBufferPointer { output -> Int32 in
+                stream.next_out = output.baseAddress; stream.avail_out = uInt(output.count)
+                return inflate(&stream, Z_NO_FLUSH)
+            }
+            let produced = buffer.count - Int(stream.avail_out)
+            try require(produced <= limit - result.count, "inflated-size-limit")
+            result.append(contentsOf: buffer.prefix(produced))
+            if code == Z_STREAM_END {
+                try require(stream.avail_in == 0, "trailing-compressed-data")
+                return result
+            }
+            try require(code == Z_OK && (produced > 0 || stream.avail_in > 0), "malformed-compressed-data")
+        }
+    }
+}
+
+/// Regular-file ustar only: no links, PAX/GNU extensions, devices or executable modes.
+func unpackTar(_ bytes: Data, manifest: ReleaseManifest) throws -> [String: Data] {
     let data = [UInt8](bytes)
     try require(data.count >= 1024 && data.count % 512 == 0, "invalid-tar-length")
     var cursor = 0

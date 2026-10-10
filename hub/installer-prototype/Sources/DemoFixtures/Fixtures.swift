@@ -61,9 +61,9 @@ public enum Fixtures {
         let hash = digest(tarball)
         let source = URL(string: "https://catalog.example.invalid/packages/\(packageID)-\(version)-\(hash).tar")!
         var manifest: [String: Any] = [
-            "schema": 1, "catalogID": "test-chengyuan", "packageID": packageID, "version": version,
+            "schema": 2, "catalogID": "test-chengyuan", "packageID": packageID, "version": version,
             "title": kind == .skill ? "学习教练 · 纯文本测试" : "插件 · 仅参数计划",
-            "kind": kind.rawValue, "archiveURL": source.absoluteString, "sha256": hash, "bytes": tarball.count,
+            "kind": kind.rawValue, "archiveURL": source.absoluteString, "archiveFormat": "tar", "sha256": hash, "bytes": tarball.count,
             "files": files.keys.sorted().map { ["path": $0, "sha256": digest(files[$0]!), "bytes": files[$0]!.count] as [String: Any] },
             "expiresAt": Int(now.addingTimeInterval(3600).timeIntervalSince1970), "dshVersion": "0.2.0-rc.2",
             "dependencies": [String](), "installScripts": false,

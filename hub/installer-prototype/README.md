@@ -2,7 +2,7 @@
 
 基于 `ab362184c917554354486cd13d300f4c934be138` 开发，目标为 Apple Silicon Mac 上的官方 DSH **0.2.0-rc.2**。当前只交付可测试核心和原生交互样例，**不能安装到真实 DSH**。不修改 DSH 源码或线上 Hub，不注册系统协议、不监听网络、不创建生产信任、不访问 API Key/聊天。
 
-技术选择：Swift 6、SwiftUI、Foundation、CryptoKit，最低构建目标 macOS 14。无第三方依赖；未来签名的本机应用可独立分发，无需老师安装 Node/pnpm。当前开发构建需要 Swift 工具链；尚未验证最低 macOS、打包、签名、公证或分发。
+技术选择：Swift 6、SwiftUI、Foundation URLSession、CryptoKit 和系统 zlib，最低构建目标 macOS 14。无额外下载的依赖；未来签名的本机应用可独立分发，无需老师安装 Node/pnpm。当前开发构建需要 Swift 工具链；尚未验证最低 macOS、打包、签名、公证或分发。
 
 ## 当前可以演示什么
 
@@ -14,6 +14,8 @@
 - Skill 更新只覆盖助手在合成目录内标记的同目录来源/同包目录。失败恢复旧目录；事务备份保留。中断的 staging/applying 记录变为 `recoveryRequired`，不推断成功、不自动重试、不复用审批。
 
 `hub-request-demo.html` 可离线展示 Hub 的四字段请求。按钮只产生请求文本，不跳转协议、不联网。原生样例的 `onOpenURL` 仅接收严格解析后的请求并报告“生产目录传输未接入”；不凭 URL 安装任何内容。完整浏览器 → OS → 助手端到端尚未打通。
+
+下载核心已独立实现：`DownloadClient.fetchManifest` 从预绑定 origin 的固定 `/manifests/<package>@<version>.json` 取得有界清单并验签；本机确认生成 5 分钟单次下载许可后，`download` 使用 URLSession 下载清单绑定的不可变 URL，写私有临时文件、累计 SHA-256，再回读核对和重新验证清单有效期。所有重定向均拒绝，禁用 Cookie/缓存/HTTP 凭据回退，使用系统 TLS 信任；限制响应声明和实际字节、总超时，支持 Task 取消。结束/失败/取消均删除临时文件，删除未确认会报错而不返回成功。默认超时 30 秒；生产配置只允许 HTTPS，显式 test catalog 才允许带端口的 `http://127.0.0.1`。这部分尚未接入原生窗口，测试里下载确认和安装确认是两个独立动作，不宣称完整单次确认体验。
 
 ## 自行启动演示（本轮未执行 UI）
 
@@ -45,16 +47,18 @@ swift test --cache-path .build/cache
 
 `CatalogTrust` 是未来随签名应用或管理流程预置的 **catalog → HTTPS origin → keyID/public key** 配置接口，绝不来自请求或待验 manifest。生产默认没有任何可信 key；`test-*` key/catalog 仅在显式 fixture 模式使用。DemoFixtures 的公开固定测试种子任何人都能签名，不能用于生产；生产目标必须排除整个 DemoFixtures 模块。没有写入密钥、系统钥匙串、配置或持久生产授权。
 
-Envelope 是 `{keyID,payload,signature}`，后两项为 base64；Ed25519 签名覆盖 payload **原始 JSON 字节**，先验签再解析。清单绑定 catalog/包/版本、明确 DSH 版本、类型/风险、有效期、同源不可变文件名、完整归档 hash/字节数和全部文件 hash/大小。确认是内存中单次随机能力，绑定 requestID + 清单摘要，5 分钟过期，不写入磁盘；拒绝跨清单、跨请求、核心重建后的复用。
+Envelope 是 `{keyID,payload,signature}`，后两项为 base64；Ed25519 签名覆盖 payload **原始 JSON 字节**，先验签再解析。当前清单 **schema 2** 增加必须的 `archiveFormat: tar|tgz|zip`，旧原型 schema 1 拒绝；没有修改现有线上 catalog 合同。清单绑定 catalog/包/版本、明确 DSH 版本、类型/风险、有效期、同源不可变文件名、完整归档 hash/字节数和全部文件 hash/大小。确认是内存中单次随机能力，绑定 requestID + 清单摘要，5 分钟过期，不写入磁盘；拒绝跨清单、跨请求、核心重建后的复用。
 
-原型使用无压缩 ustar：只允许常规文件、受限 ASCII 路径，无链接/目录条目/PAX/GNU 扩展/设备/可执行位；全部解析和校验通过后才写入。归档上限 8 MiB，展开上限 4 MiB，单文件 1 MiB、100 文件。拒绝绝对路径、`..`、大小写碰撞、未声明文件、checksum/文件 hash 不符、缺少结束块。目录 0700、文件 0600，解包不调用 shell/tar/unzip。
+支持无压缩 ustar、单成员 gzip/ustar TGZ，以及 ZIP32 的 stored/deflate 子集。使用系统 zlib 有界流式展开，不调用 shell/tar/unzip。只允许常规文件、受限 ASCII 路径，无链接/目录条目/设备/可执行位；TGZ 拒绝 PAX/GNU 扩展、拼接 gzip、尾随数据，ZIP 拒绝加密、data descriptor、extra fields、ZIP64、分卷、注释，并核对中央目录/本地头、CRC、尺寸、文件集合和 hash。归档输入上限 8 MiB，解压出的 tar 容器上限 8 MiB，文件内容合计 4 MiB，单文件 1 MiB、100 文件；不信任压缩头声明尺寸。先完整验包，再写合成目标；目录 0700、文件 0600。这是明确受限的格式支持，不承诺接受任意 ZIP/TGZ。
+
+固定 `qcu-study-coach@0.1.0-pilot.1` 原 TGZ（SHA-256 `76ed55721d7a78237af6b05bca683a045fb232374c3d869af3676f90368c4f6c`）已逐成员对照 canonical 源码/确定性生成内容，只读审计和临时下载/解包/CLI-plan 测试通过。JS 从未加载，`disabled:true` 保持原字节。纯 Skill ZIP fixture 已完成真实 deflate/stored 解析到合成 Home 的路径。测试公钥只为这些内容提供隔离测试 envelope，不构成对原包的生产签名或安装授权。
 
 纯 Skill 仅接受 UTF-8 `.md/.txt`，核对 SKILL.md frontmatter 身份。它仍可影响模型行为，文本审核不是沙箱授权。Plugin package.json 仅接受小范围字段，无依赖/脚本字段；允许的精确 peer 仅 Cordis 4.0.4 和 dsh-skill 0.2.0-rc.2，既不批准构建脚本也不豁免兼容性。Host 代码有宿主用户权限，签名不是代码隔离。此次不执行其 JS/YAML。
 
 ## 明确未实现
 
-- 生产 catalog 签名发布/轮换/撤销、网络 manifest/download 传输、限流/下载取消/重定向控制。`DownloadedArchive` 是测试传输的值对象，核心核对声明来源；它本身不能证明 TLS 下载来源。未来必须在用户确认后受限下载，再复验 hash。当前内存 fixture 可在确认前完整校验。
-- 对现有 Hub `catalog.json`、ZIP/TGZ 的自动兼容。现在签名 envelope + ustar 是独立原型合同；旧 SHA-256 目录不能自动升级成可信签名源。后续需独立受审发布转换，不改现有固定包。
+- 生产 catalog 签名发布/轮换/撤销和真实 HTTPS 部署验收、原生 UI 到下载核心的完整状态/取消交互。系统 TLS 正常验证，未在本轮向外部服务器发请求；本轮网络测试均为临时 loopback HTTP。`DownloadedArchive` 值对象的手工构造本身不能证明 TLS 来源；网络来源由 DownloadClient 负责。
+- 现有 Hub `catalog.json` 到签名 schema 2 的发布转换。旧 SHA-256 目录不能自动升级成可信签名源；固定 TGZ 字节已兼容，仍需可信签名 envelope 的受审分发。ZIP 的未支持扩展需拒绝或经审核重新打包；不会静默降级到不安全解包工具。
 - 真实 Home 选择/检测与安装、官方 CLI 执行/进程生命周期、DSH inventory/skill 调用验证、实际重启状态；无 shell、任意命令、HTTP 安装桥。
 - 自动启用 row、覆写既有用户选择、自动更新/降级、跨进程/并发安装锁、断电持久性保证。事务用原子文件写/同卷 rename；不是 fsync 级断电事务。进程中断可通过同一 SimulationEnvironment 的新核心实例识别未知状态，但尚无磁盘 root 导入/应用重开恢复 UI。
 - 本机原生确认防欺骗、签名/公证、系统 scheme handler 安装及浏览器到 OS 跳转验收。同用户恶意进程/篡改私有目录不在原型隔离保证内。
@@ -68,4 +72,4 @@ Envelope 是 `{keyID,payload,signature}`，后两项为 base64；Ed25519 签名�
 - [skills.md L64–85](https://github.com/deepseek-ai/deepseek-harness/blob/639ed015397290b3745d163aafe02ffee4aa3f84/docs/subsystems/skills.md#L64)：官方用户目录扫描和 watcher；文件落盘不等于实际调用成功。
 - [manager L425](https://github.com/deepseek-ai/deepseek-harness/blob/639ed015397290b3745d163aafe02ffee4aa3f84/packages/boot/plugin-manager/src/index.ts#L425)：bundle 选择与 row 开关分离；替换包/无 HMR 时需按返回状态重启。
 
-下一阶段先审核原型合同、补上真实网络传输和打包，再就以下具体动作获得确认：安装测试助手并注册城院 scheme；在独立真实测试 Home 初始化官方 DSH；用户确认退出/重开；安装一个固定受审包并逐项确认所需启用；使用独立测试会话/自行配置的 Key 验证实际加载。若签名公证/生产 trust 配置/Hub 发布涉及外部服务和线上变更，分别列出精确产物与目标后确认。当前不要安装测试助手或调整 `.68`。
+真实试点仍不就绪：先完成原生 UI 接入下载状态/取消、正式可信清单分发设计、应用打包和隔离 UI 验收，以及真实 CLI 适配器的退出检查/参数限制/失败处理设计。满足这些前置条件后才准备具体安装试点方案；届时再确认测试助手安装和 scheme 注册、独立真实 Home、官方 DSH 退出/重开、固定包安装/启用及实际调用。签名公证、生产 trust 与线上发布分别列明精确产物/目标后确认。本轮不请求安装助手，不调整 `.68`。

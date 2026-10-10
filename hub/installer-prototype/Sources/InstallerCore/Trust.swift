@@ -57,6 +57,7 @@ public struct InstallRequest: Codable, Equatable, Sendable {
 }
 
 public enum PackageKind: String, Codable, Sendable { case skill, plugin }
+public enum ArchiveFormat: String, Codable, Sendable { case tar, tgz, zip }
 public struct FileRecord: Codable, Sendable {
     public let path: String
     public let sha256: String
@@ -70,6 +71,7 @@ public struct ReleaseManifest: Codable, Sendable {
     public let title: String
     public let kind: PackageKind
     public let archiveURL: String
+    public let archiveFormat: ArchiveFormat
     public let sha256: String
     public let bytes: Int
     public let files: [FileRecord]
@@ -97,7 +99,8 @@ public struct CatalogTrust: Sendable {
     public let fixtureOnly: Bool
     public init(catalogID: String, origin: URL, publicKeys: [String: Data], fixtureOnly: Bool = false) throws {
         try require(matches(catalogID, idPattern) && (fixtureOnly == catalogID.hasPrefix("test-")), "trust-mode-mismatch")
-        try require(origin.scheme == "https" && origin.host != nil && origin.user == nil && origin.password == nil
+        let allowedScheme = origin.scheme == "https" || (fixtureOnly && origin.scheme == "http" && origin.host == "127.0.0.1" && origin.port != nil)
+        try require(allowedScheme && origin.host != nil && origin.user == nil && origin.password == nil
                     && origin.query == nil && origin.fragment == nil && (origin.path.isEmpty || origin.path == "/"), "invalid-trust-origin")
         for (id, key) in publicKeys {
             try require(id.hasPrefix("test-") == fixtureOnly, "test-key-in-production")
@@ -113,11 +116,11 @@ public struct CatalogTrust: Sendable {
         guard let key = publicKeys[envelope.keyID], let payload = Data(base64Encoded: envelope.payload),
               let signature = Data(base64Encoded: envelope.signature) else { throw InstallerError.refused("untrusted-key-or-encoding") }
         try require(try Curve25519.Signing.PublicKey(rawRepresentation: key).isValidSignature(signature, for: payload), "bad-signature")
-        let value = try object(payload, keys: ["schema", "catalogID", "packageID", "version", "title", "kind", "archiveURL", "sha256", "bytes", "files", "expiresAt", "dshVersion", "dependencies", "installScripts", "authority"])
+        let value = try object(payload, keys: ["schema", "catalogID", "packageID", "version", "title", "kind", "archiveURL", "archiveFormat", "sha256", "bytes", "files", "expiresAt", "dshVersion", "dependencies", "installScripts", "authority"])
         guard let files = value["files"] as? [[String: Any]] else { throw InstallerError.refused("invalid-files") }
         for file in files { try require(Set(file.keys) == ["path", "sha256", "bytes"], "unknown-file-field") }
         let manifest = try JSONDecoder().decode(ReleaseManifest.self, from: payload)
-        try require(manifest.schema == 1 && manifest.catalogID == catalogID && request.catalogID == catalogID
+        try require(manifest.schema == 2 && manifest.catalogID == catalogID && request.catalogID == catalogID
                     && manifest.packageID == request.packageID && manifest.version == request.version, "identity-mismatch")
         try require(manifest.expiresAt > Int(now.timeIntervalSince1970), "expired-manifest")
         try require(!manifest.title.isEmpty && manifest.title.count <= 120 && !manifest.title.unicodeScalars.contains(where: { $0.value < 32 }), "invalid-title")
@@ -125,7 +128,7 @@ public struct CatalogTrust: Sendable {
         try require(manifest.authority == (manifest.kind == .skill ? "model-instructions" : "host-code-outside-workspace-sandbox"), "invalid-authority-disclosure")
         try require(manifest.bytes > 0 && manifest.bytes <= 8 * 1024 * 1024 && matches(manifest.sha256, "^[a-f0-9]{64}$"), "invalid-archive-limits")
         guard let url = URL(string: manifest.archiveURL) else { throw InstallerError.refused("invalid-archive-url") }
-        let expected = origin.appendingPathComponent("packages/\(manifest.packageID)-\(manifest.version)-\(manifest.sha256).tar")
+        let expected = origin.appendingPathComponent("packages/\(manifest.packageID)-\(manifest.version)-\(manifest.sha256).\(manifest.archiveFormat.rawValue)")
         try require(url.absoluteString == expected.absoluteString, "unbound-or-mutable-archive-url")
         try require(!manifest.files.isEmpty && manifest.files.count <= 100, "file-count-limit")
         var total = 0
@@ -141,8 +144,8 @@ public struct CatalogTrust: Sendable {
     }
 }
 
-/// Immutable bytes supplied by a bounded transport. The prototype includes only
-/// fixture transport; network retrieval/redirect handling is deliberately absent.
+/// Immutable archive bytes. DownloadClient validates the network source and file;
+/// offline callers must still supply a signed envelope to Installer.prepare.
 public struct DownloadedArchive: Sendable {
     public let source: URL
     public let bytes: Data
