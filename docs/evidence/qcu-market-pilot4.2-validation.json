@@ -1,0 +1,222 @@
+{
+  "version": "0.1.0-pilot.4.2",
+  "archive": {
+    "file": "qcu-market-0.1.0-pilot.4.2.tgz",
+    "bytes": 17912,
+    "sha256": "70340f21a2e49c086ce07a37f4f178ee696a1bf915f9b920b75b6d33fe175dfc",
+    "files": [
+      {
+        "path": "package/LICENSE",
+        "bytes": 1093,
+        "sha256": "79832ece489707e2f1c9d5ddeaa9c38958a3bbce2a0d5b67645af5a4039ad787",
+        "mode": "0644"
+      },
+      {
+        "path": "package/README.md",
+        "bytes": 7368,
+        "sha256": "67fe9fc813db5dc04158cc1d6241632f785a1eb24a0ad76aa8e966da7b122d1e",
+        "mode": "0644"
+      },
+      {
+        "path": "package/client.js",
+        "bytes": 30533,
+        "sha256": "b4a5118f5e8b3caa1eb44d27f791de22ea82041e07d17389d0834d79fa277e07",
+        "mode": "0644"
+      },
+      {
+        "path": "package/cordis.patch.yml",
+        "bytes": 71,
+        "sha256": "b98edf16629859557d480042df67740baf1d2e0b458ace8d60ba69cbb7bce6dc",
+        "mode": "0644"
+      },
+      {
+        "path": "package/icon.svg",
+        "bytes": 347,
+        "sha256": "9714cc8e5ef5e32d7079e89241fb34e3ab2b9784d9c89dc30f0773b3341c584a",
+        "mode": "0644"
+      },
+      {
+        "path": "package/index.js",
+        "bytes": 879,
+        "sha256": "98eda704056c77d2967c9aff227e664f712f5c1b0095cad6392c62ebbc701227",
+        "mode": "0644"
+      },
+      {
+        "path": "package/locale/en.json",
+        "bytes": 153,
+        "sha256": "ba9059abbf09a42ffa7e5e6506e4e5413f16d6fa7418197d18cce9a38c2306ce",
+        "mode": "0644"
+      },
+      {
+        "path": "package/locale/zh.json",
+        "bytes": 152,
+        "sha256": "a2338245b1d5081bc9e52a630297edbdbe1df7b177ee6b284fb4459db68f0de9",
+        "mode": "0644"
+      },
+      {
+        "path": "package/package.json",
+        "bytes": 1450,
+        "sha256": "cf42b3b7b77ad1f41270c800f9a7d7bc402053f6168b2c9b8183ee91cddb1383",
+        "mode": "0644"
+      },
+      {
+        "path": "package/src/host-core.mjs",
+        "bytes": 5960,
+        "sha256": "817e521fe9cde830008abf7134c36a79d90a0ef303421a5aecd8a4555389b247",
+        "mode": "0644"
+      },
+      {
+        "path": "package/src/remote-contract.mjs",
+        "bytes": 1044,
+        "sha256": "85a8c699f8a2cc564ff9fbcc0d4f7f0aa5efa9d81ada0a2ee902d07e5e603e80",
+        "mode": "0644"
+      },
+      {
+        "path": "package/src/trusted-release.mjs",
+        "bytes": 660,
+        "sha256": "9c22a264ef1918bf0f0842f122a2e8664631b02cb2e9d9c80bbb50c7eac30061",
+        "mode": "0644"
+      }
+    ]
+  },
+  "tests": {
+    "source": {
+      "passed": 66,
+      "failed": 0
+    },
+    "archiveHttp": {
+      "passed": 13,
+      "failed": 0
+    },
+    "archiveScopeSubset": {
+      "passed": 15,
+      "failed": 0
+    },
+    "p41Red": {
+      "passedCacheReproductions": 2,
+      "expectedInstallContractFailures": 1
+    }
+  },
+  "runtime": {
+    "asarSha256": "18d5036bbb58eaff41d351ede99314b8d06505aec06fb2e164c49874ada30f9e",
+    "files": [
+      {
+        "package": "cordis",
+        "file": "lib/index.js",
+        "dependencyBytesEqualOfficial": true,
+        "officialSha256": "6a9394c0877ff45218818c6e815edd038f8057e1a1deb390a8d43ec81c57691e",
+        "dependencySha256": "6a9394c0877ff45218818c6e815edd038f8057e1a1deb390a8d43ec81c57691e",
+        "testRuntime": "byte-identical dependency artifact"
+      },
+      {
+        "package": "cordis-plugin-loader",
+        "file": "lib/index.js",
+        "dependencyBytesEqualOfficial": true,
+        "officialSha256": "b57c5075e881b4ceb3a15382f506ce549bcbdcd2a0f5bae292f67e6a83a45b1f",
+        "dependencySha256": "b57c5075e881b4ceb3a15382f506ce549bcbdcd2a0f5bae292f67e6a83a45b1f",
+        "testRuntime": "byte-identical dependency artifact"
+      },
+      {
+        "package": "dsh-api-gateway",
+        "file": "lib/index.js",
+        "dependencyBytesEqualOfficial": true,
+        "officialSha256": "12489aafd3be30c606824f52b45f682c42f95448db89f2458bba87fa944a50c0",
+        "dependencySha256": "12489aafd3be30c606824f52b45f682c42f95448db89f2458bba87fa944a50c0",
+        "testRuntime": "byte-identical dependency artifact"
+      },
+      {
+        "package": "dsh-api-gateway",
+        "file": "lib/client.js",
+        "dependencyBytesEqualOfficial": true,
+        "officialSha256": "e09e26fcd4849cd55683b9cc702dca896efce93a5af3968431c1c8a62147b9cf",
+        "dependencySha256": "e09e26fcd4849cd55683b9cc702dca896efce93a5af3968431c1c8a62147b9cf",
+        "testRuntime": "byte-identical dependency artifact"
+      },
+      {
+        "package": "dsh-client-connection",
+        "file": "lib/index.js",
+        "dependencyBytesEqualOfficial": true,
+        "officialSha256": "3950f524aed44e28240140a254cd928ea40eba8e2d04cc8fd04f92a687f5c91d",
+        "dependencySha256": "3950f524aed44e28240140a254cd928ea40eba8e2d04cc8fd04f92a687f5c91d",
+        "testRuntime": "byte-identical dependency artifact"
+      },
+      {
+        "package": "dsh-client-connection",
+        "file": "lib/client.js",
+        "dependencyBytesEqualOfficial": true,
+        "officialSha256": "0fbb93fa2382bb66919767f69c909585c6255486f9536f9232231edaeac8c4e6",
+        "dependencySha256": "0fbb93fa2382bb66919767f69c909585c6255486f9536f9232231edaeac8c4e6",
+        "testRuntime": "byte-identical dependency artifact"
+      },
+      {
+        "package": "dsh-typert-protocol",
+        "file": "lib/index.js",
+        "dependencyBytesEqualOfficial": true,
+        "officialSha256": "f7e0fa4b750267f6adaa1b901be7987f0d830800ec3a05f247251bf77de0b809",
+        "dependencySha256": "f7e0fa4b750267f6adaa1b901be7987f0d830800ec3a05f247251bf77de0b809",
+        "testRuntime": "byte-identical dependency artifact"
+      },
+      {
+        "package": "dsh-typert-registry",
+        "file": "lib/index.js",
+        "dependencyBytesEqualOfficial": true,
+        "officialSha256": "d52e98d35cfe8919dd6d6c46a2f4644a3c0135a0ed70c06a66d0cccd1fe12d82",
+        "dependencySha256": "d52e98d35cfe8919dd6d6c46a2f4644a3c0135a0ed70c06a66d0cccd1fe12d82",
+        "testRuntime": "byte-identical dependency artifact"
+      },
+      {
+        "package": "dsh-plugin-manager",
+        "file": "lib/index.js",
+        "dependencyBytesEqualOfficial": true,
+        "officialSha256": "f46a48b3422927eea5605a70b78502e06ef9ceaa29d7a73f4a7f742361ff51c8",
+        "dependencySha256": "f46a48b3422927eea5605a70b78502e06ef9ceaa29d7a73f4a7f742361ff51c8",
+        "testRuntime": "byte-identical dependency artifact"
+      },
+      {
+        "package": "dsh-plugin-manager",
+        "file": "lib/typert.host.js",
+        "dependencyBytesEqualOfficial": true,
+        "officialSha256": "fca5b000a2fdd995d56da7ba21a33921e4765898332db283c255df0cacac4b25",
+        "dependencySha256": "fca5b000a2fdd995d56da7ba21a33921e4765898332db283c255df0cacac4b25",
+        "testRuntime": "byte-identical dependency artifact"
+      },
+      {
+        "package": "dsh-plugin-manager",
+        "file": "lib/typert.remote-client.js",
+        "dependencyBytesEqualOfficial": true,
+        "officialSha256": "41292d52847b26265f4b55807ad3118b75d46a02edc7bbb66ab04cdc2f88822d",
+        "dependencySha256": "41292d52847b26265f4b55807ad3118b75d46a02edc7bbb66ab04cdc2f88822d",
+        "testRuntime": "byte-identical dependency artifact"
+      },
+      {
+        "package": "dsh-app-boot",
+        "file": "lib/index.js",
+        "dependencyBytesEqualOfficial": false,
+        "officialSha256": "234db45e1b3f8c683b5bc1f551948b2a2ec52a6468c7b6937725a23f1c0e0d96",
+        "dependencySha256": "07dc5e164a23dff6a6ae7c28a1377940ec4cfe24e604cdcdd0f892ace9107589",
+        "testRuntime": "exact ASAR bytes extracted to .work/http-e2e/official-app-boot/index.mjs"
+      }
+    ]
+  },
+  "miniModified": false,
+  "hubModified": false,
+  "realInstallation": false,
+  "limitations": [
+    "Mini memory identity not inspected",
+    "same-path/cache mechanism reproduced; actual pnpm remove/reinstall not run",
+    "Electron forwarding and WebSocket progress not tested",
+    "manager business effects are fixtures",
+    "no true plugin installation/enablement/skill/model acceptance"
+  ],
+  "evidenceFiles": {
+    "p41-http-red.txt": "dc287550c90761534c9254d8875491594d954c9860e2750add647873102a3759",
+    "p41-final-red.txt": "965b345ac15702fa9f108bee546348b0a0ced3f6c9448d8838bbfae45adcaffa",
+    "archive-scope-tests.txt": "e4dadc5efc5c3facc56f8a803836c68c60bff3971f602d9632ef8d58efd957ca",
+    "source-tests.txt": "1216f92a541c787640d34320cee268727302585c784d2351b582fe3d41a1ea21",
+    "archive-http-green.txt": "c6c6c8a5a05a79de9b2ecb55c887178911622c3a4d1d919b95ea2a968169297b"
+  },
+  "deterministicRepackIdentical": true,
+  "scopedUtf8FilesReviewed": 20,
+  "secretPatternCheck": "passed",
+  "independentReview": "No blocking issue; all three recommended boundary tests/hygiene changes applied"
+}

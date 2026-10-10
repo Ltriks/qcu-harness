@@ -37,8 +37,8 @@ function fixture(){
  const calls=[],mutations=[];let n=0,bundles=[],rows=[],listener
  const receipt={id,path:'/cache/'+release.file,entry:release,expiresAt:1000000}
  const inspection={status:'accepted',kind:'tarball',bundle:null,registry:null}
- const manager={listBundles:async()=>{calls.push('listBundles');return ok(bundles)},listPlugins:async()=>{calls.push('listPlugins');return ok(rows)},inspect:async()=>{calls.push('inspect');return ok(inspection)},installBundle:async(path,options)=>{mutations.push({kind:'install',path,options});bundles=[{name:release.id,version:release.version,installed:true,enabled:false}];return ok({application:'applied',stage:'install',bundle:release.id,changed:true})},cancelInstall:async()=>ok({status:'cancelled'}),waitForInstall:async()=>ok(null),setBundleEnabled:async(name,enabled)=>{mutations.push({kind:'bundle',name,enabled});bundles[0].enabled=true;return ok({application:'applied'})},setPluginEnabled:async(entryId,enabled)=>{mutations.push({kind:'row',entryId,enabled});rows[0].enabled=true;rows[0].fiberPhase='active';return ok({application:'applied'})}}
- const remote={pluginManager:manager,qcuMarket:{prepare:async()=>{calls.push('prepare');return ok(JSON.stringify(receipt))},verify:async()=>{calls.push('verify');return ok(JSON.stringify(receipt))},cancel:async()=>{calls.push('cancel-preparation');return ok('{}')}},$on:(_,fn)=>{listener=fn;return()=>{listener=null}}}
+ const manager={listBundles:async()=>{calls.push('listBundles');return ok(bundles)},listPlugins:async()=>{calls.push('listPlugins');return ok(rows)},inspect:async()=>{calls.push('inspect');return ok(inspection)},installBundle:async(path,options)=>{mutations.push({kind:'install',path,options});bundles=[{name:release.id,version:release.version,installed:true,enabled:false}];return ok({application:'applied',stage:'enable',target:release.id,enabled:false,bundle:release.id,changed:true})},cancelInstall:async()=>ok({status:'cancelled'}),waitForInstall:async()=>ok(null),setBundleEnabled:async(name,enabled)=>{mutations.push({kind:'bundle',name,enabled});bundles[0].enabled=true;return ok({application:'applied'})},setPluginEnabled:async(entryId,enabled)=>{mutations.push({kind:'row',entryId,enabled});rows[0].enabled=true;rows[0].fiberPhase='active';return ok({application:'applied'})}}
+ const remote={pluginManager:manager,qcuMarket:{status:async()=>ok(JSON.stringify({version:'0.1.0-pilot.4.2',protocol:1})),prepare:async()=>{calls.push('prepare');return ok(JSON.stringify(receipt))},verify:async()=>{calls.push('verify');return ok(JSON.stringify(receipt))},cancel:async()=>{calls.push('cancel-preparation');return ok('{}')}},$on:(_,fn)=>{listener=fn;return()=>{listener=null}}}
  const flow=new DirectMarketFlow(remote,{now:()=>0,uuid:()=>n++?id.replace('12345678','22345678'):id})
  return {flow,manager,remote,receipt,inspection,calls,mutations,setBundles:b=>bundles=b,setRows:r=>rows=r,progress:p=>listener?.(p)}
 }
@@ -109,5 +109,10 @@ test('metadata status never reads skill body or starts a session; missing bundle
 })
 test('dispose releases subscriptions and requests cancellation, ignores late success',async()=>{
  const f=fixture();let finish;f.manager.installBundle=()=>new Promise(r=>finish=r);let cancelled=0;f.manager.cancelInstall=async()=>{cancelled++;return ok({status:'cancelled'})}
- await f.flow.prepare();const pending=f.flow.confirmInstall();await tick();const before=f.flow.state;f.flow.dispose();finish(ok({application:'applied',stage:'install',bundle:release.id}));await pending;assert.equal(cancelled,1);assert.equal(f.flow.state,before)
+ await f.flow.prepare();const pending=f.flow.confirmInstall();await tick();const before=f.flow.state;f.flow.dispose();finish(ok({application:'applied',stage:'enable',target:release.id,enabled:false,bundle:release.id}));await pending;assert.equal(cancelled,1);assert.equal(f.flow.state,before)
+})
+
+for(const [field,value] of Object.entries({stage:'install',target:'other',bundle:'other',enabled:true}))test(`success with wrong ${field} stays unconfirmed`,async()=>{
+ const f=fixture();f.manager.installBundle=async()=>{f.setBundles([{name:release.id,version:release.version,installed:true,enabled:false}]);return ok({application:'applied',stage:'enable',target:release.id,bundle:release.id,enabled:false,[field]:value})}
+ await f.flow.prepare();await f.flow.confirmInstall();assert.equal(f.flow.state.phase,'unconfirmed');assert.ok(f.flow.request)
 })

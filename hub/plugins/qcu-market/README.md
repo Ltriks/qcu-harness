@@ -1,10 +1,10 @@
-# QCU market — 0.1.0-pilot.4.1
+# QCU market — 0.1.0-pilot.4.2
 
 One fixed independent coach package, downloaded on demand from the trusted LAN Hub. **Installation needs no model, API Key, session, message or agent tool.** This is local candidate source, not a deployed market.
 
 ## User flow
 
-1. Check the current profile or prepare the fixed package. The QCU Host downloads only the compiled release, verifies exact size/SHA256 and returns a five-minute receipt. The coach TGZ is not embedded in the market package. Availability is established by the current download and integrity check; offline/404 remains an error.
+1. An explicit check/preparation first verifies the running Host version and protocol. A missing/stale Host stops before download and asks for a normal DSH restart. Re-enabling a component is not a process restart. Then check the current profile or prepare the fixed package. The QCU Host downloads only the compiled release, verifies exact size/SHA256 and returns a five-minute receipt. The coach TGZ is not embedded in the market package. Availability is established by the current download and integrity check; offline/404 remains an error.
 2. The official public `pluginManager.inspect` checks the absolute TGZ spec. Its tarball inspection checks the form, not the manifest; QCU relies on the reviewed immutable archive hash for the displayed name/version/license and the official installer for bundle/runtime compatibility checks.
 3. A dedicated review section displays package, version, source, hash, size and privileges/network/profile-write risks. Only **Confirm install (keep disabled)** calls the official public `installBundle`, with `enabled:false` and a fresh request ID. Verification and inspection run again before that call; expiry, source/hash/registry/profile changes invalidate confirmation. Declining does not install. No scripts, compatibility exemptions or permissions are silently authorized.
 4. Cancellation uses official `cancelInstall`; only confirmed cancellation is called cancelled. An early not-running reply waits for the official acceptance event before retrying cancellation once. Too-late, lost replies and unknown outcomes remain visible, block repeated installation and support `waitForInstall` reconciliation. No automatic install retries.
@@ -13,7 +13,7 @@ One fixed independent coach package, downloaded on demand from the trusted LAN H
 
 ## Ownership and permissions
 
-The Host service uses public Typert registration and strict descriptors for only `prepare(UUID)`, `verify(UUID)` and `cancel(UUID)`. No URL, path, installation or general management argument exists. It has no manager, skills, sandboxPolicy, commands, tools, agents or session dependency. The Client mounts these descriptors with the public `$mount` API and calls the existing official management namespace only from the corresponding explicit user action. No private controller or UI package runtime import is used; React is the sole Client runtime import.
+The Host service uses public Typert registration and strict descriptors for only read-only `status()` (market version/protocol), `prepare(UUID)`, `verify(UUID)` and `cancel(UUID)`. No URL, path, installation or general management argument exists. It has no manager, skills, sandboxPolicy, commands, tools, agents or session dependency. The Client mounts these descriptors with the public `$mount` API and calls the existing official management namespace only from the corresponding explicit user action. No private controller or UI package runtime import is used; React is the sole Client runtime import.
 
 The Host reads/writes only its fixed package cache `~/.cache/qcu-market` in this implementation (creating `~/.cache` if absent), with owned-directory checks, no-follow read, exact hash/size, 0400 immutable link, temp cleanup, 30-second download limit and maximum 1 MiB. Receipts are in memory, at most 16, and expire after five minutes. It contacts only `http://192.168.1.68:8080/plugins/<pinned-file>` on preparation; redirects and encoded responses are refused. HTTP does not provide confidentiality; the compiled digest authenticates these reviewed bytes.
 
@@ -23,7 +23,7 @@ Client profile-status reads call public `listBundles`; `listPlugins` is only rea
 
 ## Tests and deployment
 
-See `docs/qcu-market-direct-install.md`. The official Client/Gateway/registry path is tested through an in-memory carrier; installation and activation calls in tests use fakes. No live App, profile, package manager, Mini or Hub is modified. `pilot.3.1` was a conversation bridge and remains an immutable historical artifact; pilot.4 replaces that route, not those bytes.
+See `docs/qcu-market-direct-install.md`. The actual archive is tested through official built Client Connection, HTTP, Host Connection, Gateway and strict descriptors. Installation and activation business effects use a constrained manager backend fixture; no package manager runs. See `docs/qcu-market-pilot4.2-http-validation.md` for red/green evidence and uncovered surfaces. No live App, profile, package manager, Mini or Hub is modified. `pilot.3.1` was a conversation bridge and remains an immutable historical artifact; pilot.4 replaces that route, not those bytes.
 
 
 ## pilot.4.1 dependency repair
@@ -31,3 +31,9 @@ See `docs/qcu-market-direct-install.md`. The official Client/Gateway/registry pa
 Immutable pilot.4 remains unchanged. Its live Client failed because package loading prerequisites were mistaken for Cordis service injections. The persistent shell declares `slots` and `layout`; a `remote` owner mounts QCU descriptors, and its consumer declares `remote.pluginManager` and `remote.qcuMarket`. An independent `pluginNavigation` consumer owns the details callback. Missing services keep a visible unavailable shell, and withdrawal disposes the flow and subscriptions before the owned namespace. No wildcard, new management method, Host service, peer, endpoint, origin or filesystem capability is added.
 
 The regression starts the actual source and packaged Client inside real official Cordis fibers with official ClientRemote and generated manager codecs. It reproduces the pilot.4 error, then exercises scoped startup, every used manager call, preparation/decline, missing services, late arrival, withdrawal/remount, transport reset/disposal and Host failure. The Host Gateway unload test aborts an in-flight synthetic preparation. Host answers and installation remain simulated; this patch has not been installed on the Mini.
+
+## pilot.4.2 readiness and result repair
+
+The same-name uninstall/reinstall sequence can retain a previously imported P2 no-op Host in Node while disk metadata and the Client advance. A cold process correctly serves the P4.1 routes; adding a hard-coded URL or duplicate registration is not the fix. This version detects a missing/stale Host through `status()` and asks for normal quit/reopen before preparation. It does not restart, clear module caches, modify official code, or recover by shell. A normal restart remains necessary after updating this package.
+
+Successful official `installBundle` ends with stage `enable` even for `enabled:false`. This version validates that stage, the exact bundle and target, disabled flag, then fresh inventory before showing installed-disabled. It never treats an install response as proof of enablement or skill availability. New HTTP tests also exercise all eight existing manager method codecs, failures, cancel/duplicate, remount and fresh-process recovery.

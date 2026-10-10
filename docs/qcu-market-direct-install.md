@@ -58,3 +58,7 @@ python3.11 hub/plugins/qcu-market/pack-pilot.py /tmp/qcu-market-pilot4.1
 4. 用户分别确认包和组件启用。需要重启则用户正常重启；再查组件状态，不以active代替技能调用验收。
 5. 用户自行复制/发送合成学习任务，确认真实技能调用与时间建议。该学习步骤才需要模型；不读取用户密钥或既有聊天。
 6. 任一不明结果停在“未确认”，通过官方任务/插件详情核对，不自动重装、授权脚本、加豁免或扩大权限。
+
+## pilot.4.2 HTTP 与就绪检查
+
+后续诊断、实际HTTP链路、同名包旧Host缓存复现和安装stage契约修复见 [pilot.4.2 验证](qcu-market-pilot4.2-http-validation.md)。不能再以本文历史in-memory carrier结果替代HTTP或真机验收。

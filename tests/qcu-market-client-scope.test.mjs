@@ -33,12 +33,13 @@ async function fixture(t,{manager=true,navigation=true,plugin,answer}={}){
   switch(endpoint){
    case 'pluginManager/listBundles':value=bundles;break
    case 'pluginManager/listPlugins':value=rows;break
-   case 'pluginManager/installBundle':assert.equal(a.options.enabled,false);assert.deepEqual(Object.keys(a.options).sort(),['enabled','registry','requestId']);bundles=[{name:release.id,version:release.version,installed:true,enabled:false,optional:false,removable:true,rows:[],overrides:[]}];rows=[{moduleName:release.id,entryId:'coach:row',patchId:'qcu-study-coach',enabled:false,fiberPhase:null}];value={changed:true,application:'applied',stage:'install',target:a.spec,bundle:release.id};break
+   case 'pluginManager/installBundle':assert.equal(a.options.enabled,false);assert.deepEqual(Object.keys(a.options).sort(),['enabled','registry','requestId']);bundles=[{name:release.id,version:release.version,installed:true,enabled:false,optional:false,removable:true,rows:[],overrides:[]}];rows=[{moduleName:release.id,entryId:'coach:row',patchId:'qcu-study-coach',enabled:false,fiberPhase:null}];value={changed:true,application:'applied',stage:'enable',target:release.id,enabled:false,bundle:release.id};break
    case 'pluginManager/setBundleEnabled':assert.equal(a.name,release.id);assert.equal(a.enabled,true);bundles[0].enabled=true;value={changed:true,application:'applied',stage:'enable',target:a.name};break
    case 'pluginManager/setPluginEnabled':assert.equal(a.id,'coach:row');assert.equal(a.enabled,true);rows[0].enabled=true;rows[0].fiberPhase='active';value={changed:true,application:'applied',stage:'enable',target:a.id};break
    case 'pluginManager/cancelInstall':value={status:'cancelled'};break
    case 'pluginManager/waitForInstall':value=null;break
    case 'pluginManager/inspect':value={status:'accepted',kind:'tarball',bundle:null,registry:null};break
+   case 'qcuMarket/status':value=JSON.stringify({version:'0.1.0-pilot.4.2',protocol:1});break
    case 'qcuMarket/prepare':receipt.id=a.id;value=JSON.stringify(receipt);break
    case 'qcuMarket/verify':value=JSON.stringify(receipt);break
    case 'qcuMarket/cancel':value=JSON.stringify({state:'cancelled'});break
@@ -64,7 +65,7 @@ test('Client starts in a real plugin fiber, checks inventory and prepares/declin
  assert.match(f.render(),/确认安装（保持未启用）/)
  p.onDetails();assert.deepEqual(f.details,[release.id])
  await p.flow.decline();assert.equal(p.flow.state.phase,'declined')
- assert.deepEqual(f.calls.map(c=>c.endpoint),['pluginManager/listBundles','pluginManager/listBundles','qcuMarket/prepare','pluginManager/inspect','qcuMarket/cancel'])
+ assert.deepEqual(f.calls.map(c=>c.endpoint),['qcuMarket/status','pluginManager/listBundles','qcuMarket/status','pluginManager/listBundles','qcuMarket/prepare','pluginManager/inspect','qcuMarket/cancel'])
  await f.fork.dispose();assert.equal(f.ctx.slots.entriesOfSlot('main').length,0);assert.equal(f.ctx.get('remote.qcuMarket'),undefined)
 })
 

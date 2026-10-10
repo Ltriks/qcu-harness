@@ -1,3 +1,4 @@
+import { marketRuntime } from './remote-contract.mjs'
 import { release } from './trusted-release.mjs'
 const same=(a,b)=>JSON.stringify(a)===JSON.stringify(b)
 const failure=e=>e?.message||String(e)
@@ -26,10 +27,16 @@ export class DirectMarketFlow {
   guard(){if(this.disposed)throw new Error('市场已关闭');if(this.pending||this.request)throw new Error('已有操作进行中；请等待或核对结果')}
   valid(n){if(this.disposed||n!==this.generation)throw new Error('操作已取消或目录已变化')}
   checkReceipt(r){if(!r||!same(r.entry,this.entry)||!Number.isSafeInteger(r.expiresAt)||r.expiresAt<=this.now()||typeof r.path!=='string'||!r.path.startsWith('/')||!r.path.endsWith('/'+this.entry.file))throw new Error('包来源、目录或有效期已变化；请重新准备并确认')}
-  async status(){this.guard();const n=++this.generation;this.pending={kind:'status'};this.set({phase:'checking',review:null,message:''});try{const s=await readCoach(this.remote.pluginManager,this.entry);this.valid(n);this.set({phase:'idle',status:s})}catch(e){if(n===this.generation)this.set({phase:'error',status:null,message:failure(e)})}finally{this.pending=null}}
+  async checkHost(){
+    let actual
+    try{actual=JSON.parse(unwrap(await this.remote.qcuMarket.status()))}catch(e){throw new Error('市场 Host 尚未就绪；如刚更新或重装，请正常退出并重新打开 DSH 后再检查。未发起安装。详情：'+failure(e))}
+    if(!same(actual,marketRuntime))throw new Error('市场 Host 与界面版本不一致，请正常重启 DSH 后再检查；未发起安装。')
+  }
+  async status(){this.guard();const n=++this.generation;this.pending={kind:'status'};this.set({phase:'checking',review:null,message:''});try{await this.checkHost();this.valid(n);const s=await readCoach(this.remote.pluginManager,this.entry);this.valid(n);this.set({phase:'idle',status:s})}catch(e){if(n===this.generation)this.set({phase:'error',status:null,message:failure(e)})}finally{this.pending=null}}
   async prepare(){
     this.guard();const n=++this.generation,id=this.uuid(),abort=new AbortController();this.pending={kind:'prepare',id,abort};this.set({phase:'preparing',review:null,message:'',result:null})
     try{
+      await this.checkHost();this.valid(n)
       const status=await readCoach(this.remote.pluginManager,this.entry);this.valid(n);if(status.state!=='not-installed'){this.set({phase:'idle',status});return}
       const receipt=JSON.parse(unwrap(await this.remote.qcuMarket.prepare(id,abort.signal)));this.valid(n);this.checkReceipt(receipt);if(receipt.id!==id)throw new Error('包凭据不匹配')
       const inspected=unwrap(await this.remote.pluginManager.inspect(receipt.path,{},abort.signal));this.valid(n)
@@ -62,7 +69,7 @@ export class DirectMarketFlow {
     if(!result||!['applied','restart-required','overridden','failed','cancelled'].includes(result.application)){this.set({phase:'unconfirmed',message:'官方返回未知结果；不得重装。'});return}
     if(result.application==='cancelled'){this.request=null;this.set({phase:'cancelled',result,message:'官方已确认取消并恢复安装文件。'});return}
     if(result.application==='failed'||result.application==='overridden'){this.request=null;this.set({phase:'error',result,message:result.error?.message||result.error?.code||'官方拒绝或未按预期应用；不自动重试或授权脚本。'});return}
-    if(result.stage!=='install'||result.bundle!==this.entry.id){this.set({phase:'unconfirmed',result,message:'返回的包或操作不符，请在官方详情核对。'});return}
+    if(result.stage!=='enable'||result.target!==this.entry.id||result.bundle!==this.entry.id||result.enabled!==false){this.set({phase:'unconfirmed',result,message:'返回的包或操作不符，请在官方详情核对。'});return}
     this.set({phase:'checking',result})
     try{const status=await readCoach(this.remote.pluginManager,this.entry);if(this.request!==request||this.disposed)return;this.request=null;this.set({phase:status.state==='installed-disabled'?'installed':'unconfirmed',status,result,message:status.state==='installed-disabled'?'已安装，未启用。': '安装返回成功，但当前状态不符；请核对。'})}catch(e){this.set({phase:'unconfirmed',result,message:failure(e)})}
   }
