@@ -117,7 +117,7 @@ test('p2 separates official usage from drafts and removes fake installation cont
 })
 test('scene filters update visible cards and retain native keyboard button semantics', () => {
   let category='全部',Main
-  const React={createElement:(type,props,...children)=>({type,props:props??{},children}),Fragment:'fragment',useState:()=>[category,v=>{category=v}]}
+  const React={createElement:(type,props,...children)=>({type,props:props??{},children}),Fragment:'fragment',useState:initial=>initial==='全部'?[category,v=>{category=v}]:['',()=>{}]}
   createMarketPlugin(React,{kind:'bundled',value:catalog}).apply({layout:{selectPanel(){}},slots:{inject:(_,fn)=>fn(),register:(o,c)=>{if(o.name==='main')Main=c;return ()=>{}}}})
   const flat=n=>!n||typeof n!=='object'?[]:[n,...n.children.flatMap(flat)]
   let nodes=flat(Main({onBack(){}}))
@@ -141,4 +141,21 @@ test('p2 styles are locally scoped, semantic-token based, focusable and network 
   const svg=await read('hub/plugins/qcu-market/icon.svg')
   assert.match(svg,/<svg/);assert.doesNotMatch(svg,/<script|href=|onload=|<foreignObject/)
   for(const lang of ['zh','en'])assert.ok(JSON.parse(await read(`hub/plugins/qcu-market/locale/${lang}.json`)).meta.title)
+})
+test('local search combines with category and handles blank, case-insensitive and zero-result queries', async () => {
+  const {filterMarketEntries}=await import('../hub/plugins/qcu-market/src/catalog.mjs')
+  assert.equal(filterMarketEntries(catalog.skills,'全部','  ').length,8)
+  assert.equal(filterMarketEntries(catalog.skills,'全部','OFFICE-PPTX')[0].id,'office-pptx')
+  assert.equal(filterMarketEntries(catalog.skills,'课件制作','百分比').length,0)
+  assert.equal(filterMarketEntries(catalog.skills,'备课与课堂活动','分层')[0].id,'qcu-tiered-practice')
+  assert.equal(filterMarketEntries(catalog.skills,'全部','不存在的课程').length,0)
+})
+test('compiled p2 carries the exact styles and icon vectors with no separate stylesheet fetch', async () => {
+  const {marketStyles}=await import('../hub/plugins/qcu-market/src/styles.mjs')
+  const {iconPaths}=await import('../hub/plugins/qcu-market/src/icons.mjs')
+  const compiled=await read('hub/plugins/qcu-market/client.js')
+  assert.ok(compiled.includes(marketStyles))
+  assert.ok(compiled.includes("h('style', null, marketStyles)"))
+  for(const paths of Object.values(iconPaths))for(const path of paths)assert.ok(compiled.includes(path))
+  assert.doesNotMatch(compiled,/rel:\s*['"]stylesheet|<link|@import|fetch\(/)
 })

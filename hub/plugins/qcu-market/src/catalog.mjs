@@ -41,3 +41,9 @@ export async function copyExample(text, clipboard) {
     return '复制失败；请选中下方示例文字手动复制。'
   }
 }
+
+export function filterMarketEntries(entries, category, query) {
+  const term = query.trim().toLocaleLowerCase()
+  return entries.filter(e => (category === '全部' || e.category === category)
+    && (!term || [e.name, e.summary, e.category, e.id].some(value => value.toLocaleLowerCase().includes(term))))
+}

@@ -45,6 +45,12 @@ async function copyExample(text, clipboard) {
   }
 }
 
+function filterMarketEntries(entries, category, query) {
+  const term = query.trim().toLocaleLowerCase()
+  return entries.filter(e => (category === '全部' || e.category === category)
+    && (!term || [e.name, e.summary, e.category, e.id].some(value => value.toLocaleLowerCase().includes(term))))
+}
+
 // Original QCU line drawings, MIT. Generic learning symbols; not a school crest.
 const iconPaths = {
   market: ['M4 4h6l2 2 2-2h6v15h-6l-2 2-2-2H4z', 'M12 6v15'],
@@ -63,11 +69,11 @@ function sceneIcon(category) {
 const marketStyles = `
 .qcu-market { box-sizing:border-box;height:100%;overflow:auto;padding:28px clamp(20px,4vw,48px) 48px;color:var(--dsw-alias-label-primary);background:var(--dsw-alias-bg-base);font:inherit; }
 .qcu-market * { box-sizing:border-box; }
-.qcu-market .qcu-content { max-width:1120px;margin:0 auto; }
+.qcu-market .qcu-content { max-width:1280px;margin:0 auto; }
 .qcu-market .qcu-head { display:flex;align-items:flex-start;justify-content:space-between;gap:20px;margin:24px 0; }
 .qcu-market .qcu-wordmark { display:flex;align-items:center;gap:12px; }
 .qcu-market h1 { margin:0;font-size:24px;line-height:32px;font-weight:600; }
-.qcu-market h2 { margin:0;font-size:18px;line-height:26px;font-weight:600; }
+.qcu-market h2 { margin:0;font-size:16px;line-height:24px;font-weight:600; }
 .qcu-market p { line-height:1.6; }
 .qcu-market .qcu-intro { margin:6px 0 0;color:var(--dsw-alias-label-secondary);font-size:14px; }
 .qcu-market .qcu-note { padding:14px 16px;border:1px solid var(--dsw-alias-border-l2);border-radius:12px;background:var(--dsw-alias-bg-layer-1);font-size:13px;color:var(--dsw-alias-label-secondary); }
@@ -77,14 +83,14 @@ const marketStyles = `
 .qcu-market .qcu-control:hover { background:var(--dsw-alias-interactive-bg-hover); }
 .qcu-market .qcu-control:active { background:var(--dsw-alias-interactive-bg-active); }
 .qcu-market .qcu-control[aria-pressed="true"] { background:var(--dsw-alias-button-ghost-active-fill);border-color:var(--dsw-alias-button-ghost-active-border);color:var(--dsw-alias-brand-text); }
-.qcu-market :is(button,summary,pre):focus-visible { outline:2px solid var(--dsw-alias-brand-primary);outline-offset:3px; }
+.qcu-market :is(button,summary,pre,input):focus-visible { outline:2px solid var(--dsw-alias-brand-primary);outline-offset:3px; }
 .qcu-market .qcu-count { color:var(--dsw-alias-label-secondary);font-size:13px;margin:0 0 20px; }
-.qcu-market .qcu-grid { display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:16px;align-items:start; }
-.qcu-market .qcu-card { min-width:0;padding:20px;border:1px solid var(--dsw-alias-border-l2);border-radius:16px;background:var(--dsw-alias-bg-layer-1); }
-.qcu-market .qcu-card-top { display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px; }
+.qcu-market .qcu-grid { display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:16px;align-items:start; }
+.qcu-market .qcu-card { min-width:0;padding:16px;border:1px solid var(--dsw-alias-border-l2);border-radius:16px;background:var(--dsw-alias-bg-layer-1); }
+.qcu-market .qcu-card-top { display:flex;align-items:center;gap:12px;margin-bottom:12px; }
 .qcu-market .qcu-icon-tile { display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;flex:none;border-radius:12px;color:var(--dsw-alias-brand-text);background:var(--dsw-alias-button-ghost-active-fill); }
 .qcu-market .qcu-badge { padding:4px 8px;border-radius:6px;background:var(--dsw-alias-bg-layer-2);color:var(--dsw-alias-label-secondary);font-size:12px;line-height:18px; }
-.qcu-market .qcu-status { display:block;margin:6px 0 12px;color:var(--dsw-alias-label-secondary);font-size:12px; }
+.qcu-market .qcu-status { display:block;margin:4px 0 0;color:var(--dsw-alias-label-secondary);font-size:12px; }
 .qcu-market .qcu-summary { margin:0 0 18px;font-size:14px; }
 .qcu-market details { margin-top:12px; }
 .qcu-market summary { cursor:pointer;line-height:22px; }
@@ -99,6 +105,12 @@ const marketStyles = `
 .qcu-market .qcu-meta dd { margin:4px 0;overflow-wrap:anywhere;line-height:1.6; }
 .qcu-market .qcu-foot { margin:24px 0 0;font-size:12px;color:var(--dsw-alias-label-secondary); }
 .qcu-market .qcu-error { padding:16px;border:1px solid var(--dsw-alias-state-error-primary);border-radius:12px;color:var(--dsw-alias-state-error-primary); }
+ .qcu-market .qcu-search { display:flex;align-items:center;flex-wrap:wrap;gap:10px;margin-top:24px;font-size:13px; }
+.qcu-market .qcu-search input { min-width:0;flex:1 1 220px;max-width:440px;height:38px;padding:8px 12px;border:1px solid var(--dsw-alias-border-l3);border-radius:8px;color:var(--dsw-alias-label-primary);background:var(--dsw-alias-bg-layer-1);font:inherit; }
+.qcu-market .qcu-search input::placeholder { color:var(--dsw-alias-label-secondary); }
+.qcu-market .qcu-card-heading { min-width:0; }
+.qcu-market .qcu-icon-tile[data-scene="data"],.qcu-market .qcu-icon-tile[data-scene="integrity"] { color:var(--dsw-alias-state-success-primary);background:var(--dsw-alias-state-success-secondary); }
+.qcu-market .qcu-icon-tile[data-scene="lesson"],.qcu-market .qcu-icon-tile[data-scene="reading"] { color:var(--dsw-alias-state-warn-label);background:var(--dsw-alias-state-warn-secondary); }
 @media (max-width:560px) { .qcu-market .qcu-head { flex-direction:column; } .qcu-market .qcu-card { padding:16px; } }
 `
 
@@ -128,10 +140,9 @@ function createMarketPlugin(React, source, clipboard) {
     const official = e.kind === 'builtin-guidance'
     return h('article', { className: 'qcu-card', 'aria-labelledby': `qcu-title-${e.id}` },
       h('div', { className: 'qcu-card-top' },
-        h('span', { className: 'qcu-icon-tile' }, h(Icon, { kind: sceneIcon(e.category), size: 24 })),
-        h('span', { className: 'qcu-badge' }, e.source)),
-      h('h2', { id: `qcu-title-${e.id}` }, e.name),
-      h('span', { className: 'qcu-status' }, status[e.status]),
+        h('span', { className: 'qcu-icon-tile', 'data-scene': sceneIcon(e.category) }, h(Icon, { kind: sceneIcon(e.category), size: 24 })),
+        h('div', { className: 'qcu-card-heading' }, h('h2', { id: `qcu-title-${e.id}` }, e.name),
+          h('span', { className: 'qcu-status' }, `${e.source} · ${status[e.status]}`))),
       h('p', { className: 'qcu-summary' }, e.summary),
       h('details', { className: 'qcu-guide', 'data-official': String(official) },
         h('summary', { 'aria-label': `${official ? '查看用法' : '了解草案'}：${e.name}` }, official ? '查看用法' : '了解草案'),
@@ -149,9 +160,10 @@ function createMarketPlugin(React, source, clipboard) {
   }
   function Market({ onBack }) {
     const [category, setCategory] = React.useState('全部')
+    const [query, setQuery] = React.useState('')
     const result = loadMarket(source)
     const entries = result.state === 'ready' ? result.catalog.skills : []
-    const shown = entries.filter(e => category === '全部' || e.category === category)
+    const shown = filterMarketEntries(entries, category, query)
     return h('section', { className: 'qcu-market', 'aria-label': 'QCU市场' },
       h('style', null, marketStyles),
       h('div', { className: 'qcu-content' },
@@ -162,10 +174,15 @@ function createMarketPlugin(React, source, clipboard) {
           h('span', { className: 'qcu-badge' }, '教学内容预览 · p2')),
         h('p', { className: 'qcu-note' }, '官方能力可查看用法；QCU自有内容仍在开发中。本页提供说明与示例，暂不提供安装。'),
         result.state === 'offline' ? h('p', { className: 'qcu-error', role: 'alert' }, result.message) : h(React.Fragment, null,
+          h('div', { className: 'qcu-search' },
+            h('label', { htmlFor: 'qcu-market-search' }, '搜索教学内容'),
+            h('input', { id: 'qcu-market-search', type: 'search', value: query, placeholder: '搜索名称、用途或技能标识', onChange: event => setQuery(event.target.value) }),
+            query ? h('button', { type: 'button', className: 'qcu-control', onClick: () => setQuery('') }, '清除搜索') : null),
           h('nav', { className: 'qcu-filters', 'aria-label': '教学场景' },
             ...['全部', ...new Set(entries.map(e => e.category))].map(c => h('button', { key: c, type: 'button', className: 'qcu-control', 'aria-pressed': category === c, onClick: () => setCategory(c) }, h(Icon, { kind: sceneIcon(c), size: 16 }), c))),
           h('p', { className: 'qcu-count', role: 'status', 'aria-live': 'polite' }, `${category} · ${shown.length} 项内容`),
-          h('div', { className: 'qcu-grid' }, ...shown.map(e => h(Card, { key: e.id, entry: e }))),
+          shown.length ? h('div', { className: 'qcu-grid' }, ...shown.map(e => h(Card, { key: e.id, entry: e })))
+            : h('p', { className: 'qcu-note' }, '没有匹配的内容，请调整搜索词或选择全部场景。'),
           h('p', { className: 'qcu-foot' }, result.catalog.compatible_dsh)),
         h('details', { className: 'qcu-foot' }, h('summary', null, '关于权限与数据'),
           h('p', null, '此Client插件只展示随包目录，不探测安装状态、不读取聊天或密钥。仅点击复制时写入剪贴板；代码运行于Client，并非零风险。远程目录未接通；失败显示离线，不执行远程HTML。'))))

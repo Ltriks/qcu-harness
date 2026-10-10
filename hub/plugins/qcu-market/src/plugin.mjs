@@ -1,4 +1,4 @@
-import { loadMarket, copyExample } from './catalog.mjs'
+import { loadMarket, copyExample, filterMarketEntries } from './catalog.mjs'
 import { iconPaths, sceneIcon } from './icons.mjs'
 import { marketStyles } from './styles.mjs'
 
@@ -27,10 +27,9 @@ export function createMarketPlugin(React, source, clipboard) {
     const official = e.kind === 'builtin-guidance'
     return h('article', { className: 'qcu-card', 'aria-labelledby': `qcu-title-${e.id}` },
       h('div', { className: 'qcu-card-top' },
-        h('span', { className: 'qcu-icon-tile' }, h(Icon, { kind: sceneIcon(e.category), size: 24 })),
-        h('span', { className: 'qcu-badge' }, e.source)),
-      h('h2', { id: `qcu-title-${e.id}` }, e.name),
-      h('span', { className: 'qcu-status' }, status[e.status]),
+        h('span', { className: 'qcu-icon-tile', 'data-scene': sceneIcon(e.category) }, h(Icon, { kind: sceneIcon(e.category), size: 24 })),
+        h('div', { className: 'qcu-card-heading' }, h('h2', { id: `qcu-title-${e.id}` }, e.name),
+          h('span', { className: 'qcu-status' }, `${e.source} · ${status[e.status]}`))),
       h('p', { className: 'qcu-summary' }, e.summary),
       h('details', { className: 'qcu-guide', 'data-official': String(official) },
         h('summary', { 'aria-label': `${official ? '查看用法' : '了解草案'}：${e.name}` }, official ? '查看用法' : '了解草案'),
@@ -48,9 +47,10 @@ export function createMarketPlugin(React, source, clipboard) {
   }
   function Market({ onBack }) {
     const [category, setCategory] = React.useState('全部')
+    const [query, setQuery] = React.useState('')
     const result = loadMarket(source)
     const entries = result.state === 'ready' ? result.catalog.skills : []
-    const shown = entries.filter(e => category === '全部' || e.category === category)
+    const shown = filterMarketEntries(entries, category, query)
     return h('section', { className: 'qcu-market', 'aria-label': 'QCU市场' },
       h('style', null, marketStyles),
       h('div', { className: 'qcu-content' },
@@ -61,10 +61,15 @@ export function createMarketPlugin(React, source, clipboard) {
           h('span', { className: 'qcu-badge' }, '教学内容预览 · p2')),
         h('p', { className: 'qcu-note' }, '官方能力可查看用法；QCU自有内容仍在开发中。本页提供说明与示例，暂不提供安装。'),
         result.state === 'offline' ? h('p', { className: 'qcu-error', role: 'alert' }, result.message) : h(React.Fragment, null,
+          h('div', { className: 'qcu-search' },
+            h('label', { htmlFor: 'qcu-market-search' }, '搜索教学内容'),
+            h('input', { id: 'qcu-market-search', type: 'search', value: query, placeholder: '搜索名称、用途或技能标识', onChange: event => setQuery(event.target.value) }),
+            query ? h('button', { type: 'button', className: 'qcu-control', onClick: () => setQuery('') }, '清除搜索') : null),
           h('nav', { className: 'qcu-filters', 'aria-label': '教学场景' },
             ...['全部', ...new Set(entries.map(e => e.category))].map(c => h('button', { key: c, type: 'button', className: 'qcu-control', 'aria-pressed': category === c, onClick: () => setCategory(c) }, h(Icon, { kind: sceneIcon(c), size: 16 }), c))),
           h('p', { className: 'qcu-count', role: 'status', 'aria-live': 'polite' }, `${category} · ${shown.length} 项内容`),
-          h('div', { className: 'qcu-grid' }, ...shown.map(e => h(Card, { key: e.id, entry: e }))),
+          shown.length ? h('div', { className: 'qcu-grid' }, ...shown.map(e => h(Card, { key: e.id, entry: e })))
+            : h('p', { className: 'qcu-note' }, '没有匹配的内容，请调整搜索词或选择全部场景。'),
           h('p', { className: 'qcu-foot' }, result.catalog.compatible_dsh)),
         h('details', { className: 'qcu-foot' }, h('summary', null, '关于权限与数据'),
           h('p', null, '此Client插件只展示随包目录，不探测安装状态、不读取聊天或密钥。仅点击复制时写入剪贴板；代码运行于Client，并非零风险。远程目录未接通；失败显示离线，不执行远程HTML。'))))
