@@ -23,7 +23,7 @@ export function createLoopPlugin(React){
       h('p',null,'安装无需模型或 API Key。包由校内 Hub 独立托管，点击准备后按需下载；市场不捆绑教练安装包。'),
       h('article',{className:'qcu-card'},h('h2',null,'QCU学习方法教练'),h('p',null,`${release.id}@${release.version} · skill ${release.skill} · DSH ${release.runtime} · MIT`),h('p',null,'拆解任务、合理安排节奏与错题复盘；不代写应交作业。'),
         h('p',{role:'status','aria-live':'polite'},labels[state.status?.state]||'当前实例尚未核对'),h('p',null,state.status?.reason||''),
-        h('p',{className:'qcu-note'},'当前独立教练包尚未发布到 Hub，下载失败会明确显示。模拟测试通过；真机安装、重启及教学效果待验收。'),
+        h('p',{className:'qcu-note'},'独立教练包从校内 Hub 按需下载；是否可获取以本次下载与完整性校验结果为准。模拟测试通过；真机安装、重启及教学效果待验收。'),
         unavailable?h('p',{role:'alert'},unavailable):null,
         button('检查本实例',()=>flow.status(),!flow||(busy&&!(state.phase==='unconfirmed'&&!flow.request))||Boolean(review)),
         !review&&(!state.status||state.status.state==='not-installed')?button('下载并查看安装确认',()=>flow.prepare(),!flow||busy):null,
