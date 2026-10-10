@@ -1,4 +1,4 @@
-# QCU无模型确认安装：pilot.4
+# QCU无模型确认安装：pilot.4.1
 
 本版接通的是自有明确确认界面 + 官方公开安装服务，**没有修改DSH源码，没有复用私有安装控制器，也不需要模型或API Key**。官方UI用户点击的安装路径与agent工具的模型turn审批路径不同；先前3.1对话桥接不再是推荐试用路线。
 
@@ -8,7 +8,7 @@
 
 启用包、启用精确组件分别展示确认；不自动授权build脚本、不加版本豁免、不改权限、不自动重启、不自动发学习任务。组件active仅展示组件已加载，不冒称目标会话技能可用。示例复制有实际失败反馈。
 
-市场包仅包含条目/代码，不内嵌教练TGZ。目录本次未发布到Hub，现场未部署，点击下载可能404。旧版教练仍会明确报冲突，本版不提供自动升级/卸载。
+市场包仅包含条目/代码，不内嵌教练TGZ。固定教练 P2 已在此前授权试用中发布到校内 Hub；可用性仍以本次下载和完整性校验为准，离线或404会报错。旧版教练仍会明确报冲突，本版不提供自动升级/卸载。
 
 ## 公开接口证据
 
@@ -39,21 +39,21 @@
 
 测试分四组：历史目录回归、固定源/下载/确认/取消/状态机模拟、确认组件行为、官方真实Cordis/SlotRegistry/Layout/Client Gateway/Host Gateway/SkillRegistry与tarball解析。真实管理操作均由假的manager实现；不运行pnpm或修改真实profile。模拟覆盖：拒绝/取消/双击/重入、source/hash/expiry/registry/实例变化、检查失败、脚本待授权、回包丢失、取消抢在任务接收前、取消过晚、独立启用、组件ID变化、重启返回和释放。
 
-尚未测试：真实Mini运行、实际Hub服务传输、真实安装/取消/启用/HMR/重启、视觉人工验收、真实教学模型效果。当前实例公开服务挂载及部署peer兼容性仍须现场只读预检，不由模拟测试代替。
+pilot.4 真机已安装并启用，但遇到 Cordis 注入错误；本补丁修复和红绿回归见 `qcu-market-pilot4.1-injection-repair.md`。此前已核对固定 Hub 传输。pilot.4.1 尚未进行真实Mini安装、真实安装/取消/启用/HMR/重启、视觉人工验收或真实教学模型效果。当前实例公开服务挂载及部署peer兼容性仍须现场只读预检，不由模拟测试代替。
 
 ```sh
 node hub/plugins/qcu-market/build.mjs
 python3.11 scripts/pack-coach-v2.py --out /tmp/qcu-coach-check
 python3.11 scripts/prepare-market-loop-tests.py --dependencies "$QCU_OFFICIAL_DEPENDENCIES" --coach /tmp/qcu-coach-check/qcu-study-coach-0.1.0-pilot.2-4ac9b2489ece90098faea5f5d0cf79c6efb2989214eaf74f4e38c4841c2eb060.tgz
 node --test tests/qcu-market.test.mjs tests/qcu-market-loop.test.mjs tests/qcu-market-direct-ui.test.mjs
-node --experimental-transform-types --test tests/qcu-market-official.test.mjs tests/qcu-market-host-official.test.mjs
-python3.11 hub/plugins/qcu-market/pack-pilot.py /tmp/qcu-market-pilot4
+node --experimental-transform-types --test tests/qcu-market-official.test.mjs tests/qcu-market-host-official.test.mjs tests/qcu-market-client-scope.test.mjs
+python3.11 hub/plugins/qcu-market/pack-pilot.py /tmp/qcu-market-pilot4.1
 ```
 
 ## 待另行授权的真机最短计划
 
 1. 只读核对目标profile、rc.2版本、公开Remote及已有教练版本；有旧教练冲突时停，另明确其卸载处理，不自动覆盖。
-2. 在校内Hub只新增固定哈希教练包/目录，回读校验，不动旧文件。通过官方UI安装固定pilot.4市场包并显式启用其Host行；这是新增管理UI能力，不能按纯视觉更新授权。
+2. 沿用已核验的固定教练包与校内 Hub，不重复发布。通过官方UI安装固定pilot.4.1市场包并显式启用其Host行；这是新增管理UI能力，不能按纯视觉更新授权。
 3. 首次打开确认：核对名称、版本、来源、hash及联网/文件写入范围。先拒绝一次，查无安装；再重新准备，用户确认一次。验收双击仅一次，安装后保持未启用。
 4. 用户分别确认包和组件启用。需要重启则用户正常重启；再查组件状态，不以active代替技能调用验收。
 5. 用户自行复制/发送合成学习任务，确认真实技能调用与时间建议。该学习步骤才需要模型；不读取用户密钥或既有聊天。

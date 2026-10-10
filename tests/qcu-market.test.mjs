@@ -137,7 +137,7 @@ test('p2 styles are locally scoped, semantic-token based, focusable and network 
   const selectors=marketStyles.split('{').slice(0,-1).map(x=>x.slice(x.lastIndexOf('}')+1).trim()).filter(x=>x&&!x.startsWith('@media'))
   assert.ok(selectors.every(x=>x.startsWith('.qcu-market')))
   const pkg=JSON.parse(await read('hub/plugins/qcu-market/package.json'))
-  assert.equal(pkg.version,'0.1.0-pilot.4')
+  assert.equal(pkg.version,'0.1.0-pilot.4.1')
   assert.equal(pkg.icon,'./icon.svg')
   const svg=await read('hub/plugins/qcu-market/icon.svg')
   assert.match(svg,/<svg/);assert.doesNotMatch(svg,/<script|href=|onload=|<foreignObject/)

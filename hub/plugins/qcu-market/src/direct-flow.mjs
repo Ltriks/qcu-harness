@@ -6,7 +6,7 @@ export async function readCoach(manager,entry=release){
   const bundles=unwrap(await manager.listBundles()),bundle=bundles.find(b=>b.name===entry.id)
   if(!bundle?.installed)return {state:'not-installed'}
   if(bundle.version!==entry.version)return {state:'conflict',reason:'已有其他版本，请在官方插件页单独审核处理。'}
-  if(bundle.error)return {state:'failed',reason:bundle.error}
+  if(bundle.error)return {state:'failed',reason:typeof bundle.error==='string'?bundle.error:(bundle.error.code||'官方加载失败')}
   if(!bundle.enabled)return {state:'installed-disabled'}
   const rows=unwrap(await manager.listPlugins()).filter(r=>r.moduleName===entry.id)
   if(rows.length!==1)return {state:'conflict',reason:'组件数量不符；不猜测组件标识。'}

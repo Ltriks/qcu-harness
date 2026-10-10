@@ -1,0 +1,30 @@
+{
+  "version": "0.1.0-pilot.4.1",
+  "bytes": 17063,
+  "sha256": "8b4e637a4efedeefc95835602f65ad60ec1440b8b6ed9671327adc05a0d22801",
+  "immutableP4Unchanged": true,
+  "changedArchiveFiles": [
+    "package/README.md",
+    "package/client.js",
+    "package/package.json"
+  ],
+  "manifestOnlyVersionChanged": true,
+  "sourceTests": {
+    "passed": 62,
+    "failed": 0
+  },
+  "archiveOfficialTests": {
+    "passed": 15,
+    "failed": 0
+  },
+  "immutableP4StartupRegression": {
+    "passed": 0,
+    "failed": 1,
+    "expectedFailure": "cannot get property \"remote.pluginManager\" without inject"
+  },
+  "hostCodeUnchanged": true,
+  "newPrivileges": [],
+  "liveDeployment": "not performed",
+  "hubChange": false,
+  "fixedCoachChange": false
+}

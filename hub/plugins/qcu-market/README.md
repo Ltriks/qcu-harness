@@ -1,4 +1,4 @@
-# QCU market — 0.1.0-pilot.4
+# QCU market — 0.1.0-pilot.4.1
 
 One fixed independent coach package, downloaded on demand from the trusted LAN Hub. **Installation needs no model, API Key, session, message or agent tool.** This is local candidate source, not a deployed market.
 
@@ -24,3 +24,10 @@ Client profile-status reads call public `listBundles`; `listPlugins` is only rea
 ## Tests and deployment
 
 See `docs/qcu-market-direct-install.md`. The official Client/Gateway/registry path is tested through an in-memory carrier; installation and activation calls in tests use fakes. No live App, profile, package manager, Mini or Hub is modified. `pilot.3.1` was a conversation bridge and remains an immutable historical artifact; pilot.4 replaces that route, not those bytes.
+
+
+## pilot.4.1 dependency repair
+
+Immutable pilot.4 remains unchanged. Its live Client failed because package loading prerequisites were mistaken for Cordis service injections. The persistent shell declares `slots` and `layout`; a `remote` owner mounts QCU descriptors, and its consumer declares `remote.pluginManager` and `remote.qcuMarket`. An independent `pluginNavigation` consumer owns the details callback. Missing services keep a visible unavailable shell, and withdrawal disposes the flow and subscriptions before the owned namespace. No wildcard, new management method, Host service, peer, endpoint, origin or filesystem capability is added.
+
+The regression starts the actual source and packaged Client inside real official Cordis fibers with official ClientRemote and generated manager codecs. It reproduces the pilot.4 error, then exercises scoped startup, every used manager call, preparation/decline, missing services, late arrival, withdrawal/remount, transport reset/disposal and Host failure. The Host Gateway unload test aborts an in-flight synthetic preparation. Host answers and installation remain simulated; this patch has not been installed on the Mini.

@@ -15,7 +15,7 @@ const {TypertGatewayService}=await load('@deepseek-ai/dsh-api-gateway')
 const client=await import(pathToFileURL(root+'/node_modules/@deepseek-ai/dsh-api-gateway/src/client/index.ts'))
 const {parseInstallSpec}=await load('@deepseek-ai/dsh-plugin-manager')
 const coach=await import('../.work/host-check/coach/package/index.js')
-const market=await import('../.work/host-check/market/index.js')
+const market=await import(process.env.QCU_MARKET_HOST_PATH?pathToFileURL(process.env.QCU_MARKET_HOST_PATH):new URL('../.work/host-check/market/index.js',import.meta.url))
 test('official Host Gateway validates bounded endpoints without sessions/tools/manager and unload withdraws them',async()=>{
  const ctx=new Context();new TypertRegistry(ctx);const gateway=new TypertGatewayService(ctx,{})
  const fork=ctx.plugin(market);await fork.await();assert.deepEqual(market.inject,['typert'])
@@ -47,4 +47,13 @@ test('real Skills registry loads exact immutable coach, refuses duplicate and di
  await fork.dispose();assert.equal(await ctx.skills.get('qcu-study-coach'),undefined)
  const next=ctx.plugin(coach,{enabled:true});await next.await();assert.equal((await ctx.skills.get('qcu-study-coach')).provider,skill.provider)
  await next.dispose();await ctx.fiber.dispose()
+})
+test('real Host fiber unload aborts its pending preparation and revokes in-memory receipts',async()=>{
+ const ctx=new Context();new TypertRegistry(ctx);const gateway=new TypertGatewayService(ctx,{})
+ const fork=ctx.plugin(market);await fork.await();const packages=ctx.get('qcuMarket').packages
+ let started;const ready=new Promise(resolve=>{started=resolve})
+ packages.download=({signal})=>new Promise((resolve,reject)=>{started();signal.addEventListener('abort',()=>reject(Error('preparation aborted')),{once:true})})
+ const running=gateway.invoke({namespace:'qcuMarket',method:'prepare',args:{id:'12345678-1234-1234-1234-123456789012'}})
+ const rejected=assert.rejects(running,/aborted|withdrawn|unavailable/);await ready;await fork.dispose();await rejected
+ assert.equal(packages.pending.size,0);assert.equal(packages.receipts.size,0);assert.equal(ctx.get('qcuMarket'),undefined);await ctx.fiber.dispose()
 })

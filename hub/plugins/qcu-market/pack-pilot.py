@@ -7,7 +7,7 @@ args = parser.parse_args()
 root = Path(__file__).resolve().parent
 manifest = json.loads((root / 'package.json').read_text())
 assert manifest['name'] == 'qcu-market'
-assert manifest['version'] in ['0.1.0-pilot.4']
+assert manifest['version'] in ['0.1.0-pilot.4.1']
 assert 'scripts' not in manifest
 assert not any(manifest.get(k) for k in ['dependencies', 'optionalDependencies', 'bundledDependencies'])
 assert manifest['peerDependencies']['@deepseek-ai/cordis']=='4.0.4'
