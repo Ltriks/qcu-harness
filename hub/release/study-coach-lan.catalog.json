@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "revision": "pilot-test1-study-coach-p1-live",
+  "title": "城院 Hub · 局域网内部试点",
+  "tagline": "学习方法教练固定包与合成安装探针；仅同局域网下载，不自动安装。",
+  "updated_at": "2026-10-10",
+  "compatible_dsh": "以条目 dshVersions 精确版本为准，仍须官方兼容检查",
+  "install_hint": "切换到「插件 Plugin」下载固定 TGZ，核对独立提供的 SHA256，再在官方 rc.2 通过 plugin_manager 安装核验后的本机文件。管理动作逐次审批；首页不是 package spec。",
+  "skill_hint": "本次没有单独 Skill ZIP；学习方法教练由插件包提供，见「插件 Plugin」。",
+  "plugin_hint": "安装后正常重启，通过真实 list_plugins 获得精确 row 标识，再逐次批准启用并正常重启。保持 workspace-write+ask；不自动更新、不豁免版本。",
+  "audience": "lan-private",
+  "publicRelease": false,
+  "skills": [],
+  "plugins": [
+    {
+      "id": "qcu-dialogue-install-probe",
+      "name": "对话安装合成探针",
+      "category": "内部合成",
+      "version": "0.0.1-test.1",
+      "risk": "合成测试",
+      "summary": "只注册内存标记 Skill，不是学校规范或正式生产插件。",
+      "status": "published",
+      "review": "approved",
+      "synthetic": true,
+      "defaultDisabled": true,
+      "bytes": 1279,
+      "sha256": "8b8ad2afc154278eb835a48305ce54c01d4ccc733b8f1896f807aa06dd00632e",
+      "file": "qcu-dialogue-install-probe-0.0.1-test.1-8b8ad2afc154278eb835a48305ce54c01d4ccc733b8f1896f807aa06dd00632e.tgz",
+      "dshVersions": [
+        "0.2.0-rc.2"
+      ]
+    },
+    {
+      "id": "qcu-study-coach",
+      "name": "学习方法教练（内部试点）",
+      "category": "学习支持",
+      "version": "0.1.0-pilot.1",
+      "risk": "通用指导",
+      "summary": "提供任务拆解、一周节奏和错题复盘；不代写应交正文，不代表学校正式评分标准。固定 rc.2 包，默认停用。",
+      "status": "published",
+      "review": "approved",
+      "synthetic": false,
+      "defaultDisabled": true,
+      "file": "qcu-study-coach-0.1.0-pilot.1-76ed55721d7a78237af6b05bca683a045fb232374c3d869af3676f90368c4f6c.tgz",
+      "sha256": "76ed55721d7a78237af6b05bca683a045fb232374c3d869af3676f90368c4f6c",
+      "bytes": 3331,
+      "dshVersions": [
+        "0.2.0-rc.2"
+      ]
+    }
+  ]
+}

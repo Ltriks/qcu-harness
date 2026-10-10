@@ -1,5 +1,7 @@
 # 学习教练：首个真实技能的离线候选
 
+后续状态：该原固定包已于 2026-10-10 经用户明确批准加入 .68 局域网 Hub，保留修复后的服务和原探针，未自动安装。实际 URL、哈希、双端 HTTP/DOM 证据与未验收边界见 [LAN 发布记录](HUB-STUDY-COACH-LAN-PUBLICATION.md)。下文离线阶段事实按原时间范围保留，不能当作当前发布状态或安装验收。
+
 候选qcu-study-coach 0.1.0-pilot.1仅封装canonical `skills/chengyuan-study-coach/SKILL.md`，提供任务拆解、一周节奏及错题复盘指引。正文逐字节保留，不包含私人材料，不是正式学校评分规范。SHA256：dfd2fac7624c2f46f0bdcb15c7ea475156082d538b44d023f39b7e445e42de32。
 
 Bundle默认停用；代码只注册内存Skill，校验正文固定哈希，不读文件、不联网、不执行工具/子进程。固定Cordis4.0.4及DSH Skill0.2.0-rc.2 peers，无runtime dependencies或安装脚本，不改DSH源码。
