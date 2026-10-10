@@ -1,3 +1,5 @@
+import {releaseKeyOf} from '../hub/plugins/qcu-market/src/catalog-core.mjs'
+import {release} from '../hub/plugins/qcu-market/src/trusted-release.mjs'
 // Real official registries, Gateway/Client transport and Skills; no application/profile or real installer.
 import test from 'node:test'
 import assert from 'node:assert/strict'
@@ -21,7 +23,7 @@ test('official Host Gateway validates bounded endpoints without sessions/tools/m
  const fork=ctx.plugin(market);await fork.await();assert.deepEqual(market.inject,['typert'])
  const request={namespace:'qcuMarket',method:'cancel',args:{id:'12345678-1234-1234-1234-123456789012'}}
  assert.equal(JSON.parse(await gateway.invoke(request)).state,'cancelled')
- await assert.rejects(gateway.invoke({...request,method:'prepare',args:{id:'http://arbitrary'}}),/boundary validation/)
+ await assert.rejects(gateway.invoke({...request,method:'prepare',args:{id:'http://arbitrary',releaseKey:releaseKeyOf(release)}}),/boundary validation/)
  await assert.rejects(gateway.invoke({...request,method:'install'}),/no active Remote/)
  await fork.dispose();await assert.rejects(gateway.invoke(request),/withdrawn|unavailable/);await ctx.fiber.dispose()
 })
@@ -32,7 +34,7 @@ test('official Client $mount and Host Gateway exchange a receipt cancellation ov
  const c=ctx.plugin({inject:client.inject,apply:client.apply});await c.await()
  const unmount=await ctx.remote.$mount(remoteContribution)
  const value=await ctx.remote.qcuMarket.cancel('12345678-1234-1234-1234-123456789012');assert.equal(value.ok,true);assert.equal(JSON.parse(value.value).state,'cancelled');assert.equal(calls,1)
- const invalid=await ctx.remote.qcuMarket.prepare('/not-a-uuid');assert.equal(invalid.ok,false);assert.equal(calls,2)
+ const invalid=await ctx.remote.qcuMarket.prepare('/not-a-uuid',releaseKeyOf(release));assert.equal(invalid.ok,false);assert.equal(calls,2)
  await unmount();assert.equal(ctx.get('remote.qcuMarket'),undefined)
  await c.dispose();await ctx.fiber.dispose();await h.dispose();await host.fiber.dispose()
 })
@@ -53,7 +55,7 @@ test('real Host fiber unload aborts its pending preparation and revokes in-memor
  const fork=ctx.plugin(market);await fork.await();const packages=ctx.get('qcuMarket').packages
  let started;const ready=new Promise(resolve=>{started=resolve})
  packages.download=({signal})=>new Promise((resolve,reject)=>{started();signal.addEventListener('abort',()=>reject(Error('preparation aborted')),{once:true})})
- const running=gateway.invoke({namespace:'qcuMarket',method:'prepare',args:{id:'12345678-1234-1234-1234-123456789012'}})
+ const running=gateway.invoke({namespace:'qcuMarket',method:'prepare',args:{id:'12345678-1234-1234-1234-123456789012',releaseKey:releaseKeyOf(release)}})
  const rejected=assert.rejects(running,/aborted|withdrawn|unavailable/);await ready;await fork.dispose();await rejected
  assert.equal(packages.pending.size,0);assert.equal(packages.receipts.size,0);assert.equal(ctx.get('qcuMarket'),undefined);await ctx.fiber.dispose()
 })

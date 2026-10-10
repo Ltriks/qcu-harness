@@ -7,7 +7,7 @@ args = parser.parse_args()
 root = Path(__file__).resolve().parent
 manifest = json.loads((root / 'package.json').read_text())
 assert manifest['name'] == 'qcu-market'
-assert manifest['version'] in ['0.1.0-pilot.4.2']
+assert manifest['version'] in ['0.1.0-pilot.5']
 assert 'scripts' not in manifest
 assert not any(manifest.get(k) for k in ['dependencies', 'optionalDependencies', 'bundledDependencies'])
 assert manifest['peerDependencies']['@deepseek-ai/cordis']=='4.0.4'
@@ -15,7 +15,7 @@ assert all(v=='0.2.0-rc.2' for k,v in manifest['peerDependencies'].items() if k!
 assert json.loads((root/'cordis.patch.yml').read_text())[0]['insert'] == [{'id':'qcu-market','name':'qcu-market','disabled':True}]
 files = sorted(['package.json', *manifest['files']])
 assert len(files) == len(set(files))
-assert set(files)=={'package.json','index.js','client.js','cordis.patch.yml','README.md','LICENSE','icon.svg','locale/zh.json','locale/en.json','src/host-core.mjs','src/trusted-release.mjs','src/remote-contract.mjs'}
+assert set(files)=={'package.json','index.js','client.js','cordis.patch.yml','README.md','LICENSE','icon.svg','locale/zh.json','locale/en.json','src/host-core.mjs','src/trusted-release.mjs','src/remote-contract.mjs','src/catalog-core.mjs','src/bundled-catalog.mjs'}
 for path in manifest['exports'].values():
     assert all(path.removeprefix('./').replace('*',language) in files for language in ['zh','en'])
 assert manifest['dsh']['bundle']['patch'].removeprefix('./') in files

@@ -6,7 +6,7 @@ export const inject=['typert']
 class QcuPackageService extends TypertRemoteService {
   constructor(ctx){super(ctx,'qcuMarket');this.packages=new PackagePreparation();ctx.effect(()=>()=>this.packages.dispose())}
   status(){return JSON.stringify(marketRuntime)}
-  prepare(id,signal){return this.packages.prepare(id,signal)}
+  prepare(id,releaseKey,signal){return this.packages.prepare(id,releaseKey,signal)}
   verify(id,signal){return this.packages.verify(id,signal)}
   cancel(id){return this.packages.cancel(id)}
 }

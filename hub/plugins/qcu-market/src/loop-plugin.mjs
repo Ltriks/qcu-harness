@@ -1,4 +1,5 @@
-import { DirectMarketFlow } from './direct-flow.mjs'
+import {bundledCatalog} from './bundled-catalog.mjs'
+import { createCatalogFlows } from './direct-flow.mjs'
 import { remoteContribution } from './remote-contract.mjs'
 import { release } from './trusted-release.mjs'
 import { iconPaths } from './icons.mjs'
@@ -9,7 +10,8 @@ const example='/qcu-study-coach\n我今天有30分钟复习一个知识点。请
 export function createLoopPlugin(React){
   const h=React.createElement
   function Icon(){return h('svg',{width:24,height:24,viewBox:'0 0 24 24',fill:'none',stroke:'currentColor',strokeWidth:1.7,'aria-hidden':true},...iconPaths.market.map((d,i)=>h('path',{key:i,d})))}
-  function Market({flow,onBack,onDetails,unavailable}){
+  function Market({flow,onBack,onDetails,unavailable,item=bundledCatalog.entries[0]}){
+    const release=item.release,example=item.example
     const state=React.useSyncExternalStore(flow?.subscribe||noSubscribe,flow?.snapshot||(()=>unavailableSnapshot),flow?.snapshot||(()=>unavailableSnapshot))
     const [error,setError]=React.useState(''),[copied,setCopied]=React.useState('')
     React.useEffect(()=>()=>{if(flow&&!flow.disposed&&(flow.state.review||flow.pending?.kind==='prepare'))void flow.cancel()},[flow])
@@ -21,17 +23,17 @@ export function createLoopPlugin(React){
     return h('section',{className:'qcu-market','aria-label':'QCU市场'},h('style',null,marketStyles),h('div',{className:'qcu-content'},
       button('返回对话',onBack),h('header',{className:'qcu-head'},h('div',{className:'qcu-wordmark'},h(Icon),h('h1',null,'QCU市场')),h('span',{className:'qcu-badge'},'用户确认安装 · 本地候选')),
       h('p',null,'安装无需模型或 API Key。包由校内 Hub 独立托管，点击准备后按需下载；市场不捆绑教练安装包。'),
-      h('article',{className:'qcu-card'},h('h2',null,'QCU学习方法教练'),h('p',null,`${release.id}@${release.version} · skill ${release.skill} · DSH ${release.runtime} · MIT`),h('p',null,'拆解任务、合理安排节奏与错题复盘；不代写应交作业。'),
+      h('article',{className:'qcu-card'},h('h2',null,item.title),h('p',null,`${release.id}@${release.version} · skill ${release.skill} · DSH ${release.runtime} · MIT`),h('p',null,item.scenario+' · '+item.purpose),h('p',null,item.sourceLabel+' · '+item.prerequisites),
         h('p',{role:'status','aria-live':'polite'},labels[state.status?.state]||'当前实例尚未核对'),h('p',null,state.status?.reason||''),
-        h('p',{className:'qcu-note'},'独立教练包从校内 Hub 按需下载；是否可获取以本次下载与完整性校验结果为准。模拟测试通过；真机安装、重启及教学效果待验收。'),
+        h('p',{className:'qcu-note'},item.testStatus),
         unavailable?h('p',{role:'alert'},unavailable):null,
         button('检查本实例',()=>flow.status(),!flow||(busy&&!(state.phase==='unconfirmed'&&!flow.request))||Boolean(review)),
         !review&&(!state.status||state.status.state==='not-installed')?button('下载并查看安装确认',()=>flow.prepare(),!flow||busy):null,
         state.status?.state==='installed-disabled'&&!review?button('查看启用包确认',()=>flow.reviewEnable('bundle'),busy):null,
         state.status?.state==='row-disabled'&&!review?button('查看启用组件确认',()=>flow.reviewEnable('row'),busy):null,
-        button('官方插件详情',onDetails),
-        review?h('section',{className:'qcu-note','aria-labelledby':'qcu-review-title'},h('h2',{id:'qcu-review-title'},review.kind==='install'?'请确认本次安装':'请确认本次启用'),
-          h('p',null,`名称：QCU学习方法教练；包：${release.id}；版本：${release.version}；来源：QCU自有 / ${release.origin}`),
+        button('官方插件详情',()=>onDetails(release.id)),
+        review?h('section',{className:'qcu-note','aria-labelledby':'qcu-review-'+release.id},h('h2',{id:'qcu-review-'+release.id},review.kind==='install'?'请确认本次安装':'请确认本次启用'),
+          h('p',null,item.risk),h('p',null,`名称：${item.title}；包：${release.id}；版本：${release.version}；来源：QCU自有 / ${release.origin}`),
           h('p',{style:{overflowWrap:'anywhere'}},`SHA256：${release.sha256}；${release.bytes} 字节`),
           h('p',null,review.kind==='install'?`官方检查：本机固定包；registry ${review.inspected.registry??'采用当前pnpm配置'}。确认仅安装，enabled=false。`:`此处哈希是固定发行包标识，未重新读取已安装文件。本次只启用${review.kind==='bundle'?'包，不自动启用组件':`组件 ${review.status.entryId}`}。`),
           h('p',null,'代码在Host进程以应用用户权限运行，不受工作区沙箱隔离。官方安装会改写当前profile的依赖、锁文件、缓存和日志，可能访问配置的registry/镜像解析依赖；影响该profile全部会话。教练运行时只注册静态技能。'),
@@ -47,7 +49,7 @@ export function createLoopPlugin(React){
   }
   function MarketBoundary({availability,onBack}){
     const ready=React.useSyncExternalStore(availability.subscribe,availability.snapshot,availability.snapshot)
-    return h(Market,{...ready,onBack})
+    return h('div',null,...bundledCatalog.entries.map((item,i)=>h(Market,{...ready,key:item.id,item,flow:ready.flows?.[i]||ready.flow,onBack})))
   }
   return {inject:['slots','layout'],apply(ctx){
     // Keep a visible unavailable panel while optional runtime services are absent.
@@ -59,7 +61,7 @@ export function createLoopPlugin(React){
     const update=patch=>{ready={...ready,...patch};for(const fn of listeners)fn()}
     ctx.effect(()=>()=>listeners.clear())
     ctx.inject(['pluginNavigation'],navigationCtx=>{
-      update({onDetails:()=>navigationCtx.pluginNavigation.openBundle(release.id)})
+      update({onDetails:(id=release.id)=>navigationCtx.pluginNavigation.openBundle(id)})
       navigationCtx.effect(()=>()=>update({onDetails:unavailableDetails}))
     })
     ctx.inject(['remote'],async serviceCtx=>{
@@ -70,10 +72,10 @@ export function createLoopPlugin(React){
         // plugin would deadlock startup. The manager is a consumer dependency only:
         // withdrawing it must not queue $unmount inside its own namespace teardown.
         ui=serviceCtx.inject(['remote.pluginManager','remote.qcuMarket'],flowCtx=>{
-          const flow=new DirectMarketFlow(flowCtx.remote)
-          update({flow,unavailable:''})
-          flowCtx.effect(()=>()=>{flow.dispose();update({flow:null,unavailable:'服务已释放或连接能力变化，请等待服务恢复。'})})
-          flowCtx.on('connection/reset',()=>flow.invalidate())
+          const flows=createCatalogFlows(flowCtx.remote),flow=flows[0]
+          update({flow,flows,unavailable:''})
+          flowCtx.effect(()=>()=>{flows.forEach(f=>f.dispose());update({flow:null,flows:null,unavailable:'服务已释放或连接能力变化，请等待服务恢复。'})})
+          flowCtx.on('connection/reset',()=>flows.forEach(f=>f.invalidate()))
         })
       }catch(e){await ui?.dispose();await unmount?.();update({flow:null,unavailable:e.message});return}
       // Withdraw consumers before the namespace they use; both belong to this fiber.

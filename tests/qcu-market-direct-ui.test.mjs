@@ -1,3 +1,6 @@
+import {catalogSha256} from '../hub/plugins/qcu-market/src/bundled-catalog.mjs'
+import {releaseKeyOf} from '../hub/plugins/qcu-market/src/catalog-core.mjs'
+import {marketRuntime} from '../hub/plugins/qcu-market/src/remote-contract.mjs'
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import {createLoopPlugin} from '../hub/plugins/qcu-market/src/loop-plugin.mjs'
@@ -7,8 +10,8 @@ const flatten=n=>!n||typeof n!=='object'?[]:[n,...n.children.flatMap(flatten)]
 async function renderFixture(){
  const cleanups=[],effects=[],registrations=[];let installs=0,bundles=[]
  const React={createElement:(type,props,...children)=>typeof type==='function'?type({...props,children}):({type,props:props||{},children}),useSyncExternalStore:(_,get)=>get(),useState:v=>[v,()=>{}],useEffect:fn=>cleanups.push(fn())}
- const receipt={id:'12345678-1234-1234-1234-123456789012',path:'/cache/'+release.file,entry:release,expiresAt:Date.now()+100000}
- const remote={$mount:async()=>()=>{},$on:()=>()=>{},qcuMarket:{status:async()=>ok(JSON.stringify({version:'0.1.0-pilot.4.2',protocol:1})),prepare:async id=>{receipt.id=id;return ok(JSON.stringify(receipt))},verify:async()=>ok(JSON.stringify(receipt)),cancel:async()=>ok('{}')},pluginManager:{listBundles:async()=>ok(bundles),inspect:async()=>ok({status:'accepted',kind:'tarball',bundle:null,registry:null}),installBundle:async(path,options)=>{installs++;assert.equal(options.enabled,false);bundles=[{name:release.id,version:release.version,installed:true,enabled:false}];return ok({application:'applied',stage:'enable',target:release.id,enabled:false,bundle:release.id})}}}
+ const receipt={id:'12345678-1234-1234-1234-123456789012',path:'/cache/'+release.file,entry:release,catalogSha256,releaseKey:releaseKeyOf(release),expiresAt:Date.now()+100000}
+ const remote={$mount:async()=>()=>{},$on:()=>()=>{},qcuMarket:{status:async()=>ok(JSON.stringify(marketRuntime)),prepare:async id=>{receipt.id=id;return ok(JSON.stringify(receipt))},verify:async()=>ok(JSON.stringify(receipt)),cancel:async()=>ok('{}')},pluginManager:{listBundles:async()=>ok(bundles),inspect:async()=>ok({status:'accepted',kind:'tarball',bundle:null,registry:null}),installBundle:async(path,options)=>{installs++;assert.equal(options.enabled,false);bundles=[{name:release.id,version:release.version,installed:true,enabled:false}];return ok({application:'applied',stage:'enable',target:release.id,enabled:false,bundle:release.id})}}}
  const ctx={remote,inject:(_,fn)=>{const done=Promise.resolve(fn(ctx));done.dispose=async()=>{};return done},effect:fn=>effects.push(fn()),on:()=>()=>{},layout:{selectPanel(){}},slots:{inject:(_,fn)=>fn(),register:(options,component)=>{registrations.push({options,component});return()=>{}}}}
  await createLoopPlugin(React).apply(ctx);await tick();const main=registrations.find(r=>r.options.name==='main'),props=main.options.inject()
  return {tree:()=>flatten(main.component(props)),flow:props.availability.snapshot().flow,installs:()=>installs,cleanups}

@@ -1,6 +1,6 @@
 {
   "name": "qcu-market",
-  "version": "0.1.0-pilot.4.2",
+  "version": "0.1.0-pilot.5",
   "private": true,
   "type": "module",
   "license": "MIT",
@@ -46,7 +46,9 @@
     "locale/en.json",
     "src/host-core.mjs",
     "src/trusted-release.mjs",
-    "src/remote-contract.mjs"
+    "src/remote-contract.mjs",
+    "src/catalog-core.mjs",
+    "src/bundled-catalog.mjs"
   ],
   "description": "QCU固定包无模型确认安装；默认不启用；启用需另确认",
   "icon": "./icon.svg"

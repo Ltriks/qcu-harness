@@ -47,7 +47,7 @@ test('every owned draft is UTF-8, properly named and ships original license; ada
 })
 test('compiled Client registers lazy factory with only host React; Host exposes only bounded operations', async () => {
   let loaded
-  vm.runInNewContext(await read('hub/plugins/qcu-market/client.js'), {window:{__ModuleLoader__:{load:m=>loaded=m}}})
+  vm.runInNewContext(await read('hub/plugins/qcu-market/client.js'), {TextEncoder,window:{__ModuleLoader__:{load:m=>loaded=m}}})
   assert.equal(loaded.id,'qcu-market')
   const imports=[]; const p=loaded.factory(name=>{imports.push(name);return {createElement(){}}})
   assert.deepEqual(imports,['react']); assert.deepEqual(Array.from(p.inject),['slots','layout'])
@@ -137,7 +137,7 @@ test('p2 styles are locally scoped, semantic-token based, focusable and network 
   const selectors=marketStyles.split('{').slice(0,-1).map(x=>x.slice(x.lastIndexOf('}')+1).trim()).filter(x=>x&&!x.startsWith('@media'))
   assert.ok(selectors.every(x=>x.startsWith('.qcu-market')))
   const pkg=JSON.parse(await read('hub/plugins/qcu-market/package.json'))
-  assert.equal(pkg.version,'0.1.0-pilot.4.2')
+  assert.equal(pkg.version,'0.1.0-pilot.5')
   assert.equal(pkg.icon,'./icon.svg')
   const svg=await read('hub/plugins/qcu-market/icon.svg')
   assert.match(svg,/<svg/);assert.doesNotMatch(svg,/<script|href=|onload=|<foreignObject/)

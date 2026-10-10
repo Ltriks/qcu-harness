@@ -27,7 +27,7 @@ test('real Cordis/SlotRegistry and LayoutController support repeated navigation,
  let plugin=createLoopPlugin(React)
  if(process.env.QCU_MARKET_CLIENT_PATH){
   let module
-  vm.runInNewContext(await readFile(process.env.QCU_MARKET_CLIENT_PATH,'utf8'),{window:{__ModuleLoader__:{load:value=>{module=value}}}})
+  vm.runInNewContext(await readFile(process.env.QCU_MARKET_CLIENT_PATH,'utf8'),{TextEncoder,window:{__ModuleLoader__:{load:value=>{module=value}}}})
   assert.equal(module.id,'qcu-market')
   plugin=module.factory(name=>{assert.equal(name,'react');return React})
  }

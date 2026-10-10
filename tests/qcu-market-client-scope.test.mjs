@@ -1,3 +1,6 @@
+import {catalogSha256} from '../hub/plugins/qcu-market/src/bundled-catalog.mjs'
+import {releaseKeyOf} from '../hub/plugins/qcu-market/src/catalog-core.mjs'
+import {marketRuntime} from '../hub/plugins/qcu-market/src/remote-contract.mjs'
 // Real Cordis fibers + official ClientRemote and generated manager codecs.
 // Only the carrier's Host answers are fake. No App/profile/network/installer.
 import test from 'node:test'
@@ -26,7 +29,7 @@ async function fixture(t,{manager=true,navigation=true,plugin,answer}={}){
  ctx.reflect.provide('layout',{selectPanel:id=>{panel=id}})
  let nav
  if(navigation)nav=ctx.reflect.provide('pluginNavigation',{openBundle:id=>details.push(id)})
- const receipt={id:'',entry:release,path:'/cache/'+release.file,expiresAt:Date.now()+100000}
+ const receipt={id:'',entry:release,catalogSha256,releaseKey:releaseKeyOf(release),path:'/cache/'+release.file,expiresAt:Date.now()+100000}
  ctx.reflect.provide('connection',{isLoopback:true,registerGenerationSource:()=>()=>{},generation:{getSnapshot:()=>undefined,subscribe:()=>()=>{}},rpc:{open:()=>{throw Error('No stream opened')},call:async(prefix,endpoint,payload)=>{
   calls.push({endpoint,args:payload.args});const a=payload.args;let value
   if(answer){const reply=await answer(endpoint,a);if(reply)return reply}
@@ -39,7 +42,7 @@ async function fixture(t,{manager=true,navigation=true,plugin,answer}={}){
    case 'pluginManager/cancelInstall':value={status:'cancelled'};break
    case 'pluginManager/waitForInstall':value=null;break
    case 'pluginManager/inspect':value={status:'accepted',kind:'tarball',bundle:null,registry:null};break
-   case 'qcuMarket/status':value=JSON.stringify({version:'0.1.0-pilot.4.2',protocol:1});break
+   case 'qcuMarket/status':value=JSON.stringify(marketRuntime);break
    case 'qcuMarket/prepare':receipt.id=a.id;value=JSON.stringify(receipt);break
    case 'qcuMarket/verify':value=JSON.stringify(receipt);break
    case 'qcuMarket/cancel':value=JSON.stringify({state:'cancelled'});break
@@ -51,7 +54,7 @@ async function fixture(t,{manager=true,navigation=true,plugin,answer}={}){
  const mountManager=async()=>{const owner=ctx.plugin({inject:['remote'],async apply(ownerCtx){await ownerCtx.remote.$mount(managerContribution)}});await owner.await();return ()=>owner.dispose()}
  let unmountManager
  if(manager)unmountManager=await mountManager()
- if(!plugin){plugin=createLoopPlugin(React);if(process.env.QCU_MARKET_CLIENT_PATH){let mod;vm.runInNewContext(await readFile(process.env.QCU_MARKET_CLIENT_PATH,'utf8'),{window:{__ModuleLoader__:{load:v=>{mod=v}}},AbortController,crypto,setTimeout,clearTimeout});plugin=mod.factory(()=>React)}}
+ if(!plugin){plugin=createLoopPlugin(React);if(process.env.QCU_MARKET_CLIENT_PATH){let mod;vm.runInNewContext(await readFile(process.env.QCU_MARKET_CLIENT_PATH,'utf8'),{window:{__ModuleLoader__:{load:v=>{mod=v}}},TextEncoder,AbortController,crypto,setTimeout,clearTimeout});plugin=mod.factory(()=>React)}}
  const fork=ctx.plugin(plugin);await fork.await();await tick();await tick()
  const main=()=>ctx.slots.entriesOfSlot('main')[0]
  const props=()=>{const p=main().inject();return p.availability?p.availability.snapshot():p}

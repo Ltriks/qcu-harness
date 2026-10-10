@@ -1,5 +1,7 @@
+import {catalogSha256} from './bundled-catalog.mjs'
 // Explicit public Typert descriptors, shared by Host and Client. No private renderer/controller imports.
 const uuidCodec={mode:'strict',typeSymbol:'qcu-market#ReceiptId',create:()=>({parse(value){if(typeof value!=='string'||!/^([a-f0-9]{8}-)([a-f0-9]{4}-){3}[a-f0-9]{12}$/i.test(value))throw new Error('Expected receipt UUID');return value}})}
 const resultCodec={mode:'strict',typeSymbol:'qcu-market#JsonReply',create:()=>({parse(value){if(typeof value!=='string'||value.length>16384)throw new Error('Invalid QCU reply');JSON.parse(value);return value}})}
-export const marketRuntime={version:'0.1.0-pilot.4.2',protocol:1}
-export const remoteContribution={package:'qcu-market',descriptors:['status','prepare','verify','cancel'].map(method=>({id:`qcu-market#qcuMarket/${method}`,service:'qcuMarket',namespace:'qcuMarket',method,invocation:{kind:'direct'},parameters:method==='status'?[]:[{name:'id',wire:'id',source:'json',codec:uuidCodec}],...(['cancel','status'].includes(method)?{}:{cancellation:{parameter:'signal'}}),result:resultCodec}))}
+const keyCodec={mode:'strict',typeSymbol:'qcu-market#ReleaseKey',create:()=>({parse(value){if(typeof value!=='string'||value.length>250||!/^qcu-[a-z0-9-]+@[0-9a-z.-]+\+[a-f0-9]{64}$/.test(value))throw new Error('Expected reviewed release key');return value}})}
+export const marketRuntime={version:'0.1.0-pilot.5',protocol:2,catalogSha256}
+export const remoteContribution={package:'qcu-market',descriptors:['status','prepare','verify','cancel'].map(method=>({id:`qcu-market#qcuMarket/${method}`,service:'qcuMarket',namespace:'qcuMarket',method,invocation:{kind:'direct'},parameters:method==='status'?[]:[{name:'id',wire:'id',source:'json',codec:uuidCodec},...(method==='prepare'?[{name:'releaseKey',wire:'releaseKey',source:'json',codec:keyCodec}]:[])],...(['cancel','status'].includes(method)?{}:{cancellation:{parameter:'signal'}}),result:resultCodec}))}

@@ -1,3 +1,5 @@
+import {releaseKeyOf} from '../hub/plugins/qcu-market/src/catalog-core.mjs'
+import {release} from '../hub/plugins/qcu-market/src/trusted-release.mjs'
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import {readFile,mkdir,symlink,unlink,rm,readdir} from 'node:fs/promises'
@@ -29,7 +31,7 @@ for(const mode of ['bad-hash','offline'])test(`actual download ${mode} cannot re
 })
 test('HTTP cancellation and duplicate preparation abort real pending download without install',async t=>{
  const {h,d,flow}=await fixture(t);d.setMode('slow');const pending=flow.prepare();await d.started();await assert.rejects(flow.prepare(),/进行中/)
- const duplicate=await h.raw('qcuMarket/prepare',{id:id()});assert.equal((await duplicate.json()).result.ok,false)
+ const duplicate=await h.raw('qcuMarket/prepare',{id:id(),releaseKey:releaseKeyOf(release)});assert.equal((await duplicate.json()).result.ok,false)
  await flow.cancel();await pending;assert.equal(flow.state.phase,'cancelled');assert.equal(h.state.mutations.length,0);assert.equal(d.count(),1);assert.equal(h.host.get('qcuMarket').packages.pending.size,0)
  d.setMode('ok');await flow.prepare();assert.equal(flow.state.phase,'review',flow.state.message);assert.equal(h.state.mutations.length,0)
 })
@@ -94,5 +96,11 @@ test('official authenticated HTTP trust fence rejects anonymous and foreign-orig
  const {h,d}=await fixture(t)
  const anonymous=await fetch(h.origin+'/api/qcuMarket/prepare',{method:'POST'});assert.equal(anonymous.status,401)
  const foreign=await h.raw('qcuMarket/prepare',{id:id()},{headers:{'content-type':'application/json',origin:'https://untrusted.invalid'}});assert.equal(foreign.status,403)
+ assert.equal(d.count(),0);assert.equal(h.state.mutations.length,0)
+})
+
+test('actual HTTP refuses an unreviewed release key and client-controlled URL before download',async t=>{
+ const {h,d}=await fixture(t)
+ for(const args of [{id:id(),releaseKey:'qcu-unknown@0.1.0+'+'0'.repeat(64)},{id:id(),releaseKey:releaseKeyOf(release),url:'https://evil.invalid'}]){const r=await h.raw('qcuMarket/prepare',args);assert.equal((await r.json()).result.ok,false)}
  assert.equal(d.count(),0);assert.equal(h.state.mutations.length,0)
 })
