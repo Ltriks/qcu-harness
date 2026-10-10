@@ -1,5 +1,6 @@
 // Requires the pinned official-source dependency tree; no App/profile is booted.
 import test from 'node:test'
+import vm from 'node:vm'
 import assert from 'node:assert/strict'
 import { createRequire } from 'node:module'
 import { pathToFileURL } from 'node:url'
@@ -23,7 +24,14 @@ test('real Cordis/SlotRegistry and LayoutController support repeated navigation,
  const info={getSnapshot:()=>({activePanelId:active}),subscribe:()=>()=>{}}
  const layout=new LayoutController({selectPanel:id=>{active=id}},id=>ctx.slots.entriesOfSlot('main').some(e=>e.options.key===id),info)
  ctx.reflect.provide('layout',layout)
- const fork=ctx.plugin(createMarketPlugin(React,{kind:'bundled',value:catalog}))
+ let plugin=createMarketPlugin(React,{kind:'bundled',value:catalog})
+ if(process.env.QCU_MARKET_CLIENT_PATH){
+  let module
+  vm.runInNewContext(await readFile(process.env.QCU_MARKET_CLIENT_PATH,'utf8'),{window:{__ModuleLoader__:{load:value=>{module=value}}}})
+  assert.equal(module.id,'qcu-market')
+  plugin=module.factory(name=>{assert.equal(name,'react');return React})
+ }
+ const fork=ctx.plugin(plugin)
  await fork.await()
  assert.equal(ctx.slots.entriesOfSlot('main').length,1)
  const main=ctx.slots.entriesOfSlot('main')[0]
