@@ -1,0 +1,21 @@
+{
+  "scope": "Independent user report only; no DSH or fixed package operations in this Hub repair task",
+  "provider": "qcu-study-coach",
+  "version": "0.1.0-pilot.1",
+  "skill": "chengyuan-study-coach",
+  "fixedPackageSha256": "76ed55721d7a78237af6b05bca683a045fb232374c3d869af3676f90368c4f6c",
+  "reportSource": "Parent delegation from 01a118af-ea33-7529-8fa8-66afb9447002 observed 2026-10-10; underlying user message ID was not supplied",
+  "userReportedFullSkillInstructionsLoaded": true,
+  "userReportedSyntheticTaskAnswered": true,
+  "classification": "User-reported local invocation success; expanded actual tool card has not yet been reviewed by parent",
+  "proxyAutomatedGuiAcceptance": false,
+  "hubDistributionAccepted": false,
+  "upgradeRollbackAccepted": false,
+  "fixedPackageModified": false,
+  "qualityIssuesPendingReview": [
+    "Twenty minutes to select and transcribe 120 words appears unrealistic.",
+    "Claiming that not reviewing by a deadline makes all prior work worthless is overly absolute.",
+    "Directly comparing accuracy percentages measured on different samples is not a sound comparison."
+  ],
+  "followup": "Review the expanded actual tool result and improve guidance in a separately reviewed future version; do not silently change this fixed package."
+}
