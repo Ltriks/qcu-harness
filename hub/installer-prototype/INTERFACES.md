@@ -31,3 +31,5 @@ bundle 安装/启用与 row 启用独立，必须保留已有用户选择；安�
 ## 后续三项实际实现更新
 
 上一节中签名、进程/profile及后代收尾的stub说明已由本轮实际实现替代。`OfficialChecks.swift` 和 `NativeProcess` 提供真实Security.framework/libproc/profile文件检查及自有进程组管理；见 [READINESS.md](READINESS.md) 的实际证据、平台可见性阻塞和仍关闭的生产接线。不能将历史stub说明或本轮绿色单元测试当作真实试点已就绪。
+
+本地选择工厂、一次性授权模型、原生准备视图与实际执行构造器已完成接线，但生产门保持关闭。详见 [LOCAL-PILOT-WIRING.md](LOCAL-PILOT-WIRING.md)；未知进程在三个复核节点均不可绕过。

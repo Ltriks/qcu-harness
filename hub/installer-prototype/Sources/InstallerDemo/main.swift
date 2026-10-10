@@ -13,6 +13,7 @@ struct InstallerDemoApp: App {
 
 struct InstallerView: View {
     @StateObject private var model = InstallerViewModel()
+    @StateObject private var pilot = PilotPreparationViewModel()
     @State private var selected: DemoScenario = .skill
     @State private var accepted = false
     @State private var transport: DemoTransport?
@@ -68,6 +69,19 @@ struct InstallerView: View {
                     }
                 }.disabled(!model.canCleanup)
                 Divider()
+                GroupBox("真实试点准备 · 生产执行未启用") {
+                    VStack(alignment: .leading) {
+                        Button("本地选择并预检（不安装）") { pilot.chooseLocally() }.disabled(!pilot.canChoose || !model.canStart)
+                        Text(pilot.message)
+                        if let review = pilot.review {
+                            Text("目标：" + review.target + "\n官方App：" + review.app + "\n" + review.officialIdentity + "\n" + review.source).textSelection(.enabled)
+                            Text(review.package + "\nSHA-256：" + review.packageHash + "\n助手：" + review.helperHash).font(.caption.monospaced())
+                            Text(review.action)
+                        }
+                        Button("确认本次安装") { pilot.confirm() }.disabled(!pilot.canConfirm)
+                        Button("取消本次准备") { pilot.cancel() }.disabled(pilot.state == .executing || pilot.state == .finished)
+                    }.frame(maxWidth: .infinity, alignment: .leading)
+                }
                 Text("演示数据由进程内 URLProtocol 提供，无外部联网或监听；使用实际 URLSession、签名/hash、归档与状态核心。真实目录入口拒绝未配置的信任；网页公钥不能授权安装。")
                     .font(.caption).foregroundStyle(.secondary)
                 Text("真实安装阻止：官方身份/目标状态校验与独立生产授权未配置。系统协议、真实 Home、CLI 执行、DSH 重启及真实调用仍禁用。关闭窗口前建议取消并清理；应用强制退出后的暂存恢复 UI 尚未实现。")

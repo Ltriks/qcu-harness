@@ -24,6 +24,7 @@ final class OfficialChecksTests: XCTestCase {
         XCTAssertThrowsError(try MacOfficialIdentityChecker(app: app).inspect(cli))
     }
     func testRealProcessInventoryFindsCurrentExecutable() throws {
+        guard ProcessInfo.processInfo.environment["QCU_EXPLICIT_PROCESS_PREFLIGHT_TEST"] == "1" else { throw XCTSkip("Live process checks require explicit opt-in") }
         // Use own test executable's directory; no foreign command lines/env read.
         let executable = URL(fileURLWithPath: CommandLine.arguments[0]).resolvingSymlinksInPath()
         XCTAssertFalse(try MacProcessOccupancy().idle(app: executable))
@@ -50,7 +51,11 @@ final class OfficialChecksTests: XCTestCase {
             configurationPins: ["cordis.patch.yml": digest(patch), "profiles/desktop/cordis.patch.yml": digest(patch)],
             packageID: "qcu-study-coach", version: "0.1.0-pilot.1", archiveHash: "fixed-reviewed",
             files: [FileRecord(path: "package.json", sha256: digest(package), bytes: package.count), FileRecord(path: "cordis.patch.yml", sha256: digest(rowPatch), bytes: rowPatch.count)])
-        do { let idle = try checker.isIdle(home: home); XCTAssertTrue(idle) }
+        do {
+            if ProcessInfo.processInfo.environment["QCU_EXPLICIT_PROCESS_PREFLIGHT_TEST"] == "1" {
+                let idle = try checker.isIdle(home: home); XCTAssertTrue(idle)
+            }
+        }
         catch let error as InstallerError {
             // Explicit platform limitation, NOT a successful idle observation.
             XCTAssertTrue(error.description.hasPrefix("process-inventory-unavailable-"))

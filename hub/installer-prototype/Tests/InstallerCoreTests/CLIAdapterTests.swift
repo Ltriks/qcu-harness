@@ -116,7 +116,7 @@ final class CLIAdapterTests: XCTestCase {
 
     func testTimeoutAndCancelTerminateOwnedDescendants() throws {
         for cancel in [false, true] {
-            let body = "import subprocess,signal\nchild=subprocess.Popen(['/usr/bin/python3','-c','import signal,time; signal.signal(signal.SIGTERM,signal.SIG_IGN); time.sleep(30)'])\nopen(os.environ['DSH_HOME']+'/child-pid','w').write(str(child.pid))\nsignal.signal(signal.SIGTERM,signal.SIG_IGN)\ntime.sleep(30)"
+            let body = "import subprocess,signal\nchild=subprocess.Popen(['/usr/bin/python3','-c','import signal,time; signal.signal(signal.SIGTERM,signal.SIG_IGN); time.sleep(30)'])\nopen(os.environ['DSH_HOME']+'/child-pid.tmp','w').write(str(child.pid))\nos.replace(os.environ['DSH_HOME']+'/child-pid.tmp',os.environ['DSH_HOME']+'/child-pid')\nsignal.signal(signal.SIGTERM,signal.SIG_IGN)\ntime.sleep(30)"
             let (env, adapter, _) = try fixture(body); defer { try? env.removeSimulation() }
             let path = env.home.appendingPathComponent("child-pid")
             let result = try adapter.run(adapter.confirmLocally(), timeout: 3, cancelled: {
@@ -131,7 +131,7 @@ final class CLIAdapterTests: XCTestCase {
     }
 
     func testSuccessfulLeaderExitAlsoCleansBackgroundChild() throws {
-        let body = "import subprocess\nchild=subprocess.Popen(['/usr/bin/python3','-c','import time; time.sleep(30)'])\nopen(os.environ['DSH_HOME']+'/child-pid','w').write(str(child.pid))\nopen(os.environ['DSH_HOME']+'/fixture-installed','w').write('disabled')"
+        let body = "import subprocess\nchild=subprocess.Popen(['/usr/bin/python3','-c','import time; time.sleep(30)'])\nopen(os.environ['DSH_HOME']+'/child-pid.tmp','w').write(str(child.pid))\nos.replace(os.environ['DSH_HOME']+'/child-pid.tmp',os.environ['DSH_HOME']+'/child-pid')\nopen(os.environ['DSH_HOME']+'/fixture-installed','w').write('disabled')"
         let (env, adapter, _) = try fixture(body); defer { try? env.removeSimulation() }
         let result = try adapter.run(adapter.confirmLocally(), timeout: 3)
         XCTAssertEqual(result.state, .verifiedInstallationOnly)
