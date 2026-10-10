@@ -1,0 +1,9 @@
+{
+  "id": "qcu-study-coach",
+  "source": "QCU original skill draft, adapted from repository study-coach pilot guidance",
+  "license": "MIT",
+  "legacySource": "hub/plugins/qcu-study-coach",
+  "changes": ["qcu- identity", "task-specific time estimates", "non-shaming review guidance", "comparable-sample checks"],
+  "data": "Synthetic examples only; no student records",
+  "validation": "Structure and runtime discovery tested; model teaching quality awaits explicit synthetic-task acceptance"
+}

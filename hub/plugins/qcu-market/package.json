@@ -1,6 +1,6 @@
 {
   "name": "qcu-market",
-  "version": "0.1.0-pilot.2",
+  "version": "0.1.0-pilot.3.1",
   "private": true,
   "type": "module",
   "license": "MIT",
@@ -19,14 +19,29 @@
       "immediately": true,
       "inject": [
         "@deepseek-ai/dsh-client-ui-layout",
-        "@deepseek-ai/dsh-client-ui-sidebar"
+        "@deepseek-ai/dsh-client-ui-sidebar",
+        "@deepseek-ai/dsh-api-remotes",
+        "@deepseek-ai/dsh-api-session-controller",
+        "@deepseek-ai/dsh-client-ui-conversation",
+        "@deepseek-ai/dsh-client-ui-workspace",
+        "@deepseek-ai/dsh-client-ui-plugin-manager"
       ]
     }
   },
   "peerDependencies": {
     "@deepseek-ai/cordis": "4.0.4",
     "@deepseek-ai/dsh-client-ui-layout": "0.2.0-rc.2",
-    "@deepseek-ai/dsh-client-ui-sidebar": "0.2.0-rc.2"
+    "@deepseek-ai/dsh-client-ui-sidebar": "0.2.0-rc.2",
+    "@deepseek-ai/dsh-tools": "0.2.0-rc.2",
+    "@deepseek-ai/dsh-commands": "0.2.0-rc.2",
+    "@deepseek-ai/dsh-plugin-manager": "0.2.0-rc.2",
+    "@deepseek-ai/dsh-skill": "0.2.0-rc.2",
+    "@deepseek-ai/dsh-api-remotes": "0.2.0-rc.2",
+    "@deepseek-ai/dsh-api-session-controller": "0.2.0-rc.2",
+    "@deepseek-ai/dsh-client-ui-conversation": "0.2.0-rc.2",
+    "@deepseek-ai/dsh-client-ui-workspace": "0.2.0-rc.2",
+    "@deepseek-ai/dsh-client-ui-plugin-manager": "0.2.0-rc.2",
+    "@deepseek-ai/dsh-sandbox-policy": "0.2.0-rc.2"
   },
   "files": [
     "index.js",
@@ -36,8 +51,10 @@
     "LICENSE",
     "icon.svg",
     "locale/zh.json",
-    "locale/en.json"
+    "locale/en.json",
+    "src/host-core.mjs",
+    "src/trusted-release.mjs"
   ],
-  "description": "QCU teaching capability guides and skill drafts; browsing only",
+  "description": "QCU学习教练固定包准备、官方审批请求与技能可用性核验",
   "icon": "./icon.svg"
 }

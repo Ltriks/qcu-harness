@@ -45,14 +45,15 @@ test('every owned draft is UTF-8, properly named and ships original license; ada
   }
   assert.match(await read('skills/qcu-integrity-guard/SKILL.md'),/不作学生处分判断/)
 })
-test('compiled Client registers lazy factory with only host React; Host exports no tools', async () => {
+test('compiled Client registers lazy factory with only host React; Host exposes only bounded operations', async () => {
   let loaded
   vm.runInNewContext(await read('hub/plugins/qcu-market/client.js'), {window:{__ModuleLoader__:{load:m=>loaded=m}}})
   assert.equal(loaded.id,'qcu-market')
   const imports=[]; const p=loaded.factory(name=>{imports.push(name);return {createElement(){}}})
   assert.deepEqual(imports,['react']); assert.deepEqual(Array.from(p.inject),['slots','layout'])
-  const host=await import('../hub/plugins/qcu-market/index.js')
-  assert.deepEqual(Object.keys(host),['apply']); assert.equal(host.apply(),undefined)
+  const host=await read('hub/plugins/qcu-market/index.js')
+  assert.doesNotMatch(host,/installBundle|setBundleEnabled|setPluginEnabled|removeBundle/)
+  assert.match(host,/qcu_market/)
 })
 test('missing dependencies fail explicitly and only approved slots are requested', () => {
   const p=createMarketPlugin({createElement(){}},{kind:'bundled',value:catalog})
@@ -136,7 +137,7 @@ test('p2 styles are locally scoped, semantic-token based, focusable and network 
   const selectors=marketStyles.split('{').slice(0,-1).map(x=>x.slice(x.lastIndexOf('}')+1).trim()).filter(x=>x&&!x.startsWith('@media'))
   assert.ok(selectors.every(x=>x.startsWith('.qcu-market')))
   const pkg=JSON.parse(await read('hub/plugins/qcu-market/package.json'))
-  assert.equal(pkg.version,'0.1.0-pilot.2')
+  assert.equal(pkg.version,'0.1.0-pilot.3.1')
   assert.equal(pkg.icon,'./icon.svg')
   const svg=await read('hub/plugins/qcu-market/icon.svg')
   assert.match(svg,/<svg/);assert.doesNotMatch(svg,/<script|href=|onload=|<foreignObject/)
@@ -155,7 +156,7 @@ test('compiled p2 carries the exact styles and icon vectors with no separate sty
   const {iconPaths}=await import('../hub/plugins/qcu-market/src/icons.mjs')
   const compiled=await read('hub/plugins/qcu-market/client.js')
   assert.ok(compiled.includes(marketStyles))
-  assert.ok(compiled.includes("h('style', null, marketStyles)"))
+  assert.match(compiled,/h\('style',\s*null,marketStyles\)/)
   for(const paths of Object.values(iconPaths))for(const path of paths)assert.ok(compiled.includes(path))
   assert.doesNotMatch(compiled,/rel:\s*['"]stylesheet|<link|@import|fetch\(/)
 })

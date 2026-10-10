@@ -5,7 +5,7 @@ import assert from 'node:assert/strict'
 import { createRequire } from 'node:module'
 import { pathToFileURL } from 'node:url'
 import { readFile } from 'node:fs/promises'
-import { createMarketPlugin } from '../hub/plugins/qcu-market/src/plugin.mjs'
+import { createLoopPlugin } from '../hub/plugins/qcu-market/src/loop-plugin.mjs'
 const dependencyRoot=process.env.QCU_OFFICIAL_DEPENDENCIES
 if (!dependencyRoot) throw new Error('Set QCU_OFFICIAL_DEPENDENCIES to a local audited rc.2 dependency root')
 const require=createRequire(pathToFileURL(`${dependencyRoot}/package.json`))
@@ -24,7 +24,7 @@ test('real Cordis/SlotRegistry and LayoutController support repeated navigation,
  const info={getSnapshot:()=>({activePanelId:active}),subscribe:()=>()=>{}}
  const layout=new LayoutController({selectPanel:id=>{active=id}},id=>ctx.slots.entriesOfSlot('main').some(e=>e.options.key===id),info)
  ctx.reflect.provide('layout',layout)
- let plugin=createMarketPlugin(React,{kind:'bundled',value:catalog})
+ let plugin=createLoopPlugin(React)
  if(process.env.QCU_MARKET_CLIENT_PATH){
   let module
   vm.runInNewContext(await readFile(process.env.QCU_MARKET_CLIENT_PATH,'utf8'),{window:{__ModuleLoader__:{load:value=>{module=value}}}})
@@ -39,8 +39,8 @@ test('real Cordis/SlotRegistry and LayoutController support repeated navigation,
  layout.selectPanel('qcu-market');layout.selectPanel('qcu-market');assert.equal(active,'qcu-market')
  main.inject().onBack();assert.equal(active,null)
  const html=renderToStaticMarkup(React.createElement(main.component,main.inject()))
- assert.match(html,/QCU市场/);assert.match(html,/本实例未验证/);assert.match(html,/权限与风险/)
- assert.equal((html.match(/<article/g)||[]).length,8)
+ assert.match(html,/QCU市场/);assert.match(html,/学习方法教练/);assert.match(html,/缺少官方/)
+ assert.equal((html.match(/<article/g)||[]).length,1)
  await fork.dispose()
  assert.equal(ctx.slots.entriesOfSlot('main').length,0)
  assert.equal(ctx.slots.entriesOfSlot('sidebar.panellist').length,0)

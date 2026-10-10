@@ -1,0 +1,29 @@
+{
+  "name": "qcu-study-coach",
+  "version": "0.1.0-pilot.2",
+  "type": "module",
+  "private": true,
+  "license": "MIT",
+  "description": "QCU学习方法教练：任务拆解与合理复习计划",
+  "exports": {
+    ".": "./index.js",
+    "./package.json": "./package.json"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  },
+  "peerDependencies": {
+    "@deepseek-ai/cordis": "4.0.4",
+    "@deepseek-ai/dsh-skill": "0.2.0-rc.2"
+  },
+  "files": [
+    "index.js",
+    "skill-content.js",
+    "cordis.patch.yml",
+    "README.md",
+    "LICENSE",
+    "SKILL.md"
+  ]
+}
