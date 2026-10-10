@@ -22,7 +22,7 @@ MacBook 只证明隔离 SwiftUI 演示运行；本轮没有证据证明其当前
 - 安装前后官方元数据和包文件核验、默认 row 状态保留、官方错误/stop-profile/build approval 门槛处理、丢失回执的未知状态恢复。当前 CLI 参数计划不是这些能力的证明。
 - 真实状态模型与本机确认 UI；不能把 synthetic success 映射为真实可用。安装、bundle 选择、row 启用、加载、实际 Skill 调用分别验收。
 
-官方依据：[Desktop CLI 使用要求](https://github.com/deepseek-ai/deepseek-harness/blob/639ed015397290b3745d163aafe02ffee4aa3f84/apps/desktop/README.md#L89)、[管理工具逐次审批](https://github.com/deepseek-ai/deepseek-harness/blob/639ed015397290b3745d163aafe02ffee4aa3f84/packages/boot/plugin-manager/src/tools.ts#L21)。不能承诺一次重启合并全部步骤。执行实现仍需隔离测试/评审；本轮未新增实现。
+官方依据：[Desktop CLI 使用要求](https://github.com/deepseek-ai/deepseek-harness/blob/639ed015397290b3745d163aafe02ffee4aa3f84/apps/desktop/README.md#L89)、[管理工具逐次审批](https://github.com/deepseek-ai/deepseek-harness/blob/639ed015397290b3745d163aafe02ffee4aa3f84/packages/boot/plugin-manager/src/tools.ts#L21)。不能承诺一次重启合并全部步骤。后续已新增隔离执行核心，范围和仍缺失的真实校验器见 [INTERFACES.md](INTERFACES.md) 文末；不能据此执行真实安装。
 
 ## 不造生产 key 的固定包试点
 

@@ -5,7 +5,7 @@
 | 检查 | 结果 | 范围 |
 | --- | --- | --- |
 | Swift Package 编译 | 通过 | InstallerCore、DemoFixtures、SwiftUI executable 和测试目标；不等于视觉验收 |
-| XCTest | **50/50 通过，0 失败** | 原有28项 + 10项压缩格式/URLSession测试 + 12项视图模型测试；包含多种攻击和网络故障子用例 |
+| XCTest | **60/60 通过，0 失败** | 原有28项 + 10项压缩格式/URLSession测试 + 12项视图模型测试 + 10项隔离CLI测试；包含多种攻击和网络故障子用例 |
 | Node 离线交互测试 | **2/2 通过** | Hub 样例点击生成四字段 JSON，自有 scheme 文本，不联网、不导航 |
 | 固定 TGZ / 纯 Skill ZIP | 通过 | 原固定TGZ逐成员核对、临时下载到CLI-plan；ZIP stored/deflate到合成Home |
 | URLSession 下载 | 通过 | 临时GET-only loopback：清单验签、用户许可、流式hash、拒绝重定向、超时/取消/失败清理 |
@@ -35,3 +35,7 @@
 第三阶段 XCTest 于 **2026-10-10 10:16:04（UTC+8）** 完成：50 项全部通过；Node 2 项再次通过。新增视图模型测试覆盖生产入口拒绝/fixture 传输注入拒绝、单次点击约束、确认前取消、下载中取消与清理、签名/下载/hash/归档失败、完成回执丢失、清理未知、插件仅计划和真实 loopback ZIP 完整路径。原生 SwiftUI 使用同一视图模型和 DownloadClient；无 GUI 启动或截图验收。
 
 本地 `.app` 组装成功，Info.plist 检查通过，无 URL scheme 声明；Mach-O 为 arm64，动态依赖均为系统框架/库。二进制 SHA-256：`6b902ebc870be07f199b639c74ceb1220b8e1587bb5105d9815d8cdb57fafbf7`。未调用签名、公证、注册或启动工具；产物不承诺其他机器可运行。下载和 UI 测试日志保存在本地忽略目录 `.build/validation-ui.log`。
+
+CLI核心增量：新增10项隔离 XCTest（只运行临时伪CLI，不运行DSH），覆盖生产门关闭、固定参数/最小环境、安装证据/禁用状态、重复/跨目标/伪造/过期确认、占用/同名包、CLI/包/标记变更、symlink/锁、退出0缺证据、非零失败、超时/取消、输出限额与无原文日志、中断恢复不重放。实际macOS签名验证、真实进程清单和官方profile核验仍为接口，不能计为通过。
+
+本阶段最终 XCTest 于2026-10-10 11:28:08（UTC+8）完成：60项通过、0失败；Node离线检查2项再次通过。日志为本地忽略目录 `.build/validation-cli.log`。

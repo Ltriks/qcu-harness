@@ -79,3 +79,5 @@ Envelope 是 `{keyID,payload,signature}`，后两项为 base64；Ed25519 签名�
 通过测试编译后运行 `python3 checks/build-demo-app.py`，只组装 `.build/artifacts/ChengyuanInstallerDemo.app`，不启动、不签名、不注册协议。产物是本机开发构建，不是可分发的正式安装器；Info.plist 没有 CFBundleURLTypes。
 
 获准视觉演示后，打开该应用，选择“纯 Skill”并开始；检查签名清单中的版本、来源、hash 与隔离范围，勾选后确认下载，可在下载期间取消。终态后用“清理合成目录并重置”。若需更长取消窗口选择慢下载。插件场景只显示未执行的 CLI 计划。所有成功文字限定合成目录，不能据此声称 DSH 内已可用。直接关闭窗口不保证暂存清理，尚无重开恢复 UI。
+
+CLI执行核心现已提供仅限新建合成目录的伪CLI集成测试；生产执行门仍固定拒绝。已实现/仍为接口的精确边界见 [INTERFACES.md](INTERFACES.md) 文末。既有本地.app仍为01845695构建，本轮没有重新打包或启动它。

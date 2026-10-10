@@ -70,7 +70,7 @@ struct InstallerView: View {
                 Divider()
                 Text("演示数据由进程内 URLProtocol 提供，无外部联网或监听；使用实际 URLSession、签名/hash、归档与状态核心。真实目录入口拒绝未配置的信任；网页公钥不能授权安装。")
                     .font(.caption).foregroundStyle(.secondary)
-                Text("系统协议、真实 Home、CLI 执行、DSH 重启及真实调用仍禁用。关闭窗口前建议取消并清理；应用强制退出后的暂存恢复 UI 尚未实现。")
+                Text("真实安装阻止：官方身份/目标状态校验与独立生产授权未配置。系统协议、真实 Home、CLI 执行、DSH 重启及真实调用仍禁用。关闭窗口前建议取消并清理；应用强制退出后的暂存恢复 UI 尚未实现。")
                     .font(.caption).foregroundStyle(.secondary)
             }.padding(26)
         }.onOpenURL { model.receiveExternalURL($0) }
