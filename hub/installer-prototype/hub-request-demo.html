@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="zh-CN">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'none'; base-uri 'none'; form-action 'none'">
+<title>城院 Hub · 安装请求样例</title>
+<style>
+body{font:17px/1.7 system-ui;background:#f5f7f5;color:#182a25;margin:0;padding:48px 24px}main{max-width:760px;margin:auto;background:white;padding:32px;border-radius:20px}h1{font-size:29px}button{background:#176951;color:white;border:0;padding:12px 20px;border-radius:9px;font:inherit;cursor:pointer}pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#edf3f0;padding:18px;border-radius:10px;font-size:13px}.note{color:#78551a}a{color:#176951}
+</style>
+<main>
+<p class="note">隔离交互样例 · 未连接线上 Hub · 未注册系统协议</p>
+<h1>学习教练 · 纯文本测试包</h1>
+<p>点击只生成四字段请求。本机助手需重新验证可信清单，并由老师确认具体版本、hash 和权限范围。页面不能下发命令、文件路径或安装 URL。</p>
+<button id="prepare">生成演示请求</button>
+<pre id="request">尚未发起请求</pre>
+<p id="handoff"></p>
+<p>未来链路：Hub 发起 → 本机审核展示 → 用户确认 → 下载与校验 → 安装状态 → 重开及实际验证。</p>
+<p class="note">本文件只展示协议合同。链接为城院自有方案，不是官方 dsh:// 安装接口；当前无已注册处理器，不能完成实际安装。</p>
+</main>
+<script>
+document.querySelector('#prepare').addEventListener('click', () => {
+  const request = {catalogID:'test-chengyuan',packageID:'chengyuan-study-demo',version:'0.1.0-test.1',requestID:crypto.randomUUID()};
+  const url = 'chengyuan-install://request?' + new URLSearchParams(request);
+  document.querySelector('#request').textContent = JSON.stringify(request, null, 2) + '\n\n' + url;
+  // No navigation: registering or invoking a system handler belongs to a later pilot.
+  document.querySelector('#handoff').textContent = '请求已生成；本样例不调用系统处理器，也不联网。';
+});
+</script>
+</html>
