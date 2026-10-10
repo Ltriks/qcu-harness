@@ -1,0 +1,596 @@
+{
+  "deployment": {
+    "success": true,
+    "checkedAtUtc": "2026-10-10T01:11:11.844476+00:00",
+    "oldPid": 19258,
+    "newPid": 19495,
+    "uid": 501,
+    "processStartTime": "Sat Oct 10 09:11:11 2026",
+    "fullCommandMatched": true,
+    "oldManifestSha256": "b32b40409bd2673b6cbf5a21e83333d661afc1c5577ff72d949c165892e42411",
+    "newManifestSha256": "d14de7a7aa49c7b9ebda2946f7426b5d1f2e3b84459dfe2d39284ee6f07b9fdf",
+    "newServerSha256": "8153e989daa6422fa5eb99afa02744f248a6c535a1622099287307e698da206e",
+    "miniLocalRootHttp": 200,
+    "miniLocalThemesHttp": 200,
+    "miniLocalCatalogHttp": 200,
+    "unchangedOriginalFiles": [
+      "themes.html",
+      "catalog.json",
+      "serve-hub.py",
+      "README.txt",
+      "plugins/qcu-dialogue-install-probe-0.0.1-test.1-8b8ad2afc154278eb835a48305ce54c01d4ccc733b8f1896f807aa06dd00632e.tgz",
+      "plugins/qcu-study-coach-0.1.0-pilot.1-76ed55721d7a78237af6b05bca683a045fb232374c3d869af3676f90368c4f6c.tgz"
+    ],
+    "studyCoachAlreadyPublished": true,
+    "newPackagesPublished": false,
+    "changedOnly": [
+      "index.html",
+      "manifest.json"
+    ],
+    "newIndexSha256": "020f88bb7c185b6fe658c158108d7e68813e7e6d67f86cc192e8744697f8c4e1",
+    "DSHChanged": false,
+    "autostartChanged": false,
+    "firewallChanged": false,
+    "originalFileModesPreserved": true,
+    "approval": "Sentinel_32362695629081918632b28a1f348d98; current parent explicitly authorizes two-file UX deployment",
+    "backupDirectoryName": "backup-install-ux-20261010-7ahy_xo0"
+  },
+  "macHttp": {
+    "checkedAtUtc": "2026-10-10T01:13:44.955872+00:00",
+    "origin": "http://192.168.1.68:8080",
+    "from": "original-mac",
+    "requests": [
+      {
+        "path": "/plugins/qcu-study-coach-0.1.0-pilot.1-76ed55721d7a78237af6b05bca683a045fb232374c3d869af3676f90368c4f6c.tgz",
+        "method": "GET",
+        "status": 200,
+        "bytes": 3331,
+        "sha256": "76ed55721d7a78237af6b05bca683a045fb232374c3d869af3676f90368c4f6c",
+        "contentLength": "3331",
+        "nosniff": true,
+        "cacheControl": "public, max-age=31536000, immutable"
+      },
+      {
+        "path": "/plugins/qcu-study-coach-0.1.0-pilot.1-76ed55721d7a78237af6b05bca683a045fb232374c3d869af3676f90368c4f6c.tgz",
+        "method": "HEAD",
+        "status": 200,
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "contentLength": "3331",
+        "nosniff": true,
+        "cacheControl": "public, max-age=31536000, immutable"
+      },
+      {
+        "path": "/",
+        "method": "GET",
+        "status": 200,
+        "bytes": 27123,
+        "sha256": "020f88bb7c185b6fe658c158108d7e68813e7e6d67f86cc192e8744697f8c4e1",
+        "contentLength": "27123",
+        "nosniff": true,
+        "cacheControl": "no-store"
+      },
+      {
+        "path": "/",
+        "method": "HEAD",
+        "status": 200,
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "contentLength": "27123",
+        "nosniff": true,
+        "cacheControl": "no-store"
+      },
+      {
+        "path": "/themes.html",
+        "method": "GET",
+        "status": 200,
+        "bytes": 10308,
+        "sha256": "5e400f184335b684375419d83e7690668314334b2d478fb668406c831cec9819",
+        "contentLength": "10308",
+        "nosniff": true,
+        "cacheControl": "no-store"
+      },
+      {
+        "path": "/themes.html",
+        "method": "HEAD",
+        "status": 200,
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "contentLength": "10308",
+        "nosniff": true,
+        "cacheControl": "no-store"
+      },
+      {
+        "path": "/catalog.json",
+        "method": "GET",
+        "status": 200,
+        "bytes": 2420,
+        "sha256": "bee1c76a3dfa67355b9ddab977da3940d4c878845cbea17854fbf455d541bfbf",
+        "contentLength": "2420",
+        "nosniff": true,
+        "cacheControl": "no-store"
+      },
+      {
+        "path": "/catalog.json",
+        "method": "HEAD",
+        "status": 200,
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "contentLength": "2420",
+        "nosniff": true,
+        "cacheControl": "no-store"
+      },
+      {
+        "path": "/plugins/qcu-dialogue-install-probe-0.0.1-test.1-8b8ad2afc154278eb835a48305ce54c01d4ccc733b8f1896f807aa06dd00632e.tgz",
+        "method": "GET",
+        "status": 200,
+        "bytes": 1279,
+        "sha256": "8b8ad2afc154278eb835a48305ce54c01d4ccc733b8f1896f807aa06dd00632e",
+        "contentLength": "1279",
+        "nosniff": true,
+        "cacheControl": "public, max-age=31536000, immutable"
+      },
+      {
+        "path": "/plugins/qcu-dialogue-install-probe-0.0.1-test.1-8b8ad2afc154278eb835a48305ce54c01d4ccc733b8f1896f807aa06dd00632e.tgz",
+        "method": "HEAD",
+        "status": 200,
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "contentLength": "1279",
+        "nosniff": true,
+        "cacheControl": "public, max-age=31536000, immutable"
+      },
+      {
+        "path": "/manifest.json",
+        "method": "GET",
+        "status": 404,
+        "bytes": 447
+      },
+      {
+        "path": "/README.txt",
+        "method": "GET",
+        "status": 404,
+        "bytes": 447
+      },
+      {
+        "path": "/serve-hub.py",
+        "method": "GET",
+        "status": 404,
+        "bytes": 447
+      },
+      {
+        "path": "/service.log",
+        "method": "GET",
+        "status": 404,
+        "bytes": 447
+      },
+      {
+        "path": "/launch-owned.json",
+        "method": "GET",
+        "status": 404,
+        "bytes": 447
+      },
+      {
+        "path": "/plugins/",
+        "method": "GET",
+        "status": 404,
+        "bytes": 447
+      },
+      {
+        "path": "/catalog.json?x=1",
+        "method": "GET",
+        "status": 404,
+        "bytes": 447
+      },
+      {
+        "path": "/../private",
+        "method": "GET",
+        "status": 404,
+        "bytes": 447
+      },
+      {
+        "path": "/%2e%2e/private",
+        "method": "GET",
+        "status": 404,
+        "bytes": 447
+      },
+      {
+        "path": "/backup-hub-20261010-2yds9yg8/BACKUP.json",
+        "method": "GET",
+        "status": 404,
+        "bytes": 447
+      },
+      {
+        "path": "/backup-study-coach-20261010-l3orglrt/BACKUP.json",
+        "method": "GET",
+        "status": 404,
+        "bytes": 447
+      },
+      {
+        "path": "/plugins/qcu-study-coach.tgz",
+        "method": "GET",
+        "status": 404,
+        "bytes": 447
+      },
+      {
+        "path": "/backup-install-ux-20261010-7ahy_xo0/BACKUP.json",
+        "method": "GET",
+        "status": 404,
+        "bytes": 447
+      },
+      {
+        "path": "/catalog.json",
+        "method": "GET",
+        "status": 403,
+        "bytes": 466,
+        "foreignHost": true
+      },
+      {
+        "path": "/catalog.json",
+        "method": "POST",
+        "status": 405,
+        "bytes": 472
+      },
+      {
+        "path": "/catalog.json",
+        "method": "PUT",
+        "status": 501,
+        "bytes": 496
+      },
+      {
+        "path": "/catalog.json",
+        "method": "DELETE",
+        "status": 501,
+        "bytes": 499
+      },
+      {
+        "path": "/themes.html",
+        "method": "GET",
+        "status": 200,
+        "bytes": 10308,
+        "sha256": "5e400f184335b684375419d83e7690668314334b2d478fb668406c831cec9819",
+        "contentLength": "10308",
+        "nosniff": true,
+        "cacheControl": "no-store"
+      },
+      {
+        "path": "/themes.html",
+        "method": "GET",
+        "status": 200,
+        "bytes": 10308,
+        "sha256": "5e400f184335b684375419d83e7690668314334b2d478fb668406c831cec9819",
+        "contentLength": "10308",
+        "nosniff": true,
+        "cacheControl": "no-store"
+      },
+      {
+        "path": "/",
+        "method": "GET",
+        "status": 200,
+        "bytes": 27123,
+        "sha256": "020f88bb7c185b6fe658c158108d7e68813e7e6d67f86cc192e8744697f8c4e1",
+        "contentLength": "27123",
+        "nosniff": true,
+        "cacheControl": "no-store"
+      }
+    ],
+    "idleConnection": {
+      "serverAcceptedConnectionVerified": true,
+      "serverPid": 19495,
+      "concurrentThemesHttp": 200,
+      "concurrentResponseSeconds": 0.0368,
+      "connectionClosedAfterSeconds": 5.0197,
+      "fiveSecondTimeoutVerified": true
+    },
+    "partialHeaders": {
+      "serverAcceptedConnectionVerified": true,
+      "serverPid": 19495,
+      "concurrentThemesHttp": 200,
+      "concurrentResponseSeconds": 0.0442,
+      "connectionClosedAfterSeconds": 5.0208,
+      "fiveSecondTimeoutVerified": true
+    },
+    "actualHttpPackageName": "qcu-study-coach",
+    "actualHttpPackageVersion": "0.1.0-pilot.1",
+    "completedAtUtc": "2026-10-10T01:13:56.276948+00:00",
+    "passed": true,
+    "httpChecks": 30,
+    "approvedSnapshotBytesMatched": true,
+    "newInstallGuidancePageVerified": true,
+    "nativeGUIValidated": false,
+    "studyCoachPublished": true,
+    "installedToDSH": false,
+    "serviceOrAppChangedByChecks": false
+  },
+  "miniHttp": {
+    "checkedAtUtc": "2026-10-10T01:14:03.979822+00:00",
+    "origin": "http://192.168.1.68:8080",
+    "from": "mini-local",
+    "requests": [
+      {
+        "path": "/plugins/qcu-study-coach-0.1.0-pilot.1-76ed55721d7a78237af6b05bca683a045fb232374c3d869af3676f90368c4f6c.tgz",
+        "method": "GET",
+        "status": 200,
+        "bytes": 3331,
+        "sha256": "76ed55721d7a78237af6b05bca683a045fb232374c3d869af3676f90368c4f6c",
+        "contentLength": "3331",
+        "nosniff": true,
+        "cacheControl": "public, max-age=31536000, immutable"
+      },
+      {
+        "path": "/plugins/qcu-study-coach-0.1.0-pilot.1-76ed55721d7a78237af6b05bca683a045fb232374c3d869af3676f90368c4f6c.tgz",
+        "method": "HEAD",
+        "status": 200,
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "contentLength": "3331",
+        "nosniff": true,
+        "cacheControl": "public, max-age=31536000, immutable"
+      },
+      {
+        "path": "/",
+        "method": "GET",
+        "status": 200,
+        "bytes": 27123,
+        "sha256": "020f88bb7c185b6fe658c158108d7e68813e7e6d67f86cc192e8744697f8c4e1",
+        "contentLength": "27123",
+        "nosniff": true,
+        "cacheControl": "no-store"
+      },
+      {
+        "path": "/",
+        "method": "HEAD",
+        "status": 200,
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "contentLength": "27123",
+        "nosniff": true,
+        "cacheControl": "no-store"
+      },
+      {
+        "path": "/themes.html",
+        "method": "GET",
+        "status": 200,
+        "bytes": 10308,
+        "sha256": "5e400f184335b684375419d83e7690668314334b2d478fb668406c831cec9819",
+        "contentLength": "10308",
+        "nosniff": true,
+        "cacheControl": "no-store"
+      },
+      {
+        "path": "/themes.html",
+        "method": "HEAD",
+        "status": 200,
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "contentLength": "10308",
+        "nosniff": true,
+        "cacheControl": "no-store"
+      },
+      {
+        "path": "/catalog.json",
+        "method": "GET",
+        "status": 200,
+        "bytes": 2420,
+        "sha256": "bee1c76a3dfa67355b9ddab977da3940d4c878845cbea17854fbf455d541bfbf",
+        "contentLength": "2420",
+        "nosniff": true,
+        "cacheControl": "no-store"
+      },
+      {
+        "path": "/catalog.json",
+        "method": "HEAD",
+        "status": 200,
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "contentLength": "2420",
+        "nosniff": true,
+        "cacheControl": "no-store"
+      },
+      {
+        "path": "/plugins/qcu-dialogue-install-probe-0.0.1-test.1-8b8ad2afc154278eb835a48305ce54c01d4ccc733b8f1896f807aa06dd00632e.tgz",
+        "method": "GET",
+        "status": 200,
+        "bytes": 1279,
+        "sha256": "8b8ad2afc154278eb835a48305ce54c01d4ccc733b8f1896f807aa06dd00632e",
+        "contentLength": "1279",
+        "nosniff": true,
+        "cacheControl": "public, max-age=31536000, immutable"
+      },
+      {
+        "path": "/plugins/qcu-dialogue-install-probe-0.0.1-test.1-8b8ad2afc154278eb835a48305ce54c01d4ccc733b8f1896f807aa06dd00632e.tgz",
+        "method": "HEAD",
+        "status": 200,
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "contentLength": "1279",
+        "nosniff": true,
+        "cacheControl": "public, max-age=31536000, immutable"
+      },
+      {
+        "path": "/manifest.json",
+        "method": "GET",
+        "status": 404,
+        "bytes": 447
+      },
+      {
+        "path": "/README.txt",
+        "method": "GET",
+        "status": 404,
+        "bytes": 447
+      },
+      {
+        "path": "/serve-hub.py",
+        "method": "GET",
+        "status": 404,
+        "bytes": 447
+      },
+      {
+        "path": "/service.log",
+        "method": "GET",
+        "status": 404,
+        "bytes": 447
+      },
+      {
+        "path": "/launch-owned.json",
+        "method": "GET",
+        "status": 404,
+        "bytes": 447
+      },
+      {
+        "path": "/plugins/",
+        "method": "GET",
+        "status": 404,
+        "bytes": 447
+      },
+      {
+        "path": "/catalog.json?x=1",
+        "method": "GET",
+        "status": 404,
+        "bytes": 447
+      },
+      {
+        "path": "/../private",
+        "method": "GET",
+        "status": 404,
+        "bytes": 447
+      },
+      {
+        "path": "/%2e%2e/private",
+        "method": "GET",
+        "status": 404,
+        "bytes": 447
+      },
+      {
+        "path": "/backup-hub-20261010-2yds9yg8/BACKUP.json",
+        "method": "GET",
+        "status": 404,
+        "bytes": 447
+      },
+      {
+        "path": "/backup-study-coach-20261010-l3orglrt/BACKUP.json",
+        "method": "GET",
+        "status": 404,
+        "bytes": 447
+      },
+      {
+        "path": "/plugins/qcu-study-coach.tgz",
+        "method": "GET",
+        "status": 404,
+        "bytes": 447
+      },
+      {
+        "path": "/backup-install-ux-20261010-7ahy_xo0/BACKUP.json",
+        "method": "GET",
+        "status": 404,
+        "bytes": 447
+      },
+      {
+        "path": "/catalog.json",
+        "method": "GET",
+        "status": 403,
+        "bytes": 466,
+        "foreignHost": true
+      },
+      {
+        "path": "/catalog.json",
+        "method": "POST",
+        "status": 405,
+        "bytes": 472
+      },
+      {
+        "path": "/catalog.json",
+        "method": "PUT",
+        "status": 501,
+        "bytes": 496
+      },
+      {
+        "path": "/catalog.json",
+        "method": "DELETE",
+        "status": 501,
+        "bytes": 499
+      },
+      {
+        "path": "/themes.html",
+        "method": "GET",
+        "status": 200,
+        "bytes": 10308,
+        "sha256": "5e400f184335b684375419d83e7690668314334b2d478fb668406c831cec9819",
+        "contentLength": "10308",
+        "nosniff": true,
+        "cacheControl": "no-store"
+      },
+      {
+        "path": "/themes.html",
+        "method": "GET",
+        "status": 200,
+        "bytes": 10308,
+        "sha256": "5e400f184335b684375419d83e7690668314334b2d478fb668406c831cec9819",
+        "contentLength": "10308",
+        "nosniff": true,
+        "cacheControl": "no-store"
+      },
+      {
+        "path": "/",
+        "method": "GET",
+        "status": 200,
+        "bytes": 27123,
+        "sha256": "020f88bb7c185b6fe658c158108d7e68813e7e6d67f86cc192e8744697f8c4e1",
+        "contentLength": "27123",
+        "nosniff": true,
+        "cacheControl": "no-store"
+      }
+    ],
+    "idleConnection": {
+      "serverAcceptedConnectionVerified": true,
+      "serverPid": 19495,
+      "concurrentThemesHttp": 200,
+      "concurrentResponseSeconds": 0.0024,
+      "connectionClosedAfterSeconds": 5.0022,
+      "fiveSecondTimeoutVerified": true
+    },
+    "partialHeaders": {
+      "serverAcceptedConnectionVerified": true,
+      "serverPid": 19495,
+      "concurrentThemesHttp": 200,
+      "concurrentResponseSeconds": 0.0032,
+      "connectionClosedAfterSeconds": 5.0021,
+      "fiveSecondTimeoutVerified": true
+    },
+    "actualHttpPackageName": "qcu-study-coach",
+    "actualHttpPackageVersion": "0.1.0-pilot.1",
+    "completedAtUtc": "2026-10-10T01:14:14.026917+00:00",
+    "passed": true,
+    "httpChecks": 30,
+    "approvedSnapshotBytesMatched": true,
+    "newInstallGuidancePageVerified": true,
+    "nativeGUIValidated": false,
+    "studyCoachPublished": true,
+    "installedToDSH": false,
+    "serviceOrAppChangedByChecks": false
+  },
+  "liveDOM": {
+    "checkedAtUtc": "2026-10-10T01:14:27.912Z",
+    "actualPageHttp": 200,
+    "actualCatalogHttp": 200,
+    "pageSha256": "020f88bb7c185b6fe658c158108d7e68813e7e6d67f86cc192e8744697f8c4e1",
+    "catalogSha256": "bee1c76a3dfa67355b9ddab977da3940d4c878845cbea17854fbf455d541bfbf",
+    "validation": "Actual public HTTP bytes executed in isolated JSDOM with actual downloaded catalog supplied to fetch. DOM validation only; no native browser, system clipboard, or DSH installation.",
+    "initialTab": "plugins",
+    "pluginCount": 2,
+    "sixStepGuide": true,
+    "fixedPackageHashDisplayed": true,
+    "installEnableCallInstructionsRendered": true,
+    "absentClipboardSelectsVisibleText": true,
+    "nativeGUIValidated": false,
+    "actualSystemClipboardValidated": false,
+    "installedToDSH": false,
+    "passed": true
+  },
+  "limits": {
+    "nativeBrowserGUIValidated": false,
+    "actualSystemClipboardValidated": false,
+    "fullHubToDSHInstallLifecycleValidated": false,
+    "oldDocxCandidateOperatedThisContinuation": false
+  }
+}

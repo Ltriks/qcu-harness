@@ -1,8 +1,12 @@
-# Hub 固定包安装体验：开发完成，尚未发布
+# Hub 固定包安装体验：已发布，原生复制待验收
 
-用户 Sentinel_32362695629081918632b28a1f348d98 确认当前学习教练条目可见、下载正常。这是现有发布网页的用户 PASS，不能扩大为从 Hub 到 DSH 的安装、启用、调用或更新回退通过。此次只准备开发分支，不操作 .68 站点、DSH 或旧候选。
+用户 Sentinel_32362695629081918632b28a1f348d98 确认学习教练条目可见、下载正常，并要求继续完成安装指令等体验功能。按当前明确授权，2026-10-10 01:11 UTC 已向既有局域网站点发布下列两个文件，正常重载经过身份核实的自有 Hub。没有操作 DSH 或旧 DOCX 候选。此前离线准备记录保留其历史范围；下载 PASS 不能扩大为从 Hub 到 DSH 的安装、启用、调用或更新回退通过。
 
-## 新界面的短指南（发布后使用）
+入口：[局域网 Hub](http://192.168.1.68:8080/)。MacBook 和 Mini 各 30 项真实 HTTP 检查通过：新首页和原目录、两个固定包的 GET/HEAD/字节/hash 一致；操作员文件、备份、查询与穿越路径拒绝；外部 Host 与写入方法拒绝。两端分别验证空闲连接和未完整请求头约 5 秒关闭，期间其他请求正常返回。新服务 PID 19495 是本次检查时的快照，后续不得据此直接结束进程。
+
+实际 HTTP 页面和目录字节在隔离 JSDOM 中执行通过：默认插件页、六步指南、固定哈希、安装/启用/调用指令及 Clipboard API 缺失时的可见文本选择。仍缺原生浏览器和真实系统剪贴板操作证据，不能把 DOM 结果记成原生 GUI 通过。结构化部署及两端检查见 [部署证据](evidence/hub-install-ux-deployment.json)。
+
+## 新界面的短指南
 
 1. 首页在没有独立 Skill ZIP 时直接显示 **插件 Plugin**。找到固定版本，下载 TGZ；卡片同时显示版本、SHA256 和精确兼容版本。
 2. 展开“安装到官方 DSH：分步指令”。将哈希与独立收到的可信来源对照，不以同源字段作为来源证明。
@@ -23,7 +27,7 @@
 
 复现 DOM 检查时复用已有可信 jsdom，不安装依赖：设置 `QCU_HUB_TEST_RUNTIME` 为已准备官方 Web 项目的 package.json 绝对路径，然后运行 `node --test tests/hub-web-install.test.mjs`。这不是生产运行依赖。
 
-## 待批准的精确线上替换白名单
+## 已授权部署的精确替换白名单
 
 基线 manifest pin 为 `b32b40409bd2673b6cbf5a21e83333d661afc1c5577ff72d949c165892e42411`。仅替换下面两个文件：
 
@@ -34,10 +38,10 @@
 
 其余六个文件均原字节保留：themes.html、catalog.json、serve-hub.py、README.txt、原 probe TGZ、学习教练 p1 TGZ。目录 SHA256 仍为 `bee1c76a3dfa67355b9ddab977da3940d4c878845cbea17854fbf455d541bfbf`；服务仍为 `8153e989daa6422fa5eb99afa02744f248a6c535a1622099287307e698da206e`；学习教练 TGZ 仍为 `76ed55721d7a78237af6b05bca683a045fb232374c3d869af3676f90368c4f6c`、3331 字节。没有新的 HTTP 路由。
 
-最小发布步骤（此次未执行）：
+此次发布遵循的步骤；以后重新发布时应重新核实当时基线：
 
-1. 获得对这两个文件及上述 hash 的发布批准后，只读核对现有 manifest、全部保留文件和自有 Hub 的 UID/启动时间/完整命令，保存可恢复备份。
+1. 对这两个文件及上述 hash 的发布授权已确认；只读核对原 manifest、全部保留文件和自有 Hub 的 UID/启动时间/完整命令，保存可恢复备份。
 2. 仅替换两个文件；因为服务使用内存快照，正常停止/重载核实过的自有 Hub，使新 pin 生效。沿用 .68:8080、原目录和修复服务，不新增自启、防火墙或权限。
 3. 实际 GET/HEAD 与 hash 检查，再做原生网页复制/手动选择复验；新 Hub → DSH 安装链另行逐次审批、正常重启和真实调用验收，失败按原身份边界安全恢复。
 
-本机候选为 task-7/hub-lan-preparation/hub-install-ux-preview-20261010，原线上文件未动。结构化证据和全量 hash 白名单见 [离线准备证据](evidence/hub-install-ux-preparation.json)。
+本机候选为 task-7/hub-lan-preparation/hub-install-ux-preview-20261010。线上只有 index.html 和 manifest.json 被替换，其余六文件原字节保留；原 manifest pin 为上表之前的 b32b4040…，新 pin 为 d14de7a7…完整值。恢复备份目录为站点根下 backup-install-ux-20261010-7ahy_xo0，仅供操作员使用，HTTP 访问拒绝。恢复时仍需先核实当时进程身份和当前文件，不能盲目覆盖用户新改动。此前 [离线准备证据](evidence/hub-install-ux-preparation.json) 的 preparedOnly/remoteChanged=false 是准备阶段事实，最新状态以部署证据为准。
