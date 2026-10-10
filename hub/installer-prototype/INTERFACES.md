@@ -27,3 +27,7 @@ bundle 安装/启用与 row 启用独立，必须保留已有用户选择；安�
 **仍为 stub／关闭：** `OfficialIdentityChecking` 的真实 macOS 签名/官方App检查实现、`TargetStateChecking` 的真实进程占用和官方metadata/精确文件核验、真实Home接纳、生产授权凭证发行及恢复UI。测试提供明确的fixture校验器，不能当官方身份或真实包元数据证明。`ProductionInstallGate.authorize()`无条件拒绝，原 `OfficialDesktopAdapter.execute`仍无条件拒绝；不存在环境变量/网页/fixture开关解锁。新核心未接到UI安装按钮，UI显示阻止原因。此次没有访问或执行真实App/CLI/Home，也没有重新打包、启动或替换正在使用的演示应用。
 
 正式确认清单仍须包含：经审阅的助手源码commit与二进制hash/签名状态、目标机与确切独立Home/profile、官方App/CLI版本身份、唯一包版本/hash/大小、精确来源及是否下载、用户正常退出范围、仅安装且禁用的动作、失败停止/结果未知和另行卸载边界。上述真实校验器和后代进程收尾未通过隔离验收前，不请求真实执行授权。
+
+## 后续三项实际实现更新
+
+上一节中签名、进程/profile及后代收尾的stub说明已由本轮实际实现替代。`OfficialChecks.swift` 和 `NativeProcess` 提供真实Security.framework/libproc/profile文件检查及自有进程组管理；见 [READINESS.md](READINESS.md) 的实际证据、平台可见性阻塞和仍关闭的生产接线。不能将历史stub说明或本轮绿色单元测试当作真实试点已就绪。

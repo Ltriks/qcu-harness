@@ -1,5 +1,6 @@
 import Foundation
 import Darwin
+import NativeProcess
 
 /// Public entry point remains closed. No bool, URL, environment variable or
 /// test flag can mint production authorization in this build.
@@ -133,47 +134,43 @@ final class IsolatedCLIAdapter {
         if cancelled() { result.state = .unknown; result.code = "cancelled-before-launch"; try save(result); return result }
         try preflight()
         result.state = .applying; result.code = "applying"; try save(result)
-        let process = Process()
-        process.executableURL = executable
-        process.arguments = ["plugin", "--profile", "desktop", "add", package.path]
-        process.environment = ["HOME": environment.home.path, "DSH_HOME": environment.home.path,
-                               "DSH_AGENTS_HOME": environment.home.appendingPathComponent("agents").path,
-                               "PATH": "/usr/bin:/bin", "LANG": "C", "TMPDIR": environment.root.path]
-        process.currentDirectoryURL = environment.root
-        process.standardInput = FileHandle.nullDevice
-        let output = Pipe()
-        process.standardOutput = output; process.standardError = output
-        let readFD = output.fileHandleForReading.fileDescriptor
-        _ = fcntl(readFD, F_SETFL, O_NONBLOCK)
-        defer { try? output.fileHandleForReading.close(); try? output.fileHandleForWriting.close() }
-        do { try process.run() } catch {
-            result.state = .unknown; result.code = "launch-failed"; try save(result); return result
+        let arguments = [executable.path, "plugin", "--profile", "desktop", "add", package.path]
+        let env = ["HOME=" + environment.home.path, "DSH_HOME=" + environment.home.path,
+                   "DSH_AGENTS_HOME=" + environment.home.appendingPathComponent("agents").path,
+                   "PATH=/usr/bin:/bin", "LANG=C", "TMPDIR=" + environment.root.path]
+        var argv = arguments.map { strdup($0) } + [nil]
+        var envp = env.map { strdup($0) } + [nil]
+        defer { argv.forEach { free($0) }; envp.forEach { free($0) } }
+        var child = owned_child()
+        let launch = argv.withUnsafeMutableBufferPointer { args in
+            envp.withUnsafeMutableBufferPointer { vars in
+                owned_spawn(executable.path, args.baseAddress, vars.baseAddress, environment.root.path, &child)
+            }
         }
-        // Never retain or publish child output: stronger than regex redaction.
+        if launch != 0 { result.state = .unknown; result.code = "launch-failed"; try save(result); return result }
         var count = 0
         var bytes = [UInt8](repeating: 0, count: 4096)
-        let deadline = Date().addingTimeInterval(timeout)
+        let deadline = ProcessInfo.processInfo.systemUptime + timeout
         var failure: String?
         repeat {
-            let n = read(readFD, &bytes, bytes.count)
+            let n = read(child.output, &bytes, bytes.count)
             if n > 0 { count += n }
             if count > 16384 { failure = "output-limit" }
             if cancelled() { failure = "cancelled-after-launch" }
-            if Date() >= deadline { failure = "timeout" }
-            if failure != nil && process.isRunning {
-                // Only the child launched here; never a DSH instance/profile.
-                process.terminate()
-                let grace = Date().addingTimeInterval(0.2)
-                while process.isRunning && Date() < grace { Thread.sleep(forTimeInterval: 0.01) }
-                if process.isRunning { kill(process.processIdentifier, SIGKILL) }
-            }
-            if !process.isRunning && (n <= 0 || failure != nil) { break }
+            if ProcessInfo.processInfo.systemUptime >= deadline { failure = "timeout" }
+            let exited = owned_exited(&child)
+            if exited < 0 { failure = "child-state-unknown" }
+            if failure != nil || (exited == 1 && n <= 0) { break }
             Thread.sleep(forTimeInterval: 0.005)
         } while true
-        process.waitUntilExit()
+        var exitStatus: Int32 = -1
+        if owned_finish(&child, &exitStatus) != 0 {
+            failure = "process-group-cleanup-unconfirmed"
+            if child.output >= 0 { close(child.output) }
+        }
         result.state = .unknown
-        result.code = failure ?? (process.terminationStatus == 0 ? "verification-required" : "cli-failed")
-        if failure == nil && process.terminationStatus == 0 {
+        result.code = failure ?? (exitStatus == 0 ? "verification-required" : "cli-failed")
+        if failure == nil && exitStatus == 0 {
             do {
                 try safe(environment.home)
                 if try state.verifyInstalled(home: environment.home, packageHash: packageHash) {

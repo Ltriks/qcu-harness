@@ -7,7 +7,8 @@ let package = Package(
     products: [.executable(name: "ChengyuanInstallerDemo", targets: ["InstallerDemo"])],
     targets: [
         .systemLibrary(name: "SystemZlib"),
-        .target(name: "InstallerCore", dependencies: ["SystemZlib"]),
+        .target(name: "NativeProcess"),
+        .target(name: "InstallerCore", dependencies: ["SystemZlib", "NativeProcess"]),
         .target(name: "InstallerPresentation", dependencies: ["InstallerCore"]),
         // TEST ONLY: no signing private key belongs in InstallerCore.
         .target(name: "DemoFixtures", dependencies: ["InstallerCore"]),

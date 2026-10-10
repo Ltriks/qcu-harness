@@ -5,7 +5,7 @@
 | 检查 | 结果 | 范围 |
 | --- | --- | --- |
 | Swift Package 编译 | 通过 | InstallerCore、DemoFixtures、SwiftUI executable 和测试目标；不等于视觉验收 |
-| XCTest | **60/60 通过，0 失败** | 原有28项 + 10项压缩格式/URLSession测试 + 12项视图模型测试 + 10项隔离CLI测试；包含多种攻击和网络故障子用例 |
+| XCTest | **66/66 通过，0 失败** | 原有28项 + 10项压缩格式/URLSession测试 + 12项视图模型测试 + 12项隔离CLI测试 + 4项平台检查；包含多种攻击和网络故障子用例 |
 | Node 离线交互测试 | **2/2 通过** | Hub 样例点击生成四字段 JSON，自有 scheme 文本，不联网、不导航 |
 | 固定 TGZ / 纯 Skill ZIP | 通过 | 原固定TGZ逐成员核对、临时下载到CLI-plan；ZIP stored/deflate到合成Home |
 | URLSession 下载 | 通过 | 临时GET-only loopback：清单验签、用户许可、流式hash、拒绝重定向、超时/取消/失败清理 |
@@ -39,3 +39,7 @@
 CLI核心增量：新增10项隔离 XCTest（只运行临时伪CLI，不运行DSH），覆盖生产门关闭、固定参数/最小环境、安装证据/禁用状态、重复/跨目标/伪造/过期确认、占用/同名包、CLI/包/标记变更、symlink/锁、退出0缺证据、非零失败、超时/取消、输出限额与无原文日志、中断恢复不重放。实际macOS签名验证、真实进程清单和官方profile核验仍为接口，不能计为通过。
 
 本阶段最终 XCTest 于2026-10-10 11:28:08（UTC+8）完成：60项通过、0失败；Node离线检查2项再次通过。日志为本地忽略目录 `.build/validation-cli.log`。
+
+平台检查阶段：66项XCTest于2026-10-10 11:37:04（UTC+8）完成，0失败，归档签名测试实际运行（通过显式只读归档参数提供，未跳过）。其中进程不可读的安全拒绝分支通过，但日志明确 `LIVE_IDLE_PREFLIGHT_UNVERIFIED: process-inventory-unavailable--3`，**空闲预检正向结果未通过**。已有归档Team/Bundle/版本的实际Security.framework验证、合成profile读写证据检查、超时/取消/正常退出后的自有后代内核状态检查均通过。故障回归期间发现并修复未回收退出进程身份判断及文件枚举路径差异，未以mock掩盖系统盘点缺口。
+
+固定官方CLI launcher hash后，4项平台检查于11:38:04（UTC+8）再次通过；Node 2项再次通过。生产空闲预检阻塞保持原状。

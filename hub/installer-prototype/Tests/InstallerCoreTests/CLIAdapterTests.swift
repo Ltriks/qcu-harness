@@ -1,4 +1,5 @@
 import XCTest
+import NativeProcess
 @testable import InstallerCore
 
 private struct FixtureIdentity: OfficialIdentityChecking {
@@ -111,6 +112,31 @@ final class CLIAdapterTests: XCTestCase {
         XCTAssertThrowsError(try adapter.run(forged))
         let (other, adapter2, _) = try fixture(); defer { try? other.removeSimulation() }
         XCTAssertThrowsError(try adapter2.run(consent))
+    }
+
+    func testTimeoutAndCancelTerminateOwnedDescendants() throws {
+        for cancel in [false, true] {
+            let body = "import subprocess,signal\nchild=subprocess.Popen(['/usr/bin/python3','-c','import signal,time; signal.signal(signal.SIGTERM,signal.SIG_IGN); time.sleep(30)'])\nopen(os.environ['DSH_HOME']+'/child-pid','w').write(str(child.pid))\nsignal.signal(signal.SIGTERM,signal.SIG_IGN)\ntime.sleep(30)"
+            let (env, adapter, _) = try fixture(body); defer { try? env.removeSimulation() }
+            let path = env.home.appendingPathComponent("child-pid")
+            let result = try adapter.run(adapter.confirmLocally(), timeout: 3, cancelled: {
+                cancel && FileManager.default.fileExists(atPath: path.path)
+            })
+            XCTAssertEqual(result.code, cancel ? "cancelled-after-launch" : "timeout")
+            let pid = try XCTUnwrap(Int32(String(contentsOf: path, encoding: .utf8)))
+            // A killed descendant can transiently remain a zombie awaiting init;
+            // use the kernel state, not kill(pid,0), to prove it cannot execute.
+            XCTAssertTrue(native_pid_stopped(pid) == 1)
+        }
+    }
+
+    func testSuccessfulLeaderExitAlsoCleansBackgroundChild() throws {
+        let body = "import subprocess\nchild=subprocess.Popen(['/usr/bin/python3','-c','import time; time.sleep(30)'])\nopen(os.environ['DSH_HOME']+'/child-pid','w').write(str(child.pid))\nopen(os.environ['DSH_HOME']+'/fixture-installed','w').write('disabled')"
+        let (env, adapter, _) = try fixture(body); defer { try? env.removeSimulation() }
+        let result = try adapter.run(adapter.confirmLocally(), timeout: 3)
+        XCTAssertEqual(result.state, .verifiedInstallationOnly)
+        let pid = try XCTUnwrap(Int32(String(contentsOf: env.home.appendingPathComponent("child-pid"), encoding: .utf8)))
+        XCTAssertEqual(native_pid_stopped(pid), 1)
     }
 
 }
