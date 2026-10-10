@@ -1,0 +1,31 @@
+{
+  "id": "chengyuan-study-coach-text-pilot",
+  "version": "0.1.0-pilot.1",
+  "kind": "pure-text-skill",
+  "license": "MIT",
+  "canonicalSource": "skills/chengyuan-study-coach/SKILL.md",
+  "canonicalSourceSha256": "dfd2fac7624c2f46f0bdcb15c7ea475156082d538b44d023f39b7e445e42de32",
+  "changes": "Only frontmatter name and metadata.version; instruction body unchanged.",
+  "archive": "chengyuan-study-coach-text-pilot-0.1.0-pilot.1.zip",
+  "archiveBytes": 1992,
+  "sha256": "d366f04c8eee8f7beaf635c63e292ab21be3b2d77b1a464968170e5605190e76",
+  "files": [
+    {
+      "path": "chengyuan-study-coach-text-pilot/LICENSE.txt",
+      "bytes": 1093,
+      "sha256": "79832ece489707e2f1c9d5ddeaa9c38958a3bbce2a0d5b67645af5a4039ad787"
+    },
+    {
+      "path": "chengyuan-study-coach-text-pilot/SKILL.md",
+      "bytes": 1485,
+      "sha256": "d15c895e9549149cbbabe5381a83243bad433a8056c1253f5e7d5a3cc52dfb83"
+    }
+  ],
+  "relativeTarget": "skills/chengyuan-study-coach-text-pilot/",
+  "published": false,
+  "signed": false,
+  "tests": {
+    "passed": 6,
+    "scope": "temporary directories only"
+  }
+}
