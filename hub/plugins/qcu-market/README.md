@@ -1,6 +1,6 @@
 # QCU市场 · Client浏览原型
 
-为固定 DSH `0.2.0-rc.2` 增加侧栏“QCU市场”和独立主面板。沿用官方聊天、审批布局与品牌，不替换 `root`。当前源码准备版本 `0.1.0-pilot.2`，尚未打包、部署或安装。固定p1归档保持不变；用户报告p1已安装启用并看见QCU市场，仅记入口可见PASS。包内无npm生命周期或构建脚本，Client已预构建。
+为固定 DSH `0.2.0-rc.2` 增加侧栏“QCU市场”和独立主面板。沿用官方聊天、审批布局与品牌，不替换 `root`。当前固定试用版本 `0.1.0-pilot.2`，仅离线打包，尚未部署或安装。固定p1归档保持不变；用户报告p1已安装启用并看见QCU市场，仅记入口可见PASS。包内无npm生命周期或构建脚本，Client已预构建。
 
 - 唯一目录源：`hub/market/catalog.json`；沿用 Hub `skills/plugins`、`id/name/category/version/summary` 字段，补充来源、使用前提和实例验证状态。
 - 该浏览schema与 `hub/release/catalog.mjs` 的已审核不可变发布schema有意分开。草案不能冒充已有哈希与发布批准的安装包；后续正式发布应复用现有Hub版本、哈希与审核机制。
