@@ -1,6 +1,7 @@
 import hashlib
 import importlib.util
 import json
+import socket
 import tempfile
 import threading
 import unittest
@@ -88,6 +89,43 @@ class HubPythonServerTests(unittest.TestCase):
         with self.assertRaises(urllib.error.HTTPError) as e:
             opener.open(urllib.request.Request(url + '/catalog.json', method='POST'))
         self.assertEqual(e.exception.code, 405)
+
+    def start_connection_test_server(self):
+        server = hub.make_server(hub.load_snapshot(self.root, self.pin), port=0)
+        accepted = threading.Event()
+        original = server.get_request
+
+        def observe_accept():
+            request = original()
+            accepted.set()
+            return request
+
+        server.get_request = observe_accept
+        threading.Thread(target=server.serve_forever, daemon=True).start()
+        self.addCleanup(server.server_close)
+        self.addCleanup(server.shutdown)
+        idle = socket.create_connection(server.server_address, timeout=1)
+        self.addCleanup(idle.close)
+        self.assertTrue(accepted.wait(1), 'the idle connection must actually be accepted')
+        return server, idle
+
+    def test_accepted_idle_connection_does_not_block_site(self):
+        server, idle = self.start_connection_test_server()
+        opener = urllib.request.build_opener(urllib.request.ProxyHandler({}))
+        url = 'http://127.0.0.1:%s' % server.server_port
+        for path in ['/', '/themes.html', '/catalog.json', '/plugins/' + self.file]:
+            with opener.open(url + path, timeout=1) as response:
+                self.assertEqual(response.status, 200)
+        self.assertEqual(idle.fileno() >= 0, True)
+
+    def test_partial_request_times_out_and_closes_connection(self):
+        server = hub.make_server(hub.load_snapshot(self.root, self.pin), port=0)
+        threading.Thread(target=server.serve_forever, daemon=True).start()
+        self.addCleanup(server.server_close)
+        self.addCleanup(server.shutdown)
+        with socket.create_connection(server.server_address, timeout=6) as client:
+            client.sendall(b'GET /themes.html HTTP/1.1\r\nHost:')
+            self.assertEqual(client.recv(1), b'')
 
 
 if __name__ == '__main__':

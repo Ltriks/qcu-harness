@@ -5,7 +5,7 @@ import hashlib
 import ipaddress
 import json
 import re
-from http.server import BaseHTTPRequestHandler, HTTPServer
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
 MAX_FILE = 32 * 1024 * 1024
@@ -82,6 +82,9 @@ def make_server(resources, host='127.0.0.1', port=8080, lan_approved=False):
     class Handler(BaseHTTPRequestHandler):
         server_version = 'QCUStaticHub'
         sys_version = ''
+        # Browsers may preconnect without sending a request. Bound stalled
+        # socket reads/writes, and isolate them from other clients below.
+        timeout = 5.0
 
         def log_message(self, *args):
             pass
@@ -114,7 +117,7 @@ def make_server(resources, host='127.0.0.1', port=8080, lan_approved=False):
             if not head:
                 self.wfile.write(data)
 
-    return HTTPServer((host, port), Handler)
+    return ThreadingHTTPServer((host, port), Handler)
 
 
 def main():
