@@ -5,7 +5,7 @@ public struct ReviewedDownload: Sendable {
     public let request: InstallRequest
     public let manifest: ReleaseManifest
     public let manifestDigest: String
-    fileprivate let envelope: Data
+    public let envelope: Data
 }
 public struct DownloadConsent: Sendable { fileprivate let id: UUID }
 
@@ -28,12 +28,14 @@ public actor DownloadClient {
     public nonisolated let stagingDirectory: URL
     private let trust: CatalogTrust
     private let timeout: TimeInterval
+    private let fixtureProtocol: URLProtocol.Type?
     private var consents: [UUID: (String, String, Date)] = [:]
     private var active = 0
 
-    public init(trust: CatalogTrust, timeout: TimeInterval = 30) throws {
+    public init(trust: CatalogTrust, timeout: TimeInterval = 30, fixtureProtocol: URLProtocol.Type? = nil) throws {
         try require(timeout >= 0.1 && timeout <= 60 && (trust.fixtureOnly || timeout >= 5), "invalid-download-timeout")
-        self.trust = trust; self.timeout = timeout
+        try require(fixtureProtocol == nil || trust.fixtureOnly, "fixture-transport-in-production")
+        self.trust = trust; self.timeout = timeout; self.fixtureProtocol = fixtureProtocol
         stagingDirectory = FileManager.default.temporaryDirectory.resolvingSymlinksInPath()
             .appendingPathComponent("chengyuan-DOWNLOAD-SIMULATION-\(UUID().uuidString)")
         try FileManager.default.createDirectory(at: stagingDirectory, withIntermediateDirectories: false, attributes: [.posixPermissions: 0o700])
@@ -98,6 +100,7 @@ public actor DownloadClient {
         let handle = try FileHandle(forWritingTo: file)
         defer { try? handle.close() }
         let configuration = URLSessionConfiguration.ephemeral
+        if let fixtureProtocol { configuration.protocolClasses = [fixtureProtocol] }
         configuration.urlCache = nil; configuration.httpCookieStorage = nil; configuration.urlCredentialStorage = nil
         configuration.httpShouldSetCookies = false
         configuration.timeoutIntervalForRequest = timeout; configuration.timeoutIntervalForResource = timeout

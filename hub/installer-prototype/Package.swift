@@ -8,9 +8,10 @@ let package = Package(
     targets: [
         .systemLibrary(name: "SystemZlib"),
         .target(name: "InstallerCore", dependencies: ["SystemZlib"]),
+        .target(name: "InstallerPresentation", dependencies: ["InstallerCore"]),
         // TEST ONLY: no signing private key belongs in InstallerCore.
         .target(name: "DemoFixtures", dependencies: ["InstallerCore"]),
-        .executableTarget(name: "InstallerDemo", dependencies: ["InstallerCore", "DemoFixtures"]),
-        .testTarget(name: "InstallerCoreTests", dependencies: ["InstallerCore", "DemoFixtures"], resources: [.copy("Fixtures")]),
+        .executableTarget(name: "InstallerDemo", dependencies: ["InstallerCore", "InstallerPresentation", "DemoFixtures"]),
+        .testTarget(name: "InstallerCoreTests", dependencies: ["InstallerCore", "InstallerPresentation", "DemoFixtures"], resources: [.copy("Fixtures")]),
     ]
 )

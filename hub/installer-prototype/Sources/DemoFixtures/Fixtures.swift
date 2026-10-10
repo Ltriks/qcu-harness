@@ -43,7 +43,7 @@ public enum Fixtures {
         return archive
     }
     public static func make(kind: PackageKind = .skill, version: String = "0.1.0-test.1", requestID: String = UUID().uuidString.lowercased(),
-                            now: Date = Date(), files customFiles: [String: Data]? = nil, entryType: UInt8 = 48, mode: Int = 0o600,
+                            now: Date = Date(), origin: URL = URL(string: "https://catalog.example.invalid")!, files customFiles: [String: Data]? = nil, entryType: UInt8 = 48, mode: Int = 0o600,
                             mutate: ((inout [String: Any]) -> Void)? = nil) throws -> Fixture {
         let packageID = kind == .skill ? "chengyuan-study-demo" : "chengyuan-plugin-demo"
         let defaultFiles: [String: Data]
@@ -59,7 +59,7 @@ public enum Fixtures {
         let files = customFiles ?? defaultFiles
         let tarball = tar(files, entryType: entryType, mode: mode)
         let hash = digest(tarball)
-        let source = URL(string: "https://catalog.example.invalid/packages/\(packageID)-\(version)-\(hash).tar")!
+        let source = origin.appendingPathComponent("packages/\(packageID)-\(version)-\(hash).tar")
         var manifest: [String: Any] = [
             "schema": 2, "catalogID": "test-chengyuan", "packageID": packageID, "version": version,
             "title": kind == .skill ? "学习教练 · 纯文本测试" : "插件 · 仅参数计划",
@@ -71,7 +71,7 @@ public enum Fixtures {
         ]
         mutate?(&manifest)
         let request = try InstallRequest.parse(JSONSerialization.data(withJSONObject: ["catalogID": "test-chengyuan", "packageID": packageID, "version": version, "requestID": requestID]))
-        let trust = try CatalogTrust(catalogID: "test-chengyuan", origin: URL(string: "https://catalog.example.invalid")!,
+        let trust = try CatalogTrust(catalogID: "test-chengyuan", origin: origin,
                                      publicKeys: [testKeyID: key().publicKey.rawRepresentation], fixtureOnly: true)
         return Fixture(request: request, envelope: try signed(manifest), archive: DownloadedArchive(source: source, bytes: tarball), trust: trust)
     }
