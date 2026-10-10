@@ -1,0 +1,28 @@
+{
+  "scope": "authorized LAN publication and staging; UI blocked",
+  "approval": "Sentinel_bf8bf70d70488191b5d87c0b89a77517",
+  "hubPublished": true,
+  "newCoachVersion": "0.1.0-pilot.2",
+  "newCoachSha256": "4ac9b2489ece90098faea5f5d0cf79c6efb2989214eaf74f4e38c4841c2eb060",
+  "catalogSha256": "9c86af7ce018d7251cb8038651ea4abc46b721b6d8988555398817722c0a65c6",
+  "manifestSha256": "1c19160c006daf7a7da99a2856c4f85a849202047c33d031edb794daff5f9fe2",
+  "httpChecks": {
+    "mac": 15,
+    "mini": 15
+  },
+  "oldPackagesUnchanged": true,
+  "hubScriptAndPagesUnchanged": true,
+  "defaultDshProfileUnchanged": true,
+  "marketInstalledVersion": "0.1.0-pilot.2",
+  "marketPilot4Staged": true,
+  "marketPilot4Installed": false,
+  "coachInstalled": false,
+  "activationTested": false,
+  "installCancellationTested": false,
+  "appRestarted": false,
+  "visualAcceptance": "not-tested",
+  "blocker": "Computer-use tool reports Mac locked; human installation confirmation not available",
+  "rollbackPerformed": false,
+  "rollbackBackupPrepared": true,
+  "knownCopyIssue": "Immutable pilot.4 still says coach not published; live catalog and receipts record actual publication. No package bytes changed."
+}

@@ -1,13 +1,13 @@
 {
   "schemaVersion": 1,
-  "revision": "pilot-test1-study-coach-p1-live",
-  "title": "城院 Hub · 局域网内部试点",
-  "tagline": "学习方法教练固定包与合成安装探针；仅同局域网下载，不自动安装。",
+  "revision": "pilot-study-coach-p2-live",
+  "title": "QCU Hub · 局域网内部试点",
+  "tagline": "独立固定版本学习教练包；旧版保留，新版按需下载。",
   "updated_at": "2026-10-10",
   "compatible_dsh": "以条目 dshVersions 精确版本为准，仍须官方兼容检查",
-  "install_hint": "切换到「插件 Plugin」下载固定 TGZ，核对独立提供的 SHA256，再在官方 rc.2 通过 plugin_manager 安装核验后的本机文件。管理动作逐次审批；首页不是 package spec。",
-  "skill_hint": "本次没有单独 Skill ZIP；学习方法教练由插件包提供，见「插件 Plugin」。",
-  "plugin_hint": "安装后正常重启，通过真实 list_plugins 获得精确 row 标识，再逐次批准启用并正常重启。保持 workspace-write+ask；不自动更新、不豁免版本。",
+  "install_hint": "独立TGZ托管于此。QCU市场pilot.4支持下载校验后由本机用户明确确认安装，无需模型或API Key；当前市场真机升级尚待用户确认。也可经官方插件页安装核验后的本机包。",
+  "skill_hint": "新版插件注册qcu-study-coach；旧版技能名保留在旧包。此处不提供单独Skill ZIP。",
+  "plugin_hint": "默认不启用。包与组件启用需分别确认；必要时用户正常重启。已安装旧版时报冲突，不自动覆盖、不授权build脚本、不加版本豁免。",
   "audience": "lan-private",
   "publicRelease": false,
   "skills": [],
@@ -44,6 +44,24 @@
       "file": "qcu-study-coach-0.1.0-pilot.1-76ed55721d7a78237af6b05bca683a045fb232374c3d869af3676f90368c4f6c.tgz",
       "sha256": "76ed55721d7a78237af6b05bca683a045fb232374c3d869af3676f90368c4f6c",
       "bytes": 3331,
+      "dshVersions": [
+        "0.2.0-rc.2"
+      ]
+    },
+    {
+      "id": "qcu-study-coach",
+      "name": "QCU学习方法教练 P2（内部试点）",
+      "category": "学习支持",
+      "version": "0.1.0-pilot.2",
+      "risk": "Host代码／需本机确认",
+      "summary": "新技能qcu-study-coach：合理拆解任务与错题复盘；不代写。固定包结构与注册测试通过，真实安装/启用/教学效果待验收。MIT；旧版不自动覆盖。",
+      "status": "published",
+      "review": "approved",
+      "synthetic": false,
+      "defaultDisabled": true,
+      "file": "qcu-study-coach-0.1.0-pilot.2-4ac9b2489ece90098faea5f5d0cf79c6efb2989214eaf74f4e38c4841c2eb060.tgz",
+      "sha256": "4ac9b2489ece90098faea5f5d0cf79c6efb2989214eaf74f4e38c4841c2eb060",
+      "bytes": 3445,
       "dshVersions": [
         "0.2.0-rc.2"
       ]
