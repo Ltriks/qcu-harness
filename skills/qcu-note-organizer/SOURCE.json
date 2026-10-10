@@ -1,0 +1,7 @@
+{
+  "source": "skills/chengyuan-note-organizer/SKILL.md",
+  "baseline": "ab362184c917554354486cd13d300f4c934be138",
+  "sourceSha256": "3f626b958ba5190e56677fff06aca06fbca623ecc0d1ba4ff4f7436f1a168445",
+  "license": "MIT",
+  "changes": "QCU标识适配，补充匿名资料与非检测/处分边界"
+}

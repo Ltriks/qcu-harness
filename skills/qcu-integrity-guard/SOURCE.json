@@ -1,0 +1,7 @@
+{
+  "source": "skills/chengyuan-integrity-guard/SKILL.md",
+  "baseline": "ab362184c917554354486cd13d300f4c934be138",
+  "sourceSha256": "d54fcd0fac35b8c067db1f4a3ed5f1ca04726aa30e3f8f0415acf8114a9237f8",
+  "license": "MIT",
+  "changes": "QCU标识适配，补充匿名资料与非检测/处分边界"
+}

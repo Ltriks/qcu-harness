@@ -1,0 +1,7 @@
+{
+  "source": "skills/chengyuan-reading-outline/SKILL.md",
+  "baseline": "ab362184c917554354486cd13d300f4c934be138",
+  "sourceSha256": "ad3fd38f26940729bb9a2c9f564822b615fd610928b2df567fc8232f7d268770",
+  "license": "MIT",
+  "changes": "QCU标识适配，补充匿名资料与非检测/处分边界"
+}
