@@ -9,8 +9,8 @@ import unittest
 import zipfile
 
 ROOT = Path(__file__).resolve().parents[2]
-ID = 'chengyuan-study-coach-text-pilot'
-VERSION = '0.1.0-pilot.1'
+ID = 'qcu-study-coach-text-pilot'
+VERSION = '0.1.0-pilot.2'
 SOURCE = ROOT / 'skills/chengyuan-study-coach/SKILL.md'
 
 
@@ -29,6 +29,7 @@ def payload():
     old = 'name: chengyuan-study-coach\n'
     assert text.count(old) == 1
     text = text.replace(old, f'name: {ID}\nmetadata:\n  version: "{VERSION}"\n', 1)
+    text = text.replace('城院', 'QCU')
     return {f'{ID}/SKILL.md': text.encode(), f'{ID}/LICENSE.txt': license_text}
 
 
@@ -141,6 +142,9 @@ if __name__ == '__main__':
     result = unittest.TextTestRunner(verbosity=2).run(suite)
     if not result.wasSuccessful():
         raise SystemExit(1)
+    import sys
+    if '--test-only' in sys.argv:
+        raise SystemExit(0)
     files = payload()
     packed = archive(files)
     out = Path(tempfile.mkdtemp(prefix='qcu-pure-skill-offline-'))
@@ -150,7 +154,7 @@ if __name__ == '__main__':
         'id': ID, 'version': VERSION, 'kind': 'pure-text-skill', 'license': 'MIT',
         'canonicalSource': 'skills/chengyuan-study-coach/SKILL.md',
         'canonicalSourceSha256': sha(SOURCE.read_bytes()),
-        'changes': 'Only frontmatter name and metadata.version; instruction body unchanged.',
+        'changes': 'Frontmatter name/version and product display renamed to QCU; business instructions unchanged.',
         'archive': filename, 'archiveBytes': len(packed), 'sha256': sha(packed),
         'files': [{'path': name, 'bytes': len(data), 'sha256': sha(data)} for name, data in sorted(files.items())],
         'relativeTarget': f'skills/{ID}/', 'published': False, 'signed': False,

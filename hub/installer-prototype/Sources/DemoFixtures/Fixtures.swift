@@ -45,14 +45,14 @@ public enum Fixtures {
     public static func make(kind: PackageKind = .skill, version: String = "0.1.0-test.1", requestID: String = UUID().uuidString.lowercased(),
                             now: Date = Date(), origin: URL = URL(string: "https://catalog.example.invalid")!, files customFiles: [String: Data]? = nil, entryType: UInt8 = 48, mode: Int = 0o600,
                             mutate: ((inout [String: Any]) -> Void)? = nil) throws -> Fixture {
-        let packageID = kind == .skill ? "chengyuan-study-demo" : "chengyuan-plugin-demo"
+        let packageID = kind == .skill ? "qcu-study-demo" : "qcu-plugin-demo"
         let defaultFiles: [String: Data]
         if kind == .skill {
             defaultFiles = ["SKILL.md": Data("---\nname: \(packageID)\ndescription: Synthetic fixture only\n---\nAsk a learner to restate a concept. No private content.\n".utf8)]
         } else {
             defaultFiles = [
                 "package/package.json": Data("{\"name\":\"\(packageID)\",\"version\":\"\(version)\",\"type\":\"module\",\"main\":\"index.js\",\"dsh\":{\"bundle\":{\"patch\":\"./cordis.patch.yml\"}}}".utf8),
-                "package/cordis.patch.yml": Data("[{\"insert\":[{\"id\":\"chengyuan-plugin-demo\",\"name\":\"chengyuan-plugin-demo\",\"disabled\":true}]}]".utf8),
+                "package/cordis.patch.yml": Data("[{\"insert\":[{\"id\":\"qcu-plugin-demo\",\"name\":\"qcu-plugin-demo\",\"disabled\":true}]}]".utf8),
                 "package/index.js": Data("// TEST ONLY, never loaded by this prototype.\nexport function apply() {}\n".utf8),
             ]
         }
@@ -61,7 +61,7 @@ public enum Fixtures {
         let hash = digest(tarball)
         let source = origin.appendingPathComponent("packages/\(packageID)-\(version)-\(hash).tar")
         var manifest: [String: Any] = [
-            "schema": 2, "catalogID": "test-chengyuan", "packageID": packageID, "version": version,
+            "schema": 2, "catalogID": "test-qcu", "packageID": packageID, "version": version,
             "title": kind == .skill ? "学习教练 · 纯文本测试" : "插件 · 仅参数计划",
             "kind": kind.rawValue, "archiveURL": source.absoluteString, "archiveFormat": "tar", "sha256": hash, "bytes": tarball.count,
             "files": files.keys.sorted().map { ["path": $0, "sha256": digest(files[$0]!), "bytes": files[$0]!.count] as [String: Any] },
@@ -70,8 +70,8 @@ public enum Fixtures {
             "authority": kind == .skill ? "model-instructions" : "host-code-outside-workspace-sandbox",
         ]
         mutate?(&manifest)
-        let request = try InstallRequest.parse(JSONSerialization.data(withJSONObject: ["catalogID": "test-chengyuan", "packageID": packageID, "version": version, "requestID": requestID]))
-        let trust = try CatalogTrust(catalogID: "test-chengyuan", origin: origin,
+        let request = try InstallRequest.parse(JSONSerialization.data(withJSONObject: ["catalogID": "test-qcu", "packageID": packageID, "version": version, "requestID": requestID]))
+        let trust = try CatalogTrust(catalogID: "test-qcu", origin: origin,
                                      publicKeys: [testKeyID: key().publicKey.rawRepresentation], fixtureOnly: true)
         return Fixture(request: request, envelope: try signed(manifest), archive: DownloadedArchive(source: source, bytes: tarball), trust: trust)
     }

@@ -51,7 +51,7 @@ public final class SimulationEnvironment {
     fileprivate var identities: URL { root.appendingPathComponent("release-identities") }
     public init() throws {
         root = FileManager.default.temporaryDirectory.resolvingSymlinksInPath()
-            .appendingPathComponent("chengyuan-INSTALLER-SIMULATION-\(UUID().uuidString)", isDirectory: true)
+            .appendingPathComponent("qcu-INSTALLER-SIMULATION-\(UUID().uuidString)", isDirectory: true)
         for path in [root, home, skills, journals, transactions, identities] { try makePrivate(path) }
     }
     /// Explicit cleanup is limited to the directory this instance created.
@@ -220,7 +220,7 @@ public final class Installer {
                 try save(current)
                 return current
             }
-            let marker = ".chengyuan-simulation-owner"
+            let marker = ".qcu-simulation-owner"
             if fm.fileExists(atPath: dest.path) {
                 let markerPath = dest.appendingPathComponent(marker)
                 try environment.safe(markerPath)

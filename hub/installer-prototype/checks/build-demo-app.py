@@ -5,19 +5,20 @@ import plistlib
 import shutil
 
 root = Path(__file__).resolve().parents[1]
-candidates = [p for p in (root / '.build').rglob('ChengyuanInstallerDemo') if p.is_file() and '.app' not in str(p)]
+candidates = [p for p in (root / '.build').rglob('QCUInstallerDemo') if p.is_file() and '.app' not in str(p)]
 if len(candidates) != 1:
     raise SystemExit(f'Expected one built executable, found {len(candidates)}; run swift test first.')
-app = root / '.build/artifacts/ChengyuanInstallerDemo.app'
+app = root / '.build/artifacts/QCUInstallerDemo.app'
 if app.exists():
     raise SystemExit('Artifact already exists; preserve it or explicitly remove it before rebuilding.')
 macos = app / 'Contents/MacOS'
 macos.mkdir(parents=True)
-binary = macos / 'ChengyuanInstallerDemo'
+binary = macos / 'QCUInstallerDemo'
 shutil.copy2(candidates[0], binary)
+# Retain legacy bundle identity until a separately approved system-identity migration.
 info = dict(CFBundleExecutable=binary.name, CFBundleIdentifier='org.chengyuan.installer.isolated-demo',
-            CFBundleName='Chengyuan Installer Demo', CFBundlePackageType='APPL',
-            CFBundleShortVersionString='0.0.1', CFBundleVersion='1', LSMinimumSystemVersion='14.0',
+            CFBundleName='QCU Installer Demo', CFBundlePackageType='APPL',
+            CFBundleShortVersionString='0.0.2', CFBundleVersion='2', LSMinimumSystemVersion='14.0',
             NSHighResolutionCapable=True)
 with (app / 'Contents/Info.plist').open('wb') as stream:
     plistlib.dump(info, stream)

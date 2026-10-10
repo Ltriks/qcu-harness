@@ -37,7 +37,7 @@ public actor DownloadClient {
         try require(fixtureProtocol == nil || trust.fixtureOnly, "fixture-transport-in-production")
         self.trust = trust; self.timeout = timeout; self.fixtureProtocol = fixtureProtocol
         stagingDirectory = FileManager.default.temporaryDirectory.resolvingSymlinksInPath()
-            .appendingPathComponent("chengyuan-DOWNLOAD-SIMULATION-\(UUID().uuidString)")
+            .appendingPathComponent("qcu-DOWNLOAD-SIMULATION-\(UUID().uuidString)")
         try FileManager.default.createDirectory(at: stagingDirectory, withIntermediateDirectories: false, attributes: [.posixPermissions: 0o700])
     }
 

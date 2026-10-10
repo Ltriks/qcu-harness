@@ -6,7 +6,7 @@ import DemoFixtures
 @main
 struct InstallerDemoApp: App {
     var body: some Scene {
-        WindowGroup("城院安装助手 · 隔离原型") { InstallerView() }
+        WindowGroup("QCU安装助手 · 隔离原型") { InstallerView() }
             .defaultSize(width: 740, height: 730)
     }
 }
@@ -21,7 +21,7 @@ struct InstallerView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 18) {
-                Text("城院安装助手").font(.largeTitle.bold())
+                Text("QCU安装助手").font(.largeTitle.bold())
                 Text("隔离演示 · 不安装到真实 DSH").font(.headline).foregroundStyle(.orange)
                 Text("合成数据经 URLSession → 签名校验 → 本机确认 → 下载校验 → 合成结果")
                 HStack {

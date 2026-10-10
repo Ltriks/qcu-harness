@@ -1,4 +1,6 @@
-# 城院薄安装助手：隔离原型
+> 当前开发命名与旧安装迁移边界见 [QCU-NAMING-MIGRATION.md](../QCU-NAMING-MIGRATION.md)。历史构建记录与固定包保持原值。
+
+# QCU薄安装助手：隔离原型
 
 基于 `ab362184c917554354486cd13d300f4c934be138` 开发，目标为 Apple Silicon Mac 上的官方 DSH **0.2.0-rc.2**。当前只交付可测试核心和原生交互样例，**不能安装到真实 DSH**。不修改 DSH 源码或线上 Hub，不注册系统协议、不监听网络、不创建生产信任、不访问 API Key/聊天。
 
@@ -24,7 +26,7 @@
 ```sh
 swift test
 node --test checks/hub-demo.test.mjs
-swift run ChengyuanInstallerDemo
+swift run QCUInstallerDemo
 ```
 
 最后一条仅在希望查看原生窗口时手动执行。它不是正式应用安装，不注册 scheme；首次按模拟按钮才创建合成目录。窗口有清理按钮。直接关闭窗口会保留临时日志/备份，供诊断；不要把这些目录当真实安装记录。Node 仅用于离线 HTML 合同测试，原生程序不依赖它。
@@ -43,7 +45,7 @@ swift test --cache-path .build/cache
 
 ## 合同与信任边界
 
-入口 JSON 必须恰好包含 `catalogID/packageID/version/requestID`；拒绝未知字段、路径、重复 URL 参数、非规范 UUID。拟议自有 URL 为 `chengyuan-install://request?...`；没有安装/注册该协议。官方 `dsh://open` 仅聚焦窗口。
+入口 JSON 必须恰好包含 `catalogID/packageID/version/requestID`；拒绝未知字段、路径、重复 URL 参数、非规范 UUID。拟议自有 URL 为 `qcu-install://request?...`；没有安装/注册该协议。官方 `dsh://open` 仅聚焦窗口。
 
 `CatalogTrust` 是未来随签名应用或管理流程预置的 **catalog → HTTPS origin → keyID/public key** 配置接口，绝不来自请求或待验 manifest。生产默认没有任何可信 key；`test-*` key/catalog 仅在显式 fixture 模式使用。DemoFixtures 的公开固定测试种子任何人都能签名，不能用于生产；生产目标必须排除整个 DemoFixtures 模块。没有写入密钥、系统钥匙串、配置或持久生产授权。
 
@@ -76,7 +78,7 @@ Envelope 是 `{keyID,payload,signature}`，后两项为 base64；Ed25519 签名�
 
 ## 本地构建产物与交互说明
 
-通过测试编译后运行 `python3 checks/build-demo-app.py`，只组装 `.build/artifacts/ChengyuanInstallerDemo.app`，不启动、不签名、不注册协议。产物是本机开发构建，不是可分发的正式安装器；Info.plist 没有 CFBundleURLTypes。
+通过测试编译后运行 `python3 checks/build-demo-app.py`，只组装 `.build/artifacts/QCUInstallerDemo.app`，不启动、不签名、不注册协议。产物是本机开发构建，不是可分发的正式安装器；Info.plist 没有 CFBundleURLTypes。
 
 获准视觉演示后，打开该应用，选择“纯 Skill”并开始；检查签名清单中的版本、来源、hash 与隔离范围，勾选后确认下载，可在下载期间取消。终态后用“清理合成目录并重置”。若需更长取消窗口选择慢下载。插件场景只显示未执行的 CLI 计划。所有成功文字限定合成目录，不能据此声称 DSH 内已可用。直接关闭窗口不保证暂存清理，尚无重开恢复 UI。
 

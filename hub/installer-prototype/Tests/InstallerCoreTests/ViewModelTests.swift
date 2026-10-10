@@ -43,7 +43,7 @@ import DemoFixtures
     }
     func testProductionURLWithoutTrustIsRefusedWithoutSession() {
         let model = InstallerViewModel()
-        let url = URL(string: "chengyuan-install://request?catalogID=chengyuan&packageID=chengyuan-study-demo&version=1.0.0&requestID=7fba698a-7349-4b98-a146-caf9471e3660")!
+        let url = URL(string: "qcu-install://request?catalogID=qcu&packageID=qcu-study-demo&version=1.0.0&requestID=7fba698a-7349-4b98-a146-caf9471e3660")!
         model.receiveExternalURL(url)
         XCTAssertEqual(model.state, .refused)
         XCTAssertTrue(model.message.contains("网页提供的公钥"))
@@ -51,7 +51,7 @@ import DemoFixtures
         XCTAssertFalse(model.confirm())
     }
     func testProductionTrustCannotInjectFixtureProtocol() throws {
-        let trust = try CatalogTrust(catalogID: "chengyuan", origin: URL(string: "https://catalog.example.invalid")!, publicKeys: [:])
+        let trust = try CatalogTrust(catalogID: "qcu", origin: URL(string: "https://catalog.example.invalid")!, publicKeys: [:])
         XCTAssertThrowsError(try DownloadClient(trust: trust, fixtureProtocol: DemoURLProtocol.self))
     }
     func testDuplicateBeginAndConfirmHaveOneDownloadAndApply() async throws {

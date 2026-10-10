@@ -2,9 +2,9 @@
 import PackageDescription
 
 let package = Package(
-    name: "ChengyuanInstallerPrototype",
+    name: "QCUInstallerPrototype",
     platforms: [.macOS(.v14)],
-    products: [.executable(name: "ChengyuanInstallerDemo", targets: ["InstallerDemo"])],
+    products: [.executable(name: "QCUInstallerDemo", targets: ["InstallerDemo"])],
     targets: [
         .systemLibrary(name: "SystemZlib"),
         .target(name: "NativeProcess"),

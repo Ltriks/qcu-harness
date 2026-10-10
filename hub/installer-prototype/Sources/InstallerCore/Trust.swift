@@ -44,7 +44,7 @@ public struct InstallRequest: Codable, Equatable, Sendable {
     public static func parseURL(_ url: URL) throws -> Self {
         try require(url.absoluteString.utf8.count <= 4096, "request-url-too-large")
         guard let parts = URLComponents(url: url, resolvingAgainstBaseURL: false) else { throw InstallerError.refused("invalid-request-url") }
-        try require(parts.scheme == "chengyuan-install" && parts.host == "request" && parts.path.isEmpty
+        try require(parts.scheme == "qcu-install" && parts.host == "request" && parts.path.isEmpty
                     && parts.user == nil && parts.password == nil && parts.port == nil && parts.fragment == nil, "invalid-request-url")
         let items = parts.queryItems ?? []
         var fields: [String: String] = [:]

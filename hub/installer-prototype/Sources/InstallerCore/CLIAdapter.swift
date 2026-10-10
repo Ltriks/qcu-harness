@@ -83,7 +83,7 @@ final class IsolatedCLIAdapter {
         try require(!target.fixture, "fixture-cannot-adopt-production-target")
         try ProductionInstallGate.authorize()
         home = target.home; officialApp = target.app; executable = target.executable
-        workspace = FileManager.default.temporaryDirectory.resolvingSymlinksInPath().appendingPathComponent("chengyuan-local-pilot-" + UUID().uuidString)
+        workspace = FileManager.default.temporaryDirectory.resolvingSymlinksInPath().appendingPathComponent("qcu-local-pilot-" + UUID().uuidString)
         try FileManager.default.createDirectory(at: workspace, withIntermediateDirectories: false, attributes: [.posixPermissions: 0o700])
         package = workspace.appendingPathComponent("reviewed.tgz")
         let bytes = try bounded(target.package, limit: 3331)

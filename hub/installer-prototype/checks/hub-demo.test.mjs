@@ -21,7 +21,7 @@ test('Hub demo creates only the four-field request and never navigates or fetche
   vm.runInContext(script, context); click()
   const [json, url] = nodes.get('#request').textContent.split('\n\n')
   assert.deepEqual(Object.keys(JSON.parse(json)), ['catalogID', 'packageID', 'version', 'requestID'])
-  assert.equal(new URL(url).protocol, 'chengyuan-install:')
+  assert.equal(new URL(url).protocol, 'qcu-install:')
   assert.match(nodes.get('#handoff').textContent, /不调用系统处理器/)
   assert.match(html, /connect-src 'none'/)
 })

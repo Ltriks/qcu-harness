@@ -29,9 +29,9 @@ final class InstallerTests: XCTestCase {
     }
     func testOwnSchemeIsStrictAndNeverADSHInstallRoute() throws {
         let fixture = try Fixtures.make()
-        let query = "catalogID=test-chengyuan&packageID=chengyuan-study-demo&version=0.1.0-test.1&requestID=\(fixture.request.requestID)"
-        XCTAssertEqual(try InstallRequest.parseURL(URL(string: "chengyuan-install://request?\(query)")!), fixture.request)
-        for url in ["dsh://install?\(query)", "chengyuan-install://request?\(query)&command=whoami", "chengyuan-install://request?\(query)&catalogID=other", "chengyuan-install://request:80?\(query)"] {
+        let query = "catalogID=test-qcu&packageID=qcu-study-demo&version=0.1.0-test.1&requestID=\(fixture.request.requestID)"
+        XCTAssertEqual(try InstallRequest.parseURL(URL(string: "qcu-install://request?\(query)")!), fixture.request)
+        for url in ["chengyuan-install://request?\(query)", "dsh://install?\(query)", "qcu-install://request?\(query)&command=whoami", "qcu-install://request?\(query)&catalogID=other", "qcu-install://request:80?\(query)"] {
             XCTAssertThrowsError(try InstallRequest.parseURL(URL(string: url)!))
         }
     }
@@ -46,10 +46,10 @@ final class InstallerTests: XCTestCase {
     func testUnknownKeyAndEmptyProductionTrustFailClosed() throws {
         let fixture = try Fixtures.make()
         let env = try SimulationEnvironment(); defer { try? env.removeSimulation() }
-        let noKeys = try CatalogTrust(catalogID: "test-chengyuan", origin: fixture.trust.origin, publicKeys: [:], fixtureOnly: true)
+        let noKeys = try CatalogTrust(catalogID: "test-qcu", origin: fixture.trust.origin, publicKeys: [:], fixtureOnly: true)
         XCTAssertThrowsError(try prepare(fixture, Installer(environment: env, trust: noKeys)))
-        XCTAssertThrowsError(try CatalogTrust(catalogID: "chengyuan", origin: fixture.trust.origin, publicKeys: fixture.trust.publicKeys))
-        let production = try CatalogTrust(catalogID: "chengyuan", origin: fixture.trust.origin, publicKeys: [:])
+        XCTAssertThrowsError(try CatalogTrust(catalogID: "qcu", origin: fixture.trust.origin, publicKeys: fixture.trust.publicKeys))
+        let production = try CatalogTrust(catalogID: "qcu", origin: fixture.trust.origin, publicKeys: [:])
         XCTAssertTrue(production.publicKeys.isEmpty)
         XCTAssertThrowsError(try prepare(fixture, Installer(environment: env, trust: production)))
     }
@@ -135,7 +135,7 @@ final class InstallerTests: XCTestCase {
             let result = try installer.install(prepared, confirmation: permission)
             XCTAssertEqual(result.state, .skillInstalledInSimulation)
             XCTAssertTrue(FileManager.default.fileExists(atPath: env.skills.appendingPathComponent(fixture.request.packageID + "/SKILL.md").path))
-            XCTAssertTrue(env.home.path.contains("chengyuan-INSTALLER-SIMULATION-"))
+            XCTAssertTrue(env.home.path.contains("qcu-INSTALLER-SIMULATION-"))
             XCTAssertEqual(try installer.install(prepared, confirmation: permission).state, result.state)
         }
     }
@@ -174,7 +174,7 @@ final class InstallerTests: XCTestCase {
     }
     func testSameVersionCannotChangeContentEvenWithNewValidSignature() throws {
         let fixture = try Fixtures.make()
-        let alternate = try Fixtures.make(files: ["SKILL.md": Data("---\nname: chengyuan-study-demo\n---\nChanged\n".utf8)])
+        let alternate = try Fixtures.make(files: ["SKILL.md": Data("---\nname: qcu-study-demo\n---\nChanged\n".utf8)])
         try withInstaller(fixture) { installer, _ in
             _ = try prepare(fixture, installer)
             XCTAssertThrowsError(try prepare(alternate, installer))
@@ -229,11 +229,11 @@ final class InstallerTests: XCTestCase {
     }
     func testFailedUpdateRestoresOldSkill() throws {
         let fixture = try Fixtures.make()
-        let next = try Fixtures.make(version: "0.1.0-test.2", files: ["SKILL.md": Data("---\nname: chengyuan-study-demo\n---\nNew\n".utf8)])
+        let next = try Fixtures.make(version: "0.1.0-test.2", files: ["SKILL.md": Data("---\nname: qcu-study-demo\n---\nNew\n".utf8)])
         try withInstaller(fixture) { installer, env in
             let first = try prepare(fixture, installer)
             _ = try installer.install(first, confirmation: installer.confirmFromLocalUser(first))
-            let file = env.skills.appendingPathComponent("chengyuan-study-demo/SKILL.md")
+            let file = env.skills.appendingPathComponent("qcu-study-demo/SKILL.md")
             let before = try Data(contentsOf: file)
             let second = try prepare(next, installer)
             installer.afterBackup = { throw InstallerError.refused("simulated-disk-failure") }
@@ -257,7 +257,7 @@ final class InstallerTests: XCTestCase {
         let fixture = try Fixtures.make()
         try withInstaller(fixture) { installer, env in
             let prepared = try prepare(fixture, installer)
-            let noKeys = try CatalogTrust(catalogID: "test-chengyuan", origin: fixture.trust.origin, publicKeys: [:], fixtureOnly: true)
+            let noKeys = try CatalogTrust(catalogID: "test-qcu", origin: fixture.trust.origin, publicKeys: [:], fixtureOnly: true)
             let changed = Installer(environment: env, trust: noKeys)
             XCTAssertThrowsError(try changed.confirmFromLocalUser(prepared))
         }
@@ -274,13 +274,13 @@ final class InstallerTests: XCTestCase {
             XCTAssertTrue(FileManager.default.fileExists(atPath: backup.path))
             let permissions = try FileManager.default.attributesOfItem(atPath: env.root.path)[.posixPermissions] as? Int
             XCTAssertEqual(permissions, 0o700)
-            let mode = try FileManager.default.attributesOfItem(atPath: env.skills.appendingPathComponent("chengyuan-study-demo/SKILL.md").path)[.posixPermissions] as? Int
+            let mode = try FileManager.default.attributesOfItem(atPath: env.skills.appendingPathComponent("qcu-study-demo/SKILL.md").path)[.posixPermissions] as? Int
             XCTAssertEqual(mode, 0o600)
         }
     }
     func testJournalReadRevalidatesRequestsDecodedOutsideBoundary() throws {
         let fixture = try Fixtures.make()
-        let raw = Data("{\"catalogID\":\"test-chengyuan\",\"packageID\":\"chengyuan-study-demo\",\"version\":\"0.1.0-test.1\",\"requestID\":\"../../outside\"}".utf8)
+        let raw = Data("{\"catalogID\":\"test-qcu\",\"packageID\":\"qcu-study-demo\",\"version\":\"0.1.0-test.1\",\"requestID\":\"../../outside\"}".utf8)
         let unvalidated = try JSONDecoder().decode(InstallRequest.self, from: raw)
         try withInstaller(fixture) { installer, _ in
             XCTAssertThrowsError(try installer.receipt(for: unvalidated))

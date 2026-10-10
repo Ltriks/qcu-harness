@@ -17,13 +17,13 @@ func archivedFixture(_ name: String, origin: URL = URL(string: "https://catalog.
     let package = record["packageID"] as! String, version = record["version"] as! String, hash = record["sha256"] as! String
     let format = record["archiveFormat"] as! String
     let source = origin.appendingPathComponent("packages/\(package)-\(version)-\(hash).\(format)")
-    record["schema"] = 2; record["catalogID"] = "test-chengyuan"; record["title"] = "TEST archive"
+    record["schema"] = 2; record["catalogID"] = "test-qcu"; record["title"] = "TEST archive"
     record["archiveURL"] = source.absoluteString; record["expiresAt"] = Int(Date().addingTimeInterval(3600).timeIntervalSince1970)
     record["dshVersion"] = "0.2.0-rc.2"; record["dependencies"] = [String](); record["installScripts"] = false
     record["authority"] = record["kind"] as? String == "skill" ? "model-instructions" : "host-code-outside-workspace-sandbox"
     mutate?(&record)
-    let request = try InstallRequest.parse(JSONSerialization.data(withJSONObject: ["catalogID":"test-chengyuan", "packageID":package, "version":version, "requestID":UUID().uuidString.lowercased()]))
-    let trust = try CatalogTrust(catalogID: "test-chengyuan", origin: origin, publicKeys: [Fixtures.testKeyID: Fixtures.key().publicKey.rawRepresentation], fixtureOnly: true)
+    let request = try InstallRequest.parse(JSONSerialization.data(withJSONObject: ["catalogID":"test-qcu", "packageID":package, "version":version, "requestID":UUID().uuidString.lowercased()]))
+    let trust = try CatalogTrust(catalogID: "test-qcu", origin: origin, publicKeys: [Fixtures.testKeyID: Fixtures.key().publicKey.rawRepresentation], fixtureOnly: true)
     return ArchiveFixture(request: request, envelope: try Fixtures.signed(record), archive: DownloadedArchive(source: source, bytes: bytes), trust: trust)
 }
 
@@ -33,7 +33,7 @@ final class LoopbackFixture {
     let process: Process
     let origin: URL
     init(mode: String = "ok") throws {
-        root = FileManager.default.temporaryDirectory.appendingPathComponent("chengyuan-loopback-test-\(UUID().uuidString)")
+        root = FileManager.default.temporaryDirectory.appendingPathComponent("qcu-loopback-test-\(UUID().uuidString)")
         try FileManager.default.createDirectory(at: root, withIntermediateDirectories: false, attributes: [.posixPermissions: 0o700])
         try JSONEncoder().encode(mode).write(to: root.appendingPathComponent("mode.json"))
         process = Process()
@@ -95,8 +95,8 @@ final class ArchiveDownloadTests: XCTestCase {
         }
     }
     func testProductionTrustRefusesHTTP() throws {
-        XCTAssertThrowsError(try CatalogTrust(catalogID: "chengyuan", origin: URL(string: "http://127.0.0.1:12345")!, publicKeys: [:]))
-        XCTAssertThrowsError(try CatalogTrust(catalogID: "test-chengyuan", origin: URL(string: "http://192.0.2.1:12345")!, publicKeys: [:], fixtureOnly: true))
+        XCTAssertThrowsError(try CatalogTrust(catalogID: "qcu", origin: URL(string: "http://127.0.0.1:12345")!, publicKeys: [:]))
+        XCTAssertThrowsError(try CatalogTrust(catalogID: "test-qcu", origin: URL(string: "http://192.0.2.1:12345")!, publicKeys: [:], fixtureOnly: true))
     }
     func testDownloadManifestConsentAndArchiveIntegration() async throws {
       for name in ["good-zip", "fixed-study-coach"] {
