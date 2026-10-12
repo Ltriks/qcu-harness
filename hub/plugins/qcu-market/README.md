@@ -1,4 +1,4 @@
-# QCU market — 0.1.0-pilot.5
+# QCU market — 0.1.0-pilot.5.1
 
 One fixed independent coach package, downloaded on demand from the trusted LAN Hub. **Installation needs no model, API Key, session, message or agent tool.** This is local candidate source, not a deployed market.
 
@@ -43,3 +43,9 @@ Successful official `installBundle` ends with stage `enable` even for `enabled:f
 `catalog-input.mjs` imports the existing reviewed coach release and supplies display metadata. The build validates it and generates one immutable `src/bundled-catalog.mjs` consumed by Host and Client. Only coach P2 is listed. Synthetic second entries exist only in tests. No remote catalog fetch, signing key, automatic update or draft installation is implemented. Each card owns a flow; pending actions, confirmation reviews and unresolved installs prevent another card from starting an operation. Receipts bind UUID, release key, catalog fingerprint and expiry.
 
 The future remote contract requires a fixed Hub origin plus a separately bundled catalog SHA, revision and byte limit; a remotely supplied hash cannot authorize entries. Phase 1 does not accept remote entries at all. Exact reviewed package hashes inherit trust from the reviewed market package distribution, not the HTTP server. See `docs/qcu-market-catalog-phase1.md` in the repository for validation and live limitations.
+
+## Browse and detail UI (pilot.5.1)
+
+The home page shows only reviewed installable bundles, with category/search and compact icon cards. No independent skills are currently reviewed: that category is empty. Opening a card or returning to the list never starts an installation. Leaving a pending review/preparation revokes it; an outstanding official installation keeps its original outcome/cancellation rules. Details retain explicit install, bundle and component consent. Diagnostics are collapsed; risk details remain visible before confirmation.
+
+`src/market-view.mjs` is shared by `createLoopPlugin` and `preview.mjs`. Preview uses a clearly labelled synthetic backend from `preview-fixture.mjs`, never ships that backend, never reads a profile and never contacts Hub. Semantic theme tokens are inherited from DSH; the preview shell supplies light/dark examples. See repository `docs/qcu-market-ui-refresh.md` for reproduction and acceptance limits.

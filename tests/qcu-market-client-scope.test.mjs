@@ -65,7 +65,7 @@ test('Client starts in a real plugin fiber, checks inventory and prepares/declin
  assert.deepEqual(f.calls,[],'startup must not read inventory or download')
  await p.flow.status();assert.equal(p.flow.state.status?.state,'not-installed',p.flow.state.message)
  await p.flow.prepare();assert.equal(p.flow.state.phase,'review',p.flow.state.message)
- assert.match(f.render(),/确认安装（保持未启用）/)
+ assert.match(f.render(),/等待你的确认/);assert.doesNotMatch(f.render(),/确认安装（保持未启用）/,'list never renders confirmation controls')
  p.onDetails();assert.deepEqual(f.details,[release.id])
  await p.flow.decline();assert.equal(p.flow.state.phase,'declined')
  assert.deepEqual(f.calls.map(c=>c.endpoint),['qcuMarket/status','pluginManager/listBundles','qcuMarket/status','pluginManager/listBundles','qcuMarket/prepare','pluginManager/inspect','qcuMarket/cancel'])

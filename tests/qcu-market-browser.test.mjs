@@ -1,0 +1,58 @@
+// Real Chromium + the shared P5 UI/state machine. Backend is synthetic, never DSH.
+import test from 'node:test'
+import assert from 'node:assert/strict'
+import {createRequire} from 'node:module'
+import {readFile,mkdir} from 'node:fs/promises'
+import {createServer} from 'node:http'
+import {resolve} from 'node:path'
+const deps=process.env.QCU_BROWSER_DEPENDENCIES||process.env.QCU_OFFICIAL_DEPENDENCIES
+const require=createRequire(resolve(deps,'package.json'))
+const {chromium}=require('playwright')
+const out=process.env.QCU_MARKET_PREVIEW_OUT
+if(!out)throw Error('QCU_MARKET_PREVIEW_OUT required; first build preview.mjs')
+test('shared market UI in Chromium: browsing, consent, navigation, themes and narrow panel',async t=>{
+ const server=createServer(async(req,res)=>{try{const name=req.url==='/'?'index.html':req.url==='/app.js'?'app.js':null;if(!name){res.writeHead(404).end();return}res.setHeader('Content-Type',name.endsWith('.js')?'text/javascript':'text/html');res.end(await readFile(resolve(out,name)))}catch{res.writeHead(500).end()}})
+ await new Promise(r=>server.listen(0,'127.0.0.1',r));t.after(()=>new Promise(r=>server.close(r)))
+ const browser=await chromium.launch({headless:true});t.after(()=>browser.close())
+ const page=await browser.newPage({viewport:{width:1120,height:900}}),errors=[],outside=[]
+ page.on('pageerror',e=>errors.push(e.message))
+ await page.route('**/*',route=>{if(new URL(route.request().url()).hostname!=='127.0.0.1'){outside.push(route.request().url());return route.abort()}return route.continue()})
+ const url=`http://127.0.0.1:${server.address().port}`
+ const button=name=>page.getByRole('button',{name,exact:true})
+ const calls=()=>page.evaluate(()=>window.qcuPreview.calls)
+ const mutations=async()=> (await calls()).filter(x=>['installBundle','setBundleEnabled','setPluginEnabled'].includes(x.name))
+ const open=()=>button('查看QCU学习方法教练').click()
+ const ready=()=>button('下载并查看安装确认').click()
+ const waitText=async text=>{await page.getByText(text,{exact:true}).first().waitFor()}
+ const screenshots=resolve(out,'../screenshots');await mkdir(screenshots,{recursive:true})
+ const shot=async name=>{await page.locator('.qcu-market').evaluate(el=>el.style.height='auto');await page.screenshot({path:resolve(screenshots,name+'.png'),fullPage:true})}
+ await page.goto(url)
+ await t.test('home has one real card, folded diagnostics, no startup requests',async()=>{
+  await button('查看QCU学习方法教练').waitFor();assert.equal(await page.locator('article').count(),1);assert.equal(await page.locator('details[open]').count(),0);assert.deepEqual(await calls(),[]);assert.equal(await button('下载并查看安装确认').count(),0);await shot('01-list-light')
+ })
+ await t.test('skill category is an honest empty state and search does not fabricate products',async()=>{
+  await button('技能').click();await waitText('暂无可安装的技能');assert.equal(await page.locator('article').count(),0);await shot('02-skills-empty');await button('插件').click();await page.getByRole('searchbox').fill('不存在');await waitText('没有找到匹配项目');await button('清除搜索').click();await page.getByRole('searchbox').fill('复习');assert.equal(await page.locator('article').count(),1)
+ })
+ await t.test('open/back preserves filters and focus without RPC or consent',async()=>{
+  await open();await button('← 返回列表').click();assert.equal(await page.getByRole('searchbox').inputValue(),'复习');assert.equal(await button('插件').getAttribute('aria-pressed'),'true');assert.equal(await button('查看QCU学习方法教练').evaluate(el=>el===document.activeElement),true);assert.deepEqual(await calls(),[]);await open();await shot('03-detail-light')
+ })
+ await t.test('preparation shows identity, hash and permissions with zero mutations',async()=>{
+  await ready();await button('确认安装（保持未启用）').waitFor();const review=await page.locator('.qcu-review').innerText();for(const text of ['SHA256','192.168.1.68:8080','不受工作区沙箱','enabled=false','0.1.0-pilot.2'])assert.ok(review.includes(text));assert.equal((await mutations()).length,0);await shot('04-confirmation')
+ })
+ await t.test('return revokes pending review and reentry never carries consent',async()=>{
+  await button('← 返回列表').click();await open();assert.equal(await button('确认安装（保持未启用）').count(),0);assert.ok((await calls()).some(c=>c.name==='cancel'));assert.equal((await mutations()).length,0)
+ })
+ await t.test('decline never installs',async()=>{
+  await ready();await button('拒绝／不安装').click();await waitText('未授权操作');assert.equal((await mutations()).length,0)
+ })
+ await t.test('install stays disabled and each activation requires another confirmation',async()=>{
+  await ready();await button('确认安装（保持未启用）').click();await button('查看启用包确认').waitFor();assert.equal((await mutations()).length,1);await button('查看启用包确认').click();await button('确认本次启用').waitFor();assert.equal((await mutations()).length,1);await button('确认本次启用').click();await button('查看启用组件确认').waitFor();assert.equal((await mutations()).length,2);await button('查看启用组件确认').click();await button('确认本次启用').waitFor();assert.equal((await mutations()).length,2);await button('确认本次启用').click();await waitText('组件已加载');assert.equal((await mutations()).length,3);await waitText('组件已加载；目标会话的技能发现与调用仍需验证。')
+ })
+ await t.test('unknown outcome remains blocked and reconciliation stays available',async()=>{
+  await page.evaluate(()=>{const f=window.qcuPreview.flows[0];f.request={id:'synthetic-unknown'};f.set({phase:'unconfirmed',message:'Synthetic reply loss'})});assert.equal(await button('下载并查看安装确认').count(),0);await button('核对官方任务结果').click();await waitText('结果待核对');assert.equal((await mutations()).length,3)
+ })
+ await t.test('dark and narrow detail/list fit 360px with readable controls',async()=>{
+  await page.goto(url);await button('切换明暗').click();await shot('05-list-dark');await page.setViewportSize({width:360,height:900});await open();await shot('06-detail-dark-narrow');assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);await button('← 返回列表').click();await shot('07-list-dark-narrow');assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true)
+ })
+ await t.test('no external requests or React/runtime errors',()=>{assert.deepEqual(outside,[]);assert.deepEqual(errors,[])})
+})
