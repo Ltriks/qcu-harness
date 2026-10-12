@@ -10,7 +10,7 @@
 | `$HOME/Repos/worktrees/qcu-harness/market-ui` | 市场开发，`dev/qcu-market-prototype` |
 | `$HOME/Repos/worktrees/qcu-harness/<功能名>` | 后续并行开发 worktree；每个 worktree 独占分支 |
 | `$HOME/Artifacts/qcu-harness/<版本号>/` | 安装包、截图、测试日志与验收材料；不入 Git |
-| `$HOME/Artifacts/qcu-harness/0.1.0-pilot.5.1/final/` | 本轮最终市场候选及 SHA256 清单，未部署 |
+| `$HOME/Artifacts/qcu-harness/0.1.0-pilot.5.1/final/` | 本轮最终市场候选及 SHA256 清单，已部署到既有 mini 测试 Home |
 
 市场基线为官方 DSH `0.2.0-rc.2`，优先 Apple Silicon Mac，插件和 Skill 扩展尽量不改官方源码。新命名用 `qcu`，暂不做 JS→TS 迁移。用户自备模型 API Key；安装插件不需要调用模型。
 
@@ -29,7 +29,7 @@ node --experimental-transform-types --expose-internals --test tests/qcu-market*.
 
 Hub 当前仅局域网 `http://192.168.1.68:8080`；不可变包位于 `/plugins/`。mini 测试 Home 保持 `$HOME/qcu-p42-fresh-20261011-1300`，沿用 `Start-P42-Fresh.command`；不复制凭据、不新建 Home 来补造首次安装证据。默认 DSH 环境与测试环境的当前状态须现场重查。源码路径迁移不改变任何 mini 路径。
 
-开发分支允许审查后提交推送；新版部署到 mini/Hub、覆盖包、正式发布、main 合并/推送均不包含在本轮授权中。真实测试结束后须正常退出测试实例，核实进程结束，再普通打开 `/Applications/DeepSeek Harness.app` 恢复默认环境；仅本地 UI 开发不擅自结束尚未完成的现场验收。
+开发分支允许审查后提交推送。2026-10-12 用户另行授权后，P5.1 已通过官方安装部署至既有 mini 测试 Home，现场检查与默认环境恢复通过；详见 `docs/qcu-market-pilot5.1-live-validation.md`。Hub 未发布新版。覆盖历史包、正式发布、main 合并/推送仍不在授权内。真实测试结束后须正常退出测试实例，核实进程结束，再普通打开 `/Applications/DeepSeek Harness.app` 恢复默认环境；仅本地 UI 开发不擅自结束尚未完成的现场验收。
 
 旧临时 worktree 已转为 detached 历史归档，位置映射和逐文件校验清单保存在 `$HOME/Artifacts/qcu-harness/legacy-20261010/`。历史证据内的旧路径不批量改写，按迁移清单解析。旧线程回执仍私有，不随源码提交。
 

@@ -48,3 +48,7 @@ node --experimental-transform-types --expose-internals --test tests/qcu-market*.
 09:15 北京时间追加只读检查：测试 Home 中市场 P4.2 包已选择、profile 组件覆盖为 disabled:false；教练 P2 依赖已安装，包未选择，包内组件 disabled:true，profile 无启用覆盖。
 
 测试 Home 的 P4.2 市场可用、同 Home 重启无需重新登录、市场安装教练显示成功，沿用用户确认；新 Home 中教练的独立 Host 握手、取消分支、技能发现与调用不升级为通过。新版 UI 原生挂载/安装/启用、真实主题、mini/Hub 部署均 **未测/未执行**。现场测试仍未结束，未执行默认环境恢复。
+
+## 后续真机部署记录
+
+2026-10-12 用户另行授权后，P5.1 已在原 mini 测试 Home 安装并完成正常重启、真实 UI 与 Host 状态检查，随后恢复默认 DSH。详见 [部署与收尾记录](qcu-market-pilot5.1-live-validation.md)。前述未部署状态描述的是本文件最初开发检查点；原生暗色/窄面板及教练首次取消/技能调用仍未补测。
