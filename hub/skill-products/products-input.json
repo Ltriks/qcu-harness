@@ -1,0 +1,37 @@
+[
+  {
+    "id": "qcu-lesson-planning",
+    "title": "备课教案与课堂活动",
+    "scenario": "备课与课堂活动",
+    "purpose": "从目标与课时设计可审核教案，核对分时流程、评价及替代方案。",
+    "example": "/qcu-lesson-planning\n合成备课：本科通识课，20分钟，百分比变化，无投影。请给出教师审核草案并核对时间合计。"
+  },
+  {
+    "id": "qcu-tiered-practice",
+    "title": "分层练习设计",
+    "scenario": "备课与课堂活动",
+    "purpose": "围绕同一目标设计基础、进阶与迁移练习，分开展示教师参考与学生题单。",
+    "example": "/qcu-tiered-practice\n合成练习：用正确基数解释百分比变化，每档1题，共12分钟。给出题单、支架与教师评分要点。"
+  },
+  {
+    "id": "qcu-note-organizer",
+    "title": "课堂笔记与复习",
+    "scenario": "阅读笔记与复习",
+    "purpose": "整理已有匿名要点、疑问与复习动作，保留片段来源和待确认内容。",
+    "example": "/qcu-note-organizer\n合成生物通识要点：1光合作用需要光；2叶绿体；3呼吸作用全天进行。整理复习材料并标注未知项。"
+  },
+  {
+    "id": "qcu-reading-outline",
+    "title": "教材精读提纲",
+    "scenario": "阅读笔记与复习",
+    "purpose": "根据给定片段提炼概念、定义与自问，不编造页码或凑足术语数量。",
+    "example": "/qcu-reading-outline\n合成教材A：变化率是变化量与原值的比。B：不同原值下相同变化量的变化率不同。请给5分钟导读；作者与页码未给。"
+  },
+  {
+    "id": "qcu-integrity-guard",
+    "title": "引用与写作自查",
+    "scenario": "学术诚信与引用",
+    "purpose": "逐项核对引用缺项与AI使用披露，不给查重率、作弊结论或处分判断。",
+    "example": "/qcu-integrity-guard\n合成草稿：某教学方法提高表现（作者甲，年份未给）；参考文献仅有《合成教学研究》。请列出待核实项；课程规则未知。"
+  }
+]

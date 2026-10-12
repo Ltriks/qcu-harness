@@ -22,7 +22,7 @@ const {SlotRegistry}=await import(pathToFileURL(root+'/node_modules/@deepseek-ai
 const client=await import(pathToFileURL(root+'/node_modules/@deepseek-ai/dsh-api-gateway/src/client/index.ts'))
 const {default:managerContribution}=await load('@deepseek-ai/dsh-plugin-manager/remote')
 const tick=()=>new Promise(r=>setImmediate(r))
-async function fixture(t,{manager=true,navigation=true,plugin,answer}={}){
+async function fixture(t,{manager=true,navigation=true,plugin,answer,autoActivate=false}={}){
  const ctx=new Context();t.after(()=>ctx.fiber.dispose());new TypertRegistry(ctx);new SlotRegistry(ctx)
  ctx.slots.register({name:'root',children:{main:{kind:'keyed',scope:'root'},'sidebar.panellist':{kind:'list',scope:'root'}}},()=>null)
  const calls=[],details=[];let panel=null,bundles=[],rows=[]
@@ -36,9 +36,9 @@ async function fixture(t,{manager=true,navigation=true,plugin,answer}={}){
   switch(endpoint){
    case 'pluginManager/listBundles':value=bundles;break
    case 'pluginManager/listPlugins':value=rows;break
-   case 'pluginManager/installBundle':assert.equal(a.options.enabled,false);assert.deepEqual(Object.keys(a.options).sort(),['enabled','registry','requestId']);bundles=[{name:release.id,version:release.version,installed:true,enabled:false,optional:false,removable:true,rows:[],overrides:[]}];rows=[{moduleName:release.id,entryId:'coach:row',patchId:'qcu-study-coach',enabled:false,fiberPhase:null}];value={changed:true,application:'applied',stage:'enable',target:release.id,enabled:false,bundle:release.id};break
-   case 'pluginManager/setBundleEnabled':assert.equal(a.name,release.id);assert.equal(a.enabled,true);bundles[0].enabled=true;value={changed:true,application:'applied',stage:'enable',target:a.name};break
-   case 'pluginManager/setPluginEnabled':assert.equal(a.id,'coach:row');assert.equal(a.enabled,true);rows[0].enabled=true;rows[0].fiberPhase='active';value={changed:true,application:'applied',stage:'enable',target:a.id};break
+   case 'pluginManager/installBundle':assert.equal(a.options.enabled,false);assert.deepEqual(Object.keys(a.options).sort(),['enabled','registry','requestId']);bundles=[{name:release.id,version:release.version,installed:true,enabled:false,optional:false,removable:true,rows:[{rowId:release.id,moduleName:release.id,entryId:'coach:row'}],overrides:[]}];rows=[{moduleName:release.id,entryId:'coach:row',patchId:'qcu-study-coach',enabled:false,fiberPhase:null}];value={changed:true,application:'applied',stage:'enable',target:release.id,enabled:false,bundle:release.id};break
+   case 'pluginManager/setBundleEnabled':assert.equal(a.name,release.id);assert.equal(a.enabled,true);bundles[0].enabled=true;if(autoActivate){rows[0].enabled=true;rows[0].fiberPhase='active'}value={changed:true,application:'applied',stage:'enable',target:a.name,enabled:a.enabled};break
+   case 'pluginManager/setPluginEnabled':assert.equal(a.id,'coach:row');assert.equal(a.enabled,true);rows[0].enabled=true;rows[0].fiberPhase='active';value={changed:true,application:'applied',stage:'enable',target:a.id,enabled:a.enabled};break
    case 'pluginManager/cancelInstall':value={status:'cancelled'};break
    case 'pluginManager/waitForInstall':value=null;break
    case 'pluginManager/inspect':value={status:'accepted',kind:'tarball',bundle:null,registry:null};break
@@ -58,7 +58,7 @@ async function fixture(t,{manager=true,navigation=true,plugin,answer}={}){
  const fork=ctx.plugin(plugin);await fork.await();await tick();await tick()
  const main=()=>ctx.slots.entriesOfSlot('main')[0]
  const props=()=>{const p=main().inject();return p.availability?p.availability.snapshot():p}
- return {ctx,fork,calls,details,main,props,gateway,nav,unmountManager,mountManager,setBundles:value=>{bundles=value},panel:()=>panel,render:()=>renderToStaticMarkup(React.createElement(main().component,main().inject()))}
+ return {ctx,fork,calls,details,main,props,gateway,nav,unmountManager,mountManager,setBundles:value=>{bundles=value},setRows:value=>{rows=value},panel:()=>panel,render:()=>renderToStaticMarkup(React.createElement(main().component,main().inject()))}
 }
 test('Client starts in a real plugin fiber, checks inventory and prepares/declines through both guarded namespaces',async t=>{
  const f=await fixture(t);const p=f.props();assert.ok(p.flow,p.unavailable)
@@ -76,8 +76,7 @@ test('all eight used public manager methods pass official generated wire codecs 
  const f=await fixture(t),flow=f.props().flow
  await flow.prepare();assert.equal(flow.state.phase,'review',flow.state.message)
  await flow.confirmInstall();assert.equal(flow.state.status?.state,'installed-disabled',flow.state.message)
- await flow.reviewEnable('bundle');await flow.confirmEnable();assert.equal(flow.state.status?.state,'row-disabled',flow.state.message)
- await flow.reviewEnable('row');await flow.confirmEnable();assert.equal(flow.state.status?.state,'component-active',flow.state.message)
+ await flow.reviewActivate();await flow.confirmActivate();assert.equal(flow.state.status?.state,'component-active',flow.state.message)
  // Synthetic unresolved task exercises the same public reconciliation/cancellation calls, no install process exists.
  flow.request={id:crypto.randomUUID()};await flow.reconcile();assert.equal(flow.state.phase,'unconfirmed')
  await flow.cancel();assert.equal(flow.state.phase,'cancelled')
@@ -126,4 +125,23 @@ test('dispose during an outstanding official install requests cancellation once 
  await f.fork.dispose();assert.equal(f.calls.filter(c=>c.endpoint==='pluginManager/cancelInstall').length,1)
  const state=flow.state;finish({ok:true,value:{changed:false,application:'cancelled',stage:'install',target:'/cache/'+release.file}});await running;assert.equal(flow.state,state)
  assert.equal(f.ctx.get('remote.qcuMarket'),undefined)
+})
+
+
+test('official scoped bundle activation auto-loads row without duplicate row enable',async t=>{
+ const f=await fixture(t,{autoActivate:true}),flow=f.props().flow
+ await flow.prepare();await flow.confirmInstall();await flow.reviewActivate();await flow.confirmActivate()
+ assert.equal(flow.state.status.state,'component-active',flow.state.message)
+ assert.equal(f.calls.filter(c=>c.endpoint==='pluginManager/setBundleEnabled').length,1)
+ assert.equal(f.calls.filter(c=>c.endpoint==='pluginManager/setPluginEnabled').length,0)
+})
+for(const action of ['reset','dispose'])test(`official scoped ${action} during bundle activation prevents late row enable`,async t=>{
+ let finish
+ const f=await fixture(t,{answer:endpoint=>endpoint==='pluginManager/setBundleEnabled'?new Promise(resolve=>{finish=resolve}):undefined}),flow=f.props().flow
+ await flow.prepare();await flow.confirmInstall();await flow.reviewActivate();const running=flow.confirmActivate();await tick();assert.ok(finish)
+ if(action==='reset')f.ctx.emit('connection/reset');else await f.fork.dispose()
+ f.setBundles([{name:release.id,version:release.version,installed:true,enabled:true,optional:false,removable:true,rows:[{rowId:release.id,moduleName:release.id,entryId:'coach:row'}],overrides:[]}])
+ finish({ok:true,value:{changed:true,application:'applied',stage:'enable',target:release.id,enabled:true}});await running
+ assert.equal(f.calls.filter(c=>c.endpoint==='pluginManager/setPluginEnabled').length,0)
+ assert.notEqual(flow.state.phase,'idle');assert.match(flow.state.message,/没有被取消/)
 })

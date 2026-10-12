@@ -37,11 +37,11 @@ export async function startHost({marketDir=archiveDir,marketModule,backend={}}={
   listBundles(){return state.bundles}
   listPlugins(){return state.rows}
   inspect(spec,options,signal){assert.ok(spec.endsWith('.tgz'));assert.deepEqual(options,{});assert.ok(signal instanceof AbortSignal);return {status:'accepted',kind:'tarball',bundle:null,registry:null}}
-  async installBundle(spec,options){state.mutations.push({method:'installBundle',spec,options});assert.equal(options.enabled,false);assert.deepEqual(Object.keys(options).sort(),['enabled','registry','requestId']);if(backend.install)return backend.install(state,spec,options);const {release}=await import(pathToFileURL(marketDir+'/src/trusted-release.mjs'));state.bundles=[{name:release.id,version:release.version,installed:true,enabled:false,optional:false,removable:true,rows:[],overrides:[]}];state.rows=[{moduleName:release.id,entryId:'fixture:coach',patchId:release.id,enabled:false,fiberPhase:null}];return {changed:true,application:'applied',stage:'enable',target:release.id,bundle:release.id,enabled:false}}
+  async installBundle(spec,options){state.mutations.push({method:'installBundle',spec,options});assert.equal(options.enabled,false);assert.deepEqual(Object.keys(options).sort(),['enabled','registry','requestId']);if(backend.install)return backend.install(state,spec,options);const {bundledCatalog}=await import(pathToFileURL(marketDir+'/src/bundled-catalog.mjs'));const release=bundledCatalog.entries.find(e=>spec.endsWith('/'+e.release.file))?.release;assert.ok(release);assert.ok(!state.bundles.some(b=>b.name===release.id));state.bundles.push({name:release.id,version:release.version,installed:true,enabled:false,optional:false,removable:true,rows:[{rowId:release.id,moduleName:release.id,entryId:release.id==='qcu-study-coach'?'fixture:coach':'fixture:'+release.id}],overrides:[]});state.rows.push({moduleName:release.id,entryId:release.id==='qcu-study-coach'?'fixture:coach':'fixture:'+release.id,patchId:release.id,enabled:false,fiberPhase:null});return {changed:true,application:'applied',stage:'enable',target:release.id,bundle:release.id,enabled:false}}
   waitForInstall(requestId){return backend.wait?.(state,requestId)??null}
   cancelInstall(requestId){state.mutations.push({method:'cancelInstall',requestId});return backend.cancel?.(state,requestId)??{status:'not-running'}}
-  setBundleEnabled(name,enabled){state.mutations.push({method:'setBundleEnabled',name,enabled});assert.equal(name,'qcu-study-coach');assert.equal(enabled,true);state.bundles[0].enabled=true;return {changed:true,application:'applied',stage:'enable',target:name,enabled}}
-  setPluginEnabled(id,enabled){state.mutations.push({method:'setPluginEnabled',id,enabled});assert.equal(id,'fixture:coach');assert.equal(enabled,true);state.rows[0].enabled=true;state.rows[0].fiberPhase='active';return {changed:true,application:'applied',stage:'enable',target:id,enabled}}
+  setBundleEnabled(name,enabled){state.mutations.push({method:'setBundleEnabled',name,enabled});const bundle=state.bundles.find(b=>b.name===name);assert.ok(bundle);assert.equal(enabled,true);bundle.enabled=true;return {changed:true,application:'applied',stage:'enable',target:name,enabled}}
+  setPluginEnabled(id,enabled){state.mutations.push({method:'setPluginEnabled',id,enabled});const row=state.rows.find(r=>r.entryId===id);assert.ok(row);assert.equal(enabled,true);row.enabled=true;row.fiberPhase='active';return {changed:true,application:'applied',stage:'enable',target:id,enabled}}
  }
  const manager=host.plugin({inject:['typert'],apply(ctx){new Manager(ctx);ctx.typert.register({...TYPERT,invocations:TYPERT.invocations.filter(d=>methods.includes(d.method)),schemas:[],model:{services:[],events:[],objects:[]}})}});await manager.await()
  const module=marketModule??await import(pathToFileURL(marketDir+'/index.js'))
@@ -59,15 +59,17 @@ export async function startHost({marketDir=archiveDir,marketModule,backend={}}={
 export async function attachDownload(h,{mode='ok'}={}){
  const dir=await mkdtemp(join(tmpdir(),'qcu-http-')),cache=join(dir,'cache')
  const {release}=await import(pathToFileURL(archiveDir+'/src/trusted-release.mjs'))
+ const {bundledCatalog}=await import(pathToFileURL(archiveDir+'/src/bundled-catalog.mjs'))
  const {fetchPinned}=await import(pathToFileURL(archiveDir+'/src/host-core.mjs'))
- const inputs=JSON.parse(await readFile(join(work,'inputs.json'),'utf8')),bytes=await readFile(inputs.coach.path)
+ const inputs=JSON.parse(await readFile(join(work,'inputs.json'),'utf8')),packages=new Map()
+ for(const item of bundledCatalog.entries){const source=item.id==='qcu-study-coach'?inputs.coach:inputs.skills?.[item.id];assert.ok(source,'Missing archive fixture: '+item.id);const bytes=await readFile(source.path);assert.equal(bytes.length,item.release.bytes);packages.set(item.release.file,{entry:item.release,bytes})}
  let count=0,current=mode,startedResolve;let started=new Promise(r=>startedResolve=r)
  const sockets=new Set()
- const server=createServer((r,s)=>{count++;startedResolve();assert.equal(r.url,'/plugins/'+release.file);if(current==='slow'){r.on('close',()=>{});return}if(current==='offline'){s.writeHead(503);s.end();return}s.writeHead(200,{'content-length':bytes.length});s.end(current==='bad-hash'?Buffer.alloc(bytes.length):bytes)})
+ const server=createServer((r,s)=>{count++;startedResolve();const pack=packages.get(r.url.slice('/plugins/'.length));assert.ok(r.url.startsWith('/plugins/')&&pack);if(current==='slow'){r.on('close',()=>{});return}if(current==='offline'){s.writeHead(503);s.end();return}s.writeHead(200,{'content-length':pack.bytes.length});s.end(current==='bad-hash'?Buffer.alloc(pack.bytes.length):pack.bytes)})
  server.on('connection',s=>{sockets.add(s);s.once('close',()=>sockets.delete(s))})
  await new Promise((r,j)=>{server.once('error',j);server.listen(0,'127.0.0.1',r)})
  const url='http://127.0.0.1:'+server.address().port
- const wire=async(input,options)=>{assert.equal(input,release.origin+'/plugins/'+release.file);const response=await fetch(url+'/plugins/'+release.file,options);return new Response(response.body,{status:response.status,headers:response.headers})}
+ const wire=async(input,options)=>{const pack=[...packages.values()].find(p=>input===p.entry.origin+'/plugins/'+p.entry.file);assert.ok(pack,'Only pinned release requests');const response=await fetch(url+'/plugins/'+pack.entry.file,options);return new Response(response.body,{status:response.status,headers:response.headers})}
  const apply=()=>{const p=h.host.get('qcuMarket').packages;p.download=options=>fetchPinned({...options,root:cache,fetcher:wire})}
  apply()
  return {cache,release,count:()=>count,started:()=>started,setMode(value){current=value;started=new Promise(r=>startedResolve=r)},apply,async close(){for(const s of sockets)s.destroy();server.closeAllConnections();await new Promise(r=>server.close(r));await rm(dir,{recursive:true,force:true})}}
@@ -86,6 +88,7 @@ export async function startClient(h,{marketDir=archiveDir}={}){
  new FixtureSlots(ctx)
  ctx.provide('layout',{selectPanel(){}});ctx.provide('pluginNavigation',{openBundle(){}})
  const plugin=await clientBundle(marketDir+'/client.js');let fork=ctx.plugin(plugin);await fork.await();await tick();await tick()
- const flow=()=>entries.find(e=>e.options.name==='main').options.inject().availability.snapshot().flow
- return {ctx,flow,async remount(){await fork.dispose();fork=ctx.plugin(plugin);await fork.await();await tick();await tick()},async close(){await fork.dispose();await unmountManager();await ctx.fiber.dispose()}}
+ const flows=()=>entries.find(e=>e.options.name==='main').options.inject().availability.snapshot().flows
+ const flow=()=>flows()[0]
+ return {ctx,flow,flows,async remount(){await fork.dispose();fork=ctx.plugin(plugin);await fork.await();await tick();await tick()},async close(){await fork.dispose();await unmountManager();await ctx.fiber.dispose()}}
 }

@@ -1,0 +1,9 @@
+# QCU-MARKET-P6-FINAL-COPY
+
+Parent full suite against current P6.2 passed 214/214 (187 source + 15 HTTP + 12 Chromium test entries); 18 packaged official tests previously passed. Parent inspected screenshots, including the one activation review and narrow layouts. All use synthetic backend. Do not deploy.
+
+One final UX correction only: in `src/market-view.mjs`, activation review decline must read `拒绝／不启用`; install review retains `拒绝／不安装`. In `DirectMarketFlow.decline()`, derive truthful decline message from the existing review kind before clearing it: installation refusal says no install authorized; activation refusal says no activation authorized. Do not change guards, state machine, permissions or any mutation behavior. Add at most a meaningful activation-decline assertion that no bundle/row mutation occurs and consent is revoked; keep installation regressions intact.
+
+Because P6.2 archives already exist and are immutable, bump ONLY market to 0.1.0-pilot.6.3, use new artifact root $HOME/Artifacts/qcu-harness/0.1.0-pilot.6.3, regenerate catalog/client, exact version assertions, package deterministic market with all five unchanged Skill1.1 archive identities. Do not alter Skill versions/source/provenance, provider, coach, parent README or live docs. Preserve all historical archives.
+
+Update docs/qcu-market-p6-source.md final candidate references and clearly state parent P6.2 acceptance happened but P6.3 final parent rerun is pending. Run the narrow affected source tests and verify build/pack reproduction; do not spend time running known sandbox-denied browser tests. Parent will run final full tests, archive regressions and screenshots. No commit/push/deployment/dependency download or agents. Final response concise with candidate path, exact hash and verification limits.

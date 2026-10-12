@@ -97,6 +97,10 @@ test('success response must match bundle and fresh installed state',async()=>{
  const f=fixture();f.manager.installBundle=async()=>ok({application:'applied',stage:'install',bundle:'other'})
  await f.flow.prepare();await f.flow.confirmInstall();assert.equal(f.flow.state.phase,'unconfirmed')
 })
+test('valid success envelope with missing inventory retains the original request and blocks reinstallation',async()=>{
+ const f=fixture();f.manager.installBundle=async()=>ok({application:'applied',stage:'enable',target:release.id,bundle:release.id,enabled:false})
+ await f.flow.prepare();await f.flow.confirmInstall();assert.equal(f.flow.state.phase,'unconfirmed');assert.ok(f.flow.request);await assert.rejects(f.flow.prepare(),/进行中/)
+})
 test('bundle and exact row activation each need independent confirmation; restart never automated',async()=>{
  const f=fixture();await f.flow.prepare();await f.flow.confirmInstall();f.setRows([{moduleName:release.id,entryId:'exact:row',enabled:false,fiberPhase:'pending'}])
  await f.flow.reviewEnable('bundle');assert.equal(f.mutations.length,1);await f.flow.confirmEnable();assert.equal(f.mutations.length,2);assert.equal(f.flow.state.status.state,'row-disabled')

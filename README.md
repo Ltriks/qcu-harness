@@ -7,10 +7,14 @@
 | 位置 | 用途 |
 | --- | --- |
 | `$HOME/Repos/cowork/qcu-harness` | 主仓库，`main`；本轮不合并或推送 main |
-| `$HOME/Repos/worktrees/qcu-harness/market-ui` | 市场开发，`dev/qcu-market-prototype` |
+| `$HOME/Repos/worktrees/qcu-harness/market-ui` | 市场已推送版本，`dev/qcu-market-prototype` |
+| `$HOME/Repos/worktrees/qcu-harness/market-skills` | 独立 P6 开发，`dev/qcu-market-p6` |
 | `$HOME/Repos/worktrees/qcu-harness/<功能名>` | 后续并行开发 worktree；每个 worktree 独占分支 |
 | `$HOME/Artifacts/qcu-harness/<版本号>/` | 安装包、截图、测试日志与验收材料；不入 Git |
-| `$HOME/Artifacts/qcu-harness/0.1.0-pilot.5.1/final/` | 本轮最终市场候选及 SHA256 清单，已部署到既有 mini 测试 Home |
+| `$HOME/Artifacts/qcu-harness/0.1.0-pilot.5.1/final/` | 已部署到既有 mini 测试 Home 的市场版本 |
+| `$HOME/Artifacts/qcu-harness/0.1.0-pilot.6.3/` | 当前 P6 候选、截图与验收；尚未部署 |
+
+P6 已在独立 worktree 中实现五个教学 Skill 和单组件产品的一次启用确认，最终市场候选为 `0.1.0-pilot.6.3`；安装确认仍独立，多组件仍明确选择。P6 未部署；已部署 P5.1 与不可变旧包保持原样。接手时阅读 `docs/qcu-market-p6-source.md`、`docs/qcu-market-p6-parent-validation.md` 与 `docs/qcu-market-coach-live-20261012.md`，以开发 worktree 中的最新记录为准。
 
 市场基线为官方 DSH `0.2.0-rc.2`，优先 Apple Silicon Mac，插件和 Skill 扩展尽量不改官方源码。新命名用 `qcu`，暂不做 JS→TS 迁移。用户自备模型 API Key；安装插件不需要调用模型。
 
@@ -22,7 +26,7 @@ export QCU_BROWSER_DEPENDENCIES=/absolute/path/to/local-playwright-dependencies
 export QCU_MARKET_PREVIEW_OUT="$HOME/Artifacts/qcu-harness/0.1.0-pilot.5.1/preview"
 node hub/plugins/qcu-market/build.mjs
 node hub/plugins/qcu-market/preview.mjs
-node --experimental-transform-types --expose-internals --test tests/qcu-market*.test.mjs
+node --experimental-transform-types --expose-internals --test tests/qcu-market*.test.mjs tests/teaching-skill-products.test.mjs
 ```
 
 首次测试须准备 `scripts/prepare-market-loop-tests.py`、`scripts/prepare-market-http-tests.py` 与 `scripts/verify-market-http-runtime.py` 所需的固定归档和官方依赖；详见市场 worktree 的 `docs/qcu-market-ui-refresh.md`。浏览器测试需已有 Chromium。预览共用真实 UI 与状态机，但后台为明确标注的模拟服务，不证明真机安装通过。`.work/` 仅放可重建夹具，不作为唯一交付位置。

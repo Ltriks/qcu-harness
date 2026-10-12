@@ -10,21 +10,27 @@ export const releaseKeyOf=e=>`${e.id}@${e.version}+${e.sha256}`
 export function parseMarketCatalog(text){
  catalogAssert(typeof text==='string'&&new TextEncoder().encode(text).length<=262144,'size limit')
  const root=JSON.parse(text);exact(root,['schemaVersion','revision','protocol','entries'])
- catalogAssert(root.schemaVersion===2&&root.protocol===2&&Number.isSafeInteger(root.revision)&&root.revision>0,'schema or revision')
+ catalogAssert(root.schemaVersion===3&&root.protocol===3&&Number.isSafeInteger(root.revision)&&root.revision>0,'schema or revision')
  catalogAssert(Array.isArray(root.entries)&&root.entries.length>0&&root.entries.length<=100,'entry count')
  const seen=new Set(),versions=new Set()
  for(const item of root.entries){
-  exact(item,['id','title','scenario','purpose','sourceLabel','prerequisites','risk','example','testStatus','kind','release'])
+  exact(item,['id','title','scenario','purpose','sourceLabel','prerequisites','risk','example','testStatus','kind','provenance','release'])
   catalogAssert(packageName(item.id)&&!seen.has(item.id),'duplicate or invalid id');seen.add(item.id)
   for(const k of ['title','scenario','purpose','sourceLabel','prerequisites','risk','example','testStatus'])catalogAssert(plain(item[k]),'invalid display text')
-  catalogAssert(item.kind==='bundle'&&item.sourceLabel==='QCU自有','unsupported source or kind')
+  catalogAssert(['bundle','skill'].includes(item.kind),'unsupported kind')
+  const provenance=item.provenance
+  exact(provenance,['ownership','author','upstreamSource','pinnedRevision','license','modifications'])
+  catalogAssert(['qcu','third-party'].includes(provenance.ownership)&&item.sourceLabel===(provenance.ownership==='qcu'?'QCU自有':'第三方改编'),'source label disagrees with provenance')
+  for(const key of ['author','upstreamSource','modifications'])catalogAssert(plain(provenance[key]),'invalid provenance')
+  catalogAssert(/^[a-f0-9]{40}$/.test(provenance.pinnedRevision)&&provenance.license==='MIT','unpinned or unsupported license')
   const e=item.release;exact(e,['id','version','skill','skillSha256','provider','origin','file','bytes','sha256','runtime','releaseStatus','license'])
   catalogAssert(e.id===item.id&&e.skill===e.id&&versionName(e.version)&&e.provider===`${e.id}@${e.version}`,'package identity')
   catalogAssert(e.origin===catalogOrigin&&e.runtime==='0.2.0-rc.2'&&e.license==='MIT'&&e.releaseStatus==='local-candidate-not-published','source, compatibility or review status')
   catalogAssert(shaName(e.sha256)&&shaName(e.skillSha256)&&e.file===`${e.id}-${e.version}-${e.sha256}.tgz`,'hash or immutable path')
   catalogAssert(Number.isSafeInteger(e.bytes)&&e.bytes>0&&e.bytes<=1048576,'package size')
   catalogAssert(!versions.has(`${e.id}@${e.version}`),'duplicate version');versions.add(`${e.id}@${e.version}`)
-  Object.freeze(e);Object.freeze(item)
+  catalogAssert(e.license===provenance.license,'license mismatch')
+  Object.freeze(provenance);Object.freeze(e);Object.freeze(item)
  }
  Object.freeze(root.entries);return Object.freeze(root)
 }

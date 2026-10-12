@@ -4,8 +4,29 @@ import { marketRuntime } from './remote-contract.mjs'
 import { release } from './trusted-release.mjs'
 const same=(a,b)=>JSON.stringify(a)===JSON.stringify(b)
 const failure=e=>e?.message||String(e)
+const copy=value=>JSON.parse(JSON.stringify(value))
+// Public Cordis Service.tracker metadata is stable across scoped wrappers.
+// This identifies services only; all RPCs still use the original scoped facade.
+const serviceIdentity=value=>value?.[Symbol.for('cordis.tracker')]||value
+// Official inventory exposes manifest/row identity, not installed-file hashes.
+// Bind every exposed bundle field and the exact declared row, allowing only
+// enablement and the newly materialized entryId to change during activation.
+const bundleIdentity=b=>{const v=copy(b);delete v.enabled;v.rows=v.rows.map(r=>{delete r.entryId;return r});return v}
+export async function readActivation(manager,entry,{allowFailed=false}={}){
+  const bundles=unwrap(await manager.listBundles()).filter(b=>b.name===entry.id)
+  if(bundles.length!==1)throw Error('包数量不符；请核对安装状态')
+  const bundle=bundles[0]
+  if(!bundle.installed||bundle.version!==entry.version||bundle.error||bundle.readOnlyReason)throw Error('包版本、安装状态或权限不符')
+  if(bundle.rows?.length!==1||bundle.rows[0].rowId!==entry.id||bundle.rows[0].moduleName!==entry.id||bundle.overrides?.length!==0)throw Error('不是审核的唯一组件；必须单独选择组件，不猜测标识')
+  const rows=unwrap(await manager.listPlugins()).filter(r=>r.moduleName===entry.id||r.entryId===bundle.rows[0].entryId)
+  if(rows.length>1||rows.some(r=>r.moduleName!==entry.id||!r.entryId||r.entryId!==bundle.rows[0].entryId||r.readOnlyReason||r.patchId!==entry.id))throw Error('组件标识、数量或权限不符')
+  if(bundle.enabled&&rows.length!==1)throw Error('包已启用但唯一组件缺失')
+  const row=rows[0]
+  if(row?.fiberPhase==='failed'&&!allowFailed)throw Error('官方加载器报告失败')
+  return copy({bundle,rows,status:!bundle.enabled?{state:'installed-disabled'}:row.fiberPhase==='failed'?{state:'failed',entryId:row.entryId,reason:'官方加载器报告失败'}:!row.enabled?{state:'row-disabled',entryId:row.entryId}:{state:row.fiberPhase==='active'?'component-active':'restart-or-pending',entryId:row.entryId}})
+}
 export function unwrap(answer){if(!answer?.ok)throw new Error(answer?.error?.message||'官方服务不可用');return answer.value}
-export async function readCoach(manager,entry=release){
+export async function readProduct(manager,entry=release){
   const bundles=unwrap(await manager.listBundles()),bundle=bundles.find(b=>b.name===entry.id)
   if(!bundle?.installed)return {state:'not-installed'}
   if(bundle.version!==entry.version)return {state:'conflict',reason:'已有其他版本，请在官方插件页单独审核处理。'}
@@ -26,7 +47,7 @@ export class DirectMarketFlow {
   snapshot=()=>this.state
   subscribe=fn=>{this.listeners.add(fn);return()=>this.listeners.delete(fn)}
   set(next){if(this.disposed)return;this.state={...this.state,...next};for(const fn of this.listeners)fn()}
-  guard(){if(this.peers?.some(f=>f!==this&&(f.pending||f.request||f.state.review)))throw new Error('其他条目已有操作进行中；请先完成或取消');if(this.disposed)throw new Error('市场已关闭');if(this.pending||this.request)throw new Error('已有操作进行中；请等待或核对结果')}
+  guard(){if(this.peers?.some(f=>f!==this&&(f.pending||f.request||f.activation||f.state.review)))throw new Error('其他条目已有操作进行中；请先完成或取消');if(this.disposed)throw new Error('市场已关闭');if(this.pending||this.request||this.activation)throw new Error('已有操作进行中；请等待或核对结果')}
   valid(n){if(this.disposed||n!==this.generation)throw new Error('操作已取消或目录已变化')}
   checkReceipt(r){if(!r||r.catalogSha256!==this.fingerprint||r.releaseKey!==this.releaseKey||!same(findMarketRelease(this.catalog,this.releaseKey),this.entry)||!same(r.entry,this.entry)||!Number.isSafeInteger(r.expiresAt)||r.expiresAt<=this.now()||typeof r.path!=='string'||!r.path.startsWith('/')||!r.path.endsWith('/'+this.entry.file))throw new Error('包来源、目录或有效期已变化；请重新准备并确认')}
   async checkHost(){
@@ -34,12 +55,12 @@ export class DirectMarketFlow {
     try{actual=JSON.parse(unwrap(await this.remote.qcuMarket.status()))}catch(e){throw new Error('市场 Host 尚未就绪；如刚更新或重装，请正常退出并重新打开 DSH 后再检查。未发起安装。详情：'+failure(e))}
     if(!same(actual,{...marketRuntime,catalogSha256:this.fingerprint}))throw new Error('市场 Host 与界面版本不一致，请正常重启 DSH 后再检查；未发起安装。')
   }
-  async status(){this.guard();const n=++this.generation;this.pending={kind:'status'};this.set({phase:'checking',review:null,message:''});try{await this.checkHost();this.valid(n);const s=await readCoach(this.remote.pluginManager,this.entry);this.valid(n);this.set({phase:'idle',status:s})}catch(e){if(n===this.generation)this.set({phase:'error',status:null,message:failure(e)})}finally{this.pending=null}}
+  async status(){this.guard();const n=++this.generation;this.pending={kind:'status'};this.set({phase:'checking',review:null,message:''});try{await this.checkHost();this.valid(n);const s=await readProduct(this.remote.pluginManager,this.entry);this.valid(n);this.set({phase:'idle',status:s})}catch(e){if(n===this.generation)this.set({phase:'error',status:null,message:failure(e)})}finally{this.pending=null}}
   async prepare(){
     this.guard();const n=++this.generation,id=this.uuid(),abort=new AbortController();this.pending={kind:'prepare',id,abort};this.set({phase:'preparing',review:null,message:'',result:null})
     try{
       await this.checkHost();this.valid(n)
-      const status=await readCoach(this.remote.pluginManager,this.entry);this.valid(n);if(status.state!=='not-installed'){this.set({phase:'idle',status});return}
+      const status=await readProduct(this.remote.pluginManager,this.entry);this.valid(n);if(status.state!=='not-installed'){this.set({phase:'idle',status});return}
       const receipt=JSON.parse(unwrap(await this.remote.qcuMarket.prepare(id,this.releaseKey,abort.signal)));this.valid(n);this.checkReceipt(receipt);if(receipt.id!==id)throw new Error('包凭据不匹配')
       const inspected=unwrap(await this.remote.pluginManager.inspect(receipt.path,{},abort.signal));this.valid(n)
       if(inspected.status!=='accepted')throw new Error(inspected.reason||'官方包检查未通过')
@@ -54,7 +75,7 @@ export class DirectMarketFlow {
       await this.checkHost();this.valid(n);this.checkReceipt(review.receipt)
       const receipt=JSON.parse(unwrap(await this.remote.qcuMarket.verify(review.receipt.id,abort.signal)));this.valid(n);this.checkReceipt(receipt)
       if(!same(receipt,review.receipt))throw new Error('包凭据发生变化；原确认失效')
-      const status=await readCoach(this.remote.pluginManager,this.entry);this.valid(n);if(status.state!=='not-installed')throw new Error('本实例状态已变化；原确认失效')
+      const status=await readProduct(this.remote.pluginManager,this.entry);this.valid(n);if(status.state!=='not-installed')throw new Error('本实例状态已变化；原确认失效')
       const inspected=unwrap(await this.remote.pluginManager.inspect(receipt.path,{},abort.signal));this.valid(n)
       if(!same(inspected,review.inspected))throw new Error('官方包检查或安装源发生变化；请重新确认')
       this.checkReceipt(receipt)
@@ -73,13 +94,14 @@ export class DirectMarketFlow {
     if(result.application==='failed'||result.application==='overridden'){this.request=null;this.set({phase:'error',result,message:result.error?.message||result.error?.code||'官方拒绝或未按预期应用；不自动重试或授权脚本。'});return}
     if(result.stage!=='enable'||result.target!==this.entry.id||result.bundle!==this.entry.id||result.enabled!==false){this.set({phase:'unconfirmed',result,message:'返回的包或操作不符，请在官方详情核对。'});return}
     this.set({phase:'checking',result})
-    try{const status=await readCoach(this.remote.pluginManager,this.entry);if(this.request!==request||this.disposed)return;this.request=null;this.set({phase:status.state==='installed-disabled'?'installed':'unconfirmed',status,result,message:status.state==='installed-disabled'?'已安装，未启用。': '安装返回成功，但当前状态不符；请核对。'})}catch(e){this.set({phase:'unconfirmed',result,message:failure(e)})}
+    try{const status=await readProduct(this.remote.pluginManager,this.entry);if(this.request!==request||this.disposed)return;if(status.state==='installed-disabled')this.request=null;this.set({phase:status.state==='installed-disabled'?'installed':'unconfirmed',status,result,message:status.state==='installed-disabled'?'已安装，未启用。': '安装返回成功，但当前状态不符；请核对。'})}catch(e){this.set({phase:'unconfirmed',result,message:failure(e)})}
   }
   async decline(){
-    this.guard();const id=this.state.review?.receipt?.id;++this.generation;this.set({phase:'declined',review:null,message:'未授权安装；不会重试。'})
+    this.guard();const review=this.state.review,id=review?.receipt?.id;++this.generation;this.set({phase:'declined',review:null,message:review?.kind==='activate'?'未授权启用；不会重试。':'未授权安装；不会重试。'})
     if(id)await this.remote.qcuMarket.cancel(id).catch(()=>{})
   }
   async cancel(){
+    if(this.activation){this.leave();return}
     if(this.request){this.request.cancelRequested=true;return this.cancelRequest(this.request)}
     const pending=this.pending,id=pending?.id||this.state.review?.receipt?.id;++this.generation;pending?.abort?.abort();this.set({phase:'cancelled',review:null,message:'尚未发起安装，操作已取消。'})
     if(id){try{unwrap(await this.remote.qcuMarket.cancel(id))}catch(e){this.set({message:'未发起安装；下载取消请求未确认：'+failure(e)})}}
@@ -96,23 +118,115 @@ export class DirectMarketFlow {
   }
   progress(p){const request=this.request;if(!request||p.requestId!==request.id)return;const first=!request.acknowledged;request.acknowledged=true;if(p.phase==='applying')this.set({phase:'applying',message:'官方正在应用安装结果。'});if(first&&request.cancelRequested){if(request.cancelInFlight)request.cancelAfterAck=true;else void this.cancelRequest(request)}}
   async reconcile(){const request=this.request;if(!request||request.reconciling)return;request.reconciling=true;try{const result=unwrap(await this.remote.pluginManager.waitForInstall(request.id));if(this.request!==request)return;if(result===null)this.set({phase:'unconfirmed',message:'后端没有保留该任务结果；不代表成功或取消，请在官方详情核对。'});else await this.settle(request,result)}catch(e){this.set({phase:'unconfirmed',message:failure(e)})}finally{request.reconciling=false}}
+  async reviewActivate(){
+    this.guard();const n=++this.generation;this.pending={kind:'activation-check'};this.set({phase:'checking',review:null,message:'',result:null})
+    try{
+      await this.checkHost();this.valid(n)
+      const inventory=await readActivation(this.remote.pluginManager,this.entry);this.valid(n)
+      if(!['installed-disabled','row-disabled'].includes(inventory.status.state))throw Error('当前组件无需启用；请核对加载状态')
+      if(!same(findMarketRelease(this.catalog,this.releaseKey),this.entry))throw Error('发行目录变化')
+      this.set({phase:'review',status:inventory.status,review:{kind:'activate',entry:copy(this.entry),releaseKey:this.releaseKey,fingerprint:this.fingerprint,inventory,generation:n,expiresAt:this.now()+300000,remote:this.remote,manager:this.remote.pluginManager,host:this.remote.qcuMarket}})
+    }catch(e){if(n===this.generation)this.set({phase:'error',review:null,message:failure(e)})}finally{this.pending=null}
+  }
+  checkActivationReview(review){
+    if(review.generation!==this.generation||review.expiresAt<=this.now()||review.fingerprint!==this.fingerprint||review.releaseKey!==this.releaseKey||!same(review.entry,this.entry)||!same(findMarketRelease(this.catalog,this.releaseKey),this.entry)||review.remote!==this.remote||serviceIdentity(review.manager)!==serviceIdentity(this.remote.pluginManager)||serviceIdentity(review.host)!==serviceIdentity(this.remote.qcuMarket))throw Error('目录、连接或有效期变化；原启用确认失效')
+  }
+  activationAuthority(op){this.valid(op.generation);if(!op.authorized||op.expiresAt<=this.now()||op.fingerprint!==this.fingerprint||!same(op.entry,this.entry)||!same(findMarketRelease(this.catalog,this.releaseKey),op.entry)||op.remote!==this.remote||serviceIdentity(op.manager)!==serviceIdentity(this.remote.pluginManager)||serviceIdentity(op.host)!==serviceIdentity(this.remote.qcuMarket))throw Error('启用确认已撤销或目录变化；已发出的操作没有被取消')}
+  activationState(next){if(this.disposed)this.state={...this.state,...next};else this.set(next)}
+  async refreshActivation(op){
+    const inventory=await readActivation(op.manager,op.entry,{allowFailed:true})
+    if(!same(bundleIdentity(inventory.bundle),bundleIdentity(op.inventory.bundle)))throw Error('已安装内容标识或组件声明变化')
+    const before=op.inventory.rows[0],after=inventory.rows[0]
+    if(before&&(!after||before.entryId!==after.entryId||before.patchId!==after.patchId||!same(before.meta,after.meta)))throw Error('组件标识变化')
+    this.activationState({status:inventory.status});return inventory
+  }
+  async activationMutation(op,kind,target,expected){
+    // Recheck Host and UI authority directly before every official mutation.
+    await this.checkHost();this.activationAuthority(op)
+    const current=await readActivation(op.manager,op.entry);this.activationAuthority(op)
+    if(!same(current,expected))throw Error('官方状态变化；原启用确认失效')
+    op.sent=kind;op.uncertain=true
+    const result=unwrap(await (kind==='bundle'?op.manager.setBundleEnabled(target,true):op.manager.setPluginEnabled(target,true)))
+    op.results.push({kind,result});this.activationState({result,activationResults:copy(op.results)})
+    if(!result||!['applied','restart-required','failed','overridden','cancelled'].includes(result.application)||result.stage!=='enable'||result.target!==target||result.enabled!==true)throw Error('官方启用结果未知或目标不符；只可核对，不重试')
+    op.uncertain=result.application==='applied'
+    return result
+  }
+  async confirmActivate(){
+    this.guard();const review=this.state.review
+    if(this.state.phase!=='review'||review?.kind!=='activate')throw Error('缺少启用确认')
+    try{this.checkActivationReview(review)}catch(e){this.set({phase:'error',review:null,message:failure(e)});return}
+    const op={generation:this.generation,expiresAt:review.expiresAt,fingerprint:this.fingerprint,authorized:true,remote:this.remote,manager:this.remote.pluginManager,host:this.remote.qcuMarket,entry:copy(this.entry),inventory:review.inventory,sent:null,uncertain:false,results:[],running:true}
+    this.activation=op;this.pending={kind:'activate'};this.set({phase:'enabling',review:null,message:'正在启用审核的包及唯一组件。',result:null,activationResults:[]})
+    try{
+      await this.checkHost();this.activationAuthority(op);this.checkActivationReview(review)
+      let inventory=await readActivation(op.manager,op.entry);this.activationAuthority(op)
+      if(!same(inventory,review.inventory))throw Error('安装内容或组件状态变化；原确认失效')
+      if(!inventory.bundle.enabled){
+        const result=await this.activationMutation(op,'bundle',op.entry.id,inventory)
+        inventory=await this.refreshActivation(op)
+        if(result.application==='applied'&&!inventory.bundle.enabled)throw Error('包启用返回成功但状态不符')
+        op.uncertain=false
+        if(result.application!=='applied'){this.activationState({phase:'partial',message:'包启用已停止：'+result.application+'；请核对状态后重新查看确认。'});return}
+        this.activationAuthority(op)
+        if(!inventory.bundle.enabled)throw Error('包启用返回成功但状态不符')
+      }
+      const row=inventory.rows[0]
+      if(!row)throw Error('唯一组件缺失；停止启用')
+      if(!row.enabled){
+        // A refreshed exact disabled row is the only authorized second target.
+        const current=await this.refreshActivation(op);this.activationAuthority(op)
+        if(!same(current,inventory))throw Error('组件状态变化；停止启用并重新确认')
+        const result=await this.activationMutation(op,'row',row.entryId,inventory)
+        inventory=await this.refreshActivation(op)
+        if(result.application==='applied'&&!inventory.rows[0]?.enabled)throw Error('组件启用返回成功但状态不符')
+        op.uncertain=false
+        if(result.application!=='applied'){this.activationState({phase:'partial',message:'组件启用已停止：'+result.application+'；请核对状态后重新查看确认。'});return}
+      }
+      this.activationAuthority(op)
+      if(inventory.status.state!=='component-active'){this.activationState({phase:'partial',message:'启用已返回，组件尚未加载；请检查或正常重启，不自动重试。'});return}
+      this.activationState({phase:'idle',status:inventory.status,message:'包及唯一组件已加载；目标会话仍需验证。'})
+    }catch(e){
+      if(op.sent)try{await this.refreshActivation(op)}catch{try{this.activationState({status:await readProduct(op.manager,op.entry)})}catch{}}
+      this.activationState({phase:op.uncertain?'unconfirmed':op.sent?'partial':'error',review:null,message:(op.sent?'已发出的启用操作没有被取消；':'')+failure(e)})
+    }finally{op.running=false;this.pending=null;if(!op.uncertain)this.activation=null}
+  }
+  async reconcileActivation(){
+    const op=this.activation;if(!op||op.running||op.reconciling)return
+    op.reconciling=true
+    try{
+      await this.checkHost();const inventory=await this.refreshActivation(op)
+      // A lost reply never permits repeating that mutation. Only observed
+      // enablement releases the lock, and any remaining row needs new consent.
+      if((op.sent==='bundle'&&inventory.bundle.enabled)||(op.sent==='row'&&inventory.rows[0]?.enabled)){
+        this.activation=null;this.set({phase:'partial',review:null,message:'只读核对已观察到启用状态；剩余操作需新的启用确认。'})
+      }else this.set({phase:'unconfirmed',message:'未能确认已发出操作的结果；不重复启用，请在官方详情核对。'})
+    }catch(e){this.set({phase:'unconfirmed',message:failure(e)})}finally{op.reconciling=false}
+  }
+  leave(){
+    if(this.activation){++this.generation;this.activation.authorized=false;this.set({review:null,message:'已离开启用确认；已发出的操作没有被取消，后续组件启用已停止。'});return}
+    if(this.state.review||this.pending&&!this.request)void this.cancel()
+  }
   async reviewEnable(kind){
     this.guard();const n=++this.generation;this.pending={kind:'enable-check'};this.set({phase:'checking',review:null,message:''})
-    try{const status=await readCoach(this.remote.pluginManager,this.entry);this.valid(n);if((kind==='bundle'&&status.state!=='installed-disabled')||(kind==='row'&&status.state!=='row-disabled'))throw new Error('当前状态不支持此启用操作')
+    try{const status=await readProduct(this.remote.pluginManager,this.entry);this.valid(n);if((kind==='bundle'&&status.state!=='installed-disabled')||(kind==='row'&&status.state!=='row-disabled'))throw new Error('当前状态不支持此启用操作')
       this.set({phase:'review',status,review:{kind,entry:JSON.stringify(this.entry),status}})
     }catch(e){this.set({phase:'error',message:failure(e)})}finally{this.pending=null}
   }
   async confirmEnable(){
     this.guard();const review=this.state.review;if(this.state.phase!=='review'||!['bundle','row'].includes(review?.kind))throw new Error('缺少启用确认')
     const n=++this.generation;this.pending={kind:'enable'};this.set({phase:'enabling',review:null,message:''})
-    try{await this.checkHost();this.valid(n);const status=await readCoach(this.remote.pluginManager,this.entry);this.valid(n);if(review.entry!==JSON.stringify(this.entry)||!same(status,review.status))throw new Error('目录或组件状态变化；原确认失效')
+    try{await this.checkHost();this.valid(n);const status=await readProduct(this.remote.pluginManager,this.entry);this.valid(n);if(review.entry!==JSON.stringify(this.entry)||!same(status,review.status))throw new Error('目录或组件状态变化；原确认失效')
       const result=unwrap(await (review.kind==='bundle'?this.remote.pluginManager.setBundleEnabled(this.entry.id,true):this.remote.pluginManager.setPluginEnabled(status.entryId,true)));this.valid(n)
       if(!['applied','restart-required'].includes(result.application)){this.set({phase:'error',result,message:result.error?.message||result.error?.code||'官方未应用启用；不重试。'});return}
-      const next=await readCoach(this.remote.pluginManager,this.entry);this.valid(n);this.set({phase:'idle',status:next,result,message:result.application==='restart-required'?'需要你正常重启应用；此处不执行重启。':'启用操作已返回；以当前组件状态为准。'})
+      const next=await readProduct(this.remote.pluginManager,this.entry);this.valid(n);this.set({phase:'idle',status:next,result,message:result.application==='restart-required'?'需要你正常重启应用；此处不执行重启。':'启用操作已返回；以当前组件状态为准。'})
     }catch(e){if(n===this.generation)this.set({phase:'error',message:'启用结果需核对：'+failure(e)})}finally{this.pending=null}
   }
-  invalidate(){const receiptId=this.state.review?.receipt?.id;if(receiptId)void this.remote.qcuMarket.cancel(receiptId).catch(()=>{});++this.generation;this.pending?.abort?.abort();if(!this.request)this.set({phase:'error',status:null,review:null,message:'连接或目录变化，原确认已作废；已发出的启用操作需重新检查。'})}
-  dispose(){this.disposed=true;++this.generation;this.pending?.abort?.abort();const id=this.pending?.id||this.state.review?.receipt?.id;if(id)void this.remote.qcuMarket.cancel(id).catch(()=>{});if(this.request)void this.remote.pluginManager.cancelInstall(this.request.id).catch(()=>{});this.unlisten?.();this.listeners.clear()}
+  invalidate(){if(this.activation)this.activation.authorized=false;const receiptId=this.state.review?.receipt?.id;if(receiptId)void this.remote.qcuMarket.cancel(receiptId).catch(()=>{});++this.generation;this.pending?.abort?.abort();if(!this.request)this.set({phase:this.activation?'unconfirmed':'error',status:this.activation?this.state.status:null,review:null,message:'连接或目录变化，原确认已作废；已发出的启用操作需重新检查。'})}
+  dispose(){if(this.activation)this.activation.authorized=false;this.disposed=true;++this.generation;this.pending?.abort?.abort();const id=this.pending?.id||this.state.review?.receipt?.id;if(id)void this.remote.qcuMarket.cancel(id).catch(()=>{});if(this.request)void this.remote.pluginManager.cancelInstall(this.request.id).catch(()=>{});this.unlisten?.();this.listeners.clear()}
 }
 
 export function createCatalogFlows(remote,{catalog=bundledCatalog,fingerprint=catalogSha256}={}){const flows=[];for(const item of catalog.entries)flows.push(new DirectMarketFlow(remote,{entry:item.release,catalog,fingerprint,peers:flows}));return flows}
+
+// Compatibility export for existing coach regression fixtures.
+export const readCoach=readProduct

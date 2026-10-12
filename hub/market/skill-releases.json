@@ -1,0 +1,72 @@
+[
+  {
+    "id": "qcu-lesson-planning",
+    "version": "0.1.0-pilot.1.1",
+    "skill": "qcu-lesson-planning",
+    "skillSha256": "ae1c27f034ea4af8bf65432e52f98be21db9387bb7b5df53382211ee83c944d9",
+    "provider": "qcu-lesson-planning@0.1.0-pilot.1.1",
+    "origin": "http://192.168.1.68:8080",
+    "file": "qcu-lesson-planning-0.1.0-pilot.1.1-6f8930d4f12f8f52c93422b41cadd050db374c0fe4ce5c06e8b824e69d672bd4.tgz",
+    "bytes": 4429,
+    "sha256": "6f8930d4f12f8f52c93422b41cadd050db374c0fe4ce5c06e8b824e69d672bd4",
+    "runtime": "0.2.0-rc.2",
+    "releaseStatus": "local-candidate-not-published",
+    "license": "MIT"
+  },
+  {
+    "id": "qcu-tiered-practice",
+    "version": "0.1.0-pilot.1.1",
+    "skill": "qcu-tiered-practice",
+    "skillSha256": "90e0e9c9c6dfaea5de10c10ca4a20dcc09710a87615e641299ae547b3d5a2b69",
+    "provider": "qcu-tiered-practice@0.1.0-pilot.1.1",
+    "origin": "http://192.168.1.68:8080",
+    "file": "qcu-tiered-practice-0.1.0-pilot.1.1-183e63eab27bb13dc98f4bec437028126284459c0eeef294e1ee87e819711052.tgz",
+    "bytes": 4434,
+    "sha256": "183e63eab27bb13dc98f4bec437028126284459c0eeef294e1ee87e819711052",
+    "runtime": "0.2.0-rc.2",
+    "releaseStatus": "local-candidate-not-published",
+    "license": "MIT"
+  },
+  {
+    "id": "qcu-note-organizer",
+    "version": "0.1.0-pilot.1.1",
+    "skill": "qcu-note-organizer",
+    "skillSha256": "876d47bb444465afd7148c8afc24d4e9904197bd6b6a6e286fc4ce9153615460",
+    "provider": "qcu-note-organizer@0.1.0-pilot.1.1",
+    "origin": "http://192.168.1.68:8080",
+    "file": "qcu-note-organizer-0.1.0-pilot.1.1-9c8f1e50ac4f3aff613678c8c094b4e8f53c0393ca011e7a41ceaa5ab96f67e7.tgz",
+    "bytes": 4660,
+    "sha256": "9c8f1e50ac4f3aff613678c8c094b4e8f53c0393ca011e7a41ceaa5ab96f67e7",
+    "runtime": "0.2.0-rc.2",
+    "releaseStatus": "local-candidate-not-published",
+    "license": "MIT"
+  },
+  {
+    "id": "qcu-reading-outline",
+    "version": "0.1.0-pilot.1.1",
+    "skill": "qcu-reading-outline",
+    "skillSha256": "11a311f73a09be808b9844f5b919f08766cc7f653666a54a9ade658cec073c31",
+    "provider": "qcu-reading-outline@0.1.0-pilot.1.1",
+    "origin": "http://192.168.1.68:8080",
+    "file": "qcu-reading-outline-0.1.0-pilot.1.1-a0ab4dd00ce1a2b259126a1b11fb1c7f4e7599e13a2318ae3009e03b2cab7a79.tgz",
+    "bytes": 4748,
+    "sha256": "a0ab4dd00ce1a2b259126a1b11fb1c7f4e7599e13a2318ae3009e03b2cab7a79",
+    "runtime": "0.2.0-rc.2",
+    "releaseStatus": "local-candidate-not-published",
+    "license": "MIT"
+  },
+  {
+    "id": "qcu-integrity-guard",
+    "version": "0.1.0-pilot.1.1",
+    "skill": "qcu-integrity-guard",
+    "skillSha256": "f8d52df632c57d57a8395b2b2aa1d6ca74ef931fd7d3b296e251b6475e731714",
+    "provider": "qcu-integrity-guard@0.1.0-pilot.1.1",
+    "origin": "http://192.168.1.68:8080",
+    "file": "qcu-integrity-guard-0.1.0-pilot.1.1-3136b795de94ffd38d522c3ba5e8ac630fca4759386288aad09dfa15baea62bf.tgz",
+    "bytes": 5153,
+    "sha256": "3136b795de94ffd38d522c3ba5e8ac630fca4759386288aad09dfa15baea62bf",
+    "runtime": "0.2.0-rc.2",
+    "releaseStatus": "local-candidate-not-published",
+    "license": "MIT"
+  }
+]

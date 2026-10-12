@@ -40,7 +40,7 @@ test('real Cordis/SlotRegistry and LayoutController support repeated navigation,
  main.inject().onBack();assert.equal(active,null)
  const html=renderToStaticMarkup(React.createElement(main.component,main.inject()))
  assert.match(html,/QCU市场/);assert.match(html,/学习方法教练/);assert.match(html,/缺少官方/)
- assert.equal((html.match(/<article/g)||[]).length,1)
+ assert.equal((html.match(/<article/g)||[]).length,6)
  await fork.dispose()
  assert.equal(ctx.slots.entriesOfSlot('main').length,0)
  assert.equal(ctx.slots.entriesOfSlot('sidebar.panellist').length,0)

@@ -1,0 +1,15 @@
+{
+  "source": "skills/qcu-lesson-planning/SKILL.md",
+  "baseline": "153170ea35a30e1de6d59ccaf3898d11e662fd19",
+  "sourceSha256": "d45da7fbbb46e13f8457f4305d0a9c7b123459f0191ae298cc1f49a8c8f9abb4",
+  "license": "MIT",
+  "changes": "P6扩展教师输入、分步流程、输出契约、合成示例与限制",
+  "provenance": {
+    "ownership": "qcu",
+    "author": "lqtriks and QCU Harness contributors",
+    "upstreamSource": "skills/qcu-lesson-planning/SKILL.md",
+    "pinnedRevision": "153170ea35a30e1de6d59ccaf3898d11e662fd19",
+    "license": "MIT",
+    "modifications": "P6扩展教师输入、分步流程、输出契约、合成示例与限制；P6教师审核、来源追溯、示例与静态提供方打包"
+  }
+}

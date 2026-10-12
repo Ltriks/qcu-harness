@@ -1,5 +1,6 @@
 import {releaseKeyOf} from '../hub/plugins/qcu-market/src/catalog-core.mjs'
 import {release} from '../hub/plugins/qcu-market/src/trusted-release.mjs'
+import {bundledCatalog} from '../hub/plugins/qcu-market/src/bundled-catalog.mjs'
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import {readFile,mkdir,symlink,unlink,rm,readdir} from 'node:fs/promises'
@@ -9,6 +10,18 @@ import {spawnSync} from 'node:child_process'
 import {startHost,startClient,attachDownload,archiveDir,work,Context,load,req,tick} from './support/market-http-fixture.mjs'
 const id=()=>crypto.randomUUID()
 async function fixture(t,options){const h=await startHost(options);const d=await attachDownload(h);const c=await startClient(h);t.after(async()=>{await c.close();await d.close();await h.close()});return {h,d,c,flow:c.flow()}}
+test('real six-entry archived HTTP selects each pinned Skill and preserves per-entry consent and activation',async t=>{
+ const {h,d,c}=await fixture(t),flows=c.flows();assert.equal(flows.length,6)
+ for(let i=1;i<flows.length;i++){
+  const flow=flows[i];await flow.prepare();assert.equal(flow.state.phase,'review',flow.state.message)
+  assert.equal(flow.state.review.receipt.entry.id,bundledCatalog.entries[i].id)
+  assert.equal((await readFile(flow.state.review.receipt.path)).length,bundledCatalog.entries[i].release.bytes)
+  await assert.rejects(flows[0].prepare(),/其他条目/);await flow.confirmInstall();assert.equal(flow.state.status.state,'installed-disabled',flow.state.message)
+ }
+ assert.equal(d.count(),5);assert.equal(h.state.mutations.length,5)
+ await flows[2].reviewActivate();await assert.rejects(flows[1].reviewActivate(),/其他条目/);await flows[2].confirmActivate();assert.equal(flows[2].state.status.state,'component-active')
+ assert.equal(h.state.bundles.find(b=>b.name===flows[1].entry.id).enabled,false);assert.equal(h.state.rows.find(r=>r.moduleName===flows[1].entry.id).enabled,false);assert.equal(flows[0].state.phase,'idle')
+})
 test('actual archived Client → official HTTP → Gateway → archived Host prepares verified fixed bytes and decline never installs',async t=>{
  const {h,d,flow}=await fixture(t);assert.equal(h.calls.length,0)
  await flow.status();assert.equal(flow.state.status.state,'not-installed',flow.state.message)
@@ -21,8 +34,7 @@ test('real HTTP install/enable uses all eight official generated contracts and e
  const {h,flow}=await fixture(t);await flow.prepare();assert.equal(flow.state.phase,'review',flow.state.message)
  const install=flow.confirmInstall();await assert.rejects(flow.confirmInstall(),/进行中/);await install
  assert.equal(flow.state.phase,'installed',flow.state.message);assert.equal(flow.state.status.state,'installed-disabled');assert.equal(h.state.mutations.length,1)
- await flow.reviewEnable('bundle');await flow.confirmEnable();assert.equal(flow.state.status.state,'row-disabled',flow.state.message)
- await flow.reviewEnable('row');await flow.confirmEnable();assert.equal(flow.state.status.state,'component-active',flow.state.message)
+ await flow.reviewActivate();await flow.confirmActivate();assert.equal(flow.state.status.state,'component-active',flow.state.message)
  flow.request={id:id()};await flow.reconcile();assert.equal(flow.state.phase,'unconfirmed');await flow.cancel();assert.equal(flow.state.phase,'unconfirmed');flow.request=null
  assert.deepEqual([...new Set(h.calls.filter(c=>c.path.startsWith('/api/pluginManager/')).map(c=>c.path.split('/').pop()))].sort(),['cancelInstall','inspect','installBundle','listBundles','listPlugins','setBundleEnabled','setPluginEnabled','waitForInstall'])
 })

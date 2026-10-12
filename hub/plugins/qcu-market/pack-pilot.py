@@ -7,7 +7,7 @@ args = parser.parse_args()
 root = Path(__file__).resolve().parent
 manifest = json.loads((root / 'package.json').read_text())
 assert manifest['name'] == 'qcu-market'
-assert manifest['version'] in ['0.1.0-pilot.5.1']
+assert manifest['version'] in ['0.1.0-pilot.6.3']
 assert 'scripts' not in manifest
 assert not any(manifest.get(k) for k in ['dependencies', 'optionalDependencies', 'bundledDependencies'])
 assert manifest['peerDependencies']['@deepseek-ai/cordis']=='4.0.4'
@@ -31,8 +31,11 @@ with tarfile.open(fileobj=payload, mode='w', format=tarfile.USTAR_FORMAT) as arc
         entry.size=len(data);entry.mode=0o644;entry.mtime=0;entry.uid=entry.gid=0
         archive.addfile(entry,io.BytesIO(data))
         records.append({'path':entry.name,'bytes':len(data),'sha256':hashlib.sha256(data).hexdigest(),'mode':'0644'})
-compressed=gzip.compress(payload.getvalue(),mtime=0)
-filename=f"qcu-market-{manifest['version']}.tgz"
+buffer=io.BytesIO()
+with gzip.GzipFile(fileobj=buffer,filename='',mode='wb',compresslevel=9,mtime=0) as gz:
+    gz.write(payload.getvalue())
+compressed=buffer.getvalue()
+filename=f"qcu-market-{manifest['version']}-{hashlib.sha256(compressed).hexdigest()}.tgz"
 path=args.output/filename
 if path.exists() and path.read_bytes()!=compressed:
     raise SystemExit('Refusing to replace different bytes at the same pilot artifact path')

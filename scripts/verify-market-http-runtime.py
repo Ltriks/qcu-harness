@@ -5,7 +5,7 @@ import argparse,struct,json,hashlib
 from pathlib import Path
 p=argparse.ArgumentParser();p.add_argument('--asar',type=Path,required=True);p.add_argument('--dependencies',type=Path,required=True);p.add_argument('--out',type=Path,required=True);a=p.parse_args()
 w=Path(__file__).resolve().parents[1]/'.work/http-e2e';w.mkdir(parents=True,exist_ok=True)
-files={'cordis':['lib/index.js'],'cordis-plugin-loader':['lib/index.js'],'dsh-api-gateway':['lib/index.js','lib/client.js'],'dsh-client-connection':['lib/index.js','lib/client.js'],'dsh-typert-protocol':['lib/index.js'],'dsh-typert-registry':['lib/index.js'],'dsh-plugin-manager':['lib/index.js','lib/typert.host.js','lib/typert.remote-client.js'],'dsh-app-boot':['lib/index.js']}
+files={'dsh-skill':['lib/index.js'],'dsh-scope':['lib/index.js'],'cordis':['lib/index.js'],'cordis-plugin-loader':['lib/index.js'],'dsh-api-gateway':['lib/index.js','lib/client.js'],'dsh-client-connection':['lib/index.js','lib/client.js'],'dsh-typert-protocol':['lib/index.js'],'dsh-typert-registry':['lib/index.js'],'dsh-plugin-manager':['lib/index.js','lib/typert.host.js','lib/typert.remote-client.js'],'dsh-app-boot':['lib/index.js']}
 records=[]
 with a.asar.open('rb') as f:
  _,size,_,n=struct.unpack('<4I',f.read(16));header=json.loads(f.read(n))

@@ -7,9 +7,11 @@ import {PackagePreparation} from '../hub/plugins/qcu-market/src/host-core.mjs'
 import {createCatalogFlows} from '../hub/plugins/qcu-market/src/direct-flow.mjs'
 import {marketRuntime} from '../hub/plugins/qcu-market/src/remote-contract.mjs'
 const clone=()=>JSON.parse(catalogText),key=releaseKeyOf(bundledCatalog.entries[0].release)
-test('bundled reviewed fingerprint is exact, immutable, coach only, with no startup network',()=>{
+test('bundled reviewed fingerprint is exact, immutable, six real products, with no startup network',()=>{
  assert.equal(createHash('sha256').update(catalogText).digest('hex'),catalogSha256)
- assert.equal(bundledCatalog.entries.length,1);assert.equal(bundledCatalog.entries[0].id,'qcu-study-coach')
+ assert.equal(bundledCatalog.entries.length,6);assert.equal(bundledCatalog.entries.filter(e=>e.kind==='skill').length,5);assert.equal(bundledCatalog.entries.filter(e=>e.kind==='bundle').length,1);assert.equal(bundledCatalog.entries[0].id,'qcu-study-coach')
+ for(const item of bundledCatalog.entries){assert.equal(item.instructions,undefined);assert.ok(item.purpose.length<=2000);assert.ok(item.example.length<=2000)}
+ assert.doesNotMatch(catalogText,/name: qcu-|## 合成示例|## 操作步骤/)
  assert.throws(()=>bundledCatalog.entries[0].release.origin='https://evil.invalid')
  assert.equal(findMarketRelease(bundledCatalog,key),bundledCatalog.entries[0].release)
  assert.throws(()=>findMarketRelease(bundledCatalog,key+'0'))
@@ -18,14 +20,14 @@ for(const [label,mutate] of Object.entries({
  unknown:c=>c.trusted=true,old:c=>c.schemaVersion=1,revision:c=>c.revision=0,protocol:c=>c.protocol=1,
  duplicate:c=>c.entries.push(c.entries[0]),sameVersionOtherHash:c=>{const e=structuredClone(c.entries[0]);e.release.sha256='0'.repeat(64);c.entries.push(e)},
  remoteHash:c=>c.catalogSha256='0'.repeat(64),installed:c=>c.entries[0].installed=true,
- source:c=>c.entries[0].sourceLabel='DSH官方',draft:c=>c.entries[0].kind='draft',withdrawn:c=>c.entries[0].release.releaseStatus='withdrawn',
+ source:c=>c.entries[0].sourceLabel='DSH官方',provenance:c=>c.entries[0].provenance.ownership='third-party',unpinned:c=>c.entries[0].provenance.pinnedRevision='main',author:c=>c.entries[0].provenance.author='',missingProvenance:c=>delete c.entries[0].provenance,metadataCommand:c=>c.entries[0].provenance.command='curl bad',instructions:c=>c.entries[1].instructions='wrong',draft:c=>c.entries[0].kind='draft',withdrawn:c=>c.entries[0].release.releaseStatus='withdrawn',
  origin:c=>c.entries[0].release.origin='https://evil.invalid',path:c=>c.entries[0].release.file='../x.tgz',
  hash:c=>c.entries[0].release.sha256='bad',size:c=>c.entries[0].release.bytes=1048577,
  version:c=>c.entries[0].release.version='latest',runtime:c=>c.entries[0].release.runtime='*',
  script:c=>c.entries[0].release.command='npm install',count:c=>c.entries=Array(101).fill(c.entries[0])
 }))test(`catalog rejects ${label}`,()=>{const c=clone();mutate(c);assert.throws(()=>parseMarketCatalog(JSON.stringify(c)))})
 test('catalog rejects malformed and byte oversized text',()=>{assert.throws(()=>parseMarketCatalog('{'));assert.throws(()=>parseMarketCatalog('界'.repeat(100000)))})
-function multiple(){const c=clone(),item=structuredClone(c.entries[0]);item.id='qcu-synthetic-fixture';Object.assign(item.release,{id:item.id,skill:item.id,provider:item.id+'@'+item.release.version});item.release.file=`${item.id}-${item.release.version}-${item.release.sha256}.tgz`;c.entries.push(item);return parseMarketCatalog(JSON.stringify(c))}
+function multiple(){const c=clone();c.entries=c.entries.slice(0,1);const item=structuredClone(c.entries[0]);item.id='qcu-synthetic-fixture';Object.assign(item.release,{id:item.id,skill:item.id,provider:item.id+'@'+item.release.version});item.release.file=`${item.id}-${item.release.version}-${item.release.sha256}.tgz`;c.entries.push(item);return parseMarketCatalog(JSON.stringify(c))}
 test('host selects reviewed entry by key and rejects unknown keys without downloading; replay revoked',async()=>{
  const catalog=multiple(),downloads=[],p=new PackagePreparation({catalog,download:async({entry})=>{downloads.push(entry.id);return '/cache/'+entry.file},verify:async()=>{}})
  await assert.rejects(p.prepare(randomUUID(),'unreviewed'));assert.deepEqual(downloads,[])
