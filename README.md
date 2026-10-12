@@ -11,10 +11,10 @@
 | `$HOME/Repos/worktrees/qcu-harness/market-skills` | 独立 P6 开发，`dev/qcu-market-p6` |
 | `$HOME/Repos/worktrees/qcu-harness/<功能名>` | 后续并行开发 worktree；每个 worktree 独占分支 |
 | `$HOME/Artifacts/qcu-harness/<版本号>/` | 安装包、截图、测试日志与验收材料；不入 Git |
-| `$HOME/Artifacts/qcu-harness/0.1.0-pilot.5.1/final/` | 已部署到既有 mini 测试 Home 的市场版本 |
-| `$HOME/Artifacts/qcu-harness/0.1.0-pilot.6.3/` | 当前 P6 候选、截图与验收；尚未部署 |
+| `$HOME/Artifacts/qcu-harness/0.1.0-pilot.5.1/final/` | 历史已部署市场版本，保持不可变 |
+| `$HOME/Artifacts/qcu-harness/0.1.0-pilot.6.3/` | 当前已部署市场、五个 Skill 包、预览截图及 deployment 现场证据 |
 
-P6 已在独立 worktree 中实现五个教学 Skill 和单组件产品的一次启用确认，最终市场候选为 `0.1.0-pilot.6.3`；安装确认仍独立，多组件仍明确选择。P6 未部署；已部署 P5.1 与不可变旧包保持原样。接手时阅读 `docs/qcu-market-p6-source.md`、`docs/qcu-market-p6-parent-validation.md` 与 `docs/qcu-market-coach-live-20261012.md`，以开发 worktree 中的最新记录为准。
+市场 `0.1.0-pilot.6.3` 已部署到既有 mini 测试 Home，五个教学 Skill `0.1.0-pilot.1.1` 已分发至局域网 Hub。备课技能的安装保持禁用、一次启用、发现、注入与合成调用通过；其余四项未做真机调用。测试实例已正常退出，默认DSH环境恢复且关键配置摘要不变。安装确认仍独立，多组件仍明确选择。历史 P5.1 与不可变旧包保留。接手先读 [P6.3现场记录](docs/qcu-market-pilot6.3-live-validation.md)、[本地验收](docs/qcu-market-p6-parent-validation.md)、[源码交接](docs/qcu-market-p6-source.md) 与 [教练现场记录](docs/qcu-market-coach-live-20261012.md)。
 
 市场基线为官方 DSH `0.2.0-rc.2`，优先 Apple Silicon Mac，插件和 Skill 扩展尽量不改官方源码。新命名用 `qcu`，暂不做 JS→TS 迁移。用户自备模型 API Key；安装插件不需要调用模型。
 
@@ -23,7 +23,7 @@ P6 已在独立 worktree 中实现五个教学 Skill 和单组件产品的一次
 ```sh
 export QCU_OFFICIAL_DEPENDENCIES=/absolute/path/to/audited-official-source
 export QCU_BROWSER_DEPENDENCIES=/absolute/path/to/local-playwright-dependencies
-export QCU_MARKET_PREVIEW_OUT="$HOME/Artifacts/qcu-harness/0.1.0-pilot.5.1/preview"
+export QCU_MARKET_PREVIEW_OUT="$HOME/Artifacts/qcu-harness/0.1.0-pilot.6.3/preview"
 node hub/plugins/qcu-market/build.mjs
 node hub/plugins/qcu-market/preview.mjs
 node --experimental-transform-types --expose-internals --test tests/qcu-market*.test.mjs tests/teaching-skill-products.test.mjs
@@ -33,7 +33,7 @@ node --experimental-transform-types --expose-internals --test tests/qcu-market*.
 
 Hub 当前仅局域网 `http://192.168.1.68:8080`；不可变包位于 `/plugins/`。mini 测试 Home 保持 `$HOME/qcu-p42-fresh-20261011-1300`，沿用 `Start-P42-Fresh.command`；不复制凭据、不新建 Home 来补造首次安装证据。默认 DSH 环境与测试环境的当前状态须现场重查。源码路径迁移不改变任何 mini 路径。
 
-开发分支允许审查后提交推送。2026-10-12 用户另行授权后，P5.1 已通过官方安装部署至既有 mini 测试 Home，现场检查与默认环境恢复通过；详见 `docs/qcu-market-pilot5.1-live-validation.md`。Hub 未发布新版。覆盖历史包、正式发布、main 合并/推送仍不在授权内。真实测试结束后须正常退出测试实例，核实进程结束，再普通打开 `/Applications/DeepSeek Harness.app` 恢复默认环境；仅本地 UI 开发不擅自结束尚未完成的现场验收。
+开发分支允许审查后提交推送。2026-10-12 用户另行授权后，P5.1 已通过官方安装部署至既有 mini 测试 Home，现场检查与默认环境恢复通过；详见 `docs/qcu-market-pilot5.1-live-validation.md`。此后用户再次确认部署，Hub新增P6.3和五项Skill固定归档，既有测试Home完成上述备课功能链路；详见P6.3现场记录。覆盖历史包、正式发布、main 合并/推送仍不在授权内。真实测试结束后须正常退出测试实例，核实进程结束，再普通打开 `/Applications/DeepSeek Harness.app` 恢复默认环境；仅本地 UI 开发不擅自结束尚未完成的现场验收。
 
 旧临时 worktree 已转为 detached 历史归档，位置映射和逐文件校验清单保存在 `$HOME/Artifacts/qcu-harness/legacy-20261010/`。历史证据内的旧路径不批量改写，按迁移清单解析。旧线程回执仍私有，不随源码提交。
 

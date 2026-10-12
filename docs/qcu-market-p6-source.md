@@ -1,5 +1,7 @@
 # QCU-MARKET-P6.3 final refusal copy and source handoff
 
+> 后续父线程验收：215/215本地测试、18/18归档回归及已授权的Hub/mini部署，见[本地验收](qcu-market-p6-parent-validation.md)和[P6.3现场记录](qcu-market-pilot6.3-live-validation.md)。下文保留实现交接时的待测状态，不代表当前部署状态。
+
 Final bounded copy correction on `dev/qcu-market-p6`, base `153170ea35a30e1de6d59ccaf3898d11e662fd19`, per `.ai/tasks/QCU-MARKET-P6-FINAL-COPY.md`. Activation review now says **拒绝／不启用** and declining it says **未授权启用；不会重试。** Installation review retains **拒绝／不安装** and **未授权安装；不会重试。** `decline()` reads the existing review kind before clearing consent; guards, state machine, permissions and mutation behavior are unchanged. One activation-decline regression checks the UI copy, revoked consent and zero bundle/row mutation. Only market advances to **0.1.0-pilot.6.3**; all five Skill1.1 identities, provider, canonical source/provenance, coach, root README and live docs are preserved. No agents, dependency downloads, deployment, actual-profile installation, commits or pushes.
 
 **Parent P6.2 acceptance already happened:** the task brief reports 214/214 (187 source + 15 HTTP + 12 Chromium entries), 18 previously passing packaged official tests, and parent-inspected activation/narrow-layout screenshots, all using a synthetic backend. **Final P6.3 parent acceptance is pending:** parent must rerun the full tests, archive regressions and screenshots against the distinct candidate below. No P6.2 browser or screenshot result is attributed to P6.3.
