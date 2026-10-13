@@ -1,0 +1,17 @@
+{
+  "name": "qcu-feishu-readonly",
+  "version": "0.1.0-pilot.1.1",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "description": "Local selected-document read-only candidate; normal user CLI auth required",
+  "exports": { ".": "./index.js", "./package.json": "./package.json" },
+  "dsh": { "bundle": { "patch": "./cordis.patch.yml" } },
+  "peerDependencies": {
+    "@deepseek-ai/cordis": "4.0.4",
+    "@deepseek-ai/cosmokit": "1.8.5",
+    "@deepseek-ai/dsh-tools": "0.2.0-rc.2",
+    "@deepseek-ai/schemastery": "3.18.4"
+  },
+  "files": ["index.js", "src/core.mjs", "src/authority.mjs", "cordis.patch.yml", "README.md", "LICENSE", "NOTICE"]
+}

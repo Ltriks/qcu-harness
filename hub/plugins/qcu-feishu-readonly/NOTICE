@@ -1,0 +1,6 @@
+QCU Feishu read-only local candidate, 0.1.0-pilot.1.1.
+Uses the public @deepseek-ai/dsh-tools and Cordis APIs of DSH 0.2.0-rc.2.
+No official SDK code, CLI binary, credentials or document content is bundled.
+DSH / Cordis / schemastery: DeepSeek and contributors, MIT.
+Existing Lark CLI must be obtained and authorized separately by its user.
+Fixture results do not establish live DSH, CLI or teaching acceptance.
