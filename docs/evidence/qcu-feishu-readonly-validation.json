@@ -1,0 +1,89 @@
+{
+  "task": "QCU-FEISHU-READONLY-REFINE",
+  "candidate": {
+    "name": "qcu-feishu-readonly",
+    "version": "0.1.0-pilot.1.1",
+    "runtime": "0.2.0-rc.2",
+    "bytes": 11263,
+    "sha256": "37376ce5f03d4f0fb459dcf6f888b25f5f78df1f7734cd780c7cfd6d01e91b17",
+    "file": "qcu-feishu-readonly-0.1.0-pilot.1.1-37376ce5f03d4f0fb459dcf6f888b25f5f78df1f7734cd780c7cfd6d01e91b17.tgz",
+    "releaseStatus": "standalone-local-candidate-not-published",
+    "peers": {
+      "@deepseek-ai/cordis": "4.0.4",
+      "@deepseek-ai/cosmokit": "1.8.5",
+      "@deepseek-ai/dsh-tools": "0.2.0-rc.2",
+      "@deepseek-ai/schemastery": "3.18.4"
+    },
+    "members": {
+      "LICENSE": "989967e129b2ecb69eb8d34053ae5d2904de7093450663cac33e71e993561e55",
+      "NOTICE": "82a6c355a5521919c8b31579a2ebe7bbe853f7520ab23b50cd2c056152d0f837",
+      "README.md": "c5fdff6c6f93c1c51254c676bee2f22c3bc49e816129ba7c37d951d766f79062",
+      "cordis.patch.yml": "ba892229c142691e9be5e1602f060072bd169aae7d30dc678d60902ba5da0417",
+      "index.js": "594e00801ff4fb6353f6a7d8d0e4686f0746c113c86f695f0f6c2d2a8871b3d3",
+      "package.json": "3e501476a6c577eb1f6205457fd0446b670afbb60c38bb10f440e6277c41d913",
+      "src/authority.mjs": "b0a927f2b7a94a2e530580b02852f46e0f9053c0bd51a388e7d34f01782d1171",
+      "src/core.mjs": "a397d0696d5855c8cf2d5d3f851886abcaf8dfba128f45c3ef90c91bbfb25020"
+    }
+  },
+  "artifactManifestSha256": "0885f89b92f2d656767d0249869c3903c54d32be7e89a0b19f83766c6c579e65",
+  "sourceTests": {
+    "pass": 26,
+    "fail": 0
+  },
+  "packagingTests": {
+    "pass": 3,
+    "fail": 0
+  },
+  "archiveTests": {
+    "pass": 26,
+    "fail": 0,
+    "log": ".work/feishu-refine/archive-tests.tap"
+  },
+  "syntheticOnly": true,
+  "sdk": {
+    "artifacts": 86,
+    "packages": 27,
+    "sourceByteIdenticalRuntime": 82,
+    "officialAsarAppBootArtifacts": 2,
+    "configurationReviewArtifacts": 2,
+    "reportSha256": "6cc3430888e53b361e049f2d69b3dfbda3b22736ecede5a75ae30f6856c1b5d6"
+  },
+  "setupVerified": [
+    "Official Settings uid/refs form projection for exactly two Chinese-described fields",
+    "Official ConfigEditor writes only synthetic profile patch files",
+    "Official Loader updates stable refs without remount",
+    "Receipt and generation revocation on changes",
+    "In-flight process cancellation and draining",
+    "Invalid accepted strings become unconfigured",
+    "Late old success and queued replacement after rapid updates/unload refused",
+    "Unrelated owned volatile event preserves our receipt"
+  ],
+  "wrapperReproduction": {
+    "oldVersion": "0.1.0-pilot.1",
+    "flatAccepted": true,
+    "wrappedAccepted": false,
+    "wrappedFailureCategory": "response",
+    "syntheticOnly": true
+  },
+  "pending": [
+    "Actual desktop form rendering/save UX and installation/activation",
+    "Trusted native CLI authorization and real document wire compatibility",
+    "Live DSH model/session consent and teacher acceptance"
+  ],
+  "sdkBlocker": null,
+  "oldArtifactsPreserved": true,
+  "oldEvidencePreserved": [
+    "docs/qcu-feishu-readonly-source-pilot1.md",
+    "docs/evidence/qcu-feishu-readonly-sdk-pilot1.json",
+    "docs/evidence/qcu-feishu-readonly-validation-pilot1.json"
+  ],
+  "notPerformed": [
+    "real docs/auth-store/CLI/network access",
+    "live profile installation",
+    "deployment",
+    "dependency download",
+    "market catalog changes",
+    "commit/push",
+    "agent launch"
+  ]
+}

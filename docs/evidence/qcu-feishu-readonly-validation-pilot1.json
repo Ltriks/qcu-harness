@@ -1,0 +1,93 @@
+{
+  "candidate": {
+    "name": "qcu-feishu-readonly",
+    "version": "0.1.0-pilot.1",
+    "runtime": "0.2.0-rc.2",
+    "bytes": 9370,
+    "sha256": "2f4a0c3f9988ad8faef05c251020c9b96722e0fcff3683ec37f22105e6d5293a",
+    "file": "qcu-feishu-readonly-0.1.0-pilot.1-9370-2f4a0c3f9988ad8faef05c251020c9b96722e0fcff3683ec37f22105e6d5293a.tgz",
+    "releaseStatus": "standalone-local-candidate-not-published",
+    "peers": {
+      "@deepseek-ai/cordis": "4.0.4",
+      "@deepseek-ai/dsh-tools": "0.2.0-rc.2",
+      "@deepseek-ai/schemastery": "3.18.4"
+    },
+    "members": {
+      "LICENSE": "989967e129b2ecb69eb8d34053ae5d2904de7093450663cac33e71e993561e55",
+      "NOTICE": "dc6ffd6ab4576c9e4c1f7fef24bf79091f99efdeec46f3d6a35dcc3c76a04c45",
+      "README.md": "8d85dc66b219e1c4b494c750aaf6079ce6d8bed0f17214fce3ef6c1f694e8226",
+      "cordis.patch.yml": "ba892229c142691e9be5e1602f060072bd169aae7d30dc678d60902ba5da0417",
+      "index.js": "12da2c5634e72e27f6a13a72eb4b041799ea23f3e16530c9f50c6081fcf80bea",
+      "package.json": "2b30230ac03a2be22ea5d4e0b836e91ff4df6d59e1ba05648e78af977fa4cf0d",
+      "src/core.mjs": "205eb59a050e5e4b052cc1e2a793627f4f9df8dc8350b63361a307d3ade53300"
+    }
+  },
+  "sourceTests": {
+    "pass": 19,
+    "fail": 0,
+    "log": ".work/feishu/source-tests.tap"
+  },
+  "packagingTests": {
+    "pass": 3,
+    "fail": 0
+  },
+  "previousArchiveTests": {
+    "pass": 19,
+    "fail": 0,
+    "codeMembersIdenticalToFinal": true,
+    "log": ".work/feishu/archive-tests.tap"
+  },
+  "sdk": {
+    "files": 77,
+    "packages": 23,
+    "executionRuntimeFiles": 70,
+    "reviewDrift": [
+      {
+        "package": "@deepseek-ai/dsh-app-boot",
+        "file": "lib/index.js",
+        "sourceEqualsAsar": false,
+        "officialSha256": "234db45e1b3f8c683b5bc1f551948b2a2ec52a6468c7b6937725a23f1c0e0d96",
+        "sourceSha256": "07dc5e164a23dff6a6ae7c28a1377940ec4cfe24e604cdcdd0f892ace9107589",
+        "role": "configuration-review-only"
+      },
+      {
+        "package": "@deepseek-ai/dsh-client-ui-plugin-manager",
+        "file": "lib/client.js",
+        "sourceEqualsAsar": false,
+        "officialSha256": "a110d985d8f6f76a31048082af675b1c40073e4634aeb0d44bf0e9c8aa5142cf",
+        "sourceSha256": "6033f9b444dc9ea7ac91e6956dda3b6d03d502ccd59232a90761227298c27fd5",
+        "role": "configuration-review-only"
+      }
+    ],
+    "report": "docs/evidence/qcu-feishu-readonly-sdk.json",
+    "reportSha256": "9e904ed170ecc6c22ca86b6a5d818bfe92e7bbaeca27efbf6b63f7ba40df8981"
+  },
+  "pending": [
+    "Parent installation with enabled:false and isolated profile reconciliation/activation",
+    "Installed native Lark CLI simple-detail XML wire compatibility",
+    "Live DSH model/user/teacher validation"
+  ],
+  "notPerformed": [
+    "Actual documents/auth-store access",
+    "Actual Lark CLI execution",
+    "Dependency download",
+    "Live profile installation",
+    "Deployment",
+    "Catalog changes",
+    "Commit/push",
+    "Agent launch"
+  ],
+  "versions": {
+    "node": "25.8.1",
+    "python": "3.9.6",
+    "rtk": "0.44.2"
+  },
+  "startHead": "65b72751d120ae921ca9f87ac0c8f98f7ae201e6",
+  "requestedBaseIsAncestor": true,
+  "finalArchiveSelectedTests": {
+    "pass": 7,
+    "fail": 0,
+    "command": "node --loader ./tests/support/feishu-official-loader.mjs --test --test-name-pattern=official|duplicate|empty activation tests/qcu-feishu-readonly-official.test.mjs"
+  },
+  "artifactManifestSha256": "790c96dd8599988aca88b3c558caa5c1dd084d6a6fcb24a3c9c54c443ee22e3e"
+}
