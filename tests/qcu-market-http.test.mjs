@@ -10,17 +10,19 @@ import {spawnSync} from 'node:child_process'
 import {startHost,startClient,attachDownload,archiveDir,work,Context,load,req,tick} from './support/market-http-fixture.mjs'
 const id=()=>crypto.randomUUID()
 async function fixture(t,options){const h=await startHost(options);const d=await attachDownload(h);const c=await startClient(h);t.after(async()=>{await c.close();await d.close();await h.close()});return {h,d,c,flow:c.flow()}}
-test('real seven-entry archived HTTP selects each pinned Skill and preserves per-entry consent and activation',async t=>{
- const {h,d,c}=await fixture(t),flows=c.flows();assert.equal(flows.length,7)
+test('real eight-entry archived HTTP selects each pinned Skill or tools plugin and preserves per-entry consent and activation',async t=>{
+ const {h,d,c}=await fixture(t),flows=c.flows();assert.equal(flows.length,8)
  for(let i=1;i<flows.length;i++){
   const flow=flows[i];await flow.prepare();assert.equal(flow.state.phase,'review',flow.state.message)
   assert.equal(flow.state.review.receipt.entry.id,bundledCatalog.entries[i].id)
   assert.equal((await readFile(flow.state.review.receipt.path)).length,bundledCatalog.entries[i].release.bytes)
   await assert.rejects(flows[0].prepare(),/其他条目/);await flow.confirmInstall();assert.equal(flow.state.status.state,'installed-disabled',flow.state.message)
  }
- assert.equal(d.count(),6);assert.equal(h.state.mutations.length,6)
+ assert.equal(d.count(),7);assert.equal(h.state.mutations.length,7)
  await flows[2].reviewActivate();await assert.rejects(flows[1].reviewActivate(),/其他条目/);await flows[2].confirmActivate();assert.equal(flows[2].state.status.state,'component-active')
  assert.equal(h.state.bundles.find(b=>b.name===flows[1].entry.id).enabled,false);assert.equal(h.state.rows.find(r=>r.moduleName===flows[1].entry.id).enabled,false);assert.equal(flows[0].state.phase,'idle')
+ const tools=flows.find(f=>f.entry.id==='qcu-feishu-readonly');assert.equal(tools.entry.skill,null)
+ await tools.reviewActivate();assert.equal(h.state.mutations.length,9);await tools.confirmActivate();assert.equal(tools.state.status.state,'component-active');assert.equal(h.state.mutations.length,11)
 })
 test('actual archived Client → official HTTP → Gateway → archived Host prepares verified fixed bytes and decline never installs',async t=>{
  const {h,d,flow}=await fixture(t);assert.equal(h.calls.length,0)
@@ -76,7 +78,7 @@ test('official Loader same-name P2 → actual archive reinstall retains old Host
  try{
   const raw=await stale.raw('qcuMarket/prepare',{id:id()});assert.equal(raw.status,404);assert.equal(stale.host.get('qcuMarket'),undefined)
   await client.flow().prepare();assert.equal(client.flow().state.phase,'error');assert.equal(stale.state.mutations.length,0)
-  if(disk.version==='0.1.0-pilot.4.2')assert.match(client.flow().state.message,/正常.*重新打开|正常重启/)
+  assert.match(client.flow().state.message,/正常.*重新打开|正常重启/)
  }finally{await client.close();await stale.close()}
  const fresh=spawnSync(process.execPath,['--expose-internals',new URL('./support/market-http-cold.mjs',import.meta.url).pathname,dir],{env:process.env,encoding:'utf8',timeout:20000})
  assert.equal(fresh.status,0,fresh.stderr);assert.match(fresh.stdout,/"cancel":true/);console.log(JSON.stringify({cacheReproduction:{diskVersion:disk.version,moduleIdentityUnchanged:true,http:404,coldProcess:JSON.parse(fresh.stdout.trim())}}))
@@ -88,6 +90,17 @@ test('Host disappearance or version mismatch stops before download or manager in
  service.status=()=>JSON.stringify({version:'stale',protocol:1})
  await flow.prepare();assert.equal(flow.state.phase,'error');assert.match(flow.state.message,/版本不一致/);assert.equal(d.count(),0)
  service.status=original;await h.fork.dispose();await flow.prepare();assert.equal(flow.state.phase,'error');assert.match(flow.state.message,/Host 尚未就绪/);assert.equal(d.count(),0);assert.equal(h.state.mutations.length,0)
+})
+test('actual archived protocol3 Host with Client4 and Host4 with Client3 both refuse before download or manager writes',async t=>{
+ const previous=join(work,'previous/package')
+ for(const side of ['host','client']){
+  const h=await startHost(side==='host'?{marketDir:previous}:{}),c=await startClient(h,side==='client'?{marketDir:previous}:{})
+  try{
+   const flow=c.flow();await flow.prepare();assert.equal(flow.state.phase,'error');assert.match(flow.state.message,/版本不一致.*正常重启/)
+   assert.equal(h.state.mutations.length,0);assert.equal(h.host.get('qcuMarket').packages.pending.size,0);assert.equal(h.host.get('qcuMarket').packages.receipts.size,0)
+   assert.ok(h.calls.every(call=>call.path.endsWith('/status')))
+  }finally{await c.close();await h.close()}
+ }
 })
 test('Host unload cancels outstanding HTTP download and remount can prepare again',async t=>{
  const {h,d,flow}=await fixture(t);d.setMode('slow');const operation=flow.prepare();await d.started();const preparation=h.host.get('qcuMarket').packages

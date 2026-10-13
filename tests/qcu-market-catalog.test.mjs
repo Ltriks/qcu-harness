@@ -7,9 +7,9 @@ import {PackagePreparation} from '../hub/plugins/qcu-market/src/host-core.mjs'
 import {createCatalogFlows} from '../hub/plugins/qcu-market/src/direct-flow.mjs'
 import {marketRuntime} from '../hub/plugins/qcu-market/src/remote-contract.mjs'
 const clone=()=>JSON.parse(catalogText),key=releaseKeyOf(bundledCatalog.entries[0].release)
-test('bundled reviewed fingerprint is exact, immutable, seven real products, with no startup network',()=>{
+test('bundled reviewed fingerprint is exact, immutable, eight real products, with no startup network',()=>{
  assert.equal(createHash('sha256').update(catalogText).digest('hex'),catalogSha256)
- assert.equal(bundledCatalog.entries.length,7);assert.equal(bundledCatalog.entries.filter(e=>e.kind==='skill').length,6);assert.equal(bundledCatalog.entries.filter(e=>e.kind==='bundle').length,1);assert.equal(bundledCatalog.entries[0].id,'qcu-study-coach')
+ assert.equal(bundledCatalog.entries.length,8);assert.equal(bundledCatalog.entries.filter(e=>e.kind==='skill').length,6);assert.equal(bundledCatalog.entries.filter(e=>e.kind==='bundle').length,2);assert.equal(bundledCatalog.entries[0].id,'qcu-study-coach')
  for(const item of bundledCatalog.entries){assert.equal(item.instructions,undefined);assert.ok(item.purpose.length<=2000);assert.ok(item.example.length<=2000)}
  assert.doesNotMatch(catalogText,/name: qcu-|## 合成示例|## 操作步骤/)
  assert.throws(()=>bundledCatalog.entries[0].release.origin='https://evil.invalid')
@@ -17,7 +17,7 @@ test('bundled reviewed fingerprint is exact, immutable, seven real products, wit
  assert.throws(()=>findMarketRelease(bundledCatalog,key+'0'))
 })
 for(const [label,mutate] of Object.entries({
- unknownLicense:c=>{c.entries[0].provenance.license='GPL-3.0';c.entries[0].release.license='GPL-3.0'},licenseMismatch:c=>c.entries[0].release.license='Apache-2.0',externalSource:c=>c.entries.at(-1).sourceLabel='QCU自有',unknown:c=>c.trusted=true,old:c=>c.schemaVersion=1,revision:c=>c.revision=0,protocol:c=>c.protocol=1,
+ unknownLicense:c=>{c.entries[0].provenance.license='GPL-3.0';c.entries[0].release.license='GPL-3.0'},licenseMismatch:c=>c.entries[0].release.license='Apache-2.0',externalSource:c=>c.entries.find(e=>e.id==='qcu-team-briefing').sourceLabel='QCU自有',unknown:c=>c.trusted=true,old:c=>c.schemaVersion=1,revision:c=>c.revision=0,unreviewedRevision:c=>c.revision=5,protocol:c=>c.protocol=1,
  duplicate:c=>c.entries.push(c.entries[0]),sameVersionOtherHash:c=>{const e=structuredClone(c.entries[0]);e.release.sha256='0'.repeat(64);c.entries.push(e)},
  remoteHash:c=>c.catalogSha256='0'.repeat(64),installed:c=>c.entries[0].installed=true,
  source:c=>c.entries[0].sourceLabel='DSH官方',provenance:c=>c.entries[0].provenance.ownership='third-party',unpinned:c=>c.entries[0].provenance.pinnedRevision='main',author:c=>c.entries[0].provenance.author='',missingProvenance:c=>delete c.entries[0].provenance,metadataCommand:c=>c.entries[0].provenance.command='curl bad',instructions:c=>c.entries[1].instructions='wrong',draft:c=>c.entries[0].kind='draft',withdrawn:c=>c.entries[0].release.releaseStatus='withdrawn',

@@ -70,7 +70,7 @@ test('market build is current, archive reproducible, members match source and co
  const out=resolve(work,'market'),packMarket=()=>JSON.parse(execFileSync('rtk',['proxy',python,'hub/plugins/qcu-market/pack-pilot.py',out],{encoding:'utf8',stdio:['ignore','pipe','pipe']}))
  const report=packMarket();assert.deepEqual(packMarket(),report)
  const path=out+'/'+report.file;assert.equal(sha(await readFile(path)),report.sha256);assert.equal(report.bytes,(await readFile(path)).length)
- assert.equal(report.file,`qcu-market-0.1.0-pilot.7.1-${report.sha256}.tgz`)
+ assert.equal(report.file,`qcu-market-0.1.0-pilot.8.1-${report.sha256}.tgz`)
  const members=JSON.parse(execFileSync('rtk',['proxy',python,'-c',`import json,hashlib,tarfile\nwith tarfile.open(${JSON.stringify(path)}) as t:\n assert all(m.isfile() and m.mode==0o644 and m.uid==0 and m.gid==0 and m.mtime==0 for m in t.getmembers())\n print(json.dumps({m.name:hashlib.sha256(t.extractfile(m).read()).hexdigest() for m in t.getmembers()}))`],{encoding:'utf8'}))
  for(const file of report.files)assert.equal(members[file.path],sha(await readFile('hub/plugins/qcu-market/'+file.path.slice(8))))
  assert.equal(Object.keys(members).length,14);assert.equal(members['package/preview-fixture.mjs'],undefined)
@@ -174,7 +174,7 @@ for(const entry of [teachingProducts[0],external])test(`${entry.id}: official ca
  }finally{await child.dispose();await left.dispose();await right.dispose();await ctx.fiber.dispose()}
 })
 
-test('seven real preview entries have isolated installation/activation, reviewed catalog lock and unknown outcome block',async()=>{
+test('eight real preview entries have isolated installation/activation, reviewed catalog lock and unknown outcome block',async()=>{
  const {flows,calls,remote}=createPreviewFixture();const [coach,first,second]=flows
  try{
   assert.deepEqual(calls,[]);await first.prepare();assert.equal(first.state.phase,'review')

@@ -39,7 +39,7 @@ test('external six pinned text files, Apache instructions, unchanged MIT wrapper
  const content=files['SKILL.md'];assert.equal(sha(Buffer.from(content)),release.skillSha256)
  // Runtime content cannot require the retained upstream relative references.
  assert.doesNotMatch(content,/examples\/|\.\/|https?:\/\/|读取.{0,8}(文件|指南)/)
- assert.equal(bundledCatalog.revision,3);assert.equal(bundledCatalog.schemaVersion,3);assert.equal(bundledCatalog.protocol,3)
+ assert.equal(bundledCatalog.revision,4);assert.equal(bundledCatalog.schemaVersion,4);assert.equal(bundledCatalog.protocol,4)
 })
 test('external archive refuses immutable collision and preserves existing bytes',async()=>{
  await mkdir(work+'/collision');await writeFile(work+'/collision/'+release.file,'existing fixture')
@@ -51,13 +51,13 @@ for(const scenario of ['upstream-tamper','wrong-pin','unknown-license','wrong-so
  run(['-c',code])
 })
 for(const [key,value] of [['license','BSD-3-Clause'],['sourceLabel','QCU自有'],['origin','https://evil.invalid']])test(`catalog rejects external ${key}`,()=>{
- const catalog=JSON.parse(catalogText),item=catalog.entries.at(-1)
+ const catalog=JSON.parse(catalogText),item=catalog.entries.find(e=>e.id===release.id)
  if(key==='license'){item.release.license=value;item.provenance.license=value}else if(key==='origin')item.release.origin=value;else item[key]=value
  assert.throws(()=>parseMarketCatalog(JSON.stringify(catalog)))
 })
 
 test('new external preview flow binds its own reviewed bytes, stays disabled until one activation review and leaves unvisited peers untouched',async()=>{
- const {flows,calls,remote}=createPreviewFixture(),flow=flows.at(-1)
+ const {flows,calls,remote}=createPreviewFixture(),flow=flows.find(f=>f.entry.id===release.id)
  try{
   assert.deepEqual(calls,[]);assert.deepEqual(flow.entry,release)
   await flow.prepare();assert.deepEqual(flow.state.review.receipt.entry,release);assert.equal(flow.state.phase,'review')
@@ -66,7 +66,7 @@ test('new external preview flow binds its own reviewed bytes, stays disabled unt
   assert.deepEqual(calls.filter(c=>['installBundle','setBundleEnabled','setPluginEnabled'].includes(c.name)).map(c=>c.name),['installBundle'])
   await flow.reviewActivate();assert.equal(flow.state.review.kind,'activate');await flow.confirmActivate();assert.equal(flow.state.status.state,'component-active')
   const mutations=calls.filter(c=>['installBundle','setBundleEnabled','setPluginEnabled'].includes(c.name));assert.deepEqual(mutations.map(c=>c.name),['installBundle','setBundleEnabled','setPluginEnabled']);assert.equal(mutations[1].args[0],release.id);assert.equal(mutations[2].args[0],'preview:'+release.id)
-  for(const peer of flows.slice(0,-1)){assert.equal(peer.state.phase,'idle');assert.equal(peer.state.status,null)}
+  for(const peer of flows.filter(f=>f!==flow)){assert.equal(peer.state.phase,'idle');assert.equal(peer.state.status,null)}
   assert.equal((await remote.pluginManager.listBundles()).value.length,1)
  }finally{flows.forEach(f=>f.dispose())}
 })

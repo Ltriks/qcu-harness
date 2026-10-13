@@ -1,5 +1,5 @@
 import {bundledCatalog,catalogSha256} from './bundled-catalog.mjs'
-import {findMarketRelease,releaseKeyOf} from './catalog-core.mjs'
+import {findMarketRelease,releaseKeyOf,validateMarketRelease} from './catalog-core.mjs'
 import { createHash, randomUUID } from 'node:crypto'
 import { lstat, mkdir, open, link, unlink } from 'node:fs/promises'
 import { join } from 'node:path'
@@ -9,11 +9,9 @@ import { release } from './trusted-release.mjs'
 export const digest = bytes => createHash('sha256').update(bytes).digest('hex')
 const check = (ok, message) => { if (!ok) throw new Error(message) }
 export function validateRelease(entry = release) {
-  check(/^qcu-[a-z0-9-]+$/.test(entry.id) && entry.skill === entry.id && /^\d+\.\d+\.\d+(?:-[a-z0-9.]+)?$/.test(entry.version), 'Untrusted identity')
-  check(entry.origin === 'http://192.168.1.68:8080', 'Untrusted origin')
-  check(/^[a-f0-9]{64}$/.test(entry.sha256) && /^[a-f0-9]{64}$/.test(entry.skillSha256), 'Invalid digest')
-  check(entry.file === `${entry.id}-${entry.version}-${entry.sha256}.tgz`, 'Invalid immutable filename')
-  check(Number.isSafeInteger(entry.bytes) && entry.bytes > 0 && entry.bytes <= 1024 * 1024, 'Invalid package size')
+  const item=bundledCatalog.entries.find(item=>item.id===entry.id)
+  check(item,'Unreviewed package identity')
+  validateMarketRelease({...item,release:entry})
   return `${entry.origin}/plugins/${entry.file}`
 }
 async function safeDir(path) {
@@ -23,6 +21,7 @@ async function safeDir(path) {
   return path
 }
 export async function verifyFile(path, entry = release) {
+  validateRelease(entry)
   const info = await lstat(path)
   check(info.isFile() && !info.isSymbolicLink() && info.uid === process.getuid() && info.size === entry.bytes, 'Unsafe cached package')
   const file = await open(path, constants.O_RDONLY | constants.O_NOFOLLOW)

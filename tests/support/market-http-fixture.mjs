@@ -62,7 +62,7 @@ export async function attachDownload(h,{mode='ok'}={}){
  const {bundledCatalog}=await import(pathToFileURL(archiveDir+'/src/bundled-catalog.mjs'))
  const {fetchPinned}=await import(pathToFileURL(archiveDir+'/src/host-core.mjs'))
  const inputs=JSON.parse(await readFile(join(work,'inputs.json'),'utf8')),packages=new Map()
- for(const item of bundledCatalog.entries){const source=item.id==='qcu-study-coach'?inputs.coach:inputs.skills?.[item.id];assert.ok(source,'Missing archive fixture: '+item.id);const bytes=await readFile(source.path);assert.equal(bytes.length,item.release.bytes);packages.set(item.release.file,{entry:item.release,bytes})}
+ for(const item of bundledCatalog.entries){const source=item.id==='qcu-study-coach'?inputs.coach:inputs.skills?.[item.id]??inputs.plugins?.[item.id];assert.ok(source,'Missing archive fixture: '+item.id);const bytes=await readFile(source.path);assert.equal(bytes.length,item.release.bytes);assert.equal(source.sha256,item.release.sha256);packages.set(item.release.file,{entry:item.release,bytes})}
  let count=0,current=mode,startedResolve;let started=new Promise(r=>startedResolve=r)
  const sockets=new Set()
  const server=createServer((r,s)=>{count++;startedResolve();const pack=packages.get(r.url.slice('/plugins/'.length));assert.ok(r.url.startsWith('/plugins/')&&pack);if(current==='slow'){r.on('close',()=>{});return}if(current==='offline'){s.writeHead(503);s.end();return}s.writeHead(200,{'content-length':pack.bytes.length});s.end(current==='bad-hash'?Buffer.alloc(pack.bytes.length):pack.bytes)})

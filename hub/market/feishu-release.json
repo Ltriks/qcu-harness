@@ -1,0 +1,14 @@
+{
+  "id": "qcu-feishu-readonly",
+  "version": "0.1.0-pilot.1.1",
+  "skill": null,
+  "skillSha256": null,
+  "provider": null,
+  "origin": "http://192.168.1.68:8080",
+  "file": "qcu-feishu-readonly-0.1.0-pilot.1.1-37376ce5f03d4f0fb459dcf6f888b25f5f78df1f7734cd780c7cfd6d01e91b17.tgz",
+  "bytes": 11263,
+  "sha256": "37376ce5f03d4f0fb459dcf6f888b25f5f78df1f7734cd780c7cfd6d01e91b17",
+  "runtime": "0.2.0-rc.2",
+  "releaseStatus": "local-candidate-not-published",
+  "license": "MIT"
+}

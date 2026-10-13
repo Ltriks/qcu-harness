@@ -11,6 +11,7 @@ import {createRequire} from 'node:module'
 import {pathToFileURL} from 'node:url'
 import {createLoopPlugin} from '../hub/plugins/qcu-market/src/loop-plugin.mjs'
 import {release} from '../hub/plugins/qcu-market/src/trusted-release.mjs'
+import {createPreviewFixture} from '../hub/plugins/qcu-market/preview-fixture.mjs'
 const root=process.env.QCU_OFFICIAL_DEPENDENCIES
 if(!root)throw Error('QCU_OFFICIAL_DEPENDENCIES required')
 const require=createRequire(pathToFileURL(root+'/package.json'))
@@ -22,6 +23,7 @@ const {SlotRegistry}=await import(pathToFileURL(root+'/node_modules/@deepseek-ai
 const client=await import(pathToFileURL(root+'/node_modules/@deepseek-ai/dsh-api-gateway/src/client/index.ts'))
 const {default:managerContribution}=await load('@deepseek-ai/dsh-plugin-manager/remote')
 const tick=()=>new Promise(r=>setImmediate(r))
+async function archivedClient(file){let mod;vm.runInNewContext(await readFile(file,'utf8'),{window:{__ModuleLoader__:{load:v=>{mod=v}}},TextEncoder,AbortController,crypto,setTimeout,clearTimeout});return mod.factory(()=>React)}
 async function fixture(t,{manager=true,navigation=true,plugin,answer,autoActivate=false}={}){
  const ctx=new Context();t.after(()=>ctx.fiber.dispose());new TypertRegistry(ctx);new SlotRegistry(ctx)
  ctx.slots.register({name:'root',children:{main:{kind:'keyed',scope:'root'},'sidebar.panellist':{kind:'list',scope:'root'}}},()=>null)
@@ -144,4 +146,29 @@ for(const action of ['reset','dispose'])test(`official scoped ${action} during b
  finish({ok:true,value:{changed:true,application:'applied',stage:'enable',target:release.id,enabled:true}});await running
  assert.equal(f.calls.filter(c=>c.endpoint==='pluginManager/setPluginEnabled').length,0)
  assert.notEqual(flow.state.phase,'idle');assert.match(flow.state.message,/没有被取消/)
+})
+test('real archived protocol3/4 Host and Client pairs refuse both stale directions through official in-memory Gateway',async t=>{
+ const {TypertGatewayService}=await load('@deepseek-ai/dsh-api-gateway')
+ const current=new URL('../.work/http-e2e/market/package/',import.meta.url),previous=new URL('../.work/http-e2e/previous/package/',import.meta.url)
+ for(const [hostRoot,clientRoot] of [[previous,current],[current,previous]]){
+  const host=new Context();new TypertRegistry(host);const gateway=new TypertGatewayService(host,{}),module=await import(new URL('index.js',hostRoot));const owner=host.plugin(module);await owner.await()
+  try{
+   const f=await fixture(t,{plugin:await archivedClient(new URL('client.js',clientRoot)),answer:async(endpoint,args)=>{const [namespace,method]=endpoint.split('/');return namespace==='qcuMarket'?{ok:true,value:await gateway.invoke({namespace,method,args})}:undefined}})
+   assert.deepEqual(f.calls,[]);await f.props().flow.prepare();assert.equal(f.props().flow.state.phase,'error');assert.match(f.props().flow.state.message,/版本不一致.*正常重启/)
+   assert.deepEqual(f.calls.map(c=>c.endpoint),['qcuMarket/status']);assert.equal(host.get('qcuMarket').packages.pending.size,0);assert.equal(host.get('qcuMarket').packages.receipts.size,0)
+  }finally{await host.fiber.dispose()}
+ }
+})
+test('compiled Client4 tools entry passes official manager codecs with synthetic effects, disabled install and one separate activation review',async t=>{
+ const preview=createPreviewFixture();t.after(()=>preview.flows.forEach(f=>f.dispose()))
+ const plugin=await archivedClient(new URL('../.work/http-e2e/market/package/client.js',import.meta.url))
+ const f=await fixture(t,{plugin,answer:async(endpoint,a)=>{
+  const [namespace,method]=endpoint.split('/');const params={status:[],prepare:[a.id,a.releaseKey],verify:[a.id],cancel:[a.id],listBundles:[],listPlugins:[],inspect:[a.spec,a.options],installBundle:[a.spec,a.options],setBundleEnabled:[a.name,a.enabled],setPluginEnabled:[a.id,a.enabled]}
+  assert.ok(params[method],endpoint);return preview.remote[namespace][method](...params[method])
+ }}),flow=f.props().flows.find(f=>f.entry.id==='qcu-feishu-readonly')
+ assert.deepEqual(f.calls,[]);assert.equal(flow.entry.skill,null);await flow.prepare();assert.equal(flow.state.phase,'review',flow.state.message)
+ assert.equal(flow.state.review.receipt.entry.sha256,'37376ce5f03d4f0fb459dcf6f888b25f5f78df1f7734cd780c7cfd6d01e91b17')
+ await flow.confirmInstall();assert.equal(flow.state.status.state,'installed-disabled');await flow.reviewActivate();assert.equal(flow.state.review.kind,'activate')
+ assert.equal(f.calls.filter(c=>c.endpoint.endsWith('/setBundleEnabled')||c.endpoint.endsWith('/setPluginEnabled')).length,0)
+ await flow.confirmActivate();assert.equal(flow.state.status.state,'component-active');assert.equal(f.calls.filter(c=>c.endpoint.endsWith('/installBundle')).length,1);assert.equal(f.calls.filter(c=>c.endpoint.endsWith('/setBundleEnabled')).length,1);assert.equal(f.calls.filter(c=>c.endpoint.endsWith('/setPluginEnabled')).length,1)
 })
