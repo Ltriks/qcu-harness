@@ -2,7 +2,7 @@
 
 ## 本地开发入口与市场分支
 
-本轮扩充见[执行计划](docs/qcu-market-expansion-plan.md)；用户验收见[逐项步骤与记录](docs/qcu-market-user-acceptance.md)。P7尚未部署，继续使用P6.3验收当前产品。
+本轮扩充见[执行计划](docs/qcu-market-expansion-plan.md)；用户验收见[逐项步骤与记录](docs/qcu-market-user-acceptance.md)。P7首项外部技能本地候选已完成，[父线程验收](docs/qcu-market-p7-parent-validation.md)记录测试与预览。P7尚未部署，继续使用P6.3验收当前产品。
 
 新 Codex 线程从主仓库 `$HOME/Repos/cowork/qcu-harness` 进入。先读仓库规则、本文与任务对应文档，核对 `git status`、`git worktree list` 和最新远端；不要让两个线程同时修改同一 worktree。
 

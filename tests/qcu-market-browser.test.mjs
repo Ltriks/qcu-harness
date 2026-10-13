@@ -27,11 +27,11 @@ test('shared market UI in Chromium: browsing, consent, navigation, themes and na
  const screenshots=resolve(out,'../screenshots');await mkdir(screenshots,{recursive:true})
  const shot=async name=>{await page.locator('.qcu-market').evaluate(el=>el.style.height='auto');await page.screenshot({path:resolve(screenshots,name+'.png'),fullPage:true})}
  await page.goto(url)
- await t.test('home has six real cards, folded diagnostics, no startup requests',async()=>{
-  await button('查看QCU学习方法教练').waitFor();assert.equal(await page.locator('article').count(),6);assert.equal(await page.locator('details[open]').count(),0);assert.deepEqual(await calls(),[]);assert.equal(await button('下载并查看安装确认').count(),0);await shot('01-list-light')
+ await t.test('home has seven real cards, folded diagnostics, no startup requests',async()=>{
+  await button('查看QCU学习方法教练').waitFor();assert.equal(await page.locator('article').count(),7);assert.equal(await page.locator('details[open]').count(),0);assert.deepEqual(await calls(),[]);assert.equal(await button('下载并查看安装确认').count(),0);await shot('01-list-light')
  })
- await t.test('five packaged skills and one plugin have distinct categories and accurate search',async()=>{
-  await button('技能').click();assert.equal(await page.locator('article').count(),5);assert.equal(await button('查看QCU学习方法教练').count(),0);await page.getByRole('searchbox').fill('分层');assert.equal(await page.locator('article').count(),1);await button('查看分层练习设计').waitFor();await page.getByRole('searchbox').fill('');await shot('02-skills');await button('插件').click();await page.getByRole('searchbox').fill('不存在');await waitText('没有找到匹配项目');await button('清除搜索').click();await page.getByRole('searchbox').fill('复习');assert.equal(await page.locator('article').count(),1)
+ await t.test('six packaged skills and one plugin have distinct categories and accurate search',async()=>{
+  await button('技能').click();assert.equal(await page.locator('article').count(),6);assert.equal(await button('查看QCU学习方法教练').count(),0);await page.getByRole('searchbox').fill('分层');assert.equal(await page.locator('article').count(),1);await button('查看分层练习设计').waitFor();await page.getByRole('searchbox').fill('');await shot('02-skills');await button('插件').click();await page.getByRole('searchbox').fill('不存在');await waitText('没有找到匹配项目');await button('清除搜索').click();await page.getByRole('searchbox').fill('复习');assert.equal(await page.locator('article').count(),1)
  })
  await t.test('open/back preserves filters and focus without RPC or consent',async()=>{
   await open();await button('← 返回列表').click();assert.equal(await page.getByRole('searchbox').inputValue(),'复习');assert.equal(await button('插件').getAttribute('aria-pressed'),'true');assert.equal(await button('查看QCU学习方法教练').evaluate(el=>el===document.activeElement),true);assert.deepEqual(await calls(),[]);await open();await shot('03-detail-light')
@@ -61,6 +61,17 @@ test('shared market UI in Chromium: browsing, consent, navigation, themes and na
   assert.equal(states.bundles.find(b=>b.name==='qcu-lesson-planning').enabled,false);assert.equal(states.rows.find(r=>r.moduleName==='qcu-lesson-planning').enabled,false);assert.equal(states.rows.find(r=>r.moduleName==='qcu-tiered-practice').enabled,true);assert.equal(states.rows.find(r=>r.moduleName==='qcu-study-coach').enabled,true);
   await shot('05-skill-detail');await button('← 返回列表').click();await button('插件').click();await open();
  });
+ await t.test('external Skill search, source/license, independent status and one activation; navigation never mutates',async()=>{
+  const before=(await mutations()).length;
+  await button('← 返回列表').click();await button('技能').click();await page.getByRole('searchbox').fill('教研');assert.equal(await page.locator('article').count(),1);
+  await button('查看教研简报与工作总结').click();const facts=await page.locator('.qcu-facts').innerText();for(const text of ['第三方改编','Anthropic','Apache-2.0','dbd4588f9e1033efb41dad4bef2f7947c8993d44'])assert.ok(facts.includes(text));
+  assert.equal((await mutations()).length,before);assert.equal(await page.locator('.qcu-instructions').count(),0);await shot('10-external-detail');
+  await button('← 返回列表').click();assert.equal(await page.getByRole('searchbox').inputValue(),'教研');await button('查看教研简报与工作总结').click();assert.equal((await mutations()).length,before);
+  await ready();await button('确认安装（保持未启用）').waitFor();assert.equal((await mutations()).length,before);await button('确认安装（保持未启用）').click();await button('查看启用确认').waitFor();
+  await button('查看启用确认').click();await button('确认启用').waitFor();assert.equal((await mutations()).length,before+1);await shot('11-external-activation-review');await button('确认启用').click();await waitText('组件已加载');assert.equal((await mutations()).length,before+3);
+  const states=await page.evaluate(()=>window.qcuPreview.flows.map(f=>({id:f.entry.id,status:f.state.status?.state,phase:f.state.phase})));assert.equal(states.find(s=>s.id==='qcu-team-briefing').status,'component-active');assert.equal(states.find(s=>s.id==='qcu-lesson-planning').status,'installed-disabled');assert.equal(states.find(s=>s.id==='qcu-note-organizer').status,undefined);assert.equal(states.find(s=>s.id==='qcu-note-organizer').phase,'idle');
+  const done=(await mutations()).length;await button('← 返回列表').click();await button('查看教研简报与工作总结').click();await button('← 返回列表').click();assert.equal((await mutations()).length,done);await page.getByRole('searchbox').fill('');await button('插件').click();await open();
+ })
  await t.test('unknown outcome remains blocked and reconciliation stays available',async()=>{
   await page.evaluate(()=>{const f=window.qcuPreview.flows[0];f.request={id:'synthetic-unknown'};f.set({phase:'unconfirmed',message:'Synthetic reply loss'})});assert.equal(await button('下载并查看安装确认').count(),0);const before=(await mutations()).length;await button('核对官方任务结果').click();await waitText('结果待核对');assert.equal((await mutations()).length,before);await button('← 返回列表').click();await button('技能').click();await button('查看课堂笔记与复习').click();await ready();await page.getByRole('alert').filter({hasText:'其他条目'}).waitFor();assert.equal((await mutations()).length,before)
  })

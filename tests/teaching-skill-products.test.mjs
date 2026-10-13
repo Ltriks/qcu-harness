@@ -16,7 +16,9 @@ const require=createRequire(resolve(deps,'package.json'))
 const {Context}=require('@deepseek-ai/cordis')
 const {SkillRegistry,BUNDLED_SKILL_RANK,isModelInvocable,isUserInvocable}=await import(pathToFileURL(require.resolve('@deepseek-ai/dsh-skill')))
 const {createScope}=await import(pathToFileURL(require.resolve('@deepseek-ai/dsh-scope')))
-const products=JSON.parse(await readFile(new URL('../hub/market/skill-releases.json',import.meta.url),'utf8'))
+const teachingProducts=JSON.parse(await readFile(new URL('../hub/market/skill-releases.json',import.meta.url),'utf8'))
+const external=JSON.parse(await readFile(new URL('../hub/market/external-skill-release.json',import.meta.url),'utf8'))
+const products=[...teachingProducts,external]
 const work=resolve('.work/teaching-skill-check')
 const sha=data=>createHash('sha256').update(data).digest('hex')
 const python=process.env.QCU_PYTHON||'python3.11'
@@ -25,13 +27,14 @@ await rm(work,{recursive:true});await mkdir(work,{recursive:true})
 await symlink(resolve(deps,'node_modules'),resolve(work,'node_modules'),'dir')
 const pack=out=>JSON.parse(execFileSync('rtk',['proxy',python,'scripts/pack-teaching-skills.py','--check-records','--out',out],{encoding:'utf8',stdio:['ignore','pipe','pipe']}))
 const built=pack(resolve(work,'build'))
-assert.deepEqual(built,products)
+assert.deepEqual(built,teachingProducts)
+const externalBuilt=JSON.parse(execFileSync('rtk',['proxy',python,'scripts/pack-external-skill.py','--check-records','--out',resolve(work,'external-build')],{encoding:'utf8'}));assert.deepEqual(externalBuilt,external)
 execFileSync('rtk',['proxy',python,'-c',
- `import pathlib,tarfile\nw=pathlib.Path(${JSON.stringify(work)})\nfor p in (w/'build').glob('*.tgz'):\n with tarfile.open(p) as t:\n  assert all(m.isfile() and m.name.startswith('package/') and '..' not in pathlib.Path(m.name).parts for m in t.getmembers())\n  t.extractall(w/p.name.split('-0.1.0-')[0],filter='data')`])
+ `import pathlib,tarfile\nw=pathlib.Path(${JSON.stringify(work)})\nfor p in [*(w/'build').glob('*.tgz'), *(w/'external-build').glob('*.tgz')]:\n with tarfile.open(p) as t:\n  assert all(m.isfile() and m.name.startswith('package/') and '..' not in pathlib.Path(m.name).parts for m in t.getmembers())\n  t.extractall(w/p.name.split('-0.1.0-')[0],filter='data')`])
 
 test('five bundles reproduce exactly, explicit resources only, unchanged coach trust root',async()=>{
- assert.deepEqual(pack(resolve(work,'rebuild')),products)
- for(const entry of products){
+ assert.deepEqual(pack(resolve(work,'rebuild')),teachingProducts)
+ for(const entry of teachingProducts){
   const bytes=await readFile(resolve(work,'build',entry.file));assert.equal(sha(bytes),entry.sha256);assert.equal(bytes.length,entry.bytes)
   const dir=resolve(work,entry.id,'package'),pkg=JSON.parse(await readFile(dir+'/package.json','utf8'))
   assert.equal(pkg.name,entry.id);assert.equal(pkg.version,'0.1.0-pilot.1.1')
@@ -67,7 +70,7 @@ test('market build is current, archive reproducible, members match source and co
  const out=resolve(work,'market'),packMarket=()=>JSON.parse(execFileSync('rtk',['proxy',python,'hub/plugins/qcu-market/pack-pilot.py',out],{encoding:'utf8',stdio:['ignore','pipe','pipe']}))
  const report=packMarket();assert.deepEqual(packMarket(),report)
  const path=out+'/'+report.file;assert.equal(sha(await readFile(path)),report.sha256);assert.equal(report.bytes,(await readFile(path)).length)
- assert.equal(report.file,`qcu-market-0.1.0-pilot.6.3-${report.sha256}.tgz`)
+ assert.equal(report.file,`qcu-market-0.1.0-pilot.7.1-${report.sha256}.tgz`)
  const members=JSON.parse(execFileSync('rtk',['proxy',python,'-c',`import json,hashlib,tarfile\nwith tarfile.open(${JSON.stringify(path)}) as t:\n assert all(m.isfile() and m.mode==0o644 and m.uid==0 and m.gid==0 and m.mtime==0 for m in t.getmembers())\n print(json.dumps({m.name:hashlib.sha256(t.extractfile(m).read()).hexdigest() for m in t.getmembers()}))`],{encoding:'utf8'}))
  for(const file of report.files)assert.equal(members[file.path],sha(await readFile('hub/plugins/qcu-market/'+file.path.slice(8))))
  assert.equal(Object.keys(members).length,14);assert.equal(members['package/preview-fixture.mjs'],undefined)
@@ -151,8 +154,8 @@ for(const entry of products){
  })
 }
 
-test('official caller scopes isolate identical providers and disposal; visible ancestor collision refuses',async()=>{
- const entry=products[0],module=await import(pathToFileURL(resolve(work,entry.id,'package/index.js')))
+for(const entry of [teachingProducts[0],external])test(`${entry.id}: official caller scopes isolate identical providers and disposal; visible ancestor collision refuses`,async()=>{
+ const module=await import(pathToFileURL(resolve(work,entry.id,'package/index.js')))
  const ctx=new Context();new SkillRegistry(ctx)
  const leftKey={},rightKey={},childKey={}
  const left=createScope(ctx,leftKey),right=createScope(ctx,rightKey),child=createScope(ctx,childKey,{parent:leftKey})
@@ -171,7 +174,7 @@ test('official caller scopes isolate identical providers and disposal; visible a
  }finally{await child.dispose();await left.dispose();await right.dispose();await ctx.fiber.dispose()}
 })
 
-test('six real preview entries have isolated installation/activation, reviewed catalog lock and unknown outcome block',async()=>{
+test('seven real preview entries have isolated installation/activation, reviewed catalog lock and unknown outcome block',async()=>{
  const {flows,calls,remote}=createPreviewFixture();const [coach,first,second]=flows
  try{
   assert.deepEqual(calls,[]);await first.prepare();assert.equal(first.state.phase,'review')

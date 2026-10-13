@@ -1,0 +1,14 @@
+{
+  "id": "qcu-team-briefing",
+  "version": "0.1.0-pilot.1",
+  "skill": "qcu-team-briefing",
+  "skillSha256": "cbe698fa9539c83e6a49088d7388f441c95844837a65596600ac984125e95a84",
+  "provider": "qcu-team-briefing@0.1.0-pilot.1",
+  "origin": "http://192.168.1.68:8080",
+  "file": "qcu-team-briefing-0.1.0-pilot.1-11a6a616c488afbebc0b1781f3e40039c2e49c697cadee0fc095f2e151d6c2bf.tgz",
+  "bytes": 18882,
+  "sha256": "11a6a616c488afbebc0b1781f3e40039c2e49c697cadee0fc095f2e151d6c2bf",
+  "runtime": "0.2.0-rc.2",
+  "releaseStatus": "local-candidate-not-published",
+  "license": "Apache-2.0"
+}

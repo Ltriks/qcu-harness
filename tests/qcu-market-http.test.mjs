@@ -10,15 +10,15 @@ import {spawnSync} from 'node:child_process'
 import {startHost,startClient,attachDownload,archiveDir,work,Context,load,req,tick} from './support/market-http-fixture.mjs'
 const id=()=>crypto.randomUUID()
 async function fixture(t,options){const h=await startHost(options);const d=await attachDownload(h);const c=await startClient(h);t.after(async()=>{await c.close();await d.close();await h.close()});return {h,d,c,flow:c.flow()}}
-test('real six-entry archived HTTP selects each pinned Skill and preserves per-entry consent and activation',async t=>{
- const {h,d,c}=await fixture(t),flows=c.flows();assert.equal(flows.length,6)
+test('real seven-entry archived HTTP selects each pinned Skill and preserves per-entry consent and activation',async t=>{
+ const {h,d,c}=await fixture(t),flows=c.flows();assert.equal(flows.length,7)
  for(let i=1;i<flows.length;i++){
   const flow=flows[i];await flow.prepare();assert.equal(flow.state.phase,'review',flow.state.message)
   assert.equal(flow.state.review.receipt.entry.id,bundledCatalog.entries[i].id)
   assert.equal((await readFile(flow.state.review.receipt.path)).length,bundledCatalog.entries[i].release.bytes)
   await assert.rejects(flows[0].prepare(),/其他条目/);await flow.confirmInstall();assert.equal(flow.state.status.state,'installed-disabled',flow.state.message)
  }
- assert.equal(d.count(),5);assert.equal(h.state.mutations.length,5)
+ assert.equal(d.count(),6);assert.equal(h.state.mutations.length,6)
  await flows[2].reviewActivate();await assert.rejects(flows[1].reviewActivate(),/其他条目/);await flows[2].confirmActivate();assert.equal(flows[2].state.status.state,'component-active')
  assert.equal(h.state.bundles.find(b=>b.name===flows[1].entry.id).enabled,false);assert.equal(h.state.rows.find(r=>r.moduleName===flows[1].entry.id).enabled,false);assert.equal(flows[0].state.phase,'idle')
 })

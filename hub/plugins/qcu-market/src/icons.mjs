@@ -1,5 +1,6 @@
 // Original QCU line drawings, MIT. Generic learning symbols; not a school crest.
 export const iconPaths = {
+  briefing: ['M4 4h16v16H4z', 'M8 8h8M8 12h8M8 16h4'],
   market: ['M4 4h6l2 2 2-2h6v15h-6l-2 2-2-2H4z', 'M12 6v15'],
   lesson: ['M4 4h16v12H4z', 'M8 21l4-5 4 5M8 8h8M8 12h5'],
   slides: ['M4 3h16v14H4z', 'M12 17v4M8 21h8M8 7h8M8 11h5'],
@@ -9,5 +10,5 @@ export const iconPaths = {
   integrity: ['M12 3l8 3v6c0 5-8 9-8 9s-8-4-8-9V6z', 'M8 12l3 3 5-6'],
 }
 export function sceneIcon(category) {
-  return ({'备课与课堂活动':'lesson','课件制作':'slides','教学文档':'document','匿名教学数据':'data','阅读笔记与复习':'reading','学术诚信与引用':'integrity'})[category] ?? 'market'
+  return ({'教研沟通与总结':'briefing','备课与课堂活动':'lesson','课件制作':'slides','教学文档':'document','匿名教学数据':'data','阅读笔记与复习':'reading','学术诚信与引用':'integrity'})[category] ?? 'market'
 }

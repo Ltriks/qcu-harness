@@ -5,12 +5,16 @@ const readJson=path=>JSON.parse(readFileSync(new URL(path,import.meta.url),'utf8
 const products=readJson('../../skill-products/products-input.json')
 const releases=readJson('../../market/skill-releases.json')
 if(products.length!==5||releases.length!==5||products.some((p,i)=>p.id!==releases[i].id))throw Error('Reviewed Skill release coverage mismatch')
-const skills=products.map((product,i)=>({...product,sourceLabel:'QCU自有',kind:'skill',
+const externalProduct=readJson('../../skill-products/external-product-input.json')
+const externalRelease=readJson('../../market/external-skill-release.json')
+if(externalProduct.id!=='qcu-team-briefing'||externalRelease.id!==externalProduct.id)throw Error('Reviewed external release coverage mismatch')
+const allProducts=[...products,externalProduct],allReleases=[...releases,externalRelease]
+const skills=allProducts.map((product,i)=>({...product,sourceLabel:product.id===externalProduct.id?'第三方改编':'QCU自有',kind:'skill',
  provenance:readJson(`../../../skills/${product.id}/SOURCE.json`).provenance,
  prerequisites:'DSH 0.2.0-rc.2；安装无需模型，使用静态说明需在目标会话确认技能发现并自行配置模型。',
  risk:'提供方在Host进程以应用用户权限运行，仅注册静态说明；不增加工具权限。官方安装会改写profile依赖、锁文件、缓存与日志，可能访问registry。安装默认不启用；另一次确认覆盖本包及唯一组件。',
- testStatus:'合成示例；源与隔离测试阶段，未部署、未测试模型输出或教学效果。',release:releases[i]}))
-export default {schemaVersion:3,revision:2,protocol:3,entries:[{
+ testStatus:'合成示例；源与隔离测试阶段，未部署、未测试模型输出或教学效果。',release:allReleases[i]}))
+export default {schemaVersion:3,revision:3,protocol:3,entries:[{
  id:release.id,title:'QCU学习方法教练',scenario:'阅读笔记与复习',purpose:'拆解任务、安排复习节奏与错题复盘；不代写应交作业。',sourceLabel:'QCU自有',
  prerequisites:'DSH 0.2.0-rc.2；安装无需模型，发送学习任务需用户自行配置模型。',
  risk:'Host代码以应用用户权限运行；安装改写当前profile依赖、锁文件、缓存与日志，可能访问配置的registry。安装默认不启用；另一次确认覆盖本包及唯一组件。',
