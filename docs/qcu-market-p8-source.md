@@ -1,6 +1,6 @@
 # QCU market P8.1 tool-only catalog source handoff
 
-> 父线程后续：273市场测试、20归档回归与截图人工查看通过；新版仍未部署。见[父线程交付检查](qcu-market-p8-parent-validation.md)与[用户验收步骤](qcu-market-p8-user-acceptance.md)。下文保留实现交接时HTTP/浏览器阻塞状态。
+> 父线程后续：273市场测试、20归档回归与截图人工查看通过；用户明确授权后已发布既有LAN Hub，20项发布检查通过，DSH安装/验收由用户完成。见[发布记录](qcu-market-p8-hub-deployment.md)、[父线程交付检查](qcu-market-p8-parent-validation.md)与[用户验收步骤](qcu-market-p8-user-acceptance.md)。下文保留实现交接时HTTP/浏览器阻塞状态。
 
 2026-10-13. Implemented `.ai/tasks/QCU-MARKET-P8-INTEGRATE.md` in `market-integration`, branch `dev/qcu-market-p8`, source base `714002b2f4e9b0cdbc4f9995609342bfdf05e8a4`. Market **0.1.0-pilot.8.1** pairs **schema4 / reviewed revision4 / protocol4** with catalog SHA256 `3364e5122184fd72423bfddcded4ee344df2e1b1eb83340dcf3739324cdb17ea`. Source and archive checks pass; HTTP and browser acceptance remain blocked by this sandbox. Parent review and native user acceptance are pending. No deployment, live profile, real document/authentication call, dependency download, agent, commit or push was performed. No private parent wire script was imported or executed.
 
