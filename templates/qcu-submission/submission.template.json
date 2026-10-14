@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "templateOnly": true,
+  "id": "qcu-course-workbench",
+  "title": "待填写",
+  "version": "0.1.0-pilot.1",
+  "productType": "plugin",
+  "sourceRevision": null,
+  "license": null,
+  "runtime": "0.2.0-rc.2",
+  "components": [],
+  "skills": [],
+  "peerDependencies": {},
+  "runtimeDependencies": {},
+  "installScripts": [],
+  "permissionSummary": [],
+  "archive": {"file": null, "bytes": null, "sha256": null},
+  "materials": {
+    "spec": "PLUGIN-SPEC.md",
+    "build": "BUILD.md",
+    "license": "LICENSE.txt",
+    "source": "SOURCE.md",
+    "memberManifest": "members.json",
+    "lock": null
+  },
+  "testEvidence": {"source": null, "preview": null, "liveInstall": null, "businessAcceptance": null},
+  "knownLimits": [],
+  "published": false
+}

@@ -2,11 +2,13 @@
 
 ## 本地开发入口与市场分支
 
-P9新手体验已于2026-10-14发布现有LAN Hub：五步tips、三个常用任务模板、本地反馈。25项独立LAN下载/边界检查通过，旧12包保留；见[发布记录与固定包](docs/qcu-market-p9-hub-deployment.md)、[Cursor实机验收任务书](docs/qcu-market-p9-cursor-acceptance.md)、[安装指引](docs/qcu-market-p9-install-guide.md)和[用户验收表](docs/qcu-market-p9-user-acceptance.md)。先前295项源/HTTP/浏览器与21项归档通过，原生DSH/模型/教师验收待执行。
+P9新手体验已于2026-10-14发布现有LAN Hub：五步tips、三个常用任务模板、本地反馈。25项独立LAN下载/边界检查通过，旧12包保留；见[发布记录与固定包](docs/qcu-market-p9-hub-deployment.md)、[Cursor实机验收任务书](docs/qcu-market-p9-cursor-acceptance.md)、[安装指引](docs/qcu-market-p9-install-guide.md)和[用户验收表](docs/qcu-market-p9-user-acceptance.md)。先前295项源/HTTP/浏览器与21项归档通过；[mini用户回执复核](docs/qcu-market-p9-mini-acceptance-review.md)记录同字节本地TGZ官方安装和核心流程、三项Skill响应与教师审核用户报告通过，旧file6.3→HTTP9.1升级仍报 `ERR_PNPM_MISSING_TARBALL_INTEGRITY`，根因未复现；部分精确宽度/网络/注入/重载与截图证据仍缺，不记全项通过。
 
 历史市场P8.1、教研简报和飞书只读1.1已按用户授权发布现有LAN Hub，20项下载/边界检查通过；见[发布记录与固定安装链接](docs/qcu-market-p8-hub-deployment.md)、[交付检查](docs/qcu-market-p8-parent-validation.md)和[用户验收](docs/qcu-market-p8-user-acceptance.md)。DSH安装/启用与实机验收由用户完成，生产/测试原环境状态以现场检查为准。
 
 P9构建与复现见[源码交接](docs/qcu-market-p9-source.md)。P8工具插件目录集成见[历史源码交接](docs/qcu-market-p8-source.md)，真实桌面安装与工具发现仍待验收。本轮扩充见[执行计划](docs/qcu-market-expansion-plan.md)；P8原产品验收见[P8逐项步骤](docs/qcu-market-p8-user-acceptance.md)，P9新增体验按上述P9表执行。P7首项外部技能已纳入本次Hub发布，[父线程验收](docs/qcu-market-p7-parent-validation.md)保留当时本地测试与预览记录；市场P7中间包未发布。
+
+P10离线维护工具已完成本地父审查：两版Python各51项通过、9个固定包静态核对通过；见[最终交付检查](docs/qcu-market-p10-parent-validation.md)。P10 为 Python 3.9+ stdlib 独立离线维护工具：见[提交检查器与 schema](docs/qcu-market-p10-submission-check.md)、[管理员维护指南](docs/qcu-market-p10-maintainer-guide.md)和[合成提交模板](templates/qcu-submission/README.md)。静态通过仍需人工/原生/教师复核，不改变教师 P9 流程或固定包。
 
 新 Codex 线程从主仓库 `$HOME/Repos/cowork/qcu-harness` 进入。先读仓库规则、本文与任务对应文档，核对 `git status`、`git worktree list` 和最新远端；不要让两个线程同时修改同一 worktree。
 
@@ -18,12 +20,14 @@ P9构建与复现见[源码交接](docs/qcu-market-p9-source.md)。P8工具插�
 | `$HOME/Repos/worktrees/qcu-harness/market-expansion` | 外部技能与后续市场扩充，`dev/qcu-market-expansion` |
 | `$HOME/Repos/worktrees/qcu-harness/market-integration` | P8工具插件目录集成，`dev/qcu-market-p8` |
 | `$HOME/Repos/worktrees/qcu-harness/market-onboarding` | P9新手体验，`dev/qcu-market-p9`；独立构建、预览与实机验收文档 |
+| `$HOME/Repos/worktrees/qcu-harness/market-maintenance` | P10离线检查器，`dev/qcu-market-p10`；只维护工具、示例与文档 |
 | `$HOME/Repos/worktrees/qcu-harness/<功能名>` | 后续并行开发 worktree；每个 worktree 独占分支 |
 | `$HOME/Artifacts/qcu-harness/<版本号>/` | 安装包、截图、测试日志与验收材料；不入 Git |
 | `$HOME/Artifacts/qcu-harness/0.1.0-pilot.5.1/final/` | 历史已部署市场版本，保持不可变 |
 | `$HOME/Artifacts/qcu-harness/0.1.0-pilot.6.3/` | 历史P6.3市场、五个 Skill 包、预览截图及 deployment 现场证据 |
 | `$HOME/Artifacts/qcu-harness/0.1.0-pilot.8.1/` | 历史已发布Hub的P8市场、飞书固定包、预览截图及 deployment 发布证据；教研简报保留在P7.1原位置 |
 | `$HOME/Artifacts/qcu-harness/0.1.0-pilot.9.1/` | 当前P9固定市场包、46张合成预览截图、deployment发布证据与Cursor验收任务书 |
+| `$HOME/Artifacts/qcu-harness/0.1.0-pilot.10.1/` | P10合成 handoff、检查报告与验证日志；便携工具ZIP与父级终检；非DSH安装包 |
 
 市场 `0.1.0-pilot.6.3` 已部署到既有 mini 测试 Home，五个教学 Skill `0.1.0-pilot.1.1` 已分发至局域网 Hub。备课技能的安装保持禁用、一次启用、发现、注入与合成调用通过；其余四项未做真机调用。测试实例已正常退出，默认DSH环境恢复且关键配置摘要不变。安装确认仍独立，多组件仍明确选择。历史 P5.1 与不可变旧包保留。接手先读 [P6.3现场记录](docs/qcu-market-pilot6.3-live-validation.md)、[本地验收](docs/qcu-market-p6-parent-validation.md)、[源码交接](docs/qcu-market-p6-source.md) 与 [教练现场记录](docs/qcu-market-coach-live-20261012.md)。
 
