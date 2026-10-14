@@ -1,6 +1,6 @@
 # P9 原生用户验收表（由用户执行）
 
-本轮本地合成回归与共享React预览不证明原生DSH通过。P8历史发布/实机证据见 [P8验收](qcu-market-p8-user-acceptance.md)；P9尚未发布Hub，当前电脑可使用[父审查确认的本地TGZ](qcu-market-p9-parent-validation.md)；mini或其他电脑先取得同一包或确认Hub发布，再按 [安装指引](qcu-market-p9-install-guide.md) 在自己的官方DSH0.2.0-rc.2、Apple Silicon Mac上操作。不要为补证据重建Home或复制凭据。
+本轮本地合成回归与共享React预览不证明原生DSH通过。P9已于2026-10-14发布到现有LAN Hub，见[发布记录与固定包](qcu-market-p9-hub-deployment.md)；mini上的Cursor按[实机验收任务书](qcu-market-p9-cursor-acceptance.md)协助执行。P8历史发布/实机证据见[P8验收](qcu-market-p8-user-acceptance.md)。按[安装指引](qcu-market-p9-install-guide.md)在官方DSH0.2.0-rc.2、Apple Silicon Mac上操作；不要为补证据重建Home或复制凭据。
 
 记录人：____ 日期：____ 实际DSH版本：____ 市场版本：____ 固定包SHA256：____
 

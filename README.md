@@ -2,9 +2,9 @@
 
 ## 本地开发入口与市场分支
 
-P9新手体验已完成本地审查，尚未发布Hub：五步tips、三个常用任务模板、本地反馈。先读[交付检查与固定包](docs/qcu-market-p9-parent-validation.md)、[安装指引与截图清单](docs/qcu-market-p9-install-guide.md)、[实机验收表](docs/qcu-market-p9-user-acceptance.md)。295项源/HTTP/浏览器与21项归档通过，原生DSH/模型/教师验收由用户执行。
+P9新手体验已于2026-10-14发布现有LAN Hub：五步tips、三个常用任务模板、本地反馈。25项独立LAN下载/边界检查通过，旧12包保留；见[发布记录与固定包](docs/qcu-market-p9-hub-deployment.md)、[Cursor实机验收任务书](docs/qcu-market-p9-cursor-acceptance.md)、[安装指引](docs/qcu-market-p9-install-guide.md)和[用户验收表](docs/qcu-market-p9-user-acceptance.md)。先前295项源/HTTP/浏览器与21项归档通过，原生DSH/模型/教师验收待执行。
 
-当前市场P8.1、教研简报和飞书只读1.1已按用户授权发布现有LAN Hub，20项下载/边界检查通过；见[发布记录与固定安装链接](docs/qcu-market-p8-hub-deployment.md)、[交付检查](docs/qcu-market-p8-parent-validation.md)和[用户验收](docs/qcu-market-p8-user-acceptance.md)。DSH安装/启用与实机验收由用户完成，生产/测试原环境状态以现场检查为准。
+历史市场P8.1、教研简报和飞书只读1.1已按用户授权发布现有LAN Hub，20项下载/边界检查通过；见[发布记录与固定安装链接](docs/qcu-market-p8-hub-deployment.md)、[交付检查](docs/qcu-market-p8-parent-validation.md)和[用户验收](docs/qcu-market-p8-user-acceptance.md)。DSH安装/启用与实机验收由用户完成，生产/测试原环境状态以现场检查为准。
 
 P9构建与复现见[源码交接](docs/qcu-market-p9-source.md)。P8工具插件目录集成见[历史源码交接](docs/qcu-market-p8-source.md)，真实桌面安装与工具发现仍待验收。本轮扩充见[执行计划](docs/qcu-market-expansion-plan.md)；P8原产品验收见[P8逐项步骤](docs/qcu-market-p8-user-acceptance.md)，P9新增体验按上述P9表执行。P7首项外部技能已纳入本次Hub发布，[父线程验收](docs/qcu-market-p7-parent-validation.md)保留当时本地测试与预览记录；市场P7中间包未发布。
 
@@ -22,7 +22,8 @@ P9构建与复现见[源码交接](docs/qcu-market-p9-source.md)。P8工具插�
 | `$HOME/Artifacts/qcu-harness/<版本号>/` | 安装包、截图、测试日志与验收材料；不入 Git |
 | `$HOME/Artifacts/qcu-harness/0.1.0-pilot.5.1/final/` | 历史已部署市场版本，保持不可变 |
 | `$HOME/Artifacts/qcu-harness/0.1.0-pilot.6.3/` | 历史P6.3市场、五个 Skill 包、预览截图及 deployment 现场证据 |
-| `$HOME/Artifacts/qcu-harness/0.1.0-pilot.8.1/` | 当前已发布Hub的P8市场、飞书固定包、预览截图及 deployment 发布证据；教研简报保留在P7.1原位置 |
+| `$HOME/Artifacts/qcu-harness/0.1.0-pilot.8.1/` | 历史已发布Hub的P8市场、飞书固定包、预览截图及 deployment 发布证据；教研简报保留在P7.1原位置 |
+| `$HOME/Artifacts/qcu-harness/0.1.0-pilot.9.1/` | 当前P9固定市场包、46张合成预览截图、deployment发布证据与Cursor验收任务书 |
 
 市场 `0.1.0-pilot.6.3` 已部署到既有 mini 测试 Home，五个教学 Skill `0.1.0-pilot.1.1` 已分发至局域网 Hub。备课技能的安装保持禁用、一次启用、发现、注入与合成调用通过；其余四项未做真机调用。测试实例已正常退出，默认DSH环境恢复且关键配置摘要不变。安装确认仍独立，多组件仍明确选择。历史 P5.1 与不可变旧包保留。接手先读 [P6.3现场记录](docs/qcu-market-pilot6.3-live-validation.md)、[本地验收](docs/qcu-market-p6-parent-validation.md)、[源码交接](docs/qcu-market-p6-source.md) 与 [教练现场记录](docs/qcu-market-coach-live-20261012.md)。
 
