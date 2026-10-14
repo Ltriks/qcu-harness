@@ -97,4 +97,12 @@ export const marketStyles = `
 .qcu-market dd { margin:0;overflow-wrap:anywhere; }
 .qcu-market :is(button,summary,textarea,input):focus-visible { outline:2px solid var(--dsw-alias-brand-primary);outline-offset:3px; }
 @media(max-width:560px) { .qcu-market .qcu-toolbar { gap:14px; }.qcu-market .qcu-search { flex-basis:100%; }.qcu-market .qcu-head { margin-top:28px; }.qcu-market .qcu-card-link { padding:20px; }.qcu-market .qcu-detail-head { gap:14px; }.qcu-market .qcu-icon-large { width:48px;height:48px; }.qcu-market .qcu-actions,.qcu-market .qcu-review { padding:16px; } }
+.qcu-market .qcu-aux-page { max-width:760px;margin:28px auto; }
+.qcu-market .qcu-field { margin:18px 0; }
+.qcu-market .qcu-field textarea { min-height:72px;margin:6px 0; }
+.qcu-market .qcu-field label { font-weight:600; }
+.qcu-market .qcu-ack { display:flex;align-items:flex-start;gap:10px;margin:18px 0; }
+.qcu-market .qcu-ack input { flex:none;margin-top:6px; }
+.qcu-market .qcu-aux-page :is(h1,p,label) { overflow-wrap:anywhere; }
+.qcu-market .qcu-aux-page .qcu-control { white-space:normal;max-width:100%; }
 `

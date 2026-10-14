@@ -16,7 +16,7 @@ const item=bundledCatalog.entries.find(e=>e.id==='qcu-feishu-readonly'),release=
 const clone=()=>JSON.parse(catalogText),tools=c=>c.entries.find(e=>e.id===item.id)
 test('paired reviewed schema4/protocol4 and strict frozen capabilities preserve all seven old releases',async()=>{
  assert.equal(bundledCatalog.schemaVersion,4);assert.equal(bundledCatalog.protocol,4);assert.equal(bundledCatalog.revision,4)
- assert.equal(marketRuntime.version,'0.1.0-pilot.8.1');assert.equal(marketRuntime.protocol,4);assert.equal(marketRuntime.catalogSha256,catalogSha256)
+ assert.equal(marketRuntime.version,'0.1.0-pilot.9.1');assert.equal(marketRuntime.protocol,4);assert.equal(marketRuntime.catalogSha256,catalogSha256)
  const read=async path=>JSON.parse(await readFile(path,'utf8'))
  for(const old of [await read('hub/market/coach-release.json'),...await read('hub/market/skill-releases.json'),await read('hub/market/external-skill-release.json')]){
   const entry=bundledCatalog.entries.find(e=>e.id===old.id);assert.deepEqual(entry.release,old);assert.deepEqual(entry.capabilities,['skill'])

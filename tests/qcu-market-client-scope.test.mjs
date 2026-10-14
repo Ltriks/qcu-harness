@@ -159,6 +159,18 @@ test('real archived protocol3/4 Host and Client pairs refuse both stale directio
   }finally{await host.fiber.dispose()}
  }
 })
+test('real archived P8/P9 same-protocol Host and Client pairs refuse both stale directions through official in-memory Gateway',async t=>{
+ const {TypertGatewayService}=await load('@deepseek-ai/dsh-api-gateway')
+ const current=new URL('../.work/http-e2e/market/package/',import.meta.url),previous=new URL('../.work/http-e2e/p8/package/',import.meta.url)
+ for(const [hostRoot,clientRoot] of [[previous,current],[current,previous]]){
+  const host=new Context();new TypertRegistry(host);const gateway=new TypertGatewayService(host,{}),module=await import(new URL('index.js',hostRoot));const owner=host.plugin(module);await owner.await()
+  try{
+   const f=await fixture(t,{plugin:await archivedClient(new URL('client.js',clientRoot)),answer:async(endpoint,args)=>{const [namespace,method]=endpoint.split('/');return namespace==='qcuMarket'?{ok:true,value:await gateway.invoke({namespace,method,args})}:undefined}})
+   assert.deepEqual(f.calls,[]);await f.props().flow.prepare();assert.equal(f.props().flow.state.phase,'error');assert.match(f.props().flow.state.message,/版本不一致.*正常重启/)
+   assert.deepEqual(f.calls.map(c=>c.endpoint),['qcuMarket/status']);assert.equal(host.get('qcuMarket').packages.pending.size,0);assert.equal(host.get('qcuMarket').packages.receipts.size,0)
+  }finally{await host.fiber.dispose()}
+ }
+})
 test('compiled Client4 tools entry passes official manager codecs with synthetic effects, disabled install and one separate activation review',async t=>{
  const preview=createPreviewFixture();t.after(()=>preview.flows.forEach(f=>f.dispose()))
  const plugin=await archivedClient(new URL('../.work/http-e2e/market/package/client.js',import.meta.url))

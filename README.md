@@ -2,9 +2,11 @@
 
 ## 本地开发入口与市场分支
 
+P9新手体验已完成本地审查，尚未发布Hub：五步tips、三个常用任务模板、本地反馈。先读[交付检查与固定包](docs/qcu-market-p9-parent-validation.md)、[安装指引与截图清单](docs/qcu-market-p9-install-guide.md)、[实机验收表](docs/qcu-market-p9-user-acceptance.md)。295项源/HTTP/浏览器与21项归档通过，原生DSH/模型/教师验收由用户执行。
+
 当前市场P8.1、教研简报和飞书只读1.1已按用户授权发布现有LAN Hub，20项下载/边界检查通过；见[发布记录与固定安装链接](docs/qcu-market-p8-hub-deployment.md)、[交付检查](docs/qcu-market-p8-parent-validation.md)和[用户验收](docs/qcu-market-p8-user-acceptance.md)。DSH安装/启用与实机验收由用户完成，生产/测试原环境状态以现场检查为准。
 
-P8工具插件目录集成见[源码交接](docs/qcu-market-p8-source.md)，真实桌面安装与工具发现仍待验收。本轮扩充见[执行计划](docs/qcu-market-expansion-plan.md)；当前用户验收以[P8逐项步骤](docs/qcu-market-p8-user-acceptance.md)为准。P7首项外部技能已纳入本次Hub发布，[父线程验收](docs/qcu-market-p7-parent-validation.md)保留当时本地测试与预览记录；市场P7中间包未发布。
+P9构建与复现见[源码交接](docs/qcu-market-p9-source.md)。P8工具插件目录集成见[历史源码交接](docs/qcu-market-p8-source.md)，真实桌面安装与工具发现仍待验收。本轮扩充见[执行计划](docs/qcu-market-expansion-plan.md)；P8原产品验收见[P8逐项步骤](docs/qcu-market-p8-user-acceptance.md)，P9新增体验按上述P9表执行。P7首项外部技能已纳入本次Hub发布，[父线程验收](docs/qcu-market-p7-parent-validation.md)保留当时本地测试与预览记录；市场P7中间包未发布。
 
 新 Codex 线程从主仓库 `$HOME/Repos/cowork/qcu-harness` 进入。先读仓库规则、本文与任务对应文档，核对 `git status`、`git worktree list` 和最新远端；不要让两个线程同时修改同一 worktree。
 
@@ -15,6 +17,7 @@ P8工具插件目录集成见[源码交接](docs/qcu-market-p8-source.md)，真�
 | `$HOME/Repos/worktrees/qcu-harness/market-skills` | 独立 P6 开发，`dev/qcu-market-p6` |
 | `$HOME/Repos/worktrees/qcu-harness/market-expansion` | 外部技能与后续市场扩充，`dev/qcu-market-expansion` |
 | `$HOME/Repos/worktrees/qcu-harness/market-integration` | P8工具插件目录集成，`dev/qcu-market-p8` |
+| `$HOME/Repos/worktrees/qcu-harness/market-onboarding` | P9新手体验，`dev/qcu-market-p9`；独立构建、预览与实机验收文档 |
 | `$HOME/Repos/worktrees/qcu-harness/<功能名>` | 后续并行开发 worktree；每个 worktree 独占分支 |
 | `$HOME/Artifacts/qcu-harness/<版本号>/` | 安装包、截图、测试日志与验收材料；不入 Git |
 | `$HOME/Artifacts/qcu-harness/0.1.0-pilot.5.1/final/` | 历史已部署市场版本，保持不可变 |
@@ -30,13 +33,13 @@ P8工具插件目录集成见[源码交接](docs/qcu-market-p8-source.md)，真�
 ```sh
 export QCU_OFFICIAL_DEPENDENCIES=/absolute/path/to/audited-official-source
 export QCU_BROWSER_DEPENDENCIES=/absolute/path/to/local-playwright-dependencies
-export QCU_MARKET_PREVIEW_OUT="$HOME/Artifacts/qcu-harness/0.1.0-pilot.8.1/preview"
+export QCU_MARKET_PREVIEW_OUT="$HOME/Artifacts/qcu-harness/0.1.0-pilot.9.1/refined/preview"
 node hub/plugins/qcu-market/build.mjs
 node hub/plugins/qcu-market/preview.mjs
 node --experimental-transform-types --expose-internals --test tests/qcu-market*.test.mjs tests/teaching-skill-products.test.mjs
 ```
 
-首次测试须准备 `scripts/prepare-market-loop-tests.py`、`scripts/prepare-market-http-tests.py` 与 `scripts/verify-market-http-runtime.py` 所需的固定归档和官方依赖；P8完整归档变量、飞书输入及回归命令见[源码交接的复现步骤](docs/qcu-market-p8-source.md#reproduction-with-existing-audited-dependencies)，历史UI构建说明见 `docs/qcu-market-ui-refresh.md`。浏览器测试需已有 Chromium。预览共用真实 UI 与状态机，但后台为明确标注的模拟服务，不证明真机安装通过。`.work/` 仅放可重建夹具，不作为唯一交付位置。
+首次测试须准备 `scripts/prepare-market-loop-tests.py`、`scripts/prepare-market-http-tests.py` 与 `scripts/verify-market-http-runtime.py` 所需的固定归档和官方依赖；P9完整归档变量、固定P8错配输入、飞书输入及回归命令见[P9源码交接](docs/qcu-market-p9-source.md)，历史UI构建说明见 `docs/qcu-market-ui-refresh.md`。浏览器测试需已有 Chromium。预览共用真实 UI 与状态机，但后台为明确标注的模拟服务，不证明真机安装通过。`.work/` 仅放可重建夹具，不作为唯一交付位置。
 
 Hub 当前仅局域网 `http://192.168.1.68:8080`；不可变包位于 `/plugins/`。mini 测试 Home 保持 `$HOME/qcu-p42-fresh-20261011-1300`，沿用 `Start-P42-Fresh.command`；不复制凭据、不新建 Home 来补造首次安装证据。默认 DSH 环境与测试环境的当前状态须现场重查。源码路径迁移不改变任何 mini 路径。
 

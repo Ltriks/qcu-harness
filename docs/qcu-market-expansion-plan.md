@@ -42,3 +42,10 @@ B先选Anthropic `internal-comms`，固定修订`dbd4588f9e1033efb41dad4bef2f794
 ## 本轮状态
 
 2026-10-13更新：B的教研简报、C的飞书只读1.1及P8八产品集成已完成本地开发、审查和预览，源码`f9a51b4`已推送`dev/qcu-market-p8`。用户明确授权后，市场P8.1、教研简报和飞书三包已发布现有LAN Hub，旧包和P6.3目录保留，20项发布检查通过；详见[Hub发布记录](qcu-market-p8-hub-deployment.md)及[交付检查](qcu-market-p8-parent-validation.md)。CLI目录和一节正文读取已有证据，原生DSH安装/配置/工具/模型与教师质量仍未测，由用户按[P8验收步骤](qcu-market-p8-user-acceptance.md)执行。D—F尚未实施。没有承诺无人值守定时推进；后续线程从主仓库进入，先读本文、任务稿与Git状态。
+
+
+## 2026-10-14 新手体验迭代
+
+用户已明确授权新手指引（含安装指南）、三个常用任务模板、问题反馈与本人执行实机验收。P9源码在`market-onboarding`/`dev/qcu-market-p9`完成并经父审查：295项不同源/HTTP/浏览器检查、21项固定归档回归通过。当前仍为6技能/2插件的原八产品，没有把模板/引导冒充可安装产品；固定包与结果见[交付检查](qcu-market-p9-parent-validation.md)。P9尚未发布Hub，原P8包和已部署目录保留，普通DSH和mini测试Home未操作。
+
+下一步由用户按[P9实机验收表](qcu-market-p9-user-acceptance.md)测试，按[安装指引](qcu-market-p9-install-guide.md)五个镜头补真实截图；需跨机器取包时另行确认Hub发布。原P8新增产品的实机/模型/教师验证仍未收到完整回执。完成后再推进上表D的小范围试用，依据反馈选E的第二批技能，同时安排F的分发维护；本轮不自动邀请教师、发送反馈或扩大Hub网络范围。

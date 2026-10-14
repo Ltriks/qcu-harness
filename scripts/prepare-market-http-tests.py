@@ -1,7 +1,7 @@
 """Extract immutable packages into a disposable test tree; never install or access profiles."""
 import argparse,tarfile,hashlib,json,shutil
 from pathlib import Path
-p=argparse.ArgumentParser();p.add_argument('--dependencies',type=Path,required=True);p.add_argument('--archive',type=Path,required=True);p.add_argument('--old',type=Path,required=True);p.add_argument('--previous',type=Path,required=True);p.add_argument('--coach',type=Path,required=True);p.add_argument('--skills',type=Path);p.add_argument('--external',type=Path);p.add_argument('--feishu',type=Path,required=True);a=p.parse_args()
+p=argparse.ArgumentParser();p.add_argument('--dependencies',type=Path,required=True);p.add_argument('--archive',type=Path,required=True);p.add_argument('--p8',type=Path);p.add_argument('--old',type=Path,required=True);p.add_argument('--previous',type=Path,required=True);p.add_argument('--coach',type=Path,required=True);p.add_argument('--skills',type=Path);p.add_argument('--external',type=Path);p.add_argument('--feishu',type=Path,required=True);a=p.parse_args()
 w=Path(__file__).resolve().parents[1]/'.work/http-e2e';w.mkdir(parents=True,exist_ok=True)
 records={}
 root=Path(__file__).resolve().parents[1]
@@ -16,7 +16,9 @@ with tarfile.open(a.feishu) as t:
   assert m.isfile() and not m.issym() and t.extractfile(m).read()==(root/'hub/plugins/qcu-feishu-readonly'/m.name.removeprefix('package/')).read_bytes()
 records['plugins']={feishu['id']:{'path':str(a.feishu.resolve()),'sha256':feishu['sha256']}}
 assert hashlib.sha256(a.previous.read_bytes()).hexdigest()=='994325afc328e3f18e9bf7dd7c4f042dc03bc3e87369ef3d908cff0c29532288'
-for label,path in [('market',a.archive),('old',a.old),('previous',a.previous),('coach',a.coach)]:
+if a.p8: assert hashlib.sha256(a.p8.read_bytes()).hexdigest()=='c646b4f3f392556570110ae3067e0fbbe00f9dc253d08deabb895613e7262c09'
+for label,path in [('market',a.archive),('old',a.old),('previous',a.previous),('p8',a.p8),('coach',a.coach)]:
+ if path is None: continue
  d=w/label
  assert d.parent==w and not d.is_symlink()
  if d.exists():shutil.rmtree(d)

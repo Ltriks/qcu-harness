@@ -1,12 +1,14 @@
 import {bundledCatalog} from './bundled-catalog.mjs'
 import {iconPaths,sceneIcon} from './icons.mjs'
 import {marketStyles} from './styles.mjs'
+import {createTeacherViews} from './teacher-view.mjs'
 const unavailableSnapshot=Object.freeze({phase:'unavailable',status:null,review:null,message:''})
 const noSubscribe=()=>()=>{}
 const statusLabels={'not-installed':'未安装','installed-disabled':'已安装 · 未启用','row-disabled':'包已启用 · 组件未启用','component-active':'组件已加载','restart-or-pending':'等待加载或重启',conflict:'需要核对版本',failed:'加载失败'}
 const phaseLabels={preparing:'正在准备安装',verifying:'正在复核',installing:'正在安装',cancelling:'正在请求取消',applying:'正在应用',checking:'正在检查',enabling:'正在启用',unconfirmed:'结果待核对',error:'操作未完成',cancelled:'已取消',declined:'未授权操作',review:'等待你的确认',partial:'启用部分完成 · 需核对'}
 export function createMarketViews(React){
  const h=React.createElement
+ const {Guide,Tasks,Feedback}=createTeacherViews(React)
  const useFlow=flow=>React.useSyncExternalStore(flow?.subscribe||noSubscribe,flow?.snapshot||(()=>unavailableSnapshot),flow?.snapshot||(()=>unavailableSnapshot))
  function Icon({name='market'}){return h('svg',{width:26,height:26,viewBox:'0 0 24 24',fill:'none',stroke:'currentColor',strokeWidth:1.6,'aria-hidden':true},...iconPaths[name].map((d,i)=>h('path',{key:i,d})))}
  const label=state=>phaseLabels[state.phase]||statusLabels[state.status?.state]||'状态待检查'
@@ -56,14 +58,19 @@ export function createMarketViews(React){
  function MarketPage({availability,onBack,catalog=bundledCatalog}){
   const ready=React.useSyncExternalStore(availability.subscribe,availability.snapshot,availability.snapshot)
   const [category,setCategory]=React.useState('all'),[query,setQuery]=React.useState(''),[selected,setSelected]=React.useState(null)
-  const root=React.useRef(null),lastSelected=React.useRef(null)
+  const [aux,setAux]=React.useState(null),[guide,setGuide]=React.useState({step:0,done:false}),[drafts,setDrafts]=React.useState({}),[task,setTask]=React.useState(null),[detailReturn,setDetailReturn]=React.useState(null)
+  const root=React.useRef(null),lastSelected=React.useRef(null),lastAux=React.useRef(null)
+  React.useEffect(()=>{if(aux)root.current?.querySelector('[data-page-heading]')?.focus();else if(lastAux.current&&!selected)root.current?.querySelector('[data-aux="'+lastAux.current+'"]')?.focus();lastAux.current=aux},[aux,selected])
+  const navigate=page=>{setSelected(null);setDetailReturn(null);setAux(page)}
+  const auxiliary=h('nav',{'aria-label':'教学辅助',className:'qcu-button-row'},...[[null,'市场首页'],['guide','新手指引'],['tasks','常用任务'],['feedback','问题反馈']].map(([key,text])=>h('button',{key:text,type:'button',className:'qcu-control','data-aux':key||'home','aria-pressed':aux===key&&!selected,onClick:()=>navigate(key)},text)))
   React.useEffect(()=>{if(selected)root.current?.querySelector('[data-page-heading]')?.focus();else if(lastSelected.current)root.current?.querySelector('[data-item="'+lastSelected.current+'"] button')?.focus();lastSelected.current=selected},[selected])
   const flowFor=item=>ready.flows?.[catalog.entries.indexOf(item)]||ready.flow
   const item=catalog.entries.find(e=>e.id===selected)
   const visible=catalog.entries.filter(e=>(category==='all'||category==='plugins'&&e.kind==='bundle'||category==='skills'&&e.kind==='skill')&&[e.title,e.purpose,e.scenario].join(' ').toLocaleLowerCase().includes(query.trim().toLocaleLowerCase()))
-  return h('section',{ref:root,className:'qcu-market','aria-label':'QCU市场'},h('style',null,marketStyles),h('div',{className:'qcu-content'},item?h(Detail,{key:item.id,item,flow:flowFor(item),onBack:()=>setSelected(null),onDetails:ready.onDetails,unavailable:ready.unavailable}):h(React.Fragment,null,
+  return h('section',{ref:root,className:'qcu-market','aria-label':'QCU市场'},h('style',null,marketStyles),h('div',{className:'qcu-content'},auxiliary,aux==='guide'?h(Guide,{state:guide,setState:setGuide,onHome:()=>navigate(null)}):aux==='tasks'?h(Tasks,{drafts,setDrafts,selected:task,setSelected:setTask,onDetail:id=>{setDetailReturn('tasks');setAux(null);setSelected(id)}}):aux==='feedback'?h(Feedback):item?h(Detail,{key:item.id,item,flow:flowFor(item),onBack:()=>{setSelected(null);setAux(detailReturn);setDetailReturn(null)},onDetails:ready.onDetails,unavailable:ready.unavailable}):h(React.Fragment,null,
    h('button',{type:'button',className:'qcu-control qcu-back',onClick:onBack},'← 返回对话'),
    h('header',{className:'qcu-head'},h('span',{className:'qcu-eyebrow'},'QCU MARKET'),h('h1',null,'为日常教学，添一份助力'),h('p',{className:'qcu-muted'},'发现实用的技能与插件，从一件小事开始。')),
+   h('p',{className:'qcu-hint'},guide.done?'已浏览引导（不代表已验收）；可随时从“新手指引”再看。':h(React.Fragment,null,'第一次使用？ ',h('button',{type:'button',className:'qcu-control',onClick:()=>navigate('guide')},'开始浏览引导'))),
    h('div',{className:'qcu-toolbar'},h('nav',{'aria-label':'市场分类',className:'qcu-tabs'},...[['all','全部'],['skills','技能'],['plugins','插件']].map(([key,text])=>h('button',{key,type:'button','aria-pressed':category===key,onClick:()=>setCategory(key)},text))),h('label',{className:'qcu-search'},h('span',null,'搜索'),h('input',{type:'search',value:query,onChange:e=>setQuery(e.target.value),placeholder:'搜索名称或用途','aria-label':'搜索名称或用途'}))),
    h('p',{className:'qcu-count'},`${visible.length} 个项目`),
    visible.length?h('div',{className:'qcu-grid'},...visible.map(e=>h('div',{key:e.id,'data-item':e.id},h(Card,{item:e,flow:flowFor(e),onOpen:()=>setSelected(e.id)})))):h('div',{className:'qcu-empty'},h(Icon),h('h2',null,query.trim()?'没有找到匹配项目':'暂无可安装的技能'),h('p',null,query.trim()?'试试其他关键词，或切换分类。':'审核后的独立技能将在这里显示。'),query?h('button',{type:'button',className:'qcu-control',onClick:()=>setQuery('')},'清除搜索'):null),
