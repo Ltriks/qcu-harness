@@ -1,5 +1,7 @@
 # P9 URL升级错误后续诊断（2026-10-15）
 
+> 后续更新：已解决实验参数导致的超时，并用未修改的mini随附pnpm复现冷/热缓存升级的完整合成链路；见[缓存机制复现](qcu-market-p9-cache-integrity-reproduction.md)。以下保留较早诊断时点，真实Home原事务仍未重放、未修复。
+
 承接[P9用户验收回执复核](qcu-market-p9-mini-acceptance-review.md)。本次取得原安装日志的直接脱敏证据，并在相同随附pnpm版本复现缺少integrity的拒绝条件。**尚未复现完整file→HTTP升级路径，未修复根因，也未更改真实安装状态。**
 
 ## 新的直接证据

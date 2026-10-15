@@ -1,5 +1,7 @@
 # P10 开发与管理员维护指南
 
+> 2026-10-15补充：[P10 mini工具51项实测通过](qcu-market-p10-mini-selftest.md)；[P9 pnpm热缓存升级丢失完整性字段机制已复现](qcu-market-p9-cache-integrity-reproduction.md)。真实Home升级仍未修复，已有坏锁不能靠改填本地TGZ自动修复。以下版本矩阵与历史边界保留。
+
 P10 是 Python 3.9+ stdlib 离线提交检查工具，教师继续使用已发布的 P9 市场。当前状态取自仓库内 2026-10-14 [P9 Hub 发布证据](qcu-market-p9-hub-deployment.md)和父级已写的[P9 mini 用户回执复核](qcu-market-p9-mini-acceptance-review.md)，本轮没有重新联网观测、部署或原生验证。新工具不更改市场、Hub、审核目录、协议、八个产品或历史包。
 
 ## 固定版本与证据
