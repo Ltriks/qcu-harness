@@ -2,7 +2,9 @@
 
 ## 本地开发入口与市场分支
 
-独立 macOS [市场安装包准备器（本地候选）](docs/qcu-market-preparation-guide.md)：工具 `0.1.0-bootstrap.1` 自动准备固定 P9 本地 TGZ，安装与启用仍由用户在官方界面分别确认；不修复已有坏锁，36 项自动测试及 mini 下载/缓存复用已通过；原生界面已截图，按钮交互与官方安装仍待验收，见[交付检查](docs/qcu-market-preparation-parent-validation.md)。
+教师首选入口：[Hub 网页三步安装指南（本地候选，未部署）](docs/qcu-hub-teacher-install.md)。现有首页新增“安装官方 DSH → 复制固定市场地址 → 在官方插件界面添加”的入口；HTTP 复制失败可手动复制，`dsh://open` 仅唤起窗口。43 项回归、27 项本地 HTTP 检查及桌面/390px 深浅主题渲染通过；系统剪贴板与首次新机器官方安装仍待验收，既有缓存完整性问题未修复。见[父线程交付检查](docs/qcu-hub-teacher-entry-parent-validation.md)。
+
+独立 macOS [市场安装包准备器（可选维护候选）](docs/qcu-market-preparation-guide.md)保留，不再作为教师前置，也不把 Apple 签名/公证列为教师入口待办。历史工具 `0.1.0-bootstrap.1` 自动准备固定 P9 本地 TGZ；36 项自动测试及 mini 下载/缓存复用已通过，原生界面已截图，按钮交互与官方安装仍未验收，详见[历史交付检查](docs/qcu-market-preparation-parent-validation.md)。源码、应用说明及归档保持原样。
 
 P9新手体验已于2026-10-14发布现有LAN Hub：五步tips、三个常用任务模板、本地反馈。25项独立LAN下载/边界检查通过，旧12包保留；见[发布记录与固定包](docs/qcu-market-p9-hub-deployment.md)、[Cursor实机验收任务书](docs/qcu-market-p9-cursor-acceptance.md)、[安装指引](docs/qcu-market-p9-install-guide.md)和[用户验收表](docs/qcu-market-p9-user-acceptance.md)。先前295项源/HTTP/浏览器与21项归档通过；[mini用户回执复核](docs/qcu-market-p9-mini-acceptance-review.md)记录同字节本地TGZ官方安装和核心流程、三项Skill响应与教师审核用户报告通过，旧file6.3→HTTP9.1升级仍报 `ERR_PNPM_MISSING_TARBALL_INTEGRITY`，根因未复现；部分精确宽度/网络/注入/重载与截图证据仍缺，不记全项通过。
 
@@ -25,8 +27,11 @@ P10离线维护工具已完成本地父审查：两版Python各51项通过、9�
 | `$HOME/Repos/worktrees/qcu-harness/market-integration` | P8工具插件目录集成，`dev/qcu-market-p8` |
 | `$HOME/Repos/worktrees/qcu-harness/market-onboarding` | P9新手体验，`dev/qcu-market-p9`；独立构建、预览与实机验收文档 |
 | `$HOME/Repos/worktrees/qcu-harness/market-maintenance` | P10离线检查器，`dev/qcu-market-p10`；只维护工具、示例与文档 |
+| `$HOME/Repos/worktrees/qcu-harness/hub-onboarding` | 当前教师网页入口，`dev/qcu-hub-onboarding`；首页静态源码，无构建依赖；测试/预览见[教师指南](docs/qcu-hub-teacher-install.md) |
+| `$HOME/Repos/worktrees/qcu-harness/market-bootstrap` | 独立准备器历史维护候选，`dev/qcu-market-bootstrap`；不作为教师安装前置 |
 | `$HOME/Repos/worktrees/qcu-harness/<功能名>` | 后续并行开发 worktree；每个 worktree 独占分支 |
 | `$HOME/Artifacts/qcu-harness/<版本号>/` | 安装包、截图、测试日志与验收材料；不入 Git |
+| `$HOME/Artifacts/qcu-harness/0.1.0-hub-onboarding.1/` | 本轮网页真实预览截图、43项回归日志、两文件Hub更新候选；未部署 |
 | `$HOME/Artifacts/qcu-harness/0.1.0-pilot.5.1/final/` | 历史已部署市场版本，保持不可变 |
 | `$HOME/Artifacts/qcu-harness/0.1.0-pilot.6.3/` | 历史P6.3市场、五个 Skill 包、预览截图及 deployment 现场证据 |
 | `$HOME/Artifacts/qcu-harness/0.1.0-pilot.8.1/` | 历史已发布Hub的P8市场、飞书固定包、预览截图及 deployment 发布证据；教研简报保留在P7.1原位置 |

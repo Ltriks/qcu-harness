@@ -1,6 +1,8 @@
 # 第一次使用：DSH 与 QCU 市场安装指引
 
-**安装包准备候选（未公开发布）：** Apple Silicon Mac 可先使用[独立准备器](qcu-market-preparation-guide.md)下载并校验固定 P9 包，再把本地路径填入官方“添加插件”，更新时优先选择这条准备路径。准备器只准备文件，不安装 DSH，不修复已有坏锁；安装与启用仍各自确认。mini 下载/复用及原生界面显示已验证；复制按钮和官方安装仍待验收，见[交付检查](qcu-market-preparation-parent-validation.md)。以下固定 TGZ URL 保留为来源参考。
+**教师首选入口：** 使用 [Hub 网页三步流程](qcu-hub-teacher-install.md)，安装团队确认的官方 DSH，复制固定 P9 地址，在“插件 → 添加插件 → 包名或地址”中审阅安装，再按官方界面另行启用/正常重启。网页入口当前为本地候选，未部署；无需独立准备器、终端或新建 Home。后续教学产品在 DSH 内的 QCU 市场安装。[独立准备器](qcu-market-preparation-guide.md)仅保留为可选维护候选，不是教师前置，不继续以 Apple 签名/公证推进教师入口。
+
+已有有效旧环境可选择网页折叠区域中的同字节本地 TGZ 备选，无需解压；Finder ⌥⌘C 取得实际绝对路径，保留文件供后续引用。若已出现损坏缓存、缺失 integrity 或 `ERR_PNPM_MISSING_TARBALL_INTEGRITY`，停止并联系维护者，保留错误；网页和本地文件均不能保证修复已有坏锁，不删除锁、清缓存、降低校验或反复重试。机制与现场边界见[缓存机制复现](qcu-market-p9-cache-integrity-reproduction.md)。
 
 P9 `0.1.0-pilot.9.1` 已于2026-10-14发布到现有局域网Hub，见[发布记录与固定安装链接](qcu-market-p9-hub-deployment.md)。先读[父线程交付检查](qcu-market-p9-parent-validation.md)，核对下面固定包后再安装。市场中的“新手指引”需要市场已经安装才能打开，不能替你安装 DSH。mini上的Cursor可按[实机验收任务书](qcu-market-p9-cursor-acceptance.md)执行；DSH与教学质量仍待验收。
 

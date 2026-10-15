@@ -33,7 +33,7 @@ const group = (card, type) => card.querySelector(`[data-copy="${type}"]`)
 test('real page code shows pinned package and starts on available plugin tab', async t => {
   const { document, coach, errors, fetches } = await page(t)
   assert.equal(document.querySelector('#tab-plugins').getAttribute('aria-pressed'), 'true')
-  assert.equal(document.querySelector('#pluginCount').textContent, '2')
+  assert.equal(document.querySelector('#pluginCount').textContent, String(published.plugins.length))
   assert.ok(coach.textContent.includes('v0.1.0-pilot.1'))
   assert.equal(group(coach, 'hash').querySelector('textarea').value, published.plugins[1].sha256)
   assert.equal(coach.querySelector('a').href, 'http://192.168.1.68:8080/plugins/' + published.plugins[1].file)

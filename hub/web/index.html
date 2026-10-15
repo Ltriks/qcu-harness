@@ -184,6 +184,29 @@
     .copy-group button { margin-top: 8px; }
     .copy-status { min-height: 1.7em; font-size: 0.85rem; }
     .path-error { color: var(--text); }
+    .qcu-entry {
+      margin-bottom: 24px; padding: 24px;
+      background: var(--panel); border: var(--border) solid var(--line);
+      border-top: 3px solid var(--card-top); border-radius: var(--radius); box-shadow: var(--shadow);
+      font-family: system-ui, "PingFang SC", "Microsoft YaHei", sans-serif;
+    }
+    .qcu-entry h2 { margin: 0 0 8px; font: 700 1.5rem/1.4 system-ui, sans-serif; }
+    .qcu-entry h3 { margin: 0 0 8px; font-size: 1rem; }
+    .qcu-entry a:not(.btn) { color: var(--text); text-underline-offset: 3px; }
+    .qcu-entry .btn { font-family: inherit; }
+    .qcu-steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; padding: 0; margin: 20px 0; list-style: none; }
+    .qcu-steps > li { min-width: 0; }
+    .qcu-entry label { display: block; margin-top: 10px; font-size: 0.85rem; }
+    .qcu-entry textarea {
+      display: block; width: 100%; min-width: 0; margin: 6px 0 10px; padding: 10px;
+      background: var(--inset); color: var(--text); border: 1px solid var(--line);
+      border-radius: var(--radius); font: 0.85rem/1.5 ui-monospace, SFMono-Regular, Menlo, monospace;
+      overflow-wrap: anywhere; resize: vertical;
+    }
+    .qcu-entry details { border-top: 1px solid var(--line); padding-top: 12px; margin-top: 12px; overflow-wrap: anywhere; }
+    .qcu-entry summary { cursor: pointer; font-weight: 600; padding: 6px 0; }
+    .qcu-entry details p + p { margin-top: 8px; }
+    .qcu-entry :is(textarea, summary):focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
     @media (max-width: 700px) {
       main { padding: 20px 16px 40px; }
       .hero { padding: 22px 18px; }
@@ -195,6 +218,8 @@
       .tabs button { padding: 12px 8px; font-size: 1rem; }
       .grid { grid-template-columns: minmax(0, 1fr); gap: 20px; }
       article { padding: 18px 16px; }
+      .qcu-entry { padding: 18px 16px; }
+      .qcu-steps { grid-template-columns: minmax(0, 1fr); gap: 20px; }
     }
   </style>
 </head>
@@ -208,6 +233,43 @@
       <h1 id="title">城院 DSH 目录站</h1>
       <p class="tagline" id="tagline">不追求全，只追求值得装</p>
     </header>
+    <section class="qcu-entry" id="qcu-teacher-entry" aria-labelledby="qcu-entry-title">
+      <h2 id="qcu-entry-title">教师从这里开始</h2>
+      <p>先在官方 DSH 添加 QCU 市场，后续教学产品在 DSH 内的“QCU市场”安装。请连接校园局域网。</p>
+      <ol class="qcu-steps">
+        <li>
+          <h3>1. 安装官方 DSH</h3>
+          <p>使用团队确认的 Apple Silicon Mac 官方安装包 <strong>0.2.0-rc.2</strong>，按安装窗口提示放入“应用程序”。</p>
+          <a class="btn" href="https://github.com/deepseek-ai/deepseek-harness/releases/tag/dsh-v0.2.0-rc.2" target="_blank" rel="noopener noreferrer">查看官方固定版本</a>
+        </li>
+        <li>
+          <h3>2. 复制市场安装地址</h3>
+          <label for="qcu-market-url">固定 QCU 市场地址（可选中手动复制）</label>
+          <textarea id="qcu-market-url" rows="4" readonly spellcheck="false" aria-describedby="qcu-copy-status">http://192.168.1.68:8080/plugins/qcu-market-0.1.0-pilot.9.1-ecdc4373baad4de8415c27a6b04aa31b9e01ae516a6e3e972660a32bd7108e12.tgz</textarea>
+          <button type="button" class="btn" id="qcu-copy-market">复制市场安装地址</button>
+          <p class="copy-status" id="qcu-copy-status" role="status" aria-live="polite"></p>
+        </li>
+        <li>
+          <h3>3. 在 DSH 添加市场</h3>
+          <p>进入 <strong>插件（Plugins） → 添加插件（Add plugin） → 包名或地址</strong>，粘贴地址，核对 QCU市场 / 0.1.0-pilot.9.1 与来源后安装。再按官方界面另行启用；如提示需重启，请正常退出并重新打开。</p>
+          <a class="btn" id="qcu-open-dsh" href="dsh://open">打开 DSH</a>
+          <p class="notes">浏览器可能询问是否打开应用。此链接仅唤起窗口，不会安装或打开添加插件面板；未响应时，请自行从“应用程序”打开 DSH。</p>
+        </li>
+      </ol>
+      <details id="qcu-file-fallback">
+        <summary>下载文件安装（备选）</summary>
+        <p><a id="qcu-market-download" href="http://192.168.1.68:8080/plugins/qcu-market-0.1.0-pilot.9.1-ecdc4373baad4de8415c27a6b04aa31b9e01ae516a6e3e972660a32bd7108e12.tgz">下载固定市场 TGZ</a>，无需解压。保存到自己选定的长期位置；在 Finder 选中文件，按 ⌥⌘C 复制实际本机绝对路径，粘贴到官方“添加插件”的“包名或地址”。核对后安装，再另行启用与正常重启。</p>
+        <p>请长期保留 TGZ，官方包管理器后续可能引用该文件。网页无法读取下载文件的绝对路径，请勿猜测目录。</p>
+        <p>有效旧环境可选择同字节本地 TGZ；此方法不保证修复已有安装错误。若已有损坏缓存、缺失 integrity 或完整性错误，请停止并联系维护者，保留错误；不要删除锁、清缓存、降低校验或反复重试。</p>
+      </details>
+      <details id="qcu-package-details">
+        <summary>固定版本、来源与使用边界</summary>
+        <p>QCU市场 0.1.0-pilot.9.1 · 43446 字节 · 支持基线：官方 DSH 0.2.0-rc.2 / Apple Silicon Mac。</p>
+        <p>SHA256：<code>ecdc4373baad4de8415c27a6b04aa31b9e01ae516a6e3e972660a32bd7108e12</code><br />市场源码提交：<code>bb1e5c80a01f26f1ab147717cbd9f79b57b198e3</code></p>
+        <p>这些元数据仅供来源对照，不构成独立来源认证。网页未对浏览器下载的文件校验字节数或 SHA256，也不能自动检测 DSH、网络连通或安装支持状态。官方链接是固定发行参考，本页未重新下载验收其安装包。</p>
+        <p>无需独立准备器、Python、Node、终端或新建 Home。网页不会安装、启用、读取配置或调用模型；复制成功只表示地址写入剪贴板。本地网页候选尚未部署，新机器首次通过官方界面安装尚未完成验收。</p>
+      </details>
+    </section>
     <div class="meta">
       <div>兼容 DSH：<strong id="compat">—</strong></div>
       <div>更新：<strong id="updated">—</strong></div>
@@ -224,6 +286,31 @@
     <div class="grid" id="list"></div>
     <footer>研发中心精选上传 · 技能与插件安装通道不同 · 模型密钥请自备</footer>
   </main>
+  <script>
+    // Bootstrap is pinned and independent of catalog loading or browser context.
+    (() => {
+      const qcuMarketUrl = "http://192.168.1.68:8080/plugins/qcu-market-0.1.0-pilot.9.1-ecdc4373baad4de8415c27a6b04aa31b9e01ae516a6e3e972660a32bd7108e12.tgz";
+      const qcuOutput = document.getElementById("qcu-market-url");
+      const qcuCopy = document.getElementById("qcu-copy-market");
+      const qcuStatus = document.getElementById("qcu-copy-status");
+      qcuCopy.addEventListener("click", async () => {
+        qcuCopy.disabled = true;
+        qcuOutput.value = qcuMarketUrl;
+        qcuStatus.textContent = "正在尝试复制…";
+        try {
+          if (typeof navigator.clipboard?.writeText !== "function") throw new Error("clipboard unavailable");
+          await navigator.clipboard.writeText(qcuMarketUrl);
+          qcuStatus.textContent = "已复制市场安装地址，请到 DSH 添加插件。";
+        } catch (_) {
+          qcuOutput.focus();
+          qcuOutput.select();
+          qcuStatus.textContent = "自动复制不可用，请按 ⌘C / Ctrl+C 手动复制已选中的地址。";
+        } finally {
+          qcuCopy.disabled = false;
+        }
+      });
+    })();
+  </script>
   <script>
     async function main() {
       const res = await fetch("./catalog.json", { cache: "no-store" });

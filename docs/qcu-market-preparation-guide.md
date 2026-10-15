@@ -1,10 +1,14 @@
-# QCU市场安装包准备（本地候选）
+# QCU市场安装包准备（可选维护候选）
+
+教师入口已改为 [Hub 网页三步安装流程](qcu-hub-teacher-install.md)，当前网页为本地候选，未部署。教师安装官方 DSH、复制固定市场地址、在官方界面添加；后续产品在 DSH 内 QCU 市场安装。网页还提供无需解压的本地 TGZ 备选，不要求运行准备器、Python、Node、终端或新建 Home。
+
+下文保留独立准备器的历史功能、证据与维护操作。它不再是教师前置；源码、应用内 README 和不可变归档保持原样，本轮不再修订应用，也不把 Developer ID 签名/公证当成教师入口的待交付工作。
 
 准备器 `0.1.0-bootstrap.1` 与市场 `0.1.0-pilot.9.1` 是两个版本。当前支持基线：官方 DSH `0.2.0-rc.2`、Apple Silicon Mac、校园局域网。
 
 最终候选产物位于开发机 `$HOME/Artifacts/qcu-harness/0.1.0-bootstrap.1/final/`。ZIP 的完整文件名、字节数和哈希见[交付检查](qcu-market-preparation-parent-validation.md)。解压目录含 `QCU市场安装准备器.app`、`先读我.md`、命令行脚本、`MANIFEST.json` 和 `SHA256SUMS`。维护者已直接传至 mini 并解压验证，无需用户手动传包；尚无 Hub 下载入口，不是公开发行版。
 
-## 教师只需三步
+## 历史准备器流程（供维护者参考）
 
 1. 连接校园局域网，双击 **QCU市场安装准备器.app**。工具自动下载、校验；已经存在的有效包直接复用。等待“安装包已准备好”。
 2. 点击 **复制安装路径**。自行打开官方 DSH，进入 **插件 → 添加插件**，粘贴该路径。
@@ -22,13 +26,13 @@
 - 已有包损坏、校验失败或保存期间发生变化：工具保留原文件并停止，联系维护者核对；不要自行覆盖、删除锁或降低校验要求。
 - 保存目录不安全：联系维护者选择本人私有普通目录。目录祖先不能是符号链接、非目录、非本人/系统所有或允许其他用户写入；最终目录须为本人私有。额外 allow ACL 也保守拒绝，不自动改权限。
 
-有效旧环境更新市场时，优先通过本工具准备同字节本地 TGZ，再走官方安装。**本工具不能修复已经缺失 integrity 的锁文件**。若已有 `ERR_PNPM_MISSING_TARBALL_INTEGRITY`，停止并保留错误供维护者检查。依据与边界见[缓存机制复现](qcu-market-p9-cache-integrity-reproduction.md)。不要求已经有有效市场的环境重复安装。
+有效旧环境更新市场时，可使用网页下载同字节本地 TGZ，再走官方安装；准备器仅作为维护者的可选准备方式。**本工具不能修复已经缺失 integrity 的锁文件**。若已有 `ERR_PNPM_MISSING_TARBALL_INTEGRITY`，停止并保留错误供维护者检查，不删除锁、清缓存、降低校验或反复重试。依据与边界见[缓存机制复现](qcu-market-p9-cache-integrity-reproduction.md)。不要求已经有有效市场的环境重复安装。
 
 ## 固定来源与维护者命令
 
 固定引用：[P9 TGZ](http://192.168.1.68:8080/plugins/qcu-market-0.1.0-pilot.9.1-ecdc4373baad4de8415c27a6b04aa31b9e01ae516a6e3e972660a32bd7108e12.tgz)，43446 字节，SHA256 `ecdc4373baad4de8415c27a6b04aa31b9e01ae516a6e3e972660a32bd7108e12`，市场源码提交 `bb1e5c80a01f26f1ab147717cbd9f79b57b198e3`。准备器不捆绑 TGZ，不信任远端 manifest，不接受 URL、版本、大小、哈希覆盖。
 
-教师运行无需 Python、Node、npm 或 rtk；只依赖 macOS 自带 shell、curl、哈希工具和 AppleScript。开发机测试/打包使用 Python 标准库和系统 osacompile，不安装依赖。
+历史准备器运行无需 Python、Node、npm 或 rtk；只依赖 macOS 自带 shell、curl、哈希工具和 AppleScript。以下为维护者历史测试/打包参考，开发机使用 Python 标准库和系统 osacompile，不安装依赖；本轮不重新打包或再生成归档。
 
 ```sh
 # 新输出目录，父目录须已存在；旧目录拒绝覆盖
