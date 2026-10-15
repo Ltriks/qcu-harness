@@ -1,5 +1,7 @@
 # 第一次使用：DSH 与 QCU 市场安装指引
 
+**安装包准备候选（未公开发布）：** Apple Silicon Mac 可先使用[独立准备器](qcu-market-preparation-guide.md)下载并校验固定 P9 包，再把本地路径填入官方“添加插件”，更新时优先选择这条准备路径。准备器只准备文件，不安装 DSH，不修复已有坏锁；安装与启用仍各自确认。mini 下载/复用及原生界面显示已验证；复制按钮和官方安装仍待验收，见[交付检查](qcu-market-preparation-parent-validation.md)。以下固定 TGZ URL 保留为来源参考。
+
 P9 `0.1.0-pilot.9.1` 已于2026-10-14发布到现有局域网Hub，见[发布记录与固定安装链接](qcu-market-p9-hub-deployment.md)。先读[父线程交付检查](qcu-market-p9-parent-validation.md)，核对下面固定包后再安装。市场中的“新手指引”需要市场已经安装才能打开，不能替你安装 DSH。mini上的Cursor可按[实机验收任务书](qcu-market-p9-cursor-acceptance.md)执行；DSH与教学质量仍待验收。
 
 1. **准备官方应用。** 当前支持范围为官方 DeepSeek Harness `0.2.0-rc.2`、Apple Silicon Mac。可从[官方桌面入口](https://deepseek.com/harness/)了解安装包来源；该入口的最新下载不自动等于本轮支持版本，请先由团队核对为 `0.2.0-rc.2`，版本说明见[官方固定发行记录](https://github.com/deepseek-ai/deepseek-harness/releases/tag/dsh-v0.2.0-rc.2)。使用团队确认的官方Apple芯片安装包，按安装窗口提示将应用放到“应用程序”，再普通打开。本文没有重新下载或验收官方安装包，也不引导绕过系统安全提示。其他系统与版本未在本轮验收。无需终端、专用启动脚本或新建测试 Home；使用自己的正常环境，不复制他人的配置或凭据。

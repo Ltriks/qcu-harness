@@ -2,6 +2,8 @@
 
 ## 本地开发入口与市场分支
 
+独立 macOS [市场安装包准备器（本地候选）](docs/qcu-market-preparation-guide.md)：工具 `0.1.0-bootstrap.1` 自动准备固定 P9 本地 TGZ，安装与启用仍由用户在官方界面分别确认；不修复已有坏锁，36 项自动测试及 mini 下载/缓存复用已通过；原生界面已截图，按钮交互与官方安装仍待验收，见[交付检查](docs/qcu-market-preparation-parent-validation.md)。
+
 P9新手体验已于2026-10-14发布现有LAN Hub：五步tips、三个常用任务模板、本地反馈。25项独立LAN下载/边界检查通过，旧12包保留；见[发布记录与固定包](docs/qcu-market-p9-hub-deployment.md)、[Cursor实机验收任务书](docs/qcu-market-p9-cursor-acceptance.md)、[安装指引](docs/qcu-market-p9-install-guide.md)和[用户验收表](docs/qcu-market-p9-user-acceptance.md)。先前295项源/HTTP/浏览器与21项归档通过；[mini用户回执复核](docs/qcu-market-p9-mini-acceptance-review.md)记录同字节本地TGZ官方安装和核心流程、三项Skill响应与教师审核用户报告通过，旧file6.3→HTTP9.1升级仍报 `ERR_PNPM_MISSING_TARBALL_INTEGRITY`，根因未复现；部分精确宽度/网络/注入/重载与截图证据仍缺，不记全项通过。
 
 历史市场P8.1、教研简报和飞书只读1.1已按用户授权发布现有LAN Hub，20项下载/边界检查通过；见[发布记录与固定安装链接](docs/qcu-market-p8-hub-deployment.md)、[交付检查](docs/qcu-market-p8-parent-validation.md)和[用户验收](docs/qcu-market-p8-user-acceptance.md)。DSH安装/启用与实机验收由用户完成，生产/测试原环境状态以现场检查为准。

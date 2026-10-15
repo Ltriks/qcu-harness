@@ -1,0 +1,7 @@
+# Parent review: bootstrap app bundle validity
+
+Parent built current source into artifact `parent-preview-1` and tried native CUA launch. CUA timed out; app inventory shows candidate not running and no cache package was prepared. Read-only `/usr/bin/codesign --verify --deep --strict ...app` FAILED: `invalid Info.plist (plist or signature have been modified)`, architecture arm64. osacompile signed its skeleton, later plist/resources mutation invalidates it. Preserve early preview; do not delete/rewrite artifacts.
+
+Correct packer after final plist/resources writes by locally ad-hoc signing ONLY the new candidate bundle (no Developer ID, no certificates/keys, no Gatekeeper/quarantine/trust/fuse changes). Verify strict/deep signature as required build check; include real `ad_hoc_signed:true`, `developer_id_signed:false`, `notarized:false` semantics and clear truthful teacher candidate docs. Original task prohibition is clarified: no Developer ID signing/key access, local ad-hoc build allowed. Do not open app or run UI; parent will do CUA review. Add necessary build validation, preserve all initial failures, use new build directories. Add no dependencies/deployment or realHome changes.
+
+Use the actual transport-provided CLI thread identity only in private work receipts; never publish private source identifiers. Keep parent and implementation source identities separate. Do not chain independent shell commands with separators.
