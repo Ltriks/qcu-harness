@@ -8,6 +8,8 @@ P9新手体验已于2026-10-14发布现有LAN Hub：五步tips、三个常用任
 
 P9构建与复现见[源码交接](docs/qcu-market-p9-source.md)。P8工具插件目录集成见[历史源码交接](docs/qcu-market-p8-source.md)，真实桌面安装与工具发现仍待验收。本轮扩充见[执行计划](docs/qcu-market-expansion-plan.md)；P8原产品验收见[P8逐项步骤](docs/qcu-market-p8-user-acceptance.md)，P9新增体验按上述P9表执行。P7首项外部技能已纳入本次Hub发布，[父线程验收](docs/qcu-market-p7-parent-validation.md)保留当时本地测试与预览记录；市场P7中间包未发布。
 
+2026-10-15补充：[P10 mini本机自测51项通过](docs/qcu-market-p10-mini-selftest.md)，已由本线程直接传包、执行并取回报告；[P9 URL错误诊断](docs/qcu-market-p9-url-diagnosis-20261015.md)已取得原日志并复现拒绝条件，来源切换根因仍未解决。
+
 P10离线维护工具已完成本地父审查：两版Python各51项通过、9个固定包静态核对通过；见[最终交付检查](docs/qcu-market-p10-parent-validation.md)。P10 为 Python 3.9+ stdlib 独立离线维护工具：见[提交检查器与 schema](docs/qcu-market-p10-submission-check.md)、[管理员维护指南](docs/qcu-market-p10-maintainer-guide.md)和[合成提交模板](templates/qcu-submission/README.md)。静态通过仍需人工/原生/教师复核，不改变教师 P9 流程或固定包。
 
 新 Codex 线程从主仓库 `$HOME/Repos/cowork/qcu-harness` 进入。先读仓库规则、本文与任务对应文档，核对 `git status`、`git worktree list` 和最新远端；不要让两个线程同时修改同一 worktree。
