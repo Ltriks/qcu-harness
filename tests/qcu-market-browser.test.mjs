@@ -30,7 +30,7 @@ test('shared market UI in Chromium: browsing, consent, navigation, themes and na
  const shot=async name=>{await page.locator('.qcu-market').evaluate(el=>el.style.height='auto');await page.screenshot({path:resolve(screenshots,name+'.png'),fullPage:true})}
  await page.goto(url)
  await t.test('home has eight real cards, folded diagnostics, no startup requests',async()=>{
-  await button('查看QCU学习方法教练').waitFor();assert.equal(await page.locator('article').count(),8);assert.equal(await page.locator('details[open]').count(),0);assert.deepEqual(await calls(),[]);assert.equal(await button('下载并查看安装确认').count(),0);await shot('01-list-light')
+  await button('查看QCU学习方法教练').waitFor();assert.equal(await page.locator('article').count(),9);assert.equal(await page.locator('details[open]').count(),0);assert.deepEqual(await calls(),[]);assert.equal(await button('下载并查看安装确认').count(),0);await shot('01-list-light')
  })
  await t.test('six packaged skills and two plugins have distinct categories and accurate search',async()=>{
   await button('技能').click();assert.equal(await page.locator('article').count(),6);assert.equal(await button('查看QCU学习方法教练').count(),0);await page.getByRole('searchbox').fill('分层');assert.equal(await page.locator('article').count(),1);await button('查看分层练习设计').waitFor();await page.getByRole('searchbox').fill('');await shot('02-skills');await button('插件').click();await page.getByRole('searchbox').fill('不存在');await waitText('没有找到匹配项目');await button('清除搜索').click();await page.getByRole('searchbox').fill('复习');assert.equal(await page.locator('article').count(),1)

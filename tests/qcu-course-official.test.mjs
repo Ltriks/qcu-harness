@@ -12,11 +12,11 @@ import {TypertRegistry} from '@deepseek-ai/dsh-typert-registry'
 import {TypertGatewayService} from '@deepseek-ai/dsh-api-gateway'
 import {LlmRuntime,LlmAdapter} from '@deepseek-ai/dsh-llm'
 import {SkillRegistry} from '@deepseek-ai/dsh-skill'
-import * as plugin from '../hub/plugins/qcu-course-workbench/index.js'
 import {remoteContribution} from '../hub/plugins/qcu-course-workbench/src/protocol.mjs'
 import {newId} from '../hub/plugins/qcu-course-workbench/src/store.mjs'
 import {lessonInput,fixtureDraft} from './support/course-fixture.mjs'
 const client=await import(pathToFileURL(process.env.QCU_OFFICIAL_DEPENDENCIES+'/node_modules/@deepseek-ai/dsh-api-gateway/src/client/index.ts'))
+const plugin=await import(process.env.QCU_COURSE_PACKAGE_ROOT?pathToFileURL(process.env.QCU_COURSE_PACKAGE_ROOT+'/index.js'):new URL('../hub/plugins/qcu-course-workbench/index.js',import.meta.url))
 const require=createRequire(pathToFileURL(process.env.QCU_OFFICIAL_DEPENDENCIES+'/package.json'))
 const React=require('react'),{renderToStaticMarkup}=require('react-dom/server')
 
@@ -74,7 +74,7 @@ test('actual Client artifact uses real official keyed slots and layout; unload r
  const ctx=new Context();new SlotRegistry(ctx);ctx.slots.register({name:'root',children:{main:{kind:'keyed',scope:'root'},'sidebar.panellist':{kind:'list',scope:'root'}}},()=>null)
  let active=null;const info={getSnapshot:()=>({activePanelId:active}),subscribe:()=>()=>{}}
  const layout=new LayoutController({selectPanel:id=>{active=id}},id=>ctx.slots.entriesOfSlot('main').some(e=>e.options.key===id),info);ctx.reflect.provide('layout',layout)
- let entry;new Script(await readFile('hub/plugins/qcu-course-workbench/client.js','utf8')).runInContext(createContext({window:{__ModuleLoader__:{load:m=>{entry=m}}},setTimeout,clearTimeout,crypto:globalThis.crypto}))
+ let entry;new Script(await readFile(process.env.QCU_COURSE_PACKAGE_ROOT?process.env.QCU_COURSE_PACKAGE_ROOT+'/client.js':'hub/plugins/qcu-course-workbench/client.js','utf8')).runInContext(createContext({window:{__ModuleLoader__:{load:m=>{entry=m}}},setTimeout,clearTimeout,crypto:globalThis.crypto}))
  const fork=ctx.plugin(entry.factory(name=>{assert.equal(name,'react');return React}));await fork.await()
  layout.selectPanel('qcu-course-workbench');assert.equal(active,'qcu-course-workbench');const main=ctx.slots.entriesOfSlot('main')[0],sidebar=ctx.slots.entriesOfSlot('sidebar.panellist')[0]
  assert.match(renderToStaticMarkup(React.createElement(main.component,main.inject?.()??{})),/Connecting/);assert.match(renderToStaticMarkup(React.createElement(sidebar.component,{size:18,active:true})),/<svg/)

@@ -10,10 +10,11 @@ export const releaseKeyOf=e=>`${e.id}@${e.version}+${e.sha256}`
 export function validateMarketRelease(item){
  const capabilities=item.capabilities
  catalogAssert(['bundle','skill'].includes(item.kind),'unsupported kind')
- catalogAssert(Array.isArray(capabilities)&&capabilities.length===1&&['skill','tools'].includes(capabilities[0])&&(item.kind!=='skill'||capabilities[0]==='skill'),'unsupported capabilities or kind')
+ catalogAssert(Array.isArray(capabilities)&&capabilities.length===1&&['skill','tools','workbench'].includes(capabilities[0])&&(item.kind!=='skill'||capabilities[0]==='skill'),'unsupported capabilities or kind')
  const e=item.release;exact(e,['id','version','skill','skillSha256','provider','origin','file','bytes','sha256','runtime','releaseStatus','license'])
  catalogAssert(e.id===item.id&&packageName(e.id)&&versionName(e.version),'package identity')
  if(capabilities[0]==='skill')catalogAssert(e.skill===e.id&&shaName(e.skillSha256)&&e.provider===`${e.id}@${e.version}`,'Skill identity')
+ else if(capabilities[0]==='workbench')catalogAssert(e.id==='qcu-course-workbench'&&e.skill==='qcu-course-draft'&&shaName(e.skillSha256)&&e.provider===`${e.id}@${e.version}`,'workbench identity')
  else catalogAssert(e.skill===null&&e.skillSha256===null&&e.provider===null,'tools-only release must not claim a Skill or provider')
  catalogAssert(e.origin===catalogOrigin&&e.runtime==='0.2.0-rc.2'&&['MIT','Apache-2.0'].includes(e.license)&&e.releaseStatus==='local-candidate-not-published','source, compatibility or review status')
  catalogAssert(shaName(e.sha256)&&e.file===`${e.id}-${e.version}-${e.sha256}.tgz`,'hash or immutable path')

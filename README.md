@@ -1,5 +1,7 @@
 # QCU Harness
 
+课程设计工作台重写候选：`dev/qcu-course-workbench`，见[交付包与验收](docs/qcu-course-workbench-delivery.md)和[数据/接口契约](docs/qcu-course-workbench-validation.md)。工作台1.0与市场12.1已完成本地165项检查及浏览器合成闭环；尚未发布到Hub或安装至真实DSH，原8项发行信息保留。
+
 ## 本地开发入口与市场分支
 
 教师首选入口：[Hub 网页三步安装指南（本地候选，未部署）](docs/qcu-hub-teacher-install.md)。现有首页新增“安装官方 DSH → 复制固定市场地址 → 在官方插件界面添加”的入口；HTTP 复制失败可手动复制，`dsh://open` 仅唤起窗口。43 项回归、27 项本地 HTTP 检查及桌面/390px 深浅主题渲染通过；系统剪贴板与首次新机器官方安装仍待验收，既有缓存完整性问题未修复。见[父线程交付检查](docs/qcu-hub-teacher-entry-parent-validation.md)。

@@ -15,6 +15,16 @@ with tarfile.open(a.feishu) as t:
  for m in members:
   assert m.isfile() and not m.issym() and t.extractfile(m).read()==(root/'hub/plugins/qcu-feishu-readonly'/m.name.removeprefix('package/')).read_bytes()
 records['plugins']={feishu['id']:{'path':str(a.feishu.resolve()),'sha256':feishu['sha256']}}
+course=json.loads((root/'hub/market/course-release.json').read_text())
+course_path=Path(__import__('os').environ.get('QCU_COURSE_ARCHIVE',''))
+assert course_path.is_file(), 'QCU_COURSE_ARCHIVE must name the fixed course workbench TGZ'
+raw=course_path.read_bytes()
+assert course_path.name==course['file'] and len(raw)==course['bytes'] and hashlib.sha256(raw).hexdigest()==course['sha256']
+with tarfile.open(course_path) as t:
+ for m in t.getmembers():
+  assert m.isfile() and not m.issym() and m.name.startswith('package/') and '..' not in Path(m.name).parts
+  assert t.extractfile(m).read()==(root/'hub/plugins/qcu-course-workbench'/m.name.removeprefix('package/')).read_bytes()
+records['plugins'][course['id']]={'path':str(course_path.resolve()),'sha256':course['sha256']}
 assert hashlib.sha256(a.previous.read_bytes()).hexdigest()=='994325afc328e3f18e9bf7dd7c4f042dc03bc3e87369ef3d908cff0c29532288'
 if a.p8: assert hashlib.sha256(a.p8.read_bytes()).hexdigest()=='c646b4f3f392556570110ae3067e0fbbe00f9dc253d08deabb895613e7262c09'
 for label,path in [('market',a.archive),('old',a.old),('previous',a.previous),('p8',a.p8),('coach',a.coach)]:

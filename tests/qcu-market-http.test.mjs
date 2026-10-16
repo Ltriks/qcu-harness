@@ -10,19 +10,19 @@ import {spawnSync} from 'node:child_process'
 import {startHost,startClient,attachDownload,archiveDir,work,Context,load,req,tick} from './support/market-http-fixture.mjs'
 const id=()=>crypto.randomUUID()
 async function fixture(t,options){const h=await startHost(options);const d=await attachDownload(h);const c=await startClient(h);t.after(async()=>{await c.close();await d.close();await h.close()});return {h,d,c,flow:c.flow()}}
-test('real eight-entry archived HTTP selects each pinned Skill or tools plugin and preserves per-entry consent and activation',async t=>{
- const {h,d,c}=await fixture(t),flows=c.flows();assert.equal(flows.length,8)
+test('real nine-entry archived HTTP selects each pinned Skill or tools plugin and preserves per-entry consent and activation',async t=>{
+ const {h,d,c}=await fixture(t),flows=c.flows();assert.equal(flows.length,9)
  for(let i=1;i<flows.length;i++){
   const flow=flows[i];await flow.prepare();assert.equal(flow.state.phase,'review',flow.state.message)
   assert.equal(flow.state.review.receipt.entry.id,bundledCatalog.entries[i].id)
   assert.equal((await readFile(flow.state.review.receipt.path)).length,bundledCatalog.entries[i].release.bytes)
   await assert.rejects(flows[0].prepare(),/其他条目/);await flow.confirmInstall();assert.equal(flow.state.status.state,'installed-disabled',flow.state.message)
  }
- assert.equal(d.count(),7);assert.equal(h.state.mutations.length,7)
+ assert.equal(d.count(),flows.length-1);assert.equal(h.state.mutations.length,flows.length-1)
  await flows[2].reviewActivate();await assert.rejects(flows[1].reviewActivate(),/其他条目/);await flows[2].confirmActivate();assert.equal(flows[2].state.status.state,'component-active')
  assert.equal(h.state.bundles.find(b=>b.name===flows[1].entry.id).enabled,false);assert.equal(h.state.rows.find(r=>r.moduleName===flows[1].entry.id).enabled,false);assert.equal(flows[0].state.phase,'idle')
  const tools=flows.find(f=>f.entry.id==='qcu-feishu-readonly');assert.equal(tools.entry.skill,null)
- await tools.reviewActivate();assert.equal(h.state.mutations.length,9);await tools.confirmActivate();assert.equal(tools.state.status.state,'component-active');assert.equal(h.state.mutations.length,11)
+ await tools.reviewActivate();assert.equal(h.state.mutations.length,flows.length+1);await tools.confirmActivate();assert.equal(tools.state.status.state,'component-active');assert.equal(h.state.mutations.length,flows.length+3)
 })
 test('actual archived Client → official HTTP → Gateway → archived Host prepares verified fixed bytes and decline never installs',async t=>{
  const {h,d,flow}=await fixture(t);assert.equal(h.calls.length,0)

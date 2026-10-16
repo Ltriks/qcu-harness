@@ -1,0 +1,14 @@
+{
+  "id": "qcu-course-workbench",
+  "version": "0.1.0-pilot.1.0",
+  "file": "qcu-course-workbench-0.1.0-pilot.1.0-0992fe07e1699545d4e94682e9d6f8b424a27199348e3a3e7e9f0a6600e84f4a.tgz",
+  "bytes": 43866,
+  "sha256": "0992fe07e1699545d4e94682e9d6f8b424a27199348e3a3e7e9f0a6600e84f4a",
+  "runtime": "0.2.0-rc.2",
+  "skill": "qcu-course-draft",
+  "skillSha256": "7eb7f221fbf1abb66e33258a1b7f5f337275a7b1861d1fe172bf6cbdedba61ba",
+  "provider": "qcu-course-workbench@0.1.0-pilot.1.0",
+  "origin": "http://192.168.1.68:8080",
+  "releaseStatus": "local-candidate-not-published",
+  "license": "MIT"
+}

@@ -7,9 +7,9 @@ import {PackagePreparation} from '../hub/plugins/qcu-market/src/host-core.mjs'
 import {createCatalogFlows} from '../hub/plugins/qcu-market/src/direct-flow.mjs'
 import {marketRuntime} from '../hub/plugins/qcu-market/src/remote-contract.mjs'
 const clone=()=>JSON.parse(catalogText),key=releaseKeyOf(bundledCatalog.entries[0].release)
-test('bundled reviewed fingerprint is exact, immutable, eight real products, with no startup network',()=>{
+test('bundled reviewed fingerprint is exact, immutable, nine real products, with no startup network',()=>{
  assert.equal(createHash('sha256').update(catalogText).digest('hex'),catalogSha256)
- assert.equal(bundledCatalog.entries.length,8);assert.equal(bundledCatalog.entries.filter(e=>e.kind==='skill').length,6);assert.equal(bundledCatalog.entries.filter(e=>e.kind==='bundle').length,2);assert.equal(bundledCatalog.entries[0].id,'qcu-study-coach')
+ assert.equal(bundledCatalog.entries.length,9);assert.equal(bundledCatalog.entries.filter(e=>e.kind==='skill').length,6);assert.equal(bundledCatalog.entries.filter(e=>e.kind==='bundle').length,3);assert.equal(bundledCatalog.entries[0].id,'qcu-study-coach')
  for(const item of bundledCatalog.entries){assert.equal(item.instructions,undefined);assert.ok(item.purpose.length<=2000);assert.ok(item.example.length<=2000)}
  assert.doesNotMatch(catalogText,/name: qcu-|## 合成示例|## 操作步骤/)
  assert.throws(()=>bundledCatalog.entries[0].release.origin='https://evil.invalid')

@@ -4,7 +4,7 @@ import {resolve,join} from 'node:path'
 import {mkdir,writeFile} from 'node:fs/promises'
 const require=createRequire(resolve(process.env.QCU_OFFICIAL_DEPENDENCIES,'package.json'))
 const {createConverter}=await import(require.resolve('@deepseek-ai/libreoffice-kit'))
-const root=resolve('.work/course-validation'),converter=await createConverter({timeoutMs:60000,fontMetadataCacheDirectory:false})
+const root=resolve(process.env.QCU_COURSE_VALIDATION_ROOT??'.work/course-validation'),converter=await createConverter({timeoutMs:60000,fontMetadataCacheDirectory:false})
 const results=[]
 try{
  for(const name of ['lesson.docx','ppt.pptx']){

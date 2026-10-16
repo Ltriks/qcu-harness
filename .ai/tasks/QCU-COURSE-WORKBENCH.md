@@ -18,3 +18,5 @@ Host 持有数据与任务，公开 Typert Remote 传输；Client 采用已验�
 - 市场固定摘要/大小/URL与包一致；保持现有产品。部署与真实模型/教师效果分层记录。
 
 源码独占分支 `dev/qcu-course-workbench`，worktree 暂在主仓库 `.work/course-workbench`（沙箱可写范围，经用户工具批准移入）；不改 main 现有 README 修改。产物最终移至规范 Artifacts 目录（按实际权限处理）。
+
+交付时迁回标准worktree `$HOME/Repos/worktrees/qcu-harness/course-workbench`。最终固定包、165项检查、浏览器复测和现场待验收边界见 `docs/qcu-course-workbench-delivery.md`。本地实现与市场接入完成；Hub发布与真实安装/模型/教师验收待确认。
