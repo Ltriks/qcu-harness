@@ -1,14 +1,19 @@
 import {taskTemplates,feedbackFields,validateFields,generateTask,generateFeedback,feedbackExport,guideSteps} from './teacher-tools.mjs'
 export function createTeacherViews(React){
  const h=React.createElement
- const button=(text,onClick,disabled=false)=>h('button',{type:'button',className:'qcu-control',onClick,disabled},text)
+ const button=(text,onClick,disabled=false,primary=false)=>h('button',{type:'button',className:'qcu-control'+(primary?' qcu-primary':''),onClick,disabled},text)
  const heading=text=>h('h1',{tabIndex:-1,'data-page-heading':true},text)
  const taskLifetime=h('p',{className:'qcu-hint'},'切换任务或查看技能再返回，草稿会保留。点击“清空本任务”、重新加载或正常退出 DSH 后清除。请只填匿名或示例材料。')
  const feedbackLifetime=h('p',{className:'qcu-hint'},'返回市场内其他页面、点击“清空反馈”、重新加载或正常退出 DSH 后，反馈会清除。')
  function Fields({fields,values,errors,onChange,prefix}){return fields.map(f=>h('div',{key:f.key,className:'qcu-field'},h('label',{htmlFor:prefix+f.key},f.label),h('textarea',{id:prefix+f.key,value:values[f.key]||'',maxLength:f.max,rows:f.max>600?4:2,'aria-invalid':Boolean(errors[f.key]),'aria-describedby':prefix+f.key+'-help',onChange:e=>onChange(f.key,e.target.value)}),h('p',{id:prefix+f.key+'-help',className:'qcu-hint'},`${(values[f.key]||'').length}/${f.max}字 · 必填`,errors[f.key]?h('span',{role:'alert'},' · '+errors[f.key]):null)))}
  function Guide({state,setState,onHome}){
   const step=guideSteps[state.step]
-  return h('div',{className:'qcu-aux-page'},heading('新手指引'),h('p',{role:'status'},`第 ${state.step+1} / ${guideSteps.length} 步 · ${state.done?'已浏览引导':'尚未浏览完成'}（不代表已验收）`),h('section',{className:'qcu-note','aria-labelledby':'qcu-step-title'},h('h2',{id:'qcu-step-title'},step.title),h('p',null,step.text),h('p',null,'下一步：'+step.action)),h('p',{className:'qcu-hint'},'设置、安装和发送都由你手动操作，请按页面提示检查结果。浏览完指引不代表设置或任务已成功。'),h('div',{className:'qcu-button-row'},button('上一步',()=>setState({...state,step:state.step-1}),state.step===0),state.step<guideSteps.length-1?button('下一步',()=>setState({...state,step:state.step+1})):button('完成引导',()=>{setState({...state,done:true});onHome()}),button('稍后再看',onHome)))
+  return h('div',{className:'qcu-aux-page qcu-guide-page'},heading('新手指引'),
+   h('p',{role:'status',className:'qcu-guide-status'},`第 ${state.step+1} / ${guideSteps.length} 步 · ${state.done?'已浏览引导':'尚未浏览完成'}（不代表已验收）`),
+   h('ol',{className:'qcu-progress','aria-label':'指引步骤'},...guideSteps.map((s,i)=>h('li',{key:s.title,'aria-current':state.step===i?'step':undefined},h('span',{className:'qcu-step-number','aria-hidden':true},String(i+1).padStart(2,'0')),h('span',null,s.title)))),
+   h('section',{className:'qcu-guide-body','aria-labelledby':'qcu-step-title'},h('span',{className:'qcu-eyebrow'},`步骤 ${String(state.step+1).padStart(2,'0')}`),h('h2',{id:'qcu-step-title'},step.title),h('p',null,step.text),h('p',{className:'qcu-note'},'下一步：'+step.action)),
+   h('p',{className:'qcu-hint'},'设置、安装和发送都由你手动操作，请按页面提示检查结果。浏览完指引不代表设置或任务已成功。'),
+   h('div',{className:'qcu-guide-controls'},h('div',{className:'qcu-button-row'},button('上一步',()=>setState({...state,step:state.step-1}),state.step===0),state.step<guideSteps.length-1?button('下一步',()=>setState({...state,step:state.step+1}),false,true):button('完成引导',()=>{setState({...state,done:true});onHome()},false,true)),button('稍后再看',onHome)))
  }
  function Tasks({drafts,setDrafts,selected,setSelected,onDetail}){
   const [errors,setErrors]=React.useState({}),[message,setMessage]=React.useState('')

@@ -21,7 +21,7 @@ test('P9 shared React teacher flows in real Chromium',async t=>{
  await page.goto(url);await button('开始浏览引导').waitFor()
  await t.test('optional guide Next/Back/skip/reentry/completion/focus never detects readiness or calls RPC',async()=>{
   assert.equal(await page.getByRole('heading',{name:'新手指引',exact:true}).count(),0);await button('开始浏览引导').click();assert.equal(await page.getByRole('heading',{name:'新手指引',exact:true}).evaluate(el=>el===document.activeElement),true)
-  assert.equal(await button('上一步').isDisabled(),true);await shot('guide-light');await button('下一步').click();await page.getByText('准备自己的模型账号',{exact:true}).waitFor();await button('上一步').click();await button('下一步').click();await button('稍后再看').click();assert.equal(await button('新手指引').evaluate(el=>el===document.activeElement),true);await button('新手指引').click();await page.getByText('准备自己的模型账号',{exact:true}).waitFor()
+  assert.equal(await button('上一步').isDisabled(),true);await shot('guide-light');await button('下一步').click();await page.getByRole('heading',{name:'准备自己的模型账号',exact:true}).waitFor();await button('上一步').click();await button('下一步').click();await button('稍后再看').click();assert.equal(await button('新手指引').evaluate(el=>el===document.activeElement),true);await button('新手指引').click();await page.getByRole('heading',{name:'准备自己的模型账号',exact:true}).waitFor()
   assert.doesNotMatch(await page.locator('.qcu-aux-page').innerText(),/系统级锚定|库存|页面内存|持久化|待部署|P9下载/)
   for(let i=0;i<3;i++)await button('下一步').click();await button('完成引导').click();await page.getByText('已浏览引导（不代表已验收）；可随时从“新手指引”再看。',{exact:true}).waitFor();assert.deepEqual(await calls(),[])
  })
