@@ -25,7 +25,7 @@ export function validateMarketRelease(item){
 export function parseMarketCatalog(text){
  catalogAssert(typeof text==='string'&&new TextEncoder().encode(text).length<=262144,'size limit')
  const root=JSON.parse(text);exact(root,['schemaVersion','revision','protocol','entries'])
- catalogAssert(root.schemaVersion===4&&root.protocol===4&&root.revision===5,'schema, protocol or reviewed revision')
+ catalogAssert(root.schemaVersion===4&&root.protocol===4&&root.revision===6,'schema, protocol or reviewed revision')
  catalogAssert(Array.isArray(root.entries)&&root.entries.length>0&&root.entries.length<=100,'entry count')
  const seen=new Set(),versions=new Set()
  for(const item of root.entries){

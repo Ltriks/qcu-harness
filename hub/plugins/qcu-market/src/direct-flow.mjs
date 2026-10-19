@@ -27,17 +27,19 @@ export async function readActivation(manager,entry,{allowFailed=false}={}){
 }
 export function unwrap(answer){if(!answer?.ok)throw new Error(answer?.error?.message||'官方服务不可用');return answer.value}
 export async function readProduct(manager,entry=release){
-  const bundles=unwrap(await manager.listBundles()),bundle=bundles.find(b=>b.name===entry.id)
-  if(!bundle?.installed)return {state:'not-installed'}
-  if(bundle.version!==entry.version)return {state:'conflict',reason:'已有其他版本，请在官方插件页单独审核处理。'}
-  if(bundle.error)return {state:'failed',reason:typeof bundle.error==='string'?bundle.error:(bundle.error.code||'官方加载失败')}
-  if(!bundle.enabled)return {state:'installed-disabled'}
+  const bundles=unwrap(await manager.listBundles()).filter(b=>b.name===entry.id)
+  if(bundles.length>1)return {state:'conflict',installedVersion:null,reason:'存在多个同名包，请在官方插件页核对。'}
+  const bundle=bundles[0],result=status=>({...status,installedVersion:bundle?.installed&&typeof bundle.version==='string'?bundle.version:null})
+  if(!bundle?.installed)return result({state:'not-installed'})
+  if(bundle.version!==entry.version)return result({state:'conflict',reason:'已有其他版本，请在官方插件页单独审核处理。'})
+  if(bundle.error)return result({state:'failed',reason:typeof bundle.error==='string'?bundle.error:(bundle.error.code||'官方加载失败')})
+  if(!bundle.enabled)return result({state:'installed-disabled'})
   const rows=unwrap(await manager.listPlugins()).filter(r=>r.moduleName===entry.id)
-  if(rows.length!==1)return {state:'conflict',reason:'组件数量不符；不猜测组件标识。'}
+  if(rows.length!==1)return result({state:'conflict',reason:'组件数量不符；不猜测组件标识。'})
   const row=rows[0]
-  if(row.fiberPhase==='failed')return {state:'failed',reason:'官方加载器报告失败。'}
-  if(!row.enabled)return {state:'row-disabled',entryId:row.entryId}
-  return {state:row.fiberPhase==='active'?'component-active':'restart-or-pending',entryId:row.entryId}
+  if(row.fiberPhase==='failed')return result({state:'failed',reason:'官方加载器报告失败。'})
+  if(!row.enabled)return result({state:'row-disabled',entryId:row.entryId})
+  return result({state:row.fiberPhase==='active'?'component-active':'restart-or-pending',entryId:row.entryId})
 }
 export class DirectMarketFlow {
   constructor(remote,{entry=release,catalog=bundledCatalog,fingerprint=catalogSha256,peers=null,uuid=()=>crypto.randomUUID(),now=()=>Date.now()}={}){

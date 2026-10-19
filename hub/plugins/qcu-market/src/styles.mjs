@@ -10,7 +10,7 @@ export const marketStyles = `
 .qcu-market :is(h1,h2,p,label) { overflow-wrap:anywhere; }
 .qcu-market .qcu-muted,.qcu-market .qcu-hint { color:var(--dsw-alias-label-secondary); }
 .qcu-market .qcu-hint { font-size:12px;margin:8px 0 0; }
-.qcu-market .qcu-eyebrow { font-size:11px;letter-spacing:.08em;font-weight:650;color:var(--dsw-alias-brand-text); }
+.qcu-market .qcu-eyebrow { font-size:11px;letter-spacing:0;font-weight:650;color:var(--dsw-alias-brand-text); }
 .qcu-market .qcu-app-header { display:flex;align-items:center;justify-content:space-between;gap:16px;padding-bottom:16px;border-bottom:1px solid var(--dsw-alias-border-l3); }
 .qcu-market .qcu-wordmark { display:flex;align-items:center;gap:10px;font-size:17px;font-weight:650; }
 .qcu-market .qcu-exit { flex:none;color:var(--dsw-alias-label-secondary); }
@@ -19,7 +19,7 @@ export const marketStyles = `
 .qcu-market .qcu-page-nav .qcu-control[aria-pressed="true"] { border-color:var(--dsw-alias-brand-primary); }
 .qcu-market .qcu-home-intro { margin:0 0 16px; }
 .qcu-market .qcu-home-intro p { margin:4px 0 0;font-size:13px; }
-.qcu-market .qcu-onboarding { display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px;margin:0 0 24px;border:1px solid var(--dsw-alias-border-l3);border-left:3px solid var(--dsw-alias-brand-primary);background:var(--dsw-alias-bg-layer-1); }
+.qcu-market .qcu-onboarding { display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px;margin:0 0 20px;border:1px solid var(--dsw-alias-border-l3);border-radius:10px;border-left:3px solid var(--dsw-alias-brand-primary);background:var(--dsw-alias-bg-layer-1); }
 .qcu-market .qcu-onboarding h2 { font-size:14px;line-height:22px; }
 .qcu-market .qcu-onboarding .qcu-hint { margin-top:2px; }
 .qcu-market .qcu-onboarding .qcu-control { flex:none; }
@@ -41,9 +41,9 @@ export const marketStyles = `
 .qcu-market .qcu-search input { min-width:0;flex:1;width:100%;height:36px;padding:7px 10px;border:1px solid var(--dsw-alias-border-l3);border-radius:4px;color:var(--dsw-alias-label-primary);background:var(--dsw-alias-bg-layer-1);font:inherit; }
 .qcu-market .qcu-search input::placeholder { color:var(--dsw-alias-label-secondary); }
 .qcu-market .qcu-count { color:var(--dsw-alias-label-secondary);font-size:12px;margin:12px 0; }
-.qcu-market .qcu-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,280px),1fr));gap:12px;align-items:start; }
+.qcu-market .qcu-grid { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;align-items:start; }
 .qcu-market .qcu-grid > div { min-width:0; }
-.qcu-market .qcu-product { border:1px solid var(--dsw-alias-border-l3);border-radius:4px;background:var(--dsw-alias-bg-layer-1);overflow:hidden; }
+.qcu-market .qcu-product { border:1px solid var(--dsw-alias-border-l3);border-radius:12px;background:var(--dsw-alias-bg-layer-1);overflow:hidden; }
 .qcu-market .qcu-product:hover { border-color:var(--dsw-alias-brand-primary);background:var(--dsw-alias-interactive-bg-hover); }
 .qcu-market .qcu-card-link { display:grid;gap:10px;width:100%;min-height:148px;padding:14px;text-align:left;border:0;color:inherit;background:transparent;cursor:pointer; }
 .qcu-market .qcu-card-link:focus-visible { outline-offset:-3px; }
@@ -115,11 +115,34 @@ export const marketStyles = `
 .qcu-market .qcu-error { padding:16px;border:1px solid var(--dsw-alias-state-error-primary);border-radius:4px;color:var(--dsw-alias-state-error-primary); }
 .qcu-market .qcu-icon-tile[data-scene="data"],.qcu-market .qcu-icon-tile[data-scene="integrity"] { color:var(--dsw-alias-state-success-primary);background:var(--dsw-alias-state-success-secondary); }
 .qcu-market .qcu-icon-tile[data-scene="lesson"],.qcu-market .qcu-icon-tile[data-scene="reading"] { color:var(--dsw-alias-state-warn-label);background:var(--dsw-alias-state-warn-secondary); }
+
+.qcu-market .qcu-market-workspace { display:grid;grid-template-columns:156px minmax(0,1fr);gap:24px;align-items:start; }
+.qcu-market .qcu-market-results { min-width:0; }
+.qcu-market .qcu-scenes h2 { margin:0 0 12px;padding:0 10px;font-size:12px;font-weight:500;color:var(--dsw-alias-label-secondary); }
+.qcu-market .qcu-scene-filter { display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;padding:10px;margin:4px 0;border:0;border-radius:7px;background:transparent;color:inherit;text-align:left;cursor:pointer;font:inherit;font-size:12px;min-height:40px; }
+.qcu-market .qcu-scene-filter[aria-pressed="true"] { background:var(--dsw-alias-button-ghost-active-fill);color:var(--dsw-alias-brand-text);font-weight:600; }
+.qcu-market .qcu-scene-filter:hover { background:var(--dsw-alias-interactive-bg-hover); }
+.qcu-market .qcu-card-version { font-size:11px;color:var(--dsw-alias-label-secondary);font-variant-numeric:tabular-nums; }
+.qcu-market .qcu-card-footer .qcu-status { flex-basis:100%; }
+.qcu-market .qcu-versions h2 { font-size:16px; }
+.qcu-market .qcu-history { border:1px solid var(--dsw-alias-border-l3);border-radius:8px;padding:4px 12px;background:var(--dsw-alias-bg-layer-1); }
+.qcu-market .qcu-version-row { display:grid;justify-items:start;gap:6px;padding:14px 0;border-top:1px solid var(--dsw-alias-border-l2);min-width:0; }
+.qcu-market .qcu-version-row h3 { margin:0;font-size:13px;font-weight:600; }
+.qcu-market .qcu-version-row code { display:block;max-width:100%;font-size:11px;line-height:1.8;overflow-wrap:anywhere; }
+.qcu-market .qcu-version-row .qcu-hint { margin:0; }
+@media(max-width:860px) {
+ .qcu-market .qcu-market-workspace { grid-template-columns:minmax(0,1fr);gap:16px; }
+ .qcu-market .qcu-scenes { display:flex;flex-wrap:wrap;gap:6px; }
+ .qcu-market .qcu-scenes h2 { flex-basis:100%;padding:0;margin:0 0 4px; }
+ .qcu-market .qcu-scene-filter { width:auto;gap:12px;margin:0;padding:8px 10px;border:1px solid var(--dsw-alias-border-l3);min-height:40px; }
+}
+@media(max-width:600px) { .qcu-market .qcu-grid { grid-template-columns:minmax(0,1fr); } }
+
 @media(max-width:560px) {
  .qcu-market { padding-top:16px; }
  .qcu-market .qcu-app-header { flex-wrap:wrap; }
  .qcu-market .qcu-wordmark { font-size:16px; }
- .qcu-market .qcu-page-nav { display:grid;grid-template-columns:repeat(4,minmax(0,1fr));margin-bottom:20px; }
+ .qcu-market .qcu-page-nav { display:flex;flex-wrap:wrap;gap:6px;margin-bottom:20px; }
  .qcu-market .qcu-page-nav .qcu-control { justify-content:center;padding-inline:6px;white-space:nowrap; }
  .qcu-market .qcu-control,.qcu-market .qcu-tabs button { min-height:44px; }
  .qcu-market summary { min-height:44px;padding:11px 0; }
