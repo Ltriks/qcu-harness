@@ -17,7 +17,7 @@ test('bundled reviewed fingerprint is exact, immutable, nine real products, with
  assert.throws(()=>findMarketRelease(bundledCatalog,key+'0'))
 })
 for(const [label,mutate] of Object.entries({
- unknownLicense:c=>{c.entries[0].provenance.license='GPL-3.0';c.entries[0].release.license='GPL-3.0'},licenseMismatch:c=>c.entries[0].release.license='Apache-2.0',externalSource:c=>c.entries.find(e=>e.id==='qcu-team-briefing').sourceLabel='QCU自有',unknown:c=>c.trusted=true,old:c=>c.schemaVersion=1,revision:c=>c.revision=0,unreviewedRevision:c=>c.revision=5,protocol:c=>c.protocol=1,
+ unknownLicense:c=>{c.entries[0].provenance.license='GPL-3.0';c.entries[0].release.license='GPL-3.0'},licenseMismatch:c=>c.entries[0].release.license='Apache-2.0',externalSource:c=>c.entries.find(e=>e.id==='qcu-team-briefing').sourceLabel='QCU自有',unknown:c=>c.trusted=true,old:c=>c.schemaVersion=1,revision:c=>c.revision=0,unreviewedRevision:c=>c.revision=6,protocol:c=>c.protocol=1,
  duplicate:c=>c.entries.push(c.entries[0]),sameVersionOtherHash:c=>{const e=structuredClone(c.entries[0]);e.release.sha256='0'.repeat(64);c.entries.push(e)},
  remoteHash:c=>c.catalogSha256='0'.repeat(64),installed:c=>c.entries[0].installed=true,
  source:c=>c.entries[0].sourceLabel='DSH官方',provenance:c=>c.entries[0].provenance.ownership='third-party',unpinned:c=>c.entries[0].provenance.pinnedRevision='main',author:c=>c.entries[0].provenance.author='',missingProvenance:c=>delete c.entries[0].provenance,metadataCommand:c=>c.entries[0].provenance.command='curl bad',instructions:c=>c.entries[1].instructions='wrong',draft:c=>c.entries[0].kind='draft',withdrawn:c=>c.entries[0].release.releaseStatus='withdrawn',

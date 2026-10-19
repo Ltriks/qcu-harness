@@ -27,17 +27,17 @@ const feishu={
  release:feishuRelease
 }
 const courseRelease=readJson('../../market/course-release.json')
-if(courseRelease.id!=='qcu-course-workbench'||courseRelease.version!=='0.1.0-pilot.1.0')throw Error('Course workbench release mismatch')
+if(courseRelease.id!=='qcu-course-workbench'||courseRelease.version!=='0.1.0-pilot.1.1')throw Error('Course workbench release mismatch')
 const course={
  id:courseRelease.id,title:'课程设计工作台',scenario:'备课与课堂活动',purpose:'选择参考资料与学习目标，生成14种课堂草案组件，教师预览修订后保存。',sourceLabel:'QCU自有',kind:'bundle',capabilities:['workbench'],
  prerequisites:'DSH 0.2.0-rc.2；先建立工作区并在官方设置配置默认模型。英文/中文界面，支持TXT/MD/CSV/DOCX/PPTX；PDF须提供经核对文字摘录。',
  risk:'Host以应用用户权限运行；只读取教师选择的资料字节。确认生成后将所选文字及目标发送给本人默认模型，可能产生费用。课程/草案存于选定工作区；参考资料只留Host内存、30分钟有效、单任务消费。预览后另确认保存，重名另存或明确覆盖；不创建对话、不修改其他插件或读取Key。安装与启用分别确认。',
  example:'侧栏 Course Studio → 选择工作区并创建课程 → 加入匿名参考资料 → 填写学习目标 → 选择2至4项组件 → 确认生成 → 教师审阅修订 → 查看位置并保存。',
- testStatus:'本地核心、官方Cordis/Typert/LLM/Skill生命周期、构建产物与浏览器合成流程已验证；Office结构及官方引擎渲染已检查。真实DSH安装、真实模型输出和教师试用仍待验收；六项创意组件为实验性。',
+ testStatus:'1.0已在mini安装并启用，但一次真实模型测试失败，原因仍未确定；1.1新增安全诊断，41项离线检查已通过。1.1原生DSH与真实模型成功、教师试用及Office验收仍待确认；六项创意组件为实验性。',
  provenance:{ownership:'qcu',author:'lqtriks and QCU Harness contributors',upstreamSource:'hub/plugins/qcu-course-workbench',pinnedRevision:readJson('../../market/course-source.json').revision,license:'MIT',modifications:'依据用户提供的课程工作台原型及交接要求重写。复用现有官方插件/Client/Remote机制，新增真实任务与本地导出；不复用旧版全局禁用清单、两个模型工具或私有桥接。源码身份以本分支交付记录与固定TGZ摘要共同核对。'},
  release:courseRelease
 }
-export default {schemaVersion:4,revision:4,protocol:4,entries:[{
+export default {schemaVersion:4,revision:5,protocol:4,entries:[{
  id:release.id,title:'QCU学习方法教练',scenario:'阅读笔记与复习',purpose:'拆解任务、安排复习节奏与错题复盘；不代写应交作业。',sourceLabel:'QCU自有',
  prerequisites:'DSH 0.2.0-rc.2；安装无需模型，发送学习任务需用户自行配置模型。',
  risk:'Host代码以应用用户权限运行；安装改写当前profile依赖、锁文件、缓存与日志，可能访问配置的registry。安装默认不启用；另一次确认覆盖本包及唯一组件。',
