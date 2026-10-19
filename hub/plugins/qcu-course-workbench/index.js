@@ -3,15 +3,36 @@ import {BlockAssembler,createUserMessage} from '@deepseek-ai/dsh-llm'
 import z from '@deepseek-ai/schemastery'
 import {readFileSync} from 'node:fs'
 import {CourseStore} from './src/store.mjs'
-import {remoteContribution,VERSION,PROTOCOL,check,exact,profile,text,OUTPUT_BUDGET,DIAGNOSTIC_COUNTER_MAX,safeFailureCode} from './src/protocol.mjs'
+import {remoteContribution,VERSION,PROTOCOL,check,exact,profile,text,OUTPUT_BUDGET,DIAGNOSTIC_COUNTER_MAX,safeFailureCode,parseRoute,policyFor,sameRoute} from './src/protocol.mjs'
 import {SYSTEM,promptFor} from './src/prompt.mjs'
 export const name='qcu-course-workbench'
 export const inject=['typert','workspaceRegistry']
 export const Config=z.object({enabled:z.boolean().default(true),frameworkJson:z.string().default('{}').description('课程模板 JSON；school/stages/pathways/alignments/competencies/careerLinkRequired。未知字段拒绝。')})
-export function createGenerator(ctx){return async(input,refs,signal,expected)=>{
- const llm=ctx.get('llm'),selection=ctx.get('agentDefaultModel')?.currentSelection()
+// Promptly abandon lookups even when an adapter ignores cancellation.
+async function cancellableLookup(lookup,signal){
+ signal?.throwIfAborted();let listener
+ try{return await Promise.race([Promise.resolve().then(()=>{signal?.throwIfAborted();return lookup()}),new Promise((_,reject)=>{listener=()=>reject(Error('cancelled'));signal?.addEventListener('abort',listener,{once:true})})])}
+ finally{signal?.removeEventListener('abort',listener);signal?.throwIfAborted()}
+}
+// Lookup is read-only and never exposes provider errors or descriptive metadata.
+export async function resolveRoute(ctx,signal){
+ signal?.throwIfAborted()
+ const selection=ctx.get('agentDefaultModel')?.currentSelection(),llm=ctx.get('llm')
  check(llm&&selection?.provider&&selection?.model,'model-not-configured')
- check(!expected||(expected.provider===selection.provider&&expected.model===selection.model),'model-selection-changed')
+ const route=parseRoute({provider:selection.provider,model:selection.model})
+ try{
+  const info=await cancellableLookup(()=>llm.resolveModelInfo(route.provider,route.model,signal),signal)
+  signal?.throwIfAborted()
+  const current=ctx.get('agentDefaultModel')?.currentSelection()
+  check(current?.provider===route.provider&&current?.model===route.model,'model-selection-changed')
+  check(info?.provider===route.provider&&info?.id===route.model,'model-policy-unavailable')
+  return {...route,policy:policyFor(info)}
+ }catch(e){signal?.throwIfAborted();check(false,e?.code==='model-selection-changed'?'model-selection-changed':'model-policy-unavailable')}
+}
+export function createGenerator(ctx){return async(input,refs,signal,expected)=>{
+ const llm=ctx.get('llm'),confirmed=parseRoute(expected,true)
+ const route=await resolveRoute(ctx,signal)
+ check(sameRoute(confirmed,route),'model-policy-changed')
  const messages=[createUserMessage({content:[{type:'text',text:promptFor(input,refs)}],source:{kind:'user'}})]
  const assembler=new BlockAssembler(),stats={chunks:0,textChars:0,reasoningChars:0,streamChars:0,outputBudget:OUTPUT_BUDGET}
  let stage='stream',finishKind='missing',failureCode
@@ -20,8 +41,18 @@ export function createGenerator(ctx){return async(input,refs,signal,expected)=>{
  let ownFailure
  const codeOf=value=>{try{return safeFailureCode(Object.getOwnPropertyDescriptor(value,'code')?.value)}catch{return}}
  const reject=reason=>{const e=Error(reason);e.code=reason;e.diagnostic={stage,reason,finishKind,...stats,...(failureCode?{failureCode}:{})};ownFailure=e;throw e}
+ // The official one-shot prepared call also binds adapter defaults/registration,
+ // closing the extra capability lookup inside llm.stream before any adapter generation.
+ const config={provider:route.provider,model:route.model,maxTokens:OUTPUT_BUDGET,...(route.policy.effort==='default'?{}:{reasoningEffort:route.policy.effort})}
+ let prepared
+ try{prepared=await cancellableLookup(()=>llm.prepareCall(config,signal),signal)}catch{signal.throwIfAborted();check(false,'model-policy-unavailable')}
+ signal.throwIfAborted()
+ const effective=route.policy.effort==='default'?route.policy.defaultEffort??undefined:route.policy.effort
+ check(prepared.config.reasoningEffort===effective&&prepared.config.maxTokens===OUTPUT_BUDGET,'model-policy-changed')
+ check(sameRoute(confirmed,await resolveRoute(ctx,signal)),'model-policy-changed')
+ signal.throwIfAborted()
  try{
-  for await(const chunk of llm.stream({...selection,messages,system:SYSTEM,maxTokens:OUTPUT_BUDGET,tools:[],signal})){
+  for await(const chunk of prepared.stream({...prepared.config,messages,system:SYSTEM,tools:[],signal})){
    signal.throwIfAborted();add('chunks',1);if(finishKind==='stop')reject('model-stream-failed')
    if(chunk.type==='finish'){
     finishKind=['stop','tool-calls','max-tokens','aborted','error'].includes(chunk.reason?.kind)?chunk.reason.kind:'unknown'
@@ -62,20 +93,22 @@ export class CourseService extends TypertRemoteService{
   try{
    const raw=JSON.parse(payload)
    if(raw.action==='workspaces'){
-    exact(raw,['action']);const selection=this.owner.get('agentDefaultModel')?.currentSelection()
-    return JSON.stringify({ok:true,version:VERSION,protocol:PROTOCOL,workspaces:this.owner.workspaceRegistry.list().map(w=>({id:w.id,title:w.title,path:w.path})),model:selection?{provider:selection.provider,model:selection.model}:null})
+    exact(raw,['action']);let model=null,policyError
+    try{model=await resolveRoute(this.owner,signal)}catch(e){signal?.throwIfAborted();policyError=e.code==='model-not-configured'?'model-not-configured':'model-policy-unavailable'}
+    return JSON.stringify({ok:true,version:VERSION,protocol:PROTOCOL,workspaces:this.owner.workspaceRegistry.list().map(w=>({id:w.id,title:w.title,path:w.path})),model,...(policyError?{policyError}:{})})
    }
    exact(raw,['workspaceId','request','expectedModel']);const store=await this.store(text(raw.workspaceId,200,true));signal?.throwIfAborted()
    let request=raw.request
    if(request?.action==='generate'){
-    // Bind the confirmation to the displayed model route before starting work.
-    const selection=this.owner.get('agentDefaultModel')?.currentSelection();check(selection?.provider&&selection?.model,'model-not-configured')
-    exact(raw.expectedModel,['provider','model'])
-    check(raw.expectedModel?.provider===selection.provider&&raw.expectedModel?.model===selection.model,'model-selection-changed')
-    request={...request,route:{provider:selection.provider,model:selection.model}}
+    check(request.route===undefined,'invalid-fields')
+    // Exact route, effective policy and budget must match the displayed consent.
+    const expected=parseRoute(raw.expectedModel,true),route=await resolveRoute(this.owner,signal)
+    check(expected.provider===route.provider&&expected.model===route.model,'model-selection-changed')
+    check(sameRoute(expected,route),'model-policy-changed')
+    request={...request,route}
    }else check(raw.expectedModel===undefined,'invalid-fields')
    return JSON.stringify({ok:true,value:await store.dispatch(request)})
-  }catch(e){return JSON.stringify({ok:false,error:['model-not-configured','model-selection-changed','state-write-failed','store-limit','save-not-found','invalid-fields','invalid-text','invalid-id','invalid-enum','invalid-list','invalid-target','disabled-target','missing-targets','invalid-lesson','empty-profile','course-not-found','task-not-found','reference-required','reference-expired-or-course-mismatch','course-mismatch','model-consent-required','task-busy','stale-preview','file-changed','invalid-filename','unsupported-file-use-text','file-too-large','empty-material','reference-limit','idempotency-conflict','draft-not-ready','save-confirmation-required','unsafe-file','unsafe-directory','workspace-not-found','workspace-changed','workspace-limit','course-limit','task-limit','version-limit','save-limit','invalid-store','invalid-sequence','invalid-timing','missing-components','invalid-draft','draft-too-large'].includes(e.code)?e.code:'operation-failed'})}
+  }catch(e){return JSON.stringify({ok:false,error:['model-policy-unavailable','model-policy-changed','invalid-model-policy','model-not-configured','model-selection-changed','state-write-failed','store-limit','save-not-found','invalid-fields','invalid-text','invalid-id','invalid-enum','invalid-list','invalid-target','disabled-target','missing-targets','invalid-lesson','empty-profile','course-not-found','task-not-found','reference-required','reference-expired-or-course-mismatch','course-mismatch','model-consent-required','task-busy','stale-preview','file-changed','invalid-filename','unsupported-file-use-text','file-too-large','empty-material','reference-limit','idempotency-conflict','draft-not-ready','save-confirmation-required','unsafe-file','unsafe-directory','workspace-not-found','workspace-changed','workspace-limit','course-limit','task-limit','version-limit','save-limit','invalid-store','invalid-sequence','invalid-timing','missing-components','invalid-draft','draft-too-large'].includes(e.code)?e.code:'operation-failed'})}
  }
  async dispose(){this.closed=true;await Promise.all([...this.stores.values()].map(async s=>{const store=await s.promise;await store.dispose()}));this.stores.clear()}
 }

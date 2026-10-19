@@ -1,0 +1,6 @@
+# QCU-COURSE-BOUNDED-REVIEW
+Parent review of current scoped implementation, same authorization and boundaries as QCU-COURSE-BOUNDED-GENERATION. No deployment/real calls/commit/push. Prefix commands rtk.
+
+One required prompt correction: the global rule saying give each question and full worked answer in ONE location and reference it elsewhere can make individually exported components incomplete. Each exported component must be self-contained: include the questions/examples it needs AND its own concise full worked answers/teacher key. Sequence may refer to component question ids, and quiz usage guidance may refer to its own quiz data. Remove the broad cross-component answer de-duplication instruction. Avoid only unnecessary prose duplication while preserving standalone usability; keep concise size bounds and all selected components. Add a focused assertion to existing prompt test for this contract. Rebuild client if needed (prompt host-only likely not), run impacted tests. Keep doc accurate.
+
+Parent independently verified local official ASAR lib/index.js for dsh-llm and dsh-llm-deepseek byte-equal existing dependencies. dsh-llm contains public prepareCall and resolveModelInfo. No official code changes needed. Parent will pack and check fresh1.2 and render actual preview after this correction.

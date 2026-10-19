@@ -6,13 +6,14 @@ import {resolve,join} from 'node:path'
 import {tmpdir} from 'node:os'
 import {fileURLToPath} from 'node:url'
 import {CourseStore} from './src/store.mjs'
-import {VERSION,PROTOCOL} from './src/protocol.mjs'
+import {VERSION,PROTOCOL,policyFor,parseRoute,sameRoute,check} from './src/protocol.mjs'
 import {fixtureDraft} from '../../../tests/support/course-fixture.mjs'
 const require=createRequire(resolve(process.env.QCU_OFFICIAL_DEPENDENCIES,'package.json'))
 const here=fileURLToPath(new URL('./',import.meta.url)),out=resolve(here,'../../../.work/course-preview')
 await mkdir(out,{recursive:true})
 const previous=process.argv.includes('--reuse-synthetic')?JSON.parse(await readFile(join(out,'runtime.json'),'utf8')):null
 const workspace=previous?.workspace??await mkdtemp(join(tmpdir(),'qcu-course-preview-'))
+const model={provider:'synthetic',model:'SYNTHETIC / 合成模型',policy:policyFor({})}
 const store=await new CourseStore(workspace,{generate:async input=>{await new Promise(r=>setTimeout(r,150));return fixtureDraft(input)}}).init()
 const entry=`import React from ${JSON.stringify(require.resolve('react'))};
 import {createRoot} from ${JSON.stringify(require.resolve('react-dom/client'))};
@@ -31,8 +32,8 @@ const server=createServer(async(req,res)=>{
   if(req.method==='POST'&&req.url==='/preview/dispatch'){
    let body='';for await(const chunk of req){body+=chunk; if(body.length>12000000)throw Error('body-too-large')}
    const v=JSON.parse(body);let result
-   if(v.action==='workspaces')result={ok:true,protocol:PROTOCOL,version:VERSION,workspaces:[{id:'synthetic-workspace',title:'Synthetic workspace · 合成工作区',path:workspace}],model:{provider:'synthetic',model:'SYNTHETIC / 合成模型'}}
-   else{if(v.workspaceId!=='synthetic-workspace')throw Error('workspace');result={ok:true,value:await store.dispatch(v.request)}}
+   if(v.action==='workspaces')result={ok:true,protocol:PROTOCOL,version:VERSION,workspaces:[{id:'synthetic-workspace',title:'Synthetic workspace · 合成工作区',path:workspace}],model}
+   else{if(v.workspaceId!=='synthetic-workspace')throw Error('workspace');if(v.request?.action==='generate'){check(sameRoute(parseRoute(v.expectedModel,true),model),'model-policy-changed');v.request={...v.request,route:model}}result={ok:true,value:await store.dispatch(v.request)}}
    res.writeHead(200,{'content-type':'application/json','cache-control':'no-store'}).end(JSON.stringify(result));return
   }
   const path=req.url==='/'?'index.html':req.url==='/app.js'?'app.js':null

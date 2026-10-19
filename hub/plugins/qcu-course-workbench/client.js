@@ -2,9 +2,32 @@
 window.__ModuleLoader__.load({id:'qcu-course-workbench',factory(require){
 const React=require('react');
 // Shared, dependency-free contract. Never accepts a filesystem path or executable model output.
-const VERSION='0.1.0-pilot.1.1'
-const PROTOCOL=1
+const VERSION='0.1.0-pilot.1.2'
+const PROTOCOL=2
 const OUTPUT_BUDGET=12000
+// Detached, bounded capability facts only; provider descriptions never cross this boundary.
+function parsePolicy(raw){
+ exact(raw,['effort','supportedEfforts','defaultEffort','outputBudget'])
+ const effortId=v=>{check(typeof v==='string'&&/^[a-zA-Z0-9_-]{1,80}$/.test(v),'invalid-model-policy');return v}
+ check(['low','off','default'].includes(raw.effort)&&raw.outputBudget===OUTPUT_BUDGET,'invalid-model-policy')
+ check(Array.isArray(raw.supportedEfforts)&&raw.supportedEfforts.length<=32&&new Set(raw.supportedEfforts).size===raw.supportedEfforts.length,'invalid-model-policy')
+ const supportedEfforts=raw.supportedEfforts.map(effortId).sort(),defaultEffort=raw.defaultEffort===null?null:effortId(raw.defaultEffort)
+ check(defaultEffort===null||supportedEfforts.includes(defaultEffort),'invalid-model-policy')
+ const effort=supportedEfforts.includes('low')?'low':supportedEfforts.includes('off')?'off':'default'
+ check(raw.effort===effort,'invalid-model-policy')
+ return {effort,supportedEfforts,defaultEffort,outputBudget:OUTPUT_BUDGET}
+}
+function policyFor(info){return parsePolicy({effort:info.reasoning?.efforts.some(e=>e.id==='low')?'low':info.reasoning?.efforts.some(e=>e.id==='off')?'off':'default',supportedEfforts:info.reasoning?.efforts.map(e=>e.id)??[],defaultEffort:info.reasoning?.defaultEffort??null,outputBudget:OUTPUT_BUDGET})}
+function parseRoute(raw,requirePolicy=false){
+ exact(raw,['provider','model','policy'])
+ const route={provider:text(raw.provider,200,true),model:text(raw.model,200,true)}
+ check(!requirePolicy||raw.policy!==undefined,'model-policy-unavailable')
+ return {...route,...(raw.policy===undefined?{}:{policy:parsePolicy(raw.policy)})}
+}
+const sameRoute=(a,b)=>{try{return JSON.stringify(parseRoute(a,true))===JSON.stringify(parseRoute(b,true))}catch{return false}}
+const policyLabel=(policy,lang='en')=>{
+ try{const p=parsePolicy(policy);return p.effort==='low'?(lang==='zh'?'低推理（low）':'Low reasoning (low)'):p.effort==='off'?(lang==='zh'?'关闭推理（off）':'Reasoning off (off)'):(lang==='zh'?'适配器默认推理策略':'Adapter default reasoning policy')+(p.defaultEffort?' ('+p.defaultEffort+')':lang==='zh'?'（强度未声明）':' (effort unspecified)')}catch{return lang==='zh'?'推理策略不可用，请重新连接':'Reasoning policy unavailable; reconnect'}
+}
 const DIAGNOSTIC_COUNTER_MAX=1000000000
 const MODEL_FAILURES=Object.freeze(['model-max-tokens','model-provider-error','model-provider-aborted','model-missing-finish','model-unknown-finish','model-unexpected-blocks','invalid-model-json','output-too-large','model-stream-failed'])
 // Exact provider-neutral codes audited in official transport/error/adapter normalization.
@@ -120,12 +143,12 @@ html[data-theme=dark] .qcu-course,html.dark .qcu-course{--bg:#252a27;--card:#303
 
 const clientId=prefix=>prefix+'_'+globalThis.crypto.randomUUID().replaceAll('-','')
 class CourseController{
- constructor(remote,{sessionId=clientId('session')}={}){this.remote=remote;this.sessionId=sessionId;this.listeners=new Set();this.state={phase:'loading',workspaceId:'',courseId:'',snapshot:null,task:null,error:'',runtime:null,saveReview:null,saved:null};this.generation=0;this.pending=false;this.timer=null;this.disposed=false;this.request=null;this.saveRequest=null}
+ constructor(remote,{sessionId=clientId('session')}={}){this.remote=remote;this.sessionId=sessionId;this.listeners=new Set();this.state={phase:'loading',workspaceId:'',courseId:'',snapshot:null,task:null,error:'',runtime:null,saveReview:null,saved:null};this.generation=0;this.pending=false;this.timer=null;this.disposed=false;this.request=null;this.saveRequest=null;this.confirmedModel=null}
  snapshot=()=>this.state
  subscribe=fn=>{this.listeners.add(fn);return()=>this.listeners.delete(fn)}
- set(patch){if(this.disposed)return;this.state={...this.state,...patch};for(const fn of this.listeners)fn()}
+ set(patch){if(this.disposed)return;if(patch.runtime&&!sameRoute(this.state.runtime?.model,patch.runtime.model))this.confirmedModel=null;this.state={...this.state,...patch};for(const fn of this.listeners)fn()}
  async call(request,workspaceId=this.state.workspaceId){
-  const raw=await this.remote.dispatch(JSON.stringify(workspaceId?{workspaceId,request,...(request.action==='generate'?{expectedModel:this.state.runtime?.model}:{})}:request))
+  const raw=await this.remote.dispatch(JSON.stringify(workspaceId?{workspaceId,request,...(request.action==='generate'?{expectedModel:this.confirmedModel}:{})}:request))
   if(!raw?.ok)throw Error('connection-unavailable')
   const result=JSON.parse(raw.value);if(!result.ok){const e=Error(result.error);e.definite=true;throw e}return Object.hasOwn(result,'value')?result.value:result
  }
@@ -140,10 +163,12 @@ class CourseController{
  async createCourse(name){return this.perform(async()=>{const c=await this.call({action:'createCourse',requestId:clientId('request'),name});await this.refresh();this.stopPoll();++this.generation;this.request=null;this.saveRequest=null;this.set({courseId:c.id,task:null,saveReview:null,saved:null,phase:'idle'});return c})}
  async addReference(file){return this.perform(async()=>{check(file.size<=8*1024*1024,'file-too-large');const bytes=new Uint8Array(await file.arrayBuffer());let str='';for(let i=0;i<bytes.length;i+=32768)str+=String.fromCharCode(...bytes.subarray(i,i+32768));const r=await this.call({action:'addReference',courseId:this.state.courseId,requestId:clientId('request'),name:file.name,base64:btoa(str)});await this.refresh();return r})}
  async removeReference(referenceId){return this.perform(async()=>{await this.call({action:'removeReference',courseId:this.state.courseId,referenceId});await this.refresh()})}
+ confirmModel(consent){this.confirmedModel=consent?parseRoute(this.state.runtime?.model,true):null}
  async generate(input,referenceIds,consent){
   return this.perform(async()=>{
+   check(consent===true&&sameRoute(this.confirmedModel,this.state.runtime?.model),'model-consent-required')
    this.stopPoll();const n=++this.generation
-   const body={courseId:this.state.courseId,sessionId:this.sessionId,input,referenceIds,consent},fingerprint=JSON.stringify(body)
+   const body={courseId:this.state.courseId,sessionId:this.sessionId,input,referenceIds,consent},fingerprint=JSON.stringify({...body,model:this.confirmedModel})
    if(this.request?.fingerprint!==fingerprint)this.request={fingerprint,body:{action:'generate',...body,requestId:clientId('request')}}
    this.set({phase:'running',task:null,saveReview:null,saved:null})
    try{const task=await this.call(this.request.body);if(n!==this.generation)return;this.set({task,phase:task.state});await this.refresh();if(['running','cancelling'].includes(task.state))this.poll()}
@@ -164,7 +189,7 @@ class CourseController{
  async save(mode){return this.perform(async()=>{const t=this.state.task,r=this.state.saveReview;check(r&&r.draftHash===t.draftHash,'stale-preview');if(!this.saveRequest)this.saveRequest={action:'save',courseId:t.courseId,taskId:t.id,component:r.component,draftHash:r.draftHash,artifactSha256:r.artifactSha256,existingSha256:r.existingSha256,mode,confirmed:true,saveId:clientId('save')};check(this.saveRequest.mode===mode,'reconcile-save-first');const saved=await this.call(this.saveRequest);this.set({saved,saveReview:null});return saved})}
  async reconcileSave(){return this.perform(async()=>{check(this.saveRequest,'save-not-found');const saved=await this.call({action:'saveStatus',courseId:this.saveRequest.courseId,saveId:this.saveRequest.saveId});if(saved.status==='saved')this.set({saved,saveReview:null});else this.set({error:'save-pending'});return saved})}
  async cancelSave(){return this.perform(async()=>{if(this.saveRequest){const result=await this.call({action:'abandonSave',courseId:this.saveRequest.courseId,saveId:this.saveRequest.saveId});if(result.status==='saved')this.set({saved:result});this.saveRequest=null}this.set({saveReview:null})})}
- invalidate(){++this.generation;this.stopPoll();this.set({phase:'unknown',saveReview:null,error:'connection-reset'})}
+ invalidate(){this.confirmedModel=null;++this.generation;this.stopPoll();this.set({phase:'unknown',saveReview:null,error:'connection-reset'})}
  dispose(){this.disposed=true;this.stopPoll();this.listeners.clear();++this.generation}
 }
 
@@ -174,6 +199,9 @@ const messages={
  'file-changed':['The existing file changed. Review the save destination again.','目标文件已变化，请重新查看保存确认。'],'unsupported-file-use-text':['Use TXT, Markdown, CSV, DOCX or PPTX. For PDF, paste verified excerpts as text.','支持 TXT、Markdown、CSV、DOCX、PPTX；PDF 请先提供经核对的文字摘录。'],
  'unknown':['Connection or generation timed out. Check the original task; do not generate again automatically.','连接或生成超时，请核对原任务，不会自动重试。'],'restart-required':['Host restarted before confirmation. Original task will not resume. Select references again to start a new task.','Host 在结果确认前退出，原任务不会自动恢复；重新选择资料后可发起新任务。'],
  'model-not-configured':['Configure your default model in DSH Settings → Models.','请先在 DSH 设置 → 模型中配置默认模型。'],
+ 'model-policy-unavailable':['Reasoning capabilities are unavailable. Reconnect before confirming a new generation.','推理能力元数据不可用，请重新连接后再确认生成。'],
+ 'model-policy-changed':['Reasoning policy or budget changed. Reconnect, review and confirm again.','推理策略或预算已变化，请重新连接、核对并再次确认。'],
+ 'invalid-model-policy':['Invalid generation policy. Reconnect and confirm again.','生成策略无效，请重新连接并再次确认。'],
  'model-selection-changed':['The default model changed. Reconnect, check the displayed route and confirm generation again.','默认模型已变化，请重新连接，核对模型后再确认生成。'],
  'state-write-failed':['The local task state could not be saved. Check workspace permissions; the task is unconfirmed.','本地任务状态写入失败，请核对工作区权限；任务结果未确认。'],
  'generation-failed':['Generation failed or returned an invalid draft. Review inputs and reselect references for a new task.','生成失败或输出未通过校验；核对输入、重新选择资料后发起新任务。'],
@@ -203,12 +231,15 @@ function createCourseViews(React){
  const h=React.createElement
  function Page({controller,onBack}){
   const state=React.useSyncExternalStore(controller.subscribe,controller.snapshot,controller.snapshot)
-  const [lang,setLang]=React.useState('en'),[step,setStep]=React.useState(0),[courseName,setCourseName]=React.useState(''),[input,setInput]=React.useState(initialInput),[references,setReferences]=React.useState([]),[consent,setConsent]=React.useState(false),[paste,setPaste]=React.useState(''),[component,setComponent]=React.useState('lesson'),[editing,setEditing]=React.useState(null),[busy,setBusy]=React.useState(false)
+  const [lang,setLang]=React.useState('en'),[step,setStep]=React.useState(0),[courseName,setCourseName]=React.useState(''),[input,setInput]=React.useState(initialInput),[references,setReferences]=React.useState([]),[consent,setConsent]=React.useState(null),[paste,setPaste]=React.useState(''),[component,setComponent]=React.useState('lesson'),[editing,setEditing]=React.useState(null),[busy,setBusy]=React.useState(false)
   const L=(en,zh)=>lang==='zh'?zh:en,read=v=>labelMap[v]?L(...labelMap[v]):v.replaceAll('-',' ')
   const msg=code=>Object.hasOwn(messages,code)?L(...messages[code]):L('Please check the input or workspace.','请检查输入或工作区。')+' ('+code+')'
   React.useEffect(()=>{void controller.boot()},[controller])
-  React.useEffect(()=>{setReferences([]);setConsent(false);setStep(0);setEditing(null)},[state.courseId,state.workspaceId])
-  React.useEffect(()=>{setConsent(false)},[JSON.stringify(input),references.join('|')])
+  React.useEffect(()=>{setReferences([]);setConsent(null);controller.confirmModel(false);setStep(0);setEditing(null)},[state.courseId,state.workspaceId])
+  const consentKey=JSON.stringify({input,references,model:state.runtime?.model,workspace:state.workspaceId,course:state.courseId})
+  const policyAvailable=(()=>{try{parseRoute(state.runtime?.model,true);return true}catch{return false}})()
+  const confirmed=policyAvailable&&consent===consentKey&&sameRoute(controller.confirmedModel,state.runtime?.model)
+  React.useEffect(()=>{setConsent(null);controller.confirmModel(false)},[consentKey])
   React.useEffect(()=>{if(state.task?.state==='succeeded'){setStep(2);setEditing(null)}},[state.task?.id,state.task?.draftHash,state.task?.state])
   React.useEffect(()=>{if(!state.snapshot)return;const p=state.snapshot.profile;setInput(old=>({...old,stage:p.stages.includes(old.stage)?old.stage:p.stages[0],pathway:p.pathways.includes(old.pathway)?old.pathway:p.pathways[0],alignment_framework:p.alignments.includes(old.alignment_framework)?old.alignment_framework:p.alignments[0],competency_tags:old.competency_tags.filter(v=>p.competencies.includes(v)).length?old.competency_tags.filter(v=>p.competencies.includes(v)):[p.competencies[0]]}))},[state.snapshot?.profile.school,state.workspaceId])
   const act=fn=>async()=>{setBusy(true);try{await fn()}catch{}finally{setBusy(false)}}
@@ -228,10 +259,10 @@ function createCourseViews(React){
     h('details',null,h('summary',null,L('Paste a verified text excerpt','粘贴经核对的资料摘录')),h('label',{className:'field'},L('Reference text (local)','参考文字（本地）'),h('textarea',{value:paste,maxLength:60000,onChange:e=>setPaste(e.target.value)})),btn('Add excerpt','加入摘录',async()=>{const file=new File([paste],'reference-excerpt.txt',{type:'text/plain'});const r=await controller.addReference(file);setReferences(old=>[...old,r.id]);setPaste('')},false,!paste.trim()||inFlight))),
    h('div',{className:'form-grid'},field('topic','Lesson topic','本课主题'),field('minutes','Duration (minutes)','课时总长（分钟）','number'),field('context','Learner context (anonymous)','学情（匿名）','textarea'),field('big_idea','Big idea (required)','核心概念（必填）','textarea'),field('stage','Stage','学段','text',state.snapshot?.profile.stages??FRAMEWORK.stage),field('pathway','Pathway','课程路径','text',state.snapshot?.profile.pathways??FRAMEWORK.pathway),field('alignment_framework','Alignment framework','对标框架','text',state.snapshot?.profile.alignments??FRAMEWORK.alignment_framework),field('bloom_level','Bloom level','布鲁姆层级','text',FRAMEWORK.bloom_level),field('think_skill','Thinking tool','思维工具','text',FRAMEWORK.think_skill),field('language','Output language','成果语言','text',['en','zh','bilingual']),field('real_world_link','Real-world link','真实情境关联','textarea'),field('career_link',state.snapshot?.profile.careerLinkRequired?'Career link (required)':'Career link (optional)',state.snapshot?.profile.careerLinkRequired?'生涯关联（必填）':'生涯关联（可选）','textarea')),
    choices('competency_tags','Competencies','能力维度',state.snapshot?.profile.competencies??FRAMEWORK.competency_tags),choices('values_focus','Values','价值品格',FRAMEWORK.values_focus),choices('assessment_evidence','Assessment evidence','评价证据',FRAMEWORK.assessment_evidence),btn('Choose components →','选择教学组件 →',async()=>setStep(1),true,!input.topic.trim()||!input.big_idea.trim()||!references.length))
-  const componentsPanel=h('div',{className:'card'},h('h2',null,L('Build your classroom toolkit','选择课堂教学组件')),h('p',{className:'muted'},L('All 14 formats share one reviewed lesson draft. Start with 2–4 components for a shorter generation. Six creative formats are experimental.','14 种格式共用一份课堂活动草案，建议先选 2–4 项；六项创意组件为实验性。')),
+  const componentsPanel=h('div',{className:'card'},h('h2',null,L('Build your classroom toolkit','选择课堂教学组件')),h('p',{className:'muted'},L('All 14 formats share one reviewed lesson draft. Start with 2–4 components; larger sets may need fewer selections to fit one complete response. Six creative formats are experimental.','14 种格式共用一份课堂活动草案，建议先选 2–4 项；较多组件可能需要减少选择才能容纳完整输出。六项创意组件为实验性。')),
    h('div',{className:'components'},COMPONENTS.map(c=>h('label',{className:'component'+(input.components.includes(c.id)?' on':''),key:c.id},h('input',{type:'checkbox',checked:input.components.includes(c.id),onChange:()=>setInput({...input,components:toggle(input.components,c.id)})}),h('div',null,h('strong',null,L(c.en,c.zh)),c.experimental?h('span',{className:'experimental'},L('Experimental','实验性')):null,h('div',{className:'muted'},c.format.toUpperCase()+(c.id==='func'?L(' · quadratic sliders',' · 二次函数滑杆'):c.id==='geo'?L(' · draggable triangle',' · 可拖动三角形'):'')))))),field('notes','Additional teaching requirements','补充教学要求','textarea'),
-   h('div',{className:'status'},L('Model','模型')+': '+(state.runtime?.model?.model??L('Not configured','未配置')),h('p',{className:'muted'},L('Generation uses your DSH default model and may incur charges. Selected reference content and lesson goals are sent to that provider. Drafts remain local; no conversation is created.','生成使用你的 DSH 默认模型，可能产生费用。所选资料内容与教学目标会发送给该模型提供方；草案在本地保存，不创建会话。'))),
-   h('label',{className:'consent'},h('input',{type:'checkbox',checked:consent,onChange:e=>setConsent(e.target.checked)}),h('span',null,L('I am entitled to use these materials and agree to send the selected content to my configured model for this draft.','我有权使用这些资料，同意将所选内容发送给已配置模型，用于本次草案。'))),h('div',{className:'row'},btn('← Goals','← 返回目标',async()=>setStep(0)),btn(inFlight?'Generating…':'Generate draft',inFlight?'生成中…':'生成课堂活动草案',async()=>{await controller.generate(input,references,consent);setReferences([])},true,inFlight||!consent||!references.length||!input.components.length||!state.runtime?.model)))
+   h('div',{className:'status'},L('Model','模型')+': '+(state.runtime?.model?state.runtime.model.provider+' / '+state.runtime.model.model:L('Unavailable; reconnect','不可用，请重新连接')),h('p',null,L('Reasoning policy: ','推理策略：')+policyLabel(state.runtime?.model?.policy,lang)),h('p',null,L('Output token budget: ','输出令牌预算：')+OUTPUT_BUDGET),h('p',{className:'muted'},L('Generation uses your DSH default model and may incur charges. Selected reference content and lesson goals are sent to that provider. Drafts remain local; no conversation is created.','生成使用你的 DSH 默认模型，可能产生费用。所选资料内容与教学目标会发送给该模型提供方；草案在本地保存，不创建会话。'))),
+   h('label',{className:'consent'},h('input',{type:'checkbox',checked:confirmed,disabled:!policyAvailable,onChange:e=>{controller.confirmModel(e.target.checked);setConsent(e.target.checked?consentKey:null)}}),h('span',null,L('I am entitled to use these materials and agree to send the selected content to my configured model for this draft.','我有权使用这些资料，同意将所选内容发送给已配置模型，用于本次草案。'))),h('div',{className:'row'},btn('← Goals','← 返回目标',async()=>setStep(0)),btn(inFlight?'Generating…':'Generate draft',inFlight?'生成中…':'生成课堂活动草案',async()=>{await controller.generate(input,references,confirmed);setReferences([])},true,inFlight||!confirmed||!references.length||!input.components.length||!policyAvailable)))
   const current=draft?.components.find(c=>c.id===component)
   const reviewPanel=h('div',{className:'card'},h('h2',null,L('Review before saving','先审阅，再保存')),draft?h(React.Fragment,null,h('p',{className:'muted'},L('Check curriculum alignment, mathematical correctness, answers and source rights. Edit content below; apply edits before saving.','请核实课程目标、数学知识、答案及来源权利。可在下方修订，应用修改后再保存。')),
    h('div',{className:'review-nav'},btn('Lesson plan','课堂活动草案',async()=>setComponent('lesson'),false,false,{'aria-pressed':component==='lesson'}),...draft.components.map(c=>btn(L(COMPONENTS.find(v=>v.id===c.id).en,''),L('',COMPONENTS.find(v=>v.id===c.id).zh),async()=>setComponent(c.id),false,false,{key:c.id,'aria-pressed':component===c.id}))),

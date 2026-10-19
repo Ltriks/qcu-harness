@@ -1,7 +1,7 @@
 import {join} from 'node:path'
 import {randomUUID} from 'node:crypto'
 import {directory,workspaceRoot,readSafe,atomic,digest,material,filename} from './files.mjs'
-import {check,exact,text,id,profile,parseInput,parseDraft,COMPONENTS,MODEL_FAILURES,safeDiagnostic} from './protocol.mjs'
+import {check,exact,text,id,profile,parseInput,parseDraft,COMPONENTS,MODEL_FAILURES,safeDiagnostic,parseRoute} from './protocol.mjs'
 import {exportArtifact} from './export.mjs'
 export const newId=prefix=>prefix+'_'+randomUUID().replaceAll('-','')
 const clone=v=>JSON.parse(JSON.stringify(v))
@@ -16,7 +16,7 @@ export class CourseStore{
   try{this.state=JSON.parse((await readSafe(this.path,25000000)).toString('utf8'));check(this.state.version===1&&Array.isArray(this.state.courses)&&Array.isArray(this.state.tasks)&&Array.isArray(this.state.saves)&&this.state.courses.length<=100&&this.state.tasks.length<=100&&this.state.saves.length<=1000,'invalid-store')}
   catch(e){if(e.code!=='ENOENT')throw e;this.state={version:1,courses:[],tasks:[],saves:[]}}
   let changed=false
-  for(const task of this.state.tasks){id(task.id,'task');id(task.courseId,'course');if(['running','cancelling'].includes(task.state)){task.state='restart-required';task.message='restart-required';changed=true}}
+  for(const task of this.state.tasks){if(task.model)task.model=parseRoute(task.model);id(task.id,'task');id(task.courseId,'course');if(['running','cancelling'].includes(task.state)){task.state='restart-required';task.message='restart-required';changed=true}}
   for(const c of this.state.courses)id(c.id,'course')
   if(changed)await this.persist();return this
  }
@@ -81,7 +81,7 @@ export class CourseStore{
   check(raw.consent===true,'model-consent-required');check(Array.isArray(raw.referenceIds)&&raw.referenceIds.length<=8&&new Set(raw.referenceIds).size===raw.referenceIds.length,'invalid-references')
   raw.referenceIds.forEach(r=>id(r,'ref'))
   // Check request replays before the one-use references have been consumed.
-  if(raw.route){exact(raw.route,['provider','model']);text(raw.route.provider,200,true);text(raw.route.model,200,true)}
+  if(raw.route)raw={...raw,route:parseRoute(raw.route,true)}
   const requestHash=hash({course:raw.courseId,session:raw.sessionId,input,refs:[...raw.referenceIds].sort(),route:raw.route??null})
   const replay=this.state.tasks.find(t=>t.requestId===raw.requestId)
   if(replay){check(replay.requestHash===requestHash,'idempotency-conflict');return this.taskResult(replay)}
@@ -102,7 +102,7 @@ export class CourseStore{
    const valid=parseDraft(draft,t.input)
    await this.serial(async()=>{if(t.state!=='running')return;t.draft=valid;t.draftHash=hash(valid);t.state='succeeded';t.message='teacher-review-required';t.finishedAt=this.now();await this.persist()})
   }catch(e){
-   if(!this.stopped)await this.serial(async()=>{if(!['running','cancelling'].includes(t.state))return;t.state=timeout?'unknown':abort.signal.aborted?'cancelled':'failed';t.message=timeout?'generation-timeout':abort.signal.aborted?'cancelled':(['model-not-configured','model-incomplete',...MODEL_FAILURES].includes(e?.code)?e.code:'generation-failed');t.finishedAt=this.now();const diagnostic=t.state==='failed'&&e?.diagnostic?.reason===t.message?safeDiagnostic(e.diagnostic):undefined;if(diagnostic)t.diagnostic=diagnostic;await this.persist()})
+   if(!this.stopped)await this.serial(async()=>{if(!['running','cancelling'].includes(t.state))return;t.state=timeout?'unknown':abort.signal.aborted?'cancelled':'failed';t.message=timeout?'generation-timeout':abort.signal.aborted?'cancelled':(['model-policy-unavailable','model-policy-changed','model-selection-changed','invalid-model-policy','model-not-configured','model-incomplete',...MODEL_FAILURES].includes(e?.code)?e.code:'generation-failed');t.finishedAt=this.now();const diagnostic=t.state==='failed'&&e?.diagnostic?.reason===t.message?safeDiagnostic(e.diagnostic):undefined;if(diagnostic)t.diagnostic=diagnostic;await this.persist()})
   }finally{clearTimeout(timer);refs.length=0}
  }
  artifact(t,component){

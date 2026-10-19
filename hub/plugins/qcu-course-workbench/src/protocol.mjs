@@ -1,7 +1,30 @@
 // Shared, dependency-free contract. Never accepts a filesystem path or executable model output.
-export const VERSION='0.1.0-pilot.1.1'
-export const PROTOCOL=1
+export const VERSION='0.1.0-pilot.1.2'
+export const PROTOCOL=2
 export const OUTPUT_BUDGET=12000
+// Detached, bounded capability facts only; provider descriptions never cross this boundary.
+export function parsePolicy(raw){
+ exact(raw,['effort','supportedEfforts','defaultEffort','outputBudget'])
+ const effortId=v=>{check(typeof v==='string'&&/^[a-zA-Z0-9_-]{1,80}$/.test(v),'invalid-model-policy');return v}
+ check(['low','off','default'].includes(raw.effort)&&raw.outputBudget===OUTPUT_BUDGET,'invalid-model-policy')
+ check(Array.isArray(raw.supportedEfforts)&&raw.supportedEfforts.length<=32&&new Set(raw.supportedEfforts).size===raw.supportedEfforts.length,'invalid-model-policy')
+ const supportedEfforts=raw.supportedEfforts.map(effortId).sort(),defaultEffort=raw.defaultEffort===null?null:effortId(raw.defaultEffort)
+ check(defaultEffort===null||supportedEfforts.includes(defaultEffort),'invalid-model-policy')
+ const effort=supportedEfforts.includes('low')?'low':supportedEfforts.includes('off')?'off':'default'
+ check(raw.effort===effort,'invalid-model-policy')
+ return {effort,supportedEfforts,defaultEffort,outputBudget:OUTPUT_BUDGET}
+}
+export function policyFor(info){return parsePolicy({effort:info.reasoning?.efforts.some(e=>e.id==='low')?'low':info.reasoning?.efforts.some(e=>e.id==='off')?'off':'default',supportedEfforts:info.reasoning?.efforts.map(e=>e.id)??[],defaultEffort:info.reasoning?.defaultEffort??null,outputBudget:OUTPUT_BUDGET})}
+export function parseRoute(raw,requirePolicy=false){
+ exact(raw,['provider','model','policy'])
+ const route={provider:text(raw.provider,200,true),model:text(raw.model,200,true)}
+ check(!requirePolicy||raw.policy!==undefined,'model-policy-unavailable')
+ return {...route,...(raw.policy===undefined?{}:{policy:parsePolicy(raw.policy)})}
+}
+export const sameRoute=(a,b)=>{try{return JSON.stringify(parseRoute(a,true))===JSON.stringify(parseRoute(b,true))}catch{return false}}
+export const policyLabel=(policy,lang='en')=>{
+ try{const p=parsePolicy(policy);return p.effort==='low'?(lang==='zh'?'低推理（low）':'Low reasoning (low)'):p.effort==='off'?(lang==='zh'?'关闭推理（off）':'Reasoning off (off)'):(lang==='zh'?'适配器默认推理策略':'Adapter default reasoning policy')+(p.defaultEffort?' ('+p.defaultEffort+')':lang==='zh'?'（强度未声明）':' (effort unspecified)')}catch{return lang==='zh'?'推理策略不可用，请重新连接':'Reasoning policy unavailable; reconnect'}
+}
 export const DIAGNOSTIC_COUNTER_MAX=1000000000
 export const MODEL_FAILURES=Object.freeze(['model-max-tokens','model-provider-error','model-provider-aborted','model-missing-finish','model-unknown-finish','model-unexpected-blocks','invalid-model-json','output-too-large','model-stream-failed'])
 // Exact provider-neutral codes audited in official transport/error/adapter normalization.
