@@ -3,7 +3,7 @@ import {BlockAssembler,createUserMessage} from '@deepseek-ai/dsh-llm'
 import z from '@deepseek-ai/schemastery'
 import {readFileSync} from 'node:fs'
 import {CourseStore} from './src/store.mjs'
-import {remoteContribution,VERSION,PROTOCOL,check,exact,profile,text} from './src/protocol.mjs'
+import {remoteContribution,VERSION,PROTOCOL,check,exact,profile,text,OUTPUT_BUDGET,DIAGNOSTIC_COUNTER_MAX,safeFailureCode} from './src/protocol.mjs'
 import {SYSTEM,promptFor} from './src/prompt.mjs'
 export const name='qcu-course-workbench'
 export const inject=['typert','workspaceRegistry']
@@ -13,14 +13,39 @@ export function createGenerator(ctx){return async(input,refs,signal,expected)=>{
  check(llm&&selection?.provider&&selection?.model,'model-not-configured')
  check(!expected||(expected.provider===selection.provider&&expected.model===selection.model),'model-selection-changed')
  const messages=[createUserMessage({content:[{type:'text',text:promptFor(input,refs)}],source:{kind:'user'}})]
- const assembler=new BlockAssembler();let bytes=0,finished=false
- for await(const chunk of llm.stream({...selection,messages,system:SYSTEM,maxTokens:12000,tools:[],signal})){
-  signal.throwIfAborted();bytes+=JSON.stringify(chunk).length;check(bytes<=1500000,'output-too-large');assembler.push(chunk)
-  if(chunk.type==='finish'){finished=true;check(chunk.reason.kind==='stop','model-incomplete')}
+ const assembler=new BlockAssembler(),stats={chunks:0,textChars:0,reasoningChars:0,streamChars:0,outputBudget:OUTPUT_BUDGET}
+ let stage='stream',finishKind='missing',failureCode
+ const add=(key,n)=>{check(Number.isSafeInteger(n)&&n>=0,'invalid-stream-counter');stats[key]=Math.min(DIAGNOSTIC_COUNTER_MAX,stats[key]+n)}
+ // A local marker prevents provider/middleware throws from impersonating our diagnostic errors.
+ let ownFailure
+ const codeOf=value=>{try{return safeFailureCode(Object.getOwnPropertyDescriptor(value,'code')?.value)}catch{return}}
+ const reject=reason=>{const e=Error(reason);e.code=reason;e.diagnostic={stage,reason,finishKind,...stats,...(failureCode?{failureCode}:{})};ownFailure=e;throw e}
+ try{
+  for await(const chunk of llm.stream({...selection,messages,system:SYSTEM,maxTokens:OUTPUT_BUDGET,tools:[],signal})){
+   signal.throwIfAborted();add('chunks',1);if(finishKind==='stop')reject('model-stream-failed')
+   if(chunk.type==='finish'){
+    finishKind=['stop','tool-calls','max-tokens','aborted','error'].includes(chunk.reason?.kind)?chunk.reason.kind:'unknown'
+    if(['error','aborted'].includes(finishKind))failureCode=codeOf(chunk.reason.failure)
+   }
+   if(chunk.type==='text-delta'||chunk.type==='reasoning-delta')add(chunk.type==='text-delta'?'textChars':'reasoningChars',chunk.text.length)
+   if(chunk.type==='block-end'&&['text','reasoning'].includes(chunk.block?.type))add(chunk.block.type==='text'?'textChars':'reasoningChars',chunk.block.text.length)
+   add('streamChars',JSON.stringify(chunk).length);if(stats.streamChars>1500000)reject('output-too-large')
+   if(chunk.type==='finish'){
+    if(finishKind!=='stop')reject({'max-tokens':'model-max-tokens',error:'model-provider-error',aborted:'model-provider-aborted','tool-calls':'model-unexpected-blocks'}[finishKind]??'model-unknown-finish')
+   }
+   if((chunk.type==='block-start'&&!['text','reasoning'].includes(chunk.blockType))||chunk.type==='tool-call-delta'||(chunk.type==='block-end'&&!['text','reasoning'].includes(chunk.block?.type)))reject('model-unexpected-blocks')
+   assembler.push(chunk)
+  }
+  signal.throwIfAborted();if(finishKind==='missing')reject('model-missing-finish')
+  stage='assembly';const blocks=assembler.blocks();if(!blocks.every(b=>['text','reasoning'].includes(b.type)))reject('model-unexpected-blocks')
+  const response=blocks.filter(b=>b.type==='text').map(b=>b.text).join('');if(response.length>180000)reject('output-too-large')
+  stage='json'
+  try{return JSON.parse(response.replace(/^\s*```(?:json)?\s*\n?/,'').replace(/\n?```\s*$/,''))}catch{reject('invalid-model-json')}
+ }catch(e){
+  signal.throwIfAborted();if(ownFailure&&e===ownFailure)throw e
+  // Never propagate raw thrown values, failure payloads, replay state or provider messages.
+  failureCode=codeOf(e);reject('model-stream-failed')
  }
- signal.throwIfAborted();check(finished,'model-incomplete');const blocks=assembler.blocks();check(blocks.every(b=>['text','reasoning'].includes(b.type)),'model-incomplete')
- const response=blocks.filter(b=>b.type==='text').map(b=>b.text).join('');check(response.length<=180000,'output-too-large')
- try{return JSON.parse(response.replace(/^\s*```(?:json)?\s*\n?/,'').replace(/\n?```\s*$/,''))}catch{check(false,'invalid-model-json')}
 }}
 export class CourseService extends TypertRemoteService{
  constructor(ctx,framework){super(ctx,'qcuCourse');this.framework=framework;this.stores=new Map();this.owner=ctx;this.closed=false;ctx.effect(()=>()=>this.dispose())}

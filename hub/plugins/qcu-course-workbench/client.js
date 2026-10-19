@@ -2,8 +2,23 @@
 window.__ModuleLoader__.load({id:'qcu-course-workbench',factory(require){
 const React=require('react');
 // Shared, dependency-free contract. Never accepts a filesystem path or executable model output.
-const VERSION='0.1.0-pilot.1.0'
+const VERSION='0.1.0-pilot.1.1'
 const PROTOCOL=1
+const OUTPUT_BUDGET=12000
+const DIAGNOSTIC_COUNTER_MAX=1000000000
+const MODEL_FAILURES=Object.freeze(['model-max-tokens','model-provider-error','model-provider-aborted','model-missing-finish','model-unknown-finish','model-unexpected-blocks','invalid-model-json','output-too-large','model-stream-failed'])
+// Exact provider-neutral codes audited in official transport/error/adapter normalization.
+const FAILURE_CODES=Object.freeze(['AUTH','QUOTA','RATE_LIMIT','INVALID_REQUEST','SERVER','CONTEXT_WINDOW_EXCEEDED','ABORTED','UNKNOWN'])
+const safeFailureCode=value=>FAILURE_CODES.includes(value)?value:undefined
+// Shared persistence/transport/render boundary: copy only fixed enums and bounded integers.
+function safeDiagnostic(value){
+ if(!value||typeof value!=='object'||!['stream','assembly','json'].includes(value.stage)||!MODEL_FAILURES.includes(value.reason)||!['stop','tool-calls','max-tokens','aborted','error','missing','unknown'].includes(value.finishKind)||value.outputBudget!==OUTPUT_BUDGET)return
+ const result={stage:value.stage,reason:value.reason,finishKind:value.finishKind,outputBudget:OUTPUT_BUDGET}
+ for(const key of ['chunks','textChars','reasoningChars','streamChars']){const n=value[key];if(!Number.isSafeInteger(n)||n<0||n>DIAGNOSTIC_COUNTER_MAX)return;result[key]=n}
+ const failureCode=safeFailureCode(value.failureCode)
+ if(failureCode&&((value.reason==='model-provider-error'&&value.finishKind==='error')||(value.reason==='model-provider-aborted'&&value.finishKind==='aborted')||value.reason==='model-stream-failed'))result.failureCode=failureCode
+ return result
+}
 const targetTitles={stage:'Stage · 学段',pathway:'Pathway · 课程路径',alignment_framework:'Alignment framework · 对标框架',competency_tags:'Competencies · 能力维度',bloom_level:'Bloom level · 布鲁姆层级',big_idea:'Big idea · 核心概念',think_skill:'Thinking tool · 思维工具',values_focus:'Values · 价值品格',real_world_link:'Real-world link · 真实情境',career_link:'Career link · 生涯关联',assessment_evidence:'Assessment evidence · 评价证据'}
 const targetValue=v=>({concept:'Conceptual understanding · 概念理解',skill:'Skills · 技能操作',thinking:'Thinking · 思维素养',language:'Academic language · 学术表达',values:'Values · 价值品格',career:'Career awareness · 生涯认知',igcse:'IGCSE','a-level':'A-Level',ib:'IB',ap:'AP',mcaa:'MCAA'}[v]??String(v).replaceAll('-',' '))
 const COMPONENTS=Object.freeze([
@@ -162,7 +177,17 @@ const messages={
  'model-selection-changed':['The default model changed. Reconnect, check the displayed route and confirm generation again.','默认模型已变化，请重新连接，核对模型后再确认生成。'],
  'state-write-failed':['The local task state could not be saved. Check workspace permissions; the task is unconfirmed.','本地任务状态写入失败，请核对工作区权限；任务结果未确认。'],
  'generation-failed':['Generation failed or returned an invalid draft. Review inputs and reselect references for a new task.','生成失败或输出未通过校验；核对输入、重新选择资料后发起新任务。'],
- 'model-incomplete':['Model output was interrupted or too long. Reduce selected components and try a new task.','模型输出中断或超长，请减少组件后新建任务。'],
+ 'model-incomplete':['This older task failed, but its exact cause was not recorded.','此历史任务生成失败，具体原因未记录。'],
+ 'cause-not-recorded':['Generation failed; the exact cause was not recorded.','生成失败，具体原因未记录。'],
+ 'model-max-tokens':['The model reported reaching its output token limit. No draft was accepted.','模型报告已达到输出令牌上限，未接受为草案。'],
+ 'model-provider-error':['The model service reported an error. Its underlying cause is unknown. No draft was accepted.','模型服务报告错误，底层原因尚不明确，未接受为草案。'],
+ 'model-provider-aborted':['The model service reported an abort without local cancellation. No draft was accepted.','模型服务报告中止，本地未发起取消，未接受为草案。'],
+ 'model-missing-finish':['The model stream ended without a finish record. No draft was accepted.','模型流结束时缺少结束记录，未接受为草案。'],
+ 'model-unknown-finish':['The model reported an unrecognized finish reason. No draft was accepted.','模型返回了未知结束原因，未接受为草案。'],
+ 'model-unexpected-blocks':['The model returned tools or unsupported content blocks. No draft was accepted.','模型返回了工具或不支持的内容块，未接受为草案。'],
+ 'invalid-model-json':['The model response was not valid JSON. No draft was accepted.','模型响应不是有效 JSON，未接受为草案。'],
+ 'output-too-large':['The response exceeded the local output size cap. No draft was accepted.','响应超过本地输出大小上限，未接受为草案。'],
+ 'model-stream-failed':['Reading or processing the model stream failed. Its underlying cause is unknown. No draft was accepted.','读取或处理模型流失败，底层原因尚不明确，未接受为草案。'],
  'invalid-timing':['Lesson stage minutes must sum to the lesson duration.','各教学环节时长之和须等于课时总长。'],
  'operation-failed':['Operation failed. Check workspace access and retry only after checking the original result.','操作失败，请核对工作区读写权限及原结果后再处理。'],
  'reconcile-save-first':['Check the original save result before preparing a different save.','请先核对原保存结果，再准备其他保存操作。'],
@@ -180,7 +205,7 @@ function createCourseViews(React){
   const state=React.useSyncExternalStore(controller.subscribe,controller.snapshot,controller.snapshot)
   const [lang,setLang]=React.useState('en'),[step,setStep]=React.useState(0),[courseName,setCourseName]=React.useState(''),[input,setInput]=React.useState(initialInput),[references,setReferences]=React.useState([]),[consent,setConsent]=React.useState(false),[paste,setPaste]=React.useState(''),[component,setComponent]=React.useState('lesson'),[editing,setEditing]=React.useState(null),[busy,setBusy]=React.useState(false)
   const L=(en,zh)=>lang==='zh'?zh:en,read=v=>labelMap[v]?L(...labelMap[v]):v.replaceAll('-',' ')
-  const msg=code=>messages[code]?L(...messages[code]):L('Please check the input or workspace.','请检查输入或工作区。')+' ('+code+')'
+  const msg=code=>Object.hasOwn(messages,code)?L(...messages[code]):L('Please check the input or workspace.','请检查输入或工作区。')+' ('+code+')'
   React.useEffect(()=>{void controller.boot()},[controller])
   React.useEffect(()=>{setReferences([]);setConsent(false);setStep(0);setEditing(null)},[state.courseId,state.workspaceId])
   React.useEffect(()=>{setConsent(false)},[JSON.stringify(input),references.join('|')])
@@ -192,6 +217,7 @@ function createCourseViews(React){
   const toggle=(list,value)=>list.includes(value)?list.filter(v=>v!==value):[...list,value]
   const choices=(key,en,zh,values)=>h('fieldset',{key},h('legend',null,L(en,zh)),h('div',{className:'chips'},values.map(v=>h('label',{className:'chip',key:v},h('input',{type:'checkbox',checked:input[key].includes(v),onChange:()=>setInput({...input,[key]:toggle(input[key],v)})}),read(v)))))
   const selectedCourse=state.snapshot?.courses.find(c=>c.id===state.courseId),task=state.task,draft=editing??task?.draft
+  const diagnostic=task?.state==='failed'&&task.diagnostic?.reason===task.message?safeDiagnostic(task.diagnostic):undefined
   const activeRefs=state.snapshot?.references.filter(r=>r.courseId===state.courseId)??[]
   const available=!!state.snapshot&&!!selectedCourse
   const inFlight=['running','cancelling'].includes(state.phase)
@@ -224,7 +250,12 @@ function createCourseViews(React){
    h('div',{className:'course-list'},state.snapshot?.courses.map(c=>h('button',{type:'button',className:'btn course-item'+(state.courseId===c.id?' selected':''),key:c.id,disabled:busy||inFlight,onClick:()=>controller.course(c.id)},c.name))),state.snapshot?h('form',{onSubmit:act(async()=>{await controller.createCourse(courseName);setCourseName('')})},h('label',{className:'field'},L('New course name','新课程名称'),h('input',{value:courseName,maxLength:120,onChange:e=>setCourseName(e.target.value)})),h('button',{className:'btn',type:'button',disabled:busy||!courseName.trim()||inFlight,onClick:act(async()=>{await controller.createCourse(courseName);setCourseName('')})},L('+ Create course','+ 创建课程'))):null),
    h('div',{className:'card recent-tasks'},h('h3',null,L('Previous drafts','历史草案')),...(state.snapshot?.tasks??[]).filter(t=>t.courseId===state.courseId).slice().reverse().slice(0,12).map(t=>h('button',{type:'button',className:'btn task-button',key:t.id,disabled:busy||inFlight,onClick:act(async()=>{setComponent('lesson');await controller.openTask(t.id);setStep(2)})},t.topic,h('div',{className:'muted'},taskName(t.state)))),!(state.snapshot?.tasks??[]).some(t=>t.courseId===state.courseId)?h('p',{className:'muted'},L('No drafts yet','还没有草案')):null)),
    h('main',null,available?h(React.Fragment,null,h('div',{className:'row',style:{marginBottom:14}},h('h2',{className:'grow'},selectedCourse.name),h('span',{className:'muted'},L('One course · one coherent lesson','一门课程 · 一份完整草案'))),h('nav',{className:'steps','aria-label':L('Draft steps','草案步骤')},[['References & goals','资料与目标'],['Teaching components','教学组件'],['Review & save','审阅与保存']].map((names,i)=>h('button',{type:'button',key:i,className:'btn step'+(step===i?' selected':''),'aria-current':step===i?'step':undefined,onClick:()=>setStep(i)},h('small',null,'STEP 0'+(i+1)),L(...names)))),
-   task?h('div',{className:'status',role:'status'},taskName(state.phase),['unknown','failed','restart-required'].includes(state.phase)?h('p',null,msg(task.message==='generation-timeout'?'unknown':task.message)):null,h('div',{className:'row'},inFlight?btn('Cancel generation','取消生成',()=>controller.cancel()):null,state.phase==='unknown'?btn('Check original task','核对原任务',()=>controller.reconcile()):null)):null,
+   task?h('div',{className:'status',role:'status'},taskName(state.phase),['unknown','failed','restart-required'].includes(state.phase)?h('p',null,msg(task.message==='generation-timeout'?'unknown':Object.hasOwn(messages,task.message)?task.message:'cause-not-recorded')):null,diagnostic?h('details',null,h('summary',null,L('Technical diagnostics','技术诊断')),h('p',{className:'muted'},L('Character counts include received deltas and block-end text; the same text may be counted twice. These are not token usage.','字符数包含接收的增量和结束块文字，同一文字可能重复计数；不代表实际令牌用量。')),h('dl',null,[
+    [L('Stage','阶段'),diagnostic.stage],[L('Reason','原因码'),diagnostic.reason],[L('Finish kind','结束类型'),diagnostic.finishKind],
+    ...(diagnostic.failureCode?[[L('Normalized failure code (classification only)','标准失败码（仅分类）'),diagnostic.failureCode]]:[]),
+    [L('Received chunks','接收块数'),diagnostic.chunks],[L('Received text characters','接收文字字符数'),diagnostic.textChars],[L('Received reasoning characters','接收推理字符数'),diagnostic.reasoningChars],
+    [L('Serialized stream characters','序列化流字符数'),diagnostic.streamChars],[L('Configured token budget','配置令牌预算'),diagnostic.outputBudget],
+   ].map(([key,value])=>h('div',{key},h('dt',null,key),h('dd',null,value))))):null,h('div',{className:'row'},inFlight?btn('Cancel generation','取消生成',()=>controller.cancel()):null,state.phase==='unknown'?btn('Check original task','核对原任务',()=>controller.reconcile()):null)):null,
    step===0?referencePanel:step===1?componentsPanel:reviewPanel):h('div',{className:'card empty'},h('div',{className:'big'},'✦'),h('h2',null,L('Start with your course','从你的一门课开始')),h('p',null,L('Choose a DSH workspace and create a course. Add references, set learning goals, then prepare a draft for review.','选择 DSH 工作区并创建课程，加入资料、设定学习目标，再生成可审阅的课堂活动草案。')),btn('Reconnect','重新连接',()=>controller.boot())))),
    h('div',{className:'footer'},'QCU · '+L('Course Studio 0.1 · Drafts require teacher review. Browsing, preview and do not call a model.','课程设计工作台 0.1 · 草案须经教师审核；浏览、预览和导出不调用模型。'))))
  }

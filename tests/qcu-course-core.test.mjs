@@ -88,3 +88,41 @@ test('HTML templates escape model markup, stay offline and export every format d
  const task={input,draft};for(const c of ['lesson',...input.components]){const a=exportArtifact(task,c),b=exportArtifact(task,c);assert.deepEqual(a,b);if(['lesson','ppt','guide','micro','hw','ticket','culture'].includes(c)){assert.ok(a.subarray(0,2).equals(Buffer.from('PK')))}else{const html=a.toString('utf8');assert.ok(!html.includes('<script>alert(1)</script>'));assert.ok(!/(?:src|href)=["']https?:\/\/|fetch\(/.test(html));assert.match(html,/connect-src 'none'/)}}
  assert.match(artifactHtml(task,'geo'),/circle.onkeydown/);assert.match(artifactHtml(task,'func'),/coefficient-/)
 })
+
+test('diagnostic persistence whitelists fields and values; legacy and unknown failures remain readable without invented causes',async()=>{
+ const secret='SENSITIVE_DIAGNOSTIC_INJECTION'
+ const safe={stage:'stream',reason:'model-provider-error',finishKind:'error',chunks:3,textChars:10,reasoningChars:20,streamChars:200,outputBudget:12000}
+ const cases=[
+  {diagnostic:{...safe,message:secret,stack:secret,url:secret,headers:{authorization:secret},failure:{code:secret},replayState:secret,refs:secret,prompt:secret,text:secret,reasoning:secret},expected:safe},
+  {diagnostic:{...safe,failureCode:'AUTH'},expected:{...safe,failureCode:'AUTH'}},
+  ...[secret,'auth',401,{code:'AUTH'}].map(failureCode=>({diagnostic:{...safe,failureCode},expected:safe})),
+  {code:'output-too-large',diagnostic:{...safe,reason:'output-too-large',failureCode:'AUTH'},expected:{...safe,reason:'output-too-large'}},
+  ...[{stage:secret},{reason:secret},{finishKind:secret},{chunks:NaN},{textChars:-1},{reasoningChars:1000000001},{streamChars:Infinity},{chunks:1.5},{outputBudget:24000}].map(patch=>({diagnostic:{...safe,...patch}})),
+  {code:'model-incomplete'}, {code:'unrecognized-failure'},
+ ]
+ const s=await make({generate:async()=>{throw Object.assign(Error(secret),current)}});let current
+ try{
+  const c=await course(s)
+  for(const item of cases){
+   current={code:'model-provider-error',...item};const r=await reference(s,c),req=request(c,r),done=await completed(s,req)
+   assert.equal(done.state,'failed');assert.equal(done.draft,undefined);assert.deepEqual(done.diagnostic,item.expected)
+   assert.equal(done.message,item.code==='unrecognized-failure'?'generation-failed':item.code??'model-provider-error')
+  }
+  const persisted=await readFile(s.path,'utf8');assert.ok(!persisted.includes(secret))
+  await s.dispose();const restarted=await new CourseStore(s.root,{generate:()=>assert.fail('reload must not generate')}).init()
+  try{for(let i=0;i<cases.length;i++){const task=restarted.state.tasks[i];assert.deepEqual((await restarted.dispatch({action:'task',courseId:c.id,taskId:task.id})).diagnostic,cases[i].expected);assert.deepEqual(restarted.snapshot().tasks[i].diagnostic,cases[i].expected)}}finally{await restarted.dispose()}
+ }finally{await s.dispose()}
+})
+
+test('local cancel, timeout and disposal win over late provider diagnostics and late success',async()=>{
+ for(const mode of ['cancel','timeout','dispose']){
+  let rejectLate,calls=0
+  const s=await make({timeoutMs:mode==='timeout'?10:120000,generate:()=>{calls++;return new Promise((_,reject)=>{rejectLate=reject})}}),c=await course(s),r=await reference(s,c),req=request(c,r),task=await s.dispatch(req)
+  if(mode==='cancel')await s.dispatch({action:'cancel',courseId:c.id,taskId:task.id})
+  if(mode==='dispose')await s.dispose();else await s.jobs.get(task.id)?.promise
+  rejectLate(Object.assign(Error('sensitive late error'),{code:'model-provider-aborted',diagnostic:{stage:'stream',reason:'model-provider-aborted',finishKind:'aborted',failureCode:'ABORTED',chunks:2,textChars:1,reasoningChars:1,streamChars:100,outputBudget:12000}}))
+  await new Promise(resolve=>setImmediate(resolve))
+  const done=s.task(task.id);assert.equal(done.state,{cancel:'cancelled',timeout:'unknown',dispose:'restart-required'}[mode]);assert.equal(done.diagnostic,undefined);assert.equal(done.draft,undefined);assert.equal(calls,1)
+  await s.dispose()
+ }
+})

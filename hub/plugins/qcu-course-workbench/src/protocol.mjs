@@ -1,6 +1,21 @@
 // Shared, dependency-free contract. Never accepts a filesystem path or executable model output.
-export const VERSION='0.1.0-pilot.1.0'
+export const VERSION='0.1.0-pilot.1.1'
 export const PROTOCOL=1
+export const OUTPUT_BUDGET=12000
+export const DIAGNOSTIC_COUNTER_MAX=1000000000
+export const MODEL_FAILURES=Object.freeze(['model-max-tokens','model-provider-error','model-provider-aborted','model-missing-finish','model-unknown-finish','model-unexpected-blocks','invalid-model-json','output-too-large','model-stream-failed'])
+// Exact provider-neutral codes audited in official transport/error/adapter normalization.
+const FAILURE_CODES=Object.freeze(['AUTH','QUOTA','RATE_LIMIT','INVALID_REQUEST','SERVER','CONTEXT_WINDOW_EXCEEDED','ABORTED','UNKNOWN'])
+export const safeFailureCode=value=>FAILURE_CODES.includes(value)?value:undefined
+// Shared persistence/transport/render boundary: copy only fixed enums and bounded integers.
+export function safeDiagnostic(value){
+ if(!value||typeof value!=='object'||!['stream','assembly','json'].includes(value.stage)||!MODEL_FAILURES.includes(value.reason)||!['stop','tool-calls','max-tokens','aborted','error','missing','unknown'].includes(value.finishKind)||value.outputBudget!==OUTPUT_BUDGET)return
+ const result={stage:value.stage,reason:value.reason,finishKind:value.finishKind,outputBudget:OUTPUT_BUDGET}
+ for(const key of ['chunks','textChars','reasoningChars','streamChars']){const n=value[key];if(!Number.isSafeInteger(n)||n<0||n>DIAGNOSTIC_COUNTER_MAX)return;result[key]=n}
+ const failureCode=safeFailureCode(value.failureCode)
+ if(failureCode&&((value.reason==='model-provider-error'&&value.finishKind==='error')||(value.reason==='model-provider-aborted'&&value.finishKind==='aborted')||value.reason==='model-stream-failed'))result.failureCode=failureCode
+ return result
+}
 export const targetTitles={stage:'Stage · 学段',pathway:'Pathway · 课程路径',alignment_framework:'Alignment framework · 对标框架',competency_tags:'Competencies · 能力维度',bloom_level:'Bloom level · 布鲁姆层级',big_idea:'Big idea · 核心概念',think_skill:'Thinking tool · 思维工具',values_focus:'Values · 价值品格',real_world_link:'Real-world link · 真实情境',career_link:'Career link · 生涯关联',assessment_evidence:'Assessment evidence · 评价证据'}
 export const targetValue=v=>({concept:'Conceptual understanding · 概念理解',skill:'Skills · 技能操作',thinking:'Thinking · 思维素养',language:'Academic language · 学术表达',values:'Values · 价值品格',career:'Career awareness · 生涯认知',igcse:'IGCSE','a-level':'A-Level',ib:'IB',ap:'AP',mcaa:'MCAA'}[v]??String(v).replaceAll('-',' '))
 export const COMPONENTS=Object.freeze([

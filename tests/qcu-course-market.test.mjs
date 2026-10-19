@@ -18,18 +18,17 @@ test('nine-entry market preserves all eight old fixed releases and pins actual c
  for(const file of ['coach-release.json','skill-releases.json','external-skill-release.json','feishu-release.json']){const old=JSON.parse(await readFile('hub/market/'+file,'utf8'));for(const r of Array.isArray(old)?old:[old])assert.deepEqual(bundledCatalog.entries.find(i=>i.id===r.id).release,r)}
  const archive=process.env.QCU_COURSE_ARCHIVE;assert.ok(archive);const bytes=await readFile(archive);assert.equal(bytes.length,release.bytes);assert.equal(createHash('sha256').update(bytes).digest('hex'),release.sha256)
  const code=`import tarfile,pathlib,subprocess,json
-root=pathlib.Path('hub/plugins/qcu-course-workbench')
 revision=${JSON.stringify(item.provenance.pinnedRevision)}
 with tarfile.open(${JSON.stringify(archive)}) as t:
- members=t.getmembers();manifest=json.loads(t.extractfile('package/package.json').read());assert len(members)==len(manifest['files'])+1
+ members=t.getmembers();manifest=json.loads(t.extractfile('package/package.json').read());assert manifest['name']=='qcu-course-workbench' and manifest['version']==${JSON.stringify(release.version)};assert {m.name for m in members}=={'package/'+n for n in ['package.json',*manifest['files']]};assert len(members)==len(manifest['files'])+1
  for m in members:
   assert m.isfile() and not m.issym() and m.name.startswith('package/') and '..' not in pathlib.Path(m.name).parts
-  name=m.name.removeprefix('package/');data=t.extractfile(m).read();assert data==(root/name).read_bytes()
+  name=m.name.removeprefix('package/');data=t.extractfile(m).read()
   committed=subprocess.check_output(['rtk','proxy','git','show',revision+':hub/plugins/qcu-course-workbench/'+name]);assert committed==data
  patch=json.loads(t.extractfile('package/cordis.patch.yml').read());assert len(patch)==1 and len(patch[0]['insert'])==1 and patch[0]['insert'][0]['disabled'] is True
  print('all archive members equal pinned source; standard npm prefix; one disabled row; deterministic bytes')`
  assert.match(execFileSync('rtk',['proxy','python3','-c',code],{encoding:'utf8'}),/all archive members/)
- assert.equal(createHash('sha256').update(await readFile('hub/plugins/qcu-course-workbench/skills/qcu-course-draft/SKILL.md')).digest('hex'),release.skillSha256)
+ const pinnedSkill=execFileSync('rtk',['proxy','git','show',item.provenance.pinnedRevision+':hub/plugins/qcu-course-workbench/skills/qcu-course-draft/SKILL.md']);assert.equal(createHash('sha256').update(pinnedSkill).digest('hex'),release.skillSha256)
 })
 test('workbench contract rejects forged Skill identity and Host downloads only the pinned bytes',async()=>{
  for(const change of [e=>e.release.skill=e.id,e=>e.id='qcu-fake-workbench',e=>e.release.provider='forged',e=>e.capabilities=['workbench','skill']]){const c=JSON.parse(catalogText);change(c.entries.find(i=>i.id===item.id));assert.throws(()=>parseMarketCatalog(JSON.stringify(c)))}

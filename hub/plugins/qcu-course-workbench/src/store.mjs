@@ -1,7 +1,7 @@
 import {join} from 'node:path'
 import {randomUUID} from 'node:crypto'
 import {directory,workspaceRoot,readSafe,atomic,digest,material,filename} from './files.mjs'
-import {check,exact,text,id,profile,parseInput,parseDraft,COMPONENTS} from './protocol.mjs'
+import {check,exact,text,id,profile,parseInput,parseDraft,COMPONENTS,MODEL_FAILURES,safeDiagnostic} from './protocol.mjs'
 import {exportArtifact} from './export.mjs'
 export const newId=prefix=>prefix+'_'+randomUUID().replaceAll('-','')
 const clone=v=>JSON.parse(JSON.stringify(v))
@@ -21,11 +21,12 @@ export class CourseStore{
   if(changed)await this.persist();return this
  }
  serial(fn){const p=this.tail.then(()=>{check(!this.stopped,'plugin-stopped');return fn()});this.tail=p.catch(()=>{});return p}
- async persist(){const bytes=Buffer.from(JSON.stringify(this.state));check(bytes.length<=24000000,'store-limit');await atomic(this.path,bytes)}
+ taskResult(task){const {diagnostic,...rest}=task;const safe=task.state==='failed'&&diagnostic?.reason===task.message?safeDiagnostic(diagnostic):undefined;return {...clone(rest),...(safe?{diagnostic:safe}:{})}}
+ async persist(){const bytes=Buffer.from(JSON.stringify({...this.state,tasks:this.state.tasks.map(t=>this.taskResult(t))}));check(bytes.length<=24000000,'store-limit');await atomic(this.path,bytes)}
  course(value){id(value,'course');const c=this.state.courses.find(c=>c.id===value);check(c,'course-not-found');return c}
  task(value){id(value,'task');const t=this.state.tasks.find(t=>t.id===value);check(t,'task-not-found');return t}
  prune(){for(const [k,r] of this.refs)if(r.expiresAt<=this.now())this.refs.delete(k)}
- snapshot(){this.prune();return {profile:this.profile,courses:clone(this.state.courses),tasks:this.state.tasks.map(({draft,input,...t})=>({...clone(t),topic:input.topic,components:input.components,hasDraft:!!draft})),references:[...this.refs.values()].map(({content,...r})=>r),outputDirectory:this.output}}
+ snapshot(){this.prune();return {profile:this.profile,courses:clone(this.state.courses),tasks:this.state.tasks.map(({draft,input,...t})=>({...this.taskResult(t),topic:input.topic,components:input.components,hasDraft:!!draft})),references:[...this.refs.values()].map(({content,...r})=>r),outputDirectory:this.output}}
  async dispatch(raw){
   check(raw&&typeof raw.action==='string','invalid-action')
   return this.serial(async()=>{
@@ -45,15 +46,15 @@ export class CourseStore{
     case 'removeReference':exact(raw,['action','courseId','referenceId']);this.course(raw.courseId);id(raw.referenceId,'ref');check(this.refs.get(raw.referenceId)?.courseId===raw.courseId,'reference-not-found');this.refs.delete(raw.referenceId);return {removed:true}
     case 'generate':return this.start(raw)
     case 'task':{
-     exact(raw,['action','courseId','taskId']);this.course(raw.courseId);const t=this.task(raw.taskId);check(t.courseId===raw.courseId,'course-mismatch');return {...clone(t),saves:clone(this.state.saves.filter(s=>s.taskId===t.id))}
+     exact(raw,['action','courseId','taskId']);this.course(raw.courseId);const t=this.task(raw.taskId);check(t.courseId===raw.courseId,'course-mismatch');return {...this.taskResult(t),saves:clone(this.state.saves.filter(s=>s.taskId===t.id))}
     }
     case 'cancel':{
      exact(raw,['action','courseId','taskId']);const t=this.task(raw.taskId);check(t.courseId===raw.courseId,'course-mismatch')
      if(t.state==='running'){t.state='cancelling';await this.persist();this.jobs.get(t.id)?.abort.abort()}
-     return clone(t)
+     return this.taskResult(t)
     }
     case 'revise':{
-     exact(raw,['action','courseId','taskId','draftHash','draft']);const t=this.task(raw.taskId);check(t.courseId===raw.courseId&&t.state==='succeeded'&&t.draftHash===raw.draftHash,'stale-preview');t.draft=parseDraft(raw.draft,t.input);t.draftHash=hash(t.draft);t.reviewedAt=this.now();await this.persist();return clone(t)
+     exact(raw,['action','courseId','taskId','draftHash','draft']);const t=this.task(raw.taskId);check(t.courseId===raw.courseId&&t.state==='succeeded'&&t.draftHash===raw.draftHash,'stale-preview');t.draft=parseDraft(raw.draft,t.input);t.draftHash=hash(t.draft);t.reviewedAt=this.now();await this.persist();return this.taskResult(t)
     }
     case 'prepareSave':return this.prepareSave(raw)
     case 'save':return this.save(raw)
@@ -83,15 +84,15 @@ export class CourseStore{
   if(raw.route){exact(raw.route,['provider','model']);text(raw.route.provider,200,true);text(raw.route.model,200,true)}
   const requestHash=hash({course:raw.courseId,session:raw.sessionId,input,refs:[...raw.referenceIds].sort(),route:raw.route??null})
   const replay=this.state.tasks.find(t=>t.requestId===raw.requestId)
-  if(replay){check(replay.requestHash===requestHash,'idempotency-conflict');return clone(replay)}
-  const repeated=this.state.tasks.find(t=>t.requestHash===requestHash);if(repeated)return clone(repeated)
+  if(replay){check(replay.requestHash===requestHash,'idempotency-conflict');return this.taskResult(replay)}
+  const repeated=this.state.tasks.find(t=>t.requestHash===requestHash);if(repeated)return this.taskResult(repeated)
   this.prune();const refs=raw.referenceIds.map(r=>{const value=this.refs.get(r);check(value&&value.courseId===raw.courseId,'reference-expired-or-course-mismatch');return value})
   check(refs.length>0,'reference-required');check(this.jobs.size<1,'task-busy');check(this.state.tasks.length<100,'task-limit')
   const t={id:newId('task'),courseId:raw.courseId,requestId:raw.requestId,requestHash,input,model:raw.route??null,referenceCount:refs.length,state:'running',createdAt:this.now(),message:'running'}
   this.state.tasks.push(t);try{await this.persist()}catch(e){this.state.tasks.pop();throw e}for(const r of refs)this.refs.delete(r.id)
   const abort=new AbortController(),job={abort,promise:null};this.jobs.set(t.id,job)
   // Launch only after the durable running checkpoint. Every late completion is fenced.
-  job.promise=this.run(t,refs,abort).catch(()=>{t.state='unknown';t.message='state-write-failed';delete t.draft;delete t.draftHash}).finally(()=>this.jobs.delete(t.id));return clone(t)
+  job.promise=this.run(t,refs,abort).catch(()=>{t.state='unknown';t.message='state-write-failed';delete t.draft;delete t.draftHash}).finally(()=>this.jobs.delete(t.id));return this.taskResult(t)
  }
  async run(t,refs,abort){
   let timeout=false,timer;const deadline=new Promise((_,reject)=>{timer=setTimeout(()=>{timeout=true;abort.abort();reject(Error('generation-timeout'))},this.timeoutMs)})
@@ -101,7 +102,7 @@ export class CourseStore{
    const valid=parseDraft(draft,t.input)
    await this.serial(async()=>{if(t.state!=='running')return;t.draft=valid;t.draftHash=hash(valid);t.state='succeeded';t.message='teacher-review-required';t.finishedAt=this.now();await this.persist()})
   }catch(e){
-   if(!this.stopped)await this.serial(async()=>{if(!['running','cancelling'].includes(t.state))return;t.state=timeout?'unknown':abort.signal.aborted?'cancelled':'failed';t.message=timeout?'generation-timeout':abort.signal.aborted?'cancelled':(['model-not-configured','model-incomplete','invalid-model-json','output-too-large'].includes(e.code)?e.code:'generation-failed');t.finishedAt=this.now();await this.persist()})
+   if(!this.stopped)await this.serial(async()=>{if(!['running','cancelling'].includes(t.state))return;t.state=timeout?'unknown':abort.signal.aborted?'cancelled':'failed';t.message=timeout?'generation-timeout':abort.signal.aborted?'cancelled':(['model-not-configured','model-incomplete',...MODEL_FAILURES].includes(e?.code)?e.code:'generation-failed');t.finishedAt=this.now();const diagnostic=t.state==='failed'&&e?.diagnostic?.reason===t.message?safeDiagnostic(e.diagnostic):undefined;if(diagnostic)t.diagnostic=diagnostic;await this.persist()})
   }finally{clearTimeout(timer);refs.length=0}
  }
  artifact(t,component){
