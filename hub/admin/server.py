@@ -7,6 +7,7 @@ import base64
 import binascii
 import copy
 import fcntl
+import getpass
 import hashlib
 import importlib.util
 import json
@@ -15,8 +16,10 @@ from pathlib import Path
 import re
 import secrets
 import stat
+import sys
 import threading
 import time
+import warnings
 from datetime import datetime, timezone
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
@@ -29,6 +32,11 @@ MAX_FILE = 1048576
 MAX_JSON = 262144
 MAX_TOTAL = 10 * 1048576
 CHECKLIST = ('source', 'license', 'permissions', 'evidenceBoundaries')
+ACCOUNT = 'qcu-admin'
+ITERATIONS = 600000
+AUTH_LIMIT = 4096
+SESSION_TTL = 8 * 60 * 60
+
 CAVEAT = '现有市场固定目录不会自动接纳此候选；需独立目录关联发行。无安装、发布或启用授权。'
 
 
@@ -84,6 +92,40 @@ def parse(data, limit=MAX_BODY):
                           parse_constant=lambda _: (_ for _ in ()).throw(ValueError()))
     except (UnicodeError, ValueError, RecursionError):
         raise Refused('json.invalid') from None
+
+
+def password_bytes(password):
+    need(type(password) is str and 12 <= len(password) <= 128 and '\0' not in password, 'auth.invalid')
+    try:
+        raw = password.encode('utf-8')
+    except UnicodeError:
+        raise Refused('auth.invalid') from None
+    need(len(raw) <= 512, 'auth.invalid')
+    return raw
+
+
+def password_auth(password, events=()):
+    raw = password_bytes(password)
+    salt = secrets.token_bytes(32)
+    return dict(schemaVersion=2, username=ACCOUNT, algorithm='pbkdf2-hmac-sha256', iterations=ITERATIONS,
+                salt=salt.hex(), passwordHash=hashlib.pbkdf2_hmac('sha256', raw, salt, ITERATIONS).hex(),
+                resetEvents=list(events))
+
+
+def prompt_password():
+    # Refuse before getpass can fall back to echoed stdin (including /dev/tty).
+    need(sys.stdin.isatty() and sys.stdout.isatty(), 'auth.tty_required')
+    print('Local account: ' + ACCOUNT, flush=True)
+    try:
+        with warnings.catch_warnings():
+            warnings.simplefilter('error', getpass.GetPassWarning)
+            password = getpass.getpass('New password: ')
+            password_bytes(password)
+            confirmation = getpass.getpass('Repeat password: ')
+            need(secrets.compare_digest(password.encode('utf-8'), confirmation.encode('utf-8')), 'auth.invalid')
+    except getpass.GetPassWarning:
+        raise Refused('auth.tty_required') from None
+    return password
 
 
 def preflight(envelope):
@@ -223,9 +265,13 @@ def validate_root(root):
 
 
 class Store:
-    def __init__(self, root, initialize=False):
+    def __init__(self, root, initialize=False, *, initial_password=None, clock=time.monotonic, recover=True):
+        # No default: CLI uses TTY input; automated tests explicitly supply synthetic fixtures.
+        auth = password_auth(initial_password) if initialize else None
         self.root = validate_root(root)
         self.mutex = threading.RLock()
+        self.auth_mutex = threading.Lock()
+        self.clock, self.sessions, self.login_failures = clock, {}, []
         self.lock_fd = None
         self.healthy = True
         try:
@@ -241,28 +287,29 @@ class Store:
             try:
                 info = os.fstat(fd)
                 need(info.st_uid == os.getuid() and stat.S_IMODE(info.st_mode) == 0o700, 'store.permissions')
+                if not initialize:
+                    state = parse(self.disk.read('state.json'))
+                    need(type(state) is dict and state.get('schemaVersion') != 1, 'store.legacy_state')
+                    need(state.get('schemaVersion') == 2 and type(state.get('records')) is dict, 'store.state')
                 self.lock_fd = os.open('process.lock', os.O_RDWR | os.O_CREAT | os.O_NOFOLLOW | os.O_NONBLOCK, 0o600, dir_fd=fd)
                 info = os.fstat(self.lock_fd)
-                need(stat.S_ISREG(info.st_mode) and info.st_nlink == 1, 'store.lock')
+                need(stat.S_ISREG(info.st_mode) and info.st_nlink == 1 and info.st_uid == os.getuid()
+                     and stat.S_IMODE(info.st_mode) == 0o600, 'store.lock')
                 fcntl.flock(self.lock_fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
             finally:
                 os.close(fd)
             if initialize:
                 self.disk.mkdir('submissions')
                 self.disk.mkdir('candidates')
-                self.disk.write('credentials.json', encoded({role: secrets.token_urlsafe(32) for role in ('submitter', 'maintainer')}), mode=0o600)
-                self.disk.write('state.json', encoded({'schemaVersion': 1, 'records': {}}), mode=0o600)
-            info = (self.root / 'credentials.json').lstat()
-            need(stat.S_ISREG(info.st_mode) and stat.S_IMODE(info.st_mode) == 0o600 and info.st_nlink == 1, 'store.credentials')
-            self.credentials = parse(self.disk.read('credentials.json'), MAX_JSON)
-            need(set(self.credentials) == {'submitter', 'maintainer'} and
-                 all(type(t) is str and len(t) >= 40 for t in self.credentials.values()) and
-                 self.credentials['submitter'] != self.credentials['maintainer'], 'store.credentials')
+                self.disk.write('admin-auth.json', encoded(auth), mode=0o600)
+                self.disk.write('state.json', encoded({'schemaVersion': 2, 'records': {}}), mode=0o600)
+            self.auth = self.load_auth()
             self.state = parse(self.disk.read('state.json'))
-            need(self.state['schemaVersion'] == 1 and type(self.state['records']) is dict, 'store.state')
+            need(type(self.state) is dict and self.state.get('schemaVersion') == 2
+                 and type(self.state.get('records')) is dict, 'store.state')
             recovered = False
             for record in self.state['records'].values():
-                if record['status'] in ('checking', 'preparing'):
+                if recover and record['status'] in ('checking', 'preparing'):
                     record['status'] = 'recoverable-failure'
                     record['failure'] = 'interrupted.operation'
                     record['audit'].append(self.audit('recovery', 'system', record['materialsDigest'], 'Interrupted operation; inspect and submit a new revision.'))
@@ -274,6 +321,7 @@ class Store:
             raise
 
     def close(self):
+        self.sessions.clear()
         if self.lock_fd is not None:
             os.close(self.lock_fd)
             self.lock_fd = None
@@ -291,11 +339,81 @@ class Store:
     def audit(action, actor, digest, reason, **extra):
         return dict(action=action, actor=actor, materialsDigest=digest, reason=reason, time=now(), **extra)
 
-    def role(self, authorization):
-        for role, token in self.credentials.items():
-            if secrets.compare_digest(authorization, 'Bearer ' + token):
-                return role
+    def load_auth(self):
+        try:
+            directory = self.disk.directory()
+            try:
+                fd = os.open('admin-auth.json', os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK, dir_fd=directory)
+            finally:
+                os.close(directory)
+            with os.fdopen(fd, 'rb') as file:
+                info = os.fstat(file.fileno())
+                need(stat.S_ISREG(info.st_mode) and info.st_nlink == 1 and info.st_uid == os.getuid()
+                     and stat.S_IMODE(info.st_mode) == 0o600 and info.st_size <= AUTH_LIMIT, 'store.auth')
+                auth = parse(file.read(AUTH_LIMIT + 1), AUTH_LIMIT)
+            need(type(auth) is dict and set(auth) == {'schemaVersion', 'username', 'algorithm', 'iterations', 'salt', 'passwordHash', 'resetEvents'}, 'store.auth')
+            need(type(auth['schemaVersion']) is int and auth['schemaVersion'] == 2 and auth['username'] == ACCOUNT
+                 and auth['algorithm'] == 'pbkdf2-hmac-sha256' and type(auth['iterations']) is int
+                 and auth['iterations'] == ITERATIONS, 'store.auth')
+            for key in ('salt', 'passwordHash'):
+                need(type(auth[key]) is str and re.fullmatch(r'[0-9a-f]{64}', auth[key]), 'store.auth')
+            need(type(auth['resetEvents']) is list and len(auth['resetEvents']) <= 16, 'store.auth')
+            for event in auth['resetEvents']:
+                need(type(event) is dict and set(event) == {'action', 'actor', 'time'}
+                     and event['action'] == 'password-reset' and event['actor'] == ACCOUNT
+                     and type(event['time']) is str and re.fullmatch(r'\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d(?:\.\d{6})?\+00:00', event['time']), 'store.auth')
+            return auth
+        except (Refused, OSError, checker.Rejected, ValueError, TypeError):
+            raise Refused('store.auth') from None
+
+    def reset_password(self, password):
+        need(self.lock_fd is not None and self.healthy, 'store.recovery_required', 409)
+        with self.auth_mutex:
+            event = dict(action='password-reset', actor=ACCOUNT, time=now())
+            auth = password_auth(password, (self.auth['resetEvents'] + [event])[-16:])
+            try:
+                self.disk.write('admin-auth.json', encoded(auth), replace=True, mode=0o600)
+            except BaseException:
+                self.healthy = False
+                raise
+            self.auth = auth
+            self.sessions.clear()
+
+    def login(self, body):
+        # Global local-prototype throttle. Serialize the check AND expensive KDF.
+        with self.auth_mutex:
+            current = self.clock()
+            self.login_failures = [stamp for stamp in self.login_failures if current - stamp < 60]
+            need(len(self.login_failures) < 5, 'auth.throttled', 429)
+            try:
+                need(type(body) is dict and set(body) == {'account', 'password'}, 'auth.invalid', 401)
+                raw = password_bytes(body['password'])
+                need(body['account'] == ACCOUNT, 'auth.invalid', 401)
+                digest = hashlib.pbkdf2_hmac('sha256', raw, bytes.fromhex(self.auth['salt']), ITERATIONS).hex()
+                need(secrets.compare_digest(digest, self.auth['passwordHash']), 'auth.invalid', 401)
+            except Refused:
+                self.login_failures.append(self.clock())
+                raise Refused('auth.invalid', 401) from None
+            self.sessions = {token: expiry for token, expiry in self.sessions.items() if expiry > self.clock()}
+            if len(self.sessions) >= 16:
+                del self.sessions[next(iter(self.sessions))]
+            token = secrets.token_urlsafe(32)
+            self.sessions[token] = self.clock() + SESSION_TTL
+            return dict(token=token, account=ACCOUNT, expiresIn=SESSION_TTL)
+
+    def principal(self, authorization):
+        with self.auth_mutex:
+            self.sessions = {token: expiry for token, expiry in self.sessions.items() if expiry > self.clock()}
+            need(type(authorization) is str and re.fullmatch(r'Bearer [A-Za-z0-9_-]{43}', authorization), 'auth.required', 401)
+            for token in self.sessions:
+                if secrets.compare_digest(authorization, 'Bearer ' + token):
+                    return ACCOUNT
         raise Refused('auth.required', 401)
+
+    def logout(self, authorization):
+        with self.auth_mutex:
+            self.sessions.pop(authorization[7:], None)
+        return {'loggedOut': True}
 
     def get(self, sid):
         need(bool(re.fullmatch(r'sub-[a-f0-9]{32}', sid)), 'record.missing', 404)
@@ -355,7 +473,7 @@ class Store:
                 self.disk.write('submissions/' + sid + '/' + name, raw)
             record = dict(id=sid, createdAt=now(), status='checking', materialsDigest=digest,
                           inventory=rows, metadata=meta, archiveHash=archive_hash, report=None,
-                          audit=[self.audit('submit', 'submitter', digest, 'Local-role submission.')], approval=None, candidate=None)
+                          audit=[self.audit('submit', ACCOUNT, digest, 'Local account handoff import.')], approval=None, candidate=None)
             self.state['records'][sid] = record
             self.save()
             try:
@@ -398,7 +516,7 @@ class Store:
             if body['action'] == 'approve':
                 need(all(body['checklist'].values()), 'review.checklist')
                 need(record['report']['staticChecksPassed'], 'review.static_failure', 409)
-            event = self.audit(body['action'], 'maintainer', record['materialsDigest'], reason.strip(), checklist=body['checklist'])
+            event = self.audit(body['action'], ACCOUNT, record['materialsDigest'], reason.strip(), checklist=body['checklist'])
             record['audit'].append(event)
             record['approval'] = event if body['action'] == 'approve' else None
             record['status'] = 'approved' if body['action'] == 'approve' else 'needs-changes'
@@ -443,7 +561,7 @@ class Store:
                 return copy.deepcopy(record)
             files = self.verify(record)
             record['status'] = 'preparing'
-            record['audit'].append(self.audit('prepare', 'maintainer', record['materialsDigest'],
+            record['audit'].append(self.audit('prepare', ACCOUNT, record['materialsDigest'],
                                              'Explicit local candidate confirmation; not published.',
                                              proposalDigest=preview['proposalDigest'], result='intent'))
             self.save()
@@ -456,7 +574,7 @@ class Store:
                             'proposal.json': encoded(dict(**preview['proposal'], proposalDigest=preview['proposalDigest']))}
                 for name, raw in contents.items():
                     self.disk.write('candidates/' + cid + '/' + name, raw)
-                preparation = self.audit('prepare', 'maintainer', record['materialsDigest'],
+                preparation = self.audit('prepare', ACCOUNT, record['materialsDigest'],
                                          'Local candidate bytes prepared; not published.',
                                          proposalDigest=preview['proposalDigest'], result='completed')
                 contents['approval-audit.json'] = encoded(dict(approval=record['approval'], audit=record['audit'] + [preparation]))
@@ -467,7 +585,7 @@ class Store:
                 self.save()
             except BaseException:
                 record['status'], record['failure'] = 'recoverable-failure', 'preparing.failed'
-                record['audit'].append(self.audit('prepare', 'maintainer', record['materialsDigest'],
+                record['audit'].append(self.audit('prepare', ACCOUNT, record['materialsDigest'],
                                                  'Candidate operation failed; inspect private state before resubmitting.',
                                                  proposalDigest=preview['proposalDigest'], result='failed'))
                 self.save()
@@ -543,10 +661,14 @@ class Handler(BaseHTTPRequestHandler):
             if self.path in static and self.command in ('GET', 'HEAD'):
                 name, mime = static[self.path]
                 return self.reply(200, (Path(__file__).parent / 'static' / name).read_bytes(), mime)
-            role = self.server.store.role(self.one('Authorization', False))
             store = self.server.store
+            authorization = self.one('Authorization', False)
+            login = self.path == '/api/login' and self.command == 'POST'
+            if not login:
+                store.principal(authorization)
             need(store.healthy, 'store.recovery_required', 409)
             if self.command == 'POST':
+                need(not login or int(length) <= AUTH_LIMIT, 'http.length', 413)
                 deadline, chunks, remaining = time.monotonic() + 10, [], int(length)
                 while remaining:
                     timeout = deadline - time.monotonic()
@@ -557,15 +679,25 @@ class Handler(BaseHTTPRequestHandler):
                     chunks.append(chunk)
                     remaining -= len(chunk)
                 raw = b''.join(chunks)
-                body = parse(raw)
+                try:
+                    body = parse(raw, AUTH_LIMIT if login else MAX_BODY)
+                except Refused:
+                    if login:
+                        raise Refused('auth.invalid', 401) from None
+                    raise
+            if login:
+                return self.reply(200, encoded(store.login(body)))
             with store.mutex:
+                store.principal(authorization)  # recheck after body read / waiting for other work
                 value = None
                 if self.path == '/api/session' and self.command == 'GET':
-                    value = {'role': role}
+                    value = {'account': ACCOUNT}
+                elif self.path == '/api/logout' and self.command == 'POST':
+                    need(body == {}, 'auth.invalid')
+                    value = store.logout(authorization)
                 elif self.path == '/api/submissions' and self.command == 'GET':
                     value = list(store.state['records'].values())
                 elif self.path == '/api/submissions' and self.command == 'POST':
-                    need(role == 'submitter', 'auth.role', 403)
                     value = store.upload(body)
                 else:
                     parts = self.path.split('/')
@@ -574,7 +706,6 @@ class Handler(BaseHTTPRequestHandler):
                     if len(parts) == 4 and self.command == 'GET':
                         value = record
                     else:
-                        need(role == 'maintainer', 'auth.role', 403)
                         action = parts[4] if len(parts) >= 5 else ''
                         if len(parts) == 5 and self.command == 'POST' and action == 'review':
                             value = store.review(record['id'], body)
@@ -624,23 +755,39 @@ def display_value(value):
     return value
 
 
+class Arguments(argparse.ArgumentParser):
+    def error(self, message):
+        # Unknown options must not echo possible password values into diagnostics.
+        self.exit(2, 'startup.arguments\n')
+
+
 def main():
-    parser = argparse.ArgumentParser(description=__doc__)
+    parser = Arguments(description=__doc__)
     parser.add_argument('--state-root', required=True, type=Path)
-    parser.add_argument('--init', action='store_true', help='Create a NEW private state root')
+    actions = parser.add_mutually_exclusive_group()
+    actions.add_argument('--init', action='store_true', help='Interactively create a NEW private state root')
+    actions.add_argument('--reset-admin-password', action='store_true', help='Interactively reset while service is stopped')
     parser.add_argument('--bind', default='127.0.0.1', choices=['127.0.0.1'])
     parser.add_argument('--port', type=int, default=8765)
     args = parser.parse_args()
     store = server = None
     try:
-        store = Store(args.state_root, args.init)
+        password = prompt_password() if args.init else None
+        store = Store(args.state_root, args.init, initial_password=password, recover=not args.reset_admin_password)
+        password = None
+        if args.reset_admin_password:
+            store.reset_password(prompt_password())
+            print('Local password reset completed.', flush=True)
+            return 0
         server = Server((args.bind, args.port), store)
-        print('Private credentials file: ' + str(store.root / 'credentials.json'), flush=True)
         print('Local preparation only: ' + server.origin, flush=True)
         server.serve_forever()
     except KeyboardInterrupt:
         pass
-    except (Refused, checker.Rejected, OSError, ValueError, KeyError, TypeError):
+    except Refused as error:
+        print('store.legacy_state' if error.code == 'store.legacy_state' else 'startup.refused', flush=True)
+        return 2
+    except (checker.Rejected, OSError, ValueError, KeyError, TypeError, EOFError):
         print('startup.refused', flush=True)
         return 2
     finally:

@@ -1,6 +1,6 @@
 # QCU Harness
 
-课程设计工作台：`dev/qcu-course-workbench`。[工作台 1.2 原生验收](docs/qcu-course1.2-native-acceptance.md)记录了一次真实生成成功、教学内容问题及尚待验收项；不能沿用早期“未安装真实 DSH”的结论。当前源码为 **1.3 本地候选（未部署）**，首用连接、完整修订和市场只读状态改进见[稳定性验证](docs/qcu-course-review-stability.md)。历史包、市场目录固定版本与旧失败任务保持原样。[Hub 本机投稿审核与发布候选 MVP](docs/qcu-hub-submissions-mvp.md)已实现并通过合成测试和真实浏览器验收，**未部署、未真实发布**；完整后续边界见[发布计划](docs/qcu-hub-submission-workflow.md)。另见[交付包与验收](docs/qcu-course-workbench-delivery.md)和[数据/接口契约](docs/qcu-course-workbench-validation.md)。
+课程设计工作台：`dev/qcu-course-workbench`。[工作台 1.2 原生验收](docs/qcu-course1.2-native-acceptance.md)记录了一次真实生成成功、教学内容问题及尚待验收项；不能沿用早期“未安装真实 DSH”的结论。当前源码为 **1.3 本地候选（未部署）**，首用连接、完整修订和市场只读状态改进见[稳定性验证](docs/qcu-course-review-stability.md)。历史包、市场目录固定版本与旧失败任务保持原样。[Hub 单管理员本机登录与审核](docs/qcu-hub-single-admin.md)已实现，22项回归及真实 Chromium 合成流程通过，**未部署、未真实发布、未创建真实账号**；[历史双角色 MVP](docs/qcu-hub-submissions-mvp.md)保留原验收口径；完整后续边界见[发布计划](docs/qcu-hub-submission-workflow.md)。另见[交付包与验收](docs/qcu-course-workbench-delivery.md)和[数据/接口契约](docs/qcu-course-workbench-validation.md)。
 
 ## 本地开发入口与市场分支
 
@@ -29,10 +29,12 @@ P10离线维护工具已完成本地父审查：两版Python各51项通过、9�
 | `$HOME/Repos/worktrees/qcu-harness/market-integration` | P8工具插件目录集成，`dev/qcu-market-p8` |
 | `$HOME/Repos/worktrees/qcu-harness/market-onboarding` | P9新手体验，`dev/qcu-market-p9`；独立构建、预览与实机验收文档 |
 | `$HOME/Repos/worktrees/qcu-harness/market-maintenance` | P10离线检查器，`dev/qcu-market-p10`；只维护工具、示例与文档 |
+| `$HOME/Repos/worktrees/qcu-harness/hub-admin-account` | 当前单管理员本机迭代，`dev/qcu-hub-admin-account`；[交互式设置／恢复与合成证据](docs/qcu-hub-single-admin.md)；旧库不迁移、未部署 |
 | `$HOME/Repos/worktrees/qcu-harness/hub-submissions` | 本机投稿审核，`dev/qcu-hub-submissions`；无构建依赖，运行和验收见 [MVP说明](docs/qcu-hub-submissions-mvp.md)；未部署 |
 | `$HOME/Repos/worktrees/qcu-harness/hub-onboarding` | 当前教师网页入口，`dev/qcu-hub-onboarding`；首页静态源码，无构建依赖；测试/预览见[教师指南](docs/qcu-hub-teacher-install.md) |
 | `$HOME/Repos/worktrees/qcu-harness/market-bootstrap` | 独立准备器历史维护候选，`dev/qcu-market-bootstrap`；不作为教师安装前置 |
 | `$HOME/Repos/worktrees/qcu-harness/<功能名>` | 后续并行开发 worktree；每个 worktree 独占分支 |
+| `$HOME/Artifacts/qcu-harness/0.1.0-hub-submissions.2/` | 单管理员登录的回归日志、10张合成截图与设置／恢复说明；未创建真实账号，未部署 |
 | `$HOME/Artifacts/qcu-harness/0.1.0-hub-submissions.1/` | 本机投稿审核的截图、回归日志和验收说明；无真实发布包或私有访问令牌 |
 | `$HOME/Artifacts/qcu-harness/<版本号>/` | 安装包、截图、测试日志与验收材料；不入 Git |
 | `$HOME/Artifacts/qcu-harness/0.1.0-hub-onboarding.1/` | 本轮网页真实预览截图、43项回归日志、两文件Hub更新候选；未部署 |

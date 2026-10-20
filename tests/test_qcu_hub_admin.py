@@ -10,6 +10,10 @@ import json
 import os
 from pathlib import Path
 import socket
+import select
+import pty
+import time
+from unittest import mock
 import subprocess
 import sys
 import tempfile
@@ -27,6 +31,8 @@ def module(name, path):
 
 
 admin = module('hub_admin', REPO / 'hub/admin/server.py')
+SYNTHETIC_PASSWORD = 'Synthetic-only-admin-2026!'
+
 fixture = module('handoff_example', REPO / 'templates/qcu-submission/generate-example.py')
 
 
@@ -35,7 +41,7 @@ class AdminTest(unittest.TestCase):
         # /tmp on macOS is a symlink: use its actual private parent explicitly.
         self.tmp = tempfile.TemporaryDirectory(dir='/private/tmp', prefix='qcu-admin-test-')
         self.root = Path(self.tmp.name)
-        self.store = admin.Store(self.root / 'state', True)
+        self.store = admin.Store(self.root / 'state', True, initial_password=SYNTHETIC_PASSWORD)
         fixture.write_handoff(self.root / 'handoff')
         self.files = {p.name: p.read_bytes() for p in (self.root / 'handoff').iterdir()}
 
@@ -92,7 +98,7 @@ class AdminTest(unittest.TestCase):
         preparations = [event for event in audit if event['action'] == 'prepare']
         self.assertEqual([event['result'] for event in preparations], ['intent', 'completed'])
         for event in preparations:
-            self.assertEqual(event['actor'], 'maintainer')
+            self.assertEqual(event['actor'], admin.ACCOUNT)
             self.assertEqual(event['materialsDigest'], record['materialsDigest'])
             self.assertEqual(event['proposalDigest'], proposal_digest)
             self.assertTrue(event['time'])
@@ -275,8 +281,8 @@ class AdminTest(unittest.TestCase):
 
     def test_root_safety_and_symlink_ancestors(self):
         for path in (REPO, REPO / '.work/private', REPO.parent, Path('/'), Path('/Users/mcq/Repos/new-state')):
-            self.refused(lambda: admin.Store(path, True))
-        self.refused(lambda: admin.Store(self.root / 'raw/../state2', True), 'store.root')
+            self.refused(lambda: admin.Store(path, True, initial_password=SYNTHETIC_PASSWORD))
+        self.refused(lambda: admin.Store(self.root / 'raw/../state2', True, initial_password=SYNTHETIC_PASSWORD), 'store.root')
         link = self.root / 'link'
         link.symlink_to(self.store.root, target_is_directory=True)
         with self.assertRaises((admin.Refused, admin.checker.Rejected, OSError)):
@@ -284,15 +290,15 @@ class AdminTest(unittest.TestCase):
         link.unlink()
         link.symlink_to(self.root, target_is_directory=True)
         with self.assertRaises((admin.Refused, admin.checker.Rejected, OSError)):
-            admin.Store(link / 'other', True)
-        self.assertEqual((self.store.root / 'credentials.json').stat().st_mode & 0o777, 0o600)
-        self.assertNotEqual(*self.store.credentials.values())
+            admin.Store(link / 'other', True, initial_password=SYNTHETIC_PASSWORD)
+        self.assertEqual((self.store.root / 'admin-auth.json').stat().st_mode & 0o777, 0o600)
+        self.assertFalse((self.store.root / 'credentials.json').exists())
         self.refused(lambda: admin.Server(('0.0.0.0', 0), self.store))
         public = self.root / 'public'
         public.mkdir()
         (public / 'manifest.json').write_text('{}')
         (public / 'catalog.json').write_text('{}')
-        self.refused(lambda: admin.Store(public / 'private', True), 'store.public_root')
+        self.refused(lambda: admin.Store(public / 'private', True, initial_password=SYNTHETIC_PASSWORD), 'store.public_root')
 
     def test_real_process_crashes_release_lock_and_recover_without_retry(self):
         # Trusted test process kills itself only after a durable checking /
@@ -348,15 +354,218 @@ s.prepare(r['id'],dict(materialsDigest=r['materialsDigest'],proposalDigest=p['pr
             self.upload()
         self.assertFalse(self.store.healthy)
 
+    def test_hash_only_no_defaults_and_strict_auth_file(self):
+        raw = self.store.disk.read('admin-auth.json')
+        auth = json.loads(raw)
+        self.assertNotIn(SYNTHETIC_PASSWORD.encode(), raw)
+        self.assertEqual(auth['iterations'], 600000)
+        self.assertEqual(auth['passwordHash'], hashlib.pbkdf2_hmac('sha256', SYNTHETIC_PASSWORD.encode(), bytes.fromhex(auth['salt']), 600000).hex())
+        for password in (None, '', 'short', 'a'*129, 'a'*12+'\0', '\ud800'*12):
+            target = self.root / 'uninitialized'
+            self.refused(lambda: admin.Store(target, True, initial_password=password), 'auth.invalid')
+            self.assertFalse(target.exists())
+        for body in ([], {}, {'account':admin.ACCOUNT, 'password':None}, {'account':admin.ACCOUNT,'password':'x'*129}, {'account':admin.ACCOUNT,'password':'a'*12+'\0'}):
+            self.store.login_failures.clear()
+            self.refused(lambda: self.store.login(body), 'auth.invalid')
+        self.store.login_failures.clear()
+        self.refused(lambda: self.store.login({'account':'other', 'password':SYNTHETIC_PASSWORD}), 'auth.invalid')
+        self.refused(lambda: self.store.login({'account':admin.ACCOUNT, 'password':'wrong-password-123'}), 'auth.invalid')
+        root = self.store.root
+        self.store.close()
+        for invalid in (b'{}', b'{"salt":"x","salt":"y"}', admin.encoded(dict(auth, iterations=1)), admin.encoded(dict(auth, salt='x'*64)), admin.encoded(dict(auth, passwordHash='g'*64)), admin.encoded(dict(auth, resetEvents=[{}])), admin.encoded(dict(auth, extra='secret')), b'x'*4097):
+            self.rewrite(root / 'admin-auth.json', invalid)
+            self.refused(lambda: admin.Store(root), 'store.auth')
+            self.assertEqual((root / 'admin-auth.json').read_bytes(), invalid)
+        self.rewrite(root / 'admin-auth.json', raw)
+        os.chmod(root / 'admin-auth.json', 0o644)
+        self.refused(lambda: admin.Store(root), 'store.auth')
+        os.chmod(root / 'admin-auth.json', 0o600)
+        alias = self.root / 'auth-alias'
+        os.link(root / 'admin-auth.json', alias)
+        self.refused(lambda: admin.Store(root), 'store.auth')
+        alias.unlink()
+        (root / 'admin-auth.json').unlink()
+        (root / 'admin-auth.json').symlink_to(self.root / 'unused')
+        self.refused(lambda: admin.Store(root), 'store.auth')
+
+    def test_throttling_serialized_before_kdf_and_clock_window(self):
+        clock = [100.0]
+        self.store.clock = lambda: clock[0]
+        original = admin.hashlib.pbkdf2_hmac
+        calls = []
+        def count(*args):
+            calls.append(1)
+            return original(*args)
+        def fail(_):
+            try:
+                self.store.login(dict(account=admin.ACCOUNT, password='Synthetic-wrong-password!'))
+            except admin.Refused as error:
+                return error.code
+        with mock.patch.object(admin.hashlib, 'pbkdf2_hmac', side_effect=count):
+            with ThreadPoolExecutor(max_workers=8) as pool:
+                codes = list(pool.map(fail, range(8)))
+            self.assertEqual(codes.count('auth.invalid'), 5)
+            self.assertEqual(codes.count('auth.throttled'), 3)
+            self.assertEqual(len(calls), 5)
+            self.refused(lambda: self.store.login(dict(account=admin.ACCOUNT, password=SYNTHETIC_PASSWORD)), 'auth.throttled')
+            self.assertEqual(len(calls), 5)
+            clock[0] += 60
+            self.assertIn('token', self.store.login(dict(account=admin.ACCOUNT, password=SYNTHETIC_PASSWORD)))
+            self.assertEqual(len(calls), 6)
+
+    def test_sessions_expiry_capacity_logout_restart_and_reset(self):
+        clock = [0.0]
+        self.store.clock = lambda: clock[0]
+        login = lambda: self.store.login(dict(account=admin.ACCOUNT, password=SYNTHETIC_PASSWORD))['token']
+        first, second = login(), login()
+        self.assertNotEqual(first, second)
+        self.assertEqual(self.store.principal('Bearer '+first), admin.ACCOUNT)
+        self.store.logout('Bearer '+first)
+        self.refused(lambda: self.store.principal('Bearer '+first), 'auth.required')
+        # Capacity logic can be checked with synthetic RAM sessions without extra KDF runs.
+        self.store.sessions = {'fixture-'+str(i): admin.SESSION_TTL for i in range(16)}
+        token = login()
+        self.assertEqual(len(self.store.sessions), 16)
+        self.assertNotIn('fixture-0', self.store.sessions)
+        clock[0] = admin.SESSION_TTL
+        self.refused(lambda: self.store.principal('Bearer '+token), 'auth.required')
+        record = self.prepare(self.review(self.upload()))
+        before = self.store.disk.read('state.json')
+        candidates = self.store.disk.tree('candidates/'+record['candidate']['id'])
+        old_auth = self.store.disk.read('admin-auth.json')
+        token = login()
+        root = self.store.root
+        self.store.close()
+        self.store = admin.Store(root)
+        self.refused(lambda: self.store.principal('Bearer '+token), 'auth.required')
+        replacement = 'Synthetic-reset-password-2026!'
+        with mock.patch.object(admin, 'now', return_value='2026-10-20T02:30:00+00:00'):
+            self.store.reset_password(replacement)
+        self.store.close()
+        self.store = admin.Store(root)
+        self.assertEqual(self.store.auth['resetEvents'][-1]['time'], '2026-10-20T02:30:00+00:00')
+        self.assertEqual(before, self.store.disk.read('state.json'))
+        self.assertEqual(candidates, self.store.candidate_files(record))
+        self.assertNotEqual(old_auth, self.store.disk.read('admin-auth.json'))
+        self.assertEqual(self.store.auth['resetEvents'][-1]['action'], 'password-reset')
+        self.assertEqual(set(self.store.auth['resetEvents'][-1]), {'action','actor','time'})
+        self.refused(login, 'auth.invalid')
+        self.assertIn('token', self.store.login(dict(account=admin.ACCOUNT, password=replacement)))
+
+    def test_reset_interrupted_state_unchanged_and_no_echo_fallback(self):
+        record = self.upload()
+        self.store.get(record['id'])['status'] = 'checking'
+        self.store.save()
+        before = self.store.disk.read('state.json')
+        root = self.store.root
+        self.store.close()
+        code, _ = self.cli_pty(root, '--reset-admin-password', ['Synthetic-interrupted-reset!']*2)
+        self.assertEqual(code, 0)
+        self.assertEqual((root/'state.json').read_bytes(), before)
+        with mock.patch.object(admin.sys.stdin, 'isatty', return_value=True), mock.patch.object(admin.sys.stdout, 'isatty', return_value=True), mock.patch.object(admin.getpass, 'getpass', side_effect=admin.getpass.GetPassWarning):
+            with contextlib.redirect_stdout(io.StringIO()) as output:
+                # Redirected stdout is intentionally non-TTY, so patch that exact object.
+                with mock.patch.object(output, 'isatty', return_value=True):
+                    self.refused(admin.prompt_password, 'auth.tty_required')
+
+    def test_legacy_state_refused_without_mutating_any_bytes(self):
+        root = self.root / 'legacy'
+        root.mkdir(mode=0o700)
+        (root/'state.json').write_bytes(b'{"schemaVersion":1,"records":{}}')
+        (root/'credentials.json').write_bytes(b'{"submitter":"synthetic-legacy-only","maintainer":"synthetic-other"}')
+        before = {p.name:p.read_bytes() for p in root.iterdir()}
+        self.refused(lambda: admin.Store(root), 'store.legacy_state')
+        result = subprocess.run([sys.executable, 'hub/admin/server.py', '--state-root',str(root)], cwd=REPO, capture_output=True)
+        self.assertEqual(result.returncode, 2)
+        self.assertEqual(result.stdout.strip(), b'store.legacy_state')
+        self.assertEqual(before, {p.name:p.read_bytes() for p in root.iterdir()})
+
+    def cli_pty(self, root, action, inputs, expect_start=False):
+        pid, fd = pty.fork()
+        if pid == 0:
+            os.execv(sys.executable, [sys.executable, str(REPO/'hub/admin/server.py'), '--state-root',str(root),action,'--port','0'])
+        output, sent, status = b'', 0, None
+        deadline = time.monotonic()+12
+        try:
+            while time.monotonic() < deadline:
+                if select.select([fd],[],[],0.1)[0]:
+                    try:
+                        output += os.read(fd,65536)
+                    except OSError:
+                        break
+                prompts = output.count(b'New password:')+output.count(b'Repeat password:')
+                if sent < len(inputs) and prompts > sent:
+                    os.write(fd, inputs[sent].encode()+b'\n')
+                    sent += 1
+                if expect_start and b'Local preparation only:' in output:
+                    os.kill(pid, 2)
+                    expect_start = False
+                done, found = os.waitpid(pid, os.WNOHANG)
+                if done:
+                    status = found
+                    break
+            if status is None:
+                done, found = os.waitpid(pid, os.WNOHANG)
+                if not done:
+                    os.kill(pid, 9)
+                    _, found = os.waitpid(pid, 0)
+                status = found
+            for password in inputs:
+                self.assertNotIn(password.encode(), output, 'PTY unexpectedly echoed synthetic input')
+            return os.waitstatus_to_exitcode(status), output
+        finally:
+            os.close(fd)
+
+    def test_cli_tty_init_reset_and_lock_without_password_arguments(self):
+        root = self.root / 'cli-state'
+        base = [sys.executable, 'hub/admin/server.py', '--state-root',str(root)]
+        invalid = subprocess.run(base+['--password','Synthetic-unsupported-argument!'], capture_output=True, cwd=REPO)
+        self.assertEqual(invalid.returncode, 2)
+        self.assertNotIn(b'Synthetic-unsupported-argument!', invalid.stdout+invalid.stderr)
+        result = subprocess.run(base+['--init'], input=b'Synthetic-not-accepted\n', capture_output=True, cwd=REPO)
+        self.assertEqual(result.returncode, 2)
+        self.assertFalse(root.exists())
+        code, _ = self.cli_pty(root, '--init', [SYNTHETIC_PASSWORD,'Synthetic-mismatch!'])
+        self.assertEqual(code, 2)
+        self.assertFalse(root.exists())
+        code, _ = self.cli_pty(root, '--init', ['short'])
+        self.assertEqual(code, 2)
+        self.assertFalse(root.exists())
+        code, _ = self.cli_pty(root, '--init', [SYNTHETIC_PASSWORD]*2, expect_start=True)
+        self.assertEqual(code, 0)
+        isolated = admin.Store(root)
+        try:
+            record = isolated.upload(self.envelope())
+            snapshot = isolated.disk.read('state.json')
+            auth = isolated.disk.read('admin-auth.json')
+            code, output = self.cli_pty(root, '--reset-admin-password', [])
+            self.assertEqual(code, 2)
+            self.assertNotIn(b'New password:', output)
+            self.assertEqual(auth, isolated.disk.read('admin-auth.json'))
+        finally:
+            isolated.close()
+        replacement = 'Synthetic-PTY-reset-2026!'
+        code, _ = self.cli_pty(root, '--reset-admin-password', [replacement]*2)
+        self.assertEqual(code, 0)
+        isolated = admin.Store(root)
+        try:
+            self.assertEqual(snapshot, isolated.disk.read('state.json'))
+            self.assertEqual(isolated.get(record['id']), record)
+            self.assertIn('token', isolated.login(dict(account=admin.ACCOUNT,password=replacement)))
+            self.assertEqual(isolated.auth['resetEvents'][-1]['actor'], admin.ACCOUNT)
+        finally:
+            isolated.close()
+
     def test_real_http_auth_csrf_limits_reads_and_downloads(self):
         server = admin.Server(('127.0.0.1', 0), self.store)
         thread = threading.Thread(target=server.serve_forever, daemon=True)
         thread.start()
-        def request(path='/', method='GET', role=None, body=None, headers=None):
+        tokens = {name: self.store.login(dict(account=admin.ACCOUNT, password=SYNTHETIC_PASSWORD))['token'] for name in ('primary', 'secondary')}
+        def request(path='/', method='GET', session=None, body=None, headers=None):
             connection = http.client.HTTPConnection(*server.server_address, timeout=3)
             base = {}
-            if role:
-                base['Authorization'] = 'Bearer ' + self.store.credentials[role]
+            if session:
+                base['Authorization'] = 'Bearer ' + tokens[session]
             if body is not None:
                 body = admin.encoded(body)
                 base.update(Origin=server.origin, **{'Content-Type': 'application/vnd.qcu.submission+json'})
@@ -372,40 +581,56 @@ s.prepare(r['id'],dict(materialsDigest=r['materialsDigest'],proposalDigest=p['pr
             for path in ('/', '/app.js', '/style.css', '/api/session', '/unknown'):
                 self.assertEqual(request(path, headers={'Host': 'evil.example'})[0], 403)
             self.assertEqual(request('/api/submissions')[0], 401)
-            self.assertEqual(request('/api/session', role='submitter')[0], 200)
+            self.assertEqual(request('/api/session', session='primary')[0], 200)
+            status, raw, _ = request('/api/login', 'POST', body=dict(account=admin.ACCOUNT, password=SYNTHETIC_PASSWORD))
+            self.assertEqual(status, 200)
+            fresh = json.loads(raw)['token']
+            self.assertNotIn(fresh, tokens.values())
+            self.assertEqual(request('/api/session', headers={'Authorization': 'Bearer ' + fresh})[0], 200)
+            self.assertEqual(request('/api/logout', 'POST', body={}, headers={'Authorization': 'Bearer ' + fresh})[0], 200)
+            self.assertEqual(request('/api/session', headers={'Authorization': 'Bearer ' + fresh})[0], 401)
+            for patch in ({'Origin':'null'}, {'Origin':''}, {'Host':'evil'}, {'Content-Type':'application/json'}, {'Content-Length':'5000'}):
+                self.assertGreaterEqual(request('/api/login', 'POST', body={}, headers=patch)[0], 400)
+            self.assertEqual(request('/api/login', 'POST', body={'account':admin.ACCOUNT,'password':SYNTHETIC_PASSWORD,'extra':True})[0], 401)
+            self.assertEqual(request('/api/session', headers={'Authorization':'Bearer '+'legacy-role-token'*4})[0], 401)
+            for raw_body in (b'{"account":"qcu-admin","account":"qcu-admin","password":"Synthetic-duplicate!"}', b'{"account":"qcu-admin","password":"' + b'x'*129 + b'"}', b'null'):
+                connection = http.client.HTTPConnection(*server.server_address, timeout=3)
+                connection.request('POST','/api/login',raw_body,{'Origin':server.origin,'Content-Type':'application/vnd.qcu.submission+json'})
+                response=connection.getresponse()
+                self.assertEqual(response.status,401)
+                self.assertEqual(json.loads(response.read()),{'error':'auth.invalid'})
+                connection.close()
             for patch in ({'Origin': 'null'}, {'Origin': ''}, {'Origin': 'https://evil.example'}, {'Content-Type': 'application/json'}, {'Content-Length': '99999999'}, {'Transfer-Encoding': 'chunked'}):
-                self.assertGreaterEqual(request('/api/submissions', 'POST', 'submitter', self.envelope(), patch)[0], 400)
-            self.assertEqual(request('/api/submissions', 'POST', 'maintainer', self.envelope())[0], 403)
-            status, raw, headers = request('/api/submissions', 'POST', 'submitter', self.envelope())
+                self.assertGreaterEqual(request('/api/submissions', 'POST', 'primary', self.envelope(), patch)[0], 400)
+            status, raw, headers = request('/api/submissions', 'POST', 'primary', self.envelope())
             self.assertEqual(status, 200)
             record = json.loads(raw)
             base = '/api/submissions/' + record['id']
             before = self.store.disk.read('state.json')
             for checklist in ({'unexpected': {'arbitrary': 'data'}}, {key: 1 for key in admin.CHECKLIST}, {}):
                 body = dict(action='return', reason='HTTP regression', materialsDigest=record['materialsDigest'], checklist=checklist)
-                status, raw, _ = request(base + '/review', 'POST', 'maintainer', body)
+                status, raw, _ = request(base + '/review', 'POST', 'secondary', body)
                 self.assertEqual(status, 400)
                 self.assertEqual(json.loads(raw), {'error': 'review.checklist'})
                 self.assertEqual(self.store.disk.read('state.json'), before)
                 self.assertEqual(self.store.get(record['id']), record)
             for path in ('/api/submissions', base, base + '/report'):
-                self.assertEqual(request(path, role='maintainer')[0], 200)
+                self.assertEqual(request(path, session='secondary')[0], 200)
             self.assertEqual(self.store.disk.read('state.json'), before)
             secret = 'sk-' + 'S' * 32
             self.store.get(record['id'])['report']['limitations'].append(secret)
             for path in (base, base + '/report'):
-                status, raw, _ = request(path, role='maintainer')
+                status, raw, _ = request(path, session='secondary')
                 self.assertEqual(status, 200)
                 self.assertNotIn(secret.encode(), raw)
                 self.assertIn(b'[redacted]', raw)
-            for path in ('/report', '/materials/0', '/candidate/0', '/preview'):
-                self.assertEqual(request(base + path, role='submitter')[0], 403)
-            for path in ('/review', '/prepare'):
-                self.assertEqual(request(base + path, 'POST', 'submitter', {})[0], 403)
+            for path, method in [(base, 'GET'), (base+'/report', 'GET'), (base+'/materials/0', 'GET'), (base+'/candidate/0', 'GET'), (base+'/preview', 'GET'), (base+'/review', 'POST'), (base+'/prepare', 'POST'), ('/api/submissions', 'POST'), ('/api/session', 'GET'), ('/api/logout', 'POST')]:
+                self.assertEqual(request(path, method, body={} if method == 'POST' else None)[0], 401)
+            self.assertEqual(self.store.disk.read('state.json'), before)
             for path in ('/materials/../credentials.json', '/materials/%2e%2e', '/materials/64', '/materials/00'):
-                self.assertEqual(request(base + path, role='maintainer')[0], 404)
+                self.assertEqual(request(base + path, session='secondary')[0], 404)
             for i, row in enumerate(record['inventory']):
-                status, raw, headers = request(base + '/materials/' + str(i), role='maintainer')
+                status, raw, headers = request(base + '/materials/' + str(i), session='secondary')
                 self.assertEqual(status, 200)
                 self.assertEqual(len(raw), row['bytes'])
                 self.assertEqual(hashlib.sha256(raw).hexdigest(), row['sha256'])
@@ -417,20 +642,20 @@ s.prepare(r['id'],dict(materialsDigest=r['materialsDigest'],proposalDigest=p['pr
             approved = self.review(record)
             prepared = self.prepare(approved)
             for i, row in enumerate(prepared['candidate']['inventory']):
-                status, raw, _ = request(base + '/candidate/' + str(i), role='maintainer')
+                status, raw, _ = request(base + '/candidate/' + str(i), session='secondary')
                 self.assertEqual(status, 200)
                 self.assertEqual(admin.sha(raw), row['sha256'])
-            token = self.store.credentials['submitter']
+            token = tokens['primary']
             stdout = io.StringIO()
             with contextlib.redirect_stderr(stdout), contextlib.redirect_stdout(stdout):
-                status, raw, _ = request('/' + token, role='maintainer')
+                status, raw, _ = request('/' + token, session='secondary')
             self.assertNotIn(token, stdout.getvalue())
             self.assertNotIn(token.encode(), raw)
             self.assertNotIn(str(self.store.root).encode(), raw)
             self.assertEqual(request('/', 'OPTIONS')[0], 405)
-            self.assertNotIn(b'<script>', request('/api/submissions', role='submitter')[1])
+            self.assertNotIn(b'<script>', request('/api/submissions', session='primary')[1])
             self.rewrite(self.store.root / 'submissions' / record['id'] / 'SOURCE.md', b'tampered')
-            status, raw, _ = request(base + '/report', role='maintainer')
+            status, raw, _ = request(base + '/report', session='secondary')
             self.assertEqual(status, 409)
             self.assertEqual(json.loads(raw), {'error': 'materials.changed'})
         finally:
@@ -442,7 +667,8 @@ s.prepare(r['id'],dict(materialsDigest=r['materialsDigest'],proposalDigest=p['pr
         server = admin.Server(('127.0.0.1', 0), self.store)
         thread = threading.Thread(target=server.serve_forever, daemon=True)
         thread.start()
-        auth = 'Authorization: Bearer ' + self.store.credentials['submitter'] + '\r\n'
+        tokens = {'primary': self.store.login(dict(account=admin.ACCOUNT, password=SYNTHETIC_PASSWORD))['token']}
+        auth = 'Authorization: Bearer ' + tokens['primary'] + '\r\n'
         base = f'POST /api/submissions HTTP/1.1\r\nHost: {server.host}\r\n' + auth
         cases = [base + 'Content-Length: 2\r\n',
                  base + f'Origin: {server.origin}\r\nContent-Length: -1\r\n',
@@ -450,7 +676,7 @@ s.prepare(r['id'],dict(materialsDigest=r['materialsDigest'],proposalDigest=p['pr
                  base + f'Origin: {server.origin}\r\nContent-Length: 2\r\nHost: evil\r\n',
                  base + f'Origin: {server.origin}\r\nContent-Length: 20\r\n']
         try:
-            for headers in cases:
+            for headers in cases + [header.replace('/api/submissions','/api/login') for header in cases]:
                 with socket.create_connection(server.server_address, timeout=3) as connection:
                     connection.sendall((headers + 'Content-Type: application/vnd.qcu.submission+json\r\n\r\n{}').encode())
                     connection.shutdown(socket.SHUT_WR)
@@ -461,7 +687,7 @@ s.prepare(r['id'],dict(materialsDigest=r['materialsDigest'],proposalDigest=p['pr
                             break
                         raw += block
                     self.assertRegex(raw.split(b'\r\n')[0], rb'HTTP/1.0 4\d\d')
-                    self.assertNotIn(self.store.credentials['submitter'].encode(), raw)
+                    self.assertNotIn(tokens['primary'].encode(), raw)
             self.assertEqual(self.store.state['records'], {})
         finally:
             server.shutdown()

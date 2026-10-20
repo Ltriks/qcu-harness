@@ -4,6 +4,8 @@
 
 开发分支：`dev/qcu-hub-submissions`；固定 worktree：`$HOME/Repos/worktrees/qcu-harness/hub-submissions`。无构建步骤，按上述操作入口运行 Python 服务；现有 LAN Hub 与 DSH 未部署此管理端。
 
+本页保留 `dbb7b8b` 双角色原型的历史验收口径；当前单管理员实现与启动方式见[单管理员说明](qcu-hub-single-admin.md)。旧 schema 1 库沿用旧分支读取，本轮不迁移或覆盖。
+
 ## 实现与边界
 
 - 接收严格 JSON 信封 `{files:[{path,base64}]}`，拒绝重复 JSON 键、深嵌套、非规范路径、重复／大小写别名／文件目录冲突及非严格 Base64。每份最多64文件，单文件1 MiB、JSON 256 KiB、总解码10 MiB、请求15 MiB。私有库最多32条记录，状态文件最多15 MiB，满后拒绝新投稿，保留既有材料。
