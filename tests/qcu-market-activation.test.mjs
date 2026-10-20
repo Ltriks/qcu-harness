@@ -48,7 +48,7 @@ test("lost reply with disabled inventory stays blocked after read-only reconcili
 test("duplicate click and cross-entry lock hold over both in-flight mutations",async()=>{
  const f=fixture(),bundle=deferred(),row=deferred(),b=f.manager.setBundleEnabled,r=f.manager.setPluginEnabled
  f.manager.setBundleEnabled=async id=>{await bundle.promise;return b(id)};f.manager.setPluginEnabled=async id=>{await row.promise;return r(id)}
- await f.flow.reviewActivate();const running=f.flow.confirmActivate();await tick();await assert.rejects(f.flow.confirmActivate(),/进行中/);await assert.rejects(f.flows[2].status(),/其他条目/);bundle.resolve();await tick();await assert.rejects(f.flows[2].status(),/其他条目/);row.resolve();await running;assert.equal(f.calls.length,2)
+ await f.flow.reviewActivate();const running=f.flow.confirmActivate();await tick();await assert.rejects(f.flow.confirmActivate(),/进行中/);await f.flows[2].status();assert.equal(f.flows[2].state.phase,'idle');bundle.resolve();await tick();await f.flows[2].status();assert.equal(f.flows[2].state.phase,'idle');row.resolve();await running;assert.equal(f.calls.length,2)
 })
 for(const action of ["leave","invalidate","dispose"])test(`${action} during bundle enable prevents late component enable and retains actual status`,async()=>{
  const f=fixture(),d=deferred(),b=f.manager.setBundleEnabled;f.manager.setBundleEnabled=async id=>{await d.promise;return b(id)}

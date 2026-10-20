@@ -1,6 +1,6 @@
 # QCU Harness
 
-课程设计工作台重写候选：`dev/qcu-course-workbench`，见[交付包与验收](docs/qcu-course-workbench-delivery.md)和[数据/接口契约](docs/qcu-course-workbench-validation.md)。工作台1.0与市场12.1已完成本地165项检查及浏览器合成闭环；尚未发布到Hub或安装至真实DSH，原8项发行信息保留。
+课程设计工作台：`dev/qcu-course-workbench`。[工作台 1.2 原生验收](docs/qcu-course1.2-native-acceptance.md)记录了一次真实生成成功、教学内容问题及尚待验收项；不能沿用早期“未安装真实 DSH”的结论。当前源码为 **1.3 本地候选（未部署）**，首用连接、完整修订和市场只读状态改进见[稳定性验证](docs/qcu-course-review-stability.md)。历史包、市场目录固定版本与旧失败任务保持原样。下一轮主任务见[Hub 投稿、审核与发布计划](docs/qcu-hub-submission-workflow.md)；另见[交付包与验收](docs/qcu-course-workbench-delivery.md)和[数据/接口契约](docs/qcu-course-workbench-validation.md)。
 
 ## 本地开发入口与市场分支
 

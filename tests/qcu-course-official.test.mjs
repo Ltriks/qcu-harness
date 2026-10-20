@@ -152,7 +152,7 @@ test('exact official capability policy selects low, off-only, or honest adapter 
   const f=await setup();try{
    f.adapter.metadata=(p,m)=>metadata(p,m,efforts,def)
    const configs=[],prepare=f.ctx.llm.prepareCall.bind(f.ctx.llm);f.ctx.llm.prepareCall=(config,signal)=>{configs.push(config);return prepare(config,signal)}
-   const shown=(await f.invoke({action:'workspaces'})).model;assert.equal(shown.policy.effort,chosen);assert.equal(shown.policy.outputBudget,12000)
+   const shown=(await f.invoke({action:'model'})).model;assert.equal(shown.policy.effort,chosen);assert.equal(shown.policy.outputBudget,12000)
    const g=await generationFixture(f,shown),reply=await g.send();assert.equal(reply.ok,true)
    const store=await f.ctx.get('qcuCourse').store(f.workspace.id);await store.jobs.get(reply.value.id)?.promise
    assert.equal(store.task(reply.value.id).state,'succeeded');assert.equal(f.adapter.calls.length,1);assert.equal(f.adapter.calls[0].reasoningEffort,effective);assert.equal(configs.length,1);assert.equal(configs[0].reasoningEffort,chosen==='default'?undefined:chosen);assert.deepEqual(f.adapter.calls[0].tools,[]);assert.equal(f.adapter.calls[0].maxTokens,12000);assert.deepEqual(store.task(reply.value.id).model,shown)
@@ -169,7 +169,7 @@ test('metadata/default/route changes at dispatch, pre-stream and official prepar
     const at=phase==='dispatch'?2:phase==='pre-stream'?3:phase==='final metadata'?5:4
     return metadata(p,m,n>=at?['max']:phase==='prepared default'?['high','max']:['low','high'],n>=at?'max':'high')
    }
-   const shown=(await f.invoke({action:'workspaces'})).model,g=await generationFixture(f,shown),reply=await g.send()
+   const shown=(await f.invoke({action:'model'})).model,g=await generationFixture(f,shown),reply=await g.send()
    const store=await f.ctx.get('qcuCourse').store(f.workspace.id)
    if(reply.ok){await store.jobs.get(reply.value.id)?.promise;assert.equal(store.task(reply.value.id).state,'failed');assert.match(store.task(reply.value.id).message,/model-(policy|selection)-(changed|unavailable)/)}else assert.equal(reply.error,'model-policy-changed')
    assert.equal(f.adapter.calls.length,0)
@@ -178,13 +178,13 @@ test('metadata/default/route changes at dispatch, pre-stream and official prepar
 })
 test('missing/failed capabilities are unavailable, errors sanitized, malformed or unconfirmed policies never generate',async()=>{
  const f=await setup();try{
-  const shown=(await f.invoke({action:'workspaces'})).model,g=await generationFixture(f,shown)
+  const shown=(await f.invoke({action:'model'})).model,g=await generationFixture(f,shown)
   for(const policy of [undefined,{...shown.policy,effort:'max'},{...shown.policy,outputBudget:24000},{...shown.policy,supportedEfforts:['low'],effort:'default'},{...shown.policy,secret:'PRIVATE_METADATA'},{...shown.policy,defaultEffort:'PRIVATE_METADATA'},{...shown.policy,supportedEfforts:['x'.repeat(81)]}]){
    const reply=await f.invoke({workspaceId:f.workspace.id,request:g.request,expectedModel:{...shown,policy}});assert.equal(reply.ok,false);assert.ok(!JSON.stringify(reply).includes('PRIVATE_METADATA'))
   }
   assert.equal((await f.invoke({workspaceId:f.workspace.id,request:{...g.request,route:shown},expectedModel:shown})).error,'invalid-fields')
   f.adapter.metadata=()=>{throw Error('PRIVATE_METADATA')}
-  const unavailable=await f.invoke({action:'workspaces'});assert.equal(unavailable.model,null);assert.equal(unavailable.policyError,'model-policy-unavailable');assert.ok(!JSON.stringify(unavailable).includes('PRIVATE_METADATA'))
+  const unavailable=await f.invoke({action:'model'});assert.equal(unavailable.model,null);assert.equal(unavailable.policyError,'model-policy-unavailable');assert.ok(!JSON.stringify(unavailable).includes('PRIVATE_METADATA'))
   assert.equal((await g.send()).error,'model-policy-unavailable');assert.equal(f.adapter.calls.length,0)
  }finally{await f.fork.dispose();await f.ctx.fiber.dispose()}
 })
@@ -201,9 +201,69 @@ test('cancel during official preparation never enters adapter stream or retries'
   let n=0,entered
   const waiting=new Promise(resolve=>{entered=resolve})
   f.adapter.metadata=(p,m,_signal)=>{n++;if(n===4){entered();return new Promise(()=>{})}return metadata(p,m,['low','high'],'high')}
-  const shown=(await f.invoke({action:'workspaces'})).model,g=await generationFixture(f,shown),reply=await g.send();assert.equal(reply.ok,true)
+  const shown=(await f.invoke({action:'model'})).model,g=await generationFixture(f,shown),reply=await g.send();assert.equal(reply.ok,true)
   const store=await f.ctx.get('qcuCourse').store(f.workspace.id);await waiting
   await f.call({action:'cancel',courseId:g.request.courseId,taskId:reply.value.id});await store.jobs.get(reply.value.id)?.promise
   assert.equal(store.task(reply.value.id).state,'cancelled');assert.equal(f.adapter.calls.length,0)
  }finally{await f.fork.dispose();await f.ctx.fiber.dispose()}
+})
+
+test('official first-use inventory and stored drafts are independent of failed or stalled MODEL metadata',async()=>{
+ const f=await setup();try{
+  const c=await f.call({action:'createCourse',requestId:newId('request'),name:'Existing synthetic course'})
+  let observed,entered;const started=new Promise(r=>entered=r)
+  f.adapter.metadata=(_p,_m,signal)=>{observed=signal;entered();return new Promise(()=>{})}
+  const inventory=await f.invoke({action:'workspaces'});assert.equal(inventory.workspaces[0].id,f.workspace.id);assert.equal(f.adapter.lookups,0);assert.equal(inventory.model,undefined)
+  const pending=f.invoke({action:'model'});await started
+  assert.equal((await f.call({action:'snapshot'})).courses[0].id,c.id);assert.equal(f.adapter.calls.length,0)
+  const unavailable=await pending;assert.equal(unavailable.policyError,'model-policy-unavailable');assert.equal(unavailable.model,null);assert.equal(observed.aborted,true)
+  f.adapter.metadata=()=>{throw Error('PRIVATE_MODEL_ERROR')}
+  assert.equal((await f.invoke({action:'workspaces'})).workspaces.length,1);assert.equal((await f.invoke({action:'model'})).policyError,'model-policy-unavailable');assert.equal((await f.call({action:'snapshot'})).courses.length,1)
+  assert.equal(f.adapter.calls.length,0)
+ }finally{await f.fork.dispose();await f.ctx.fiber.dispose()}
+})
+test('official Host disposal cancels its in-flight read-only capability query',async()=>{
+ const f=await setup();try{
+  let observed,entered;const started=new Promise(r=>entered=r)
+  f.adapter.metadata=(_p,_m,signal)=>{observed=signal;entered();return new Promise(()=>{})}
+  const pending=f.invoke({action:'model'}).catch(()=>null);await started;await f.fork.dispose();await pending
+  assert.equal(observed.aborted,true);assert.equal(f.adapter.calls.length,0)
+ }finally{await f.fork.dispose();await f.ctx.fiber.dispose()}
+})
+
+test('official Client onConnected callback cannot invent a generation or restore old consent',async()=>{
+ const f=await setup(),ctx=new Context();new TypertRegistry(ctx);let sinks
+ try{
+  ctx.reflect.provide('connection',{isLoopback:true,registerGenerationSource:()=>()=>{},generation:{getSnapshot:()=>undefined,subscribe:()=>()=>{}},rpc:{open:()=>{throw Error('No streams')},call:async(_prefix,endpoint,payload)=>{const [namespace,method]=endpoint.split('/');return {ok:true,value:await f.gateway.invoke({namespace,method,args:payload.args})}}},start:value=>{sinks=value;return {stop(){}}}})
+  const owner=ctx.plugin({inject:client.inject,apply:client.apply});await owner.await();const unmount=await ctx.remote.$mount(remoteContribution)
+  const {CourseController}=await import('../hub/plugins/qcu-course-workbench/src/controller.mjs'),c=new CourseController(ctx.remote.qcuCourse)
+  ctx.on('connection/reset',()=>c.invalidate());try{
+   await c.boot();await new Promise(r=>setImmediate(r));c.confirmModel(true);sinks.onConnected({})
+   assert.equal(c.state.phase,'idle');assert.equal(c.state.task,null);assert.equal(c.request,null);assert.equal(c.confirmedModel,null);assert.equal(c.state.error,'');assert.equal(f.adapter.calls.length,0)
+   await c.workspace(f.workspace.id);assert.equal(c.state.phase,'idle');assert.ok(c.state.snapshot);assert.equal(f.adapter.calls.length,0)
+  }finally{c.dispose();await unmount();await owner.dispose()}
+ }finally{await ctx.fiber.dispose();await f.fork.dispose();await f.ctx.fiber.dispose()}
+})
+
+test('actual Course plugin recovers first connection using bounded read-only boot, with no automatic generation',async()=>{
+ const f=await setup(),ctx=new Context();new TypertRegistry(ctx);let sinks;const actions=[]
+ const {SlotRegistry}=await import(pathToFileURL(process.env.QCU_OFFICIAL_DEPENDENCIES+'/node_modules/@deepseek-ai/dsh-client-ui-renderer/src/client/registry.ts'))
+ new SlotRegistry(ctx);ctx.slots.register({name:'root',children:{main:{kind:'keyed',scope:'root'},'sidebar.panellist':{kind:'list',scope:'root'}}},()=>null)
+ ctx.reflect.provide('layout',{selectPanel(){}})
+ try{
+  ctx.reflect.provide('connection',{isLoopback:true,registerGenerationSource:()=>()=>{},generation:{getSnapshot:()=>undefined,subscribe:()=>()=>{}},rpc:{open:()=>{throw Error('No streams')},call:async(_prefix,endpoint,payload)=>{actions.push(JSON.parse(payload.args.payload).action);const [namespace,method]=endpoint.split('/');return {ok:true,value:await f.gateway.invoke({namespace,method,args:payload.args})}}},start:value=>{sinks=value;return {stop(){}}}})
+  const gateway=ctx.plugin({inject:client.inject,apply:client.apply});await gateway.await()
+  let exported;new Script(await readFile('hub/plugins/qcu-course-workbench/client.js','utf8')).runInContext(createContext({window:{__ModuleLoader__:{load:m=>{exported=m}}},setTimeout,clearTimeout,AbortController,crypto:globalThis.crypto}))
+  let activeController;const uiReact={...React,useSyncExternalStore:(...args)=>{const value=React.useSyncExternalStore(...args);if(value&&typeof value.confirmModel==='function')activeController=value;return value}}
+  const owner=ctx.plugin(exported.factory(()=>uiReact));await owner.await();await new Promise(r=>setImmediate(r));await new Promise(r=>setImmediate(r))
+  assert.deepEqual(actions,[]);sinks.onConnected({});await new Promise(r=>setImmediate(r));await new Promise(r=>setImmediate(r))
+  const main=ctx.slots.entriesOfSlot('main')[0],html=renderToStaticMarkup(React.createElement(main.component))
+  assert.match(html,/Choose a workspace to browse existing drafts/);assert.doesNotMatch(html,/generation timed out|connection is unavailable/);assert.deepEqual(actions,['workspaces','model']);assert.equal(f.adapter.calls.length,0)
+  const originalController=activeController,pending={action:'save',courseId:newId('course'),taskId:newId('task'),component:'guide',draftHash:'original-hash',artifactSha256:'original-bytes',existingSha256:null,mode:'new-version',confirmed:true,saveId:newId('save')}
+  originalController.saveRequest=pending;originalController.saveWorkspace='original-workspace'
+  await gateway.dispose();await new Promise(r=>setImmediate(r));assert.equal(originalController.disposed,true)
+  const nextGateway=ctx.plugin({inject:client.inject,apply:client.apply});await nextGateway.await();await new Promise(r=>setImmediate(r));await new Promise(r=>setImmediate(r))
+  renderToStaticMarkup(React.createElement(main.component));assert.notEqual(activeController,originalController);assert.equal(JSON.stringify(activeController.saveRequest),JSON.stringify(pending));assert.equal(activeController.saveWorkspace,'original-workspace');assert.equal(activeController.unresolvedSave(),true);assert.deepEqual(actions,['workspaces','model'])
+  await owner.dispose();await nextGateway.dispose()
+ }finally{await ctx.fiber.dispose();await f.fork.dispose();await f.ctx.fiber.dispose()}
 })

@@ -162,3 +162,10 @@ test('prompt contains selected-only bounded instructions, complete answers and u
  // New prompt preferences do not tighten legacy strict schema acceptance.
  const legacy=fixtureDraft(input);legacy.sequence[0].minutes+=2;assert.doesNotThrow(()=>parseDraft(legacy,input))
 })
+
+test('edited component titles reach standalone DOCX/PPTX and lesson vocabulary reaches local HTML preview',()=>{
+ const input=lessonInput({components:['guide','ppt']}),draft=fixtureDraft(input),task={input,draft}
+ draft.components[0].title='Reviewed worksheet · 修订导学案';draft.components[1].title='Reviewed slides · 修订课件';draft.vocabulary[0]='Vertex — turning point.\n顶点：抛物线的转折点。'
+ const word=[...zipEntries(exportArtifact(task,'guide')).values()].join(''),slides=[...zipEntries(exportArtifact(task,'ppt')).values()].join('')
+ assert.match(word,/Reviewed worksheet · 修订导学案/);assert.match(slides,/Reviewed slides · 修订课件/);assert.match(artifactHtml(task,'lesson'),/Vertex — turning point\.\n顶点：抛物线的转折点。/)
+})

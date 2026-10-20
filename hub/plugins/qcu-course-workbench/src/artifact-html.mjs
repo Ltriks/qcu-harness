@@ -3,7 +3,7 @@ import {targetValue} from './protocol.mjs'
 export const escape=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))
 export function artifactHtml(task,component){
  const d=task.draft,c=d.components.find(c=>c.id===component),data=JSON.stringify({quiz:d.quiz,graph:d.graph,geometry:d.geometry,mind:component==='mind'?{title:task.input.topic,branches:c.sections.map(s=>s.heading)}:null}).replaceAll('<','\\u003c')
- const sections=c?c.sections:[{heading:'Learning intentions · 学习目标',body:d.intentions.join('\n')},{heading:'Success criteria · 成功标准',body:d.criteria.join('\n')},...d.sequence.map(s=>({heading:s.title+' · '+s.minutes+' min',body:s.teacher+'\n\n'+s.student+'\n\n'+s.evidence}))]
+ const sections=c?c.sections:[{heading:'Learning intentions · 学习目标',body:d.intentions.join('\n')},{heading:'Success criteria · 成功标准',body:d.criteria.join('\n')},{heading:'Vocabulary · 关键词',body:d.vocabulary.join('\n')},...d.sequence.map(s=>({heading:s.title+' · '+s.minutes+' min',body:s.teacher+'\n\n'+s.student+'\n\n'+s.evidence}))]
  const caption=component==='func'?d.graph?.caption:component==='geo'?d.geometry?.caption:''
  const script=`const data=${data};
 const sections=[...document.querySelectorAll('main>section')];let page=0;

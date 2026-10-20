@@ -8,7 +8,7 @@ import {createTeacherViews} from './teacher-view.mjs'
 const unavailableSnapshot=Object.freeze({phase:'unavailable',status:null,review:null,message:''})
 const noSubscribe=()=>()=>{}
 const statusLabels={'not-installed':'未安装','installed-disabled':'已安装 · 未启用','row-disabled':'包已启用 · 组件未启用','component-active':'组件已加载','restart-or-pending':'等待加载或重启',conflict:'需要核对版本',failed:'加载失败'}
-const phaseLabels={preparing:'正在准备安装',verifying:'正在复核',installing:'正在安装',cancelling:'正在请求取消',applying:'正在应用',checking:'正在检查',enabling:'正在启用',unconfirmed:'结果待核对',error:'操作未完成',cancelled:'已取消',declined:'未授权操作',review:'等待你的确认',partial:'启用部分完成 · 需核对'}
+const phaseLabels={unavailable:'状态检查不可用',preparing:'正在准备安装',verifying:'正在复核',installing:'正在安装',cancelling:'正在请求取消',applying:'正在应用',checking:'正在检查',enabling:'正在启用',unconfirmed:'结果待核对',error:'操作未完成',cancelled:'已取消',declined:'未授权操作',review:'等待你的确认',partial:'启用部分完成 · 需核对'}
 export function createMarketViews(React){
  const h=React.createElement
  const {Guide,Tasks,Feedback}=createTeacherViews(React)

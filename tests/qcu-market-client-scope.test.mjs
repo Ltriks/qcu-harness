@@ -27,7 +27,7 @@ async function archivedClient(file){let mod;vm.runInNewContext(await readFile(fi
 async function fixture(t,{manager=true,navigation=true,plugin,answer,autoActivate=false}={}){
  const ctx=new Context();t.after(()=>ctx.fiber.dispose());new TypertRegistry(ctx);new SlotRegistry(ctx)
  ctx.slots.register({name:'root',children:{main:{kind:'keyed',scope:'root'},'sidebar.panellist':{kind:'list',scope:'root'}}},()=>null)
- const calls=[],details=[];let panel=null,bundles=[],rows=[]
+ const calls=[],details=[];let panel=null,bundles=[],rows=[],connectionSinks
  ctx.reflect.provide('layout',{selectPanel:id=>{panel=id}})
  let nav
  if(navigation)nav=ctx.reflect.provide('pluginNavigation',{openBundle:id=>details.push(id)})
@@ -51,7 +51,7 @@ async function fixture(t,{manager=true,navigation=true,plugin,answer,autoActivat
    default:throw Error('Unexpected method '+endpoint)
   }
   return {ok:true,value}
- }},start:()=>({stop(){}})})
+ }},start:sinks=>{connectionSinks=sinks;return {stop(){}}}})
  const gateway=ctx.plugin({inject:client.inject,apply:client.apply});await gateway.await()
  const mountManager=async()=>{const owner=ctx.plugin({inject:['remote'],async apply(ownerCtx){await ownerCtx.remote.$mount(managerContribution)}});await owner.await();return ()=>owner.dispose()}
  let unmountManager
@@ -60,7 +60,7 @@ async function fixture(t,{manager=true,navigation=true,plugin,answer,autoActivat
  const fork=ctx.plugin(plugin);await fork.await();await tick();await tick()
  const main=()=>ctx.slots.entriesOfSlot('main')[0]
  const props=()=>{const p=main().inject();return p.availability?p.availability.snapshot():p}
- return {ctx,fork,calls,details,main,props,gateway,nav,unmountManager,mountManager,setBundles:value=>{bundles=value},setRows:value=>{rows=value},panel:()=>panel,render:()=>renderToStaticMarkup(React.createElement(main().component,main().inject()))}
+ return {ctx,fork,calls,details,main,props,gateway,nav,connect:()=>connectionSinks.onConnected?.({}),unmountManager,mountManager,setBundles:value=>{bundles=value},setRows:value=>{rows=value},panel:()=>panel,render:()=>renderToStaticMarkup(React.createElement(main().component,main().inject()))}
 }
 test('Client starts in a real plugin fiber, checks inventory and prepares/declines through both guarded namespaces',async t=>{
  const f=await fixture(t);const p=f.props();assert.ok(p.flow,p.unavailable)
@@ -183,4 +183,32 @@ test('compiled Client4 tools entry passes official manager codecs with synthetic
  await flow.confirmInstall();assert.equal(flow.state.status.state,'installed-disabled');await flow.reviewActivate();assert.equal(flow.state.review.kind,'activate')
  assert.equal(f.calls.filter(c=>c.endpoint.endsWith('/setBundleEnabled')||c.endpoint.endsWith('/setPluginEnabled')).length,0)
  await flow.confirmActivate();assert.equal(flow.state.status.state,'component-active');assert.equal(f.calls.filter(c=>c.endpoint.endsWith('/installBundle')).length,1);assert.equal(f.calls.filter(c=>c.endpoint.endsWith('/setBundleEnabled')).length,1);assert.equal(f.calls.filter(c=>c.endpoint.endsWith('/setPluginEnabled')).length,1)
+})
+
+test('official scoped startup/navigation do not auto-check; concurrent public inventory checks never manufacture peer-operation failures',async t=>{
+ let releaseRead;const gate=new Promise(r=>releaseRead=r)
+ const f=await fixture(t,{answer:async endpoint=>{if(endpoint==='pluginManager/listBundles'){await gate;return {ok:true,value:[]}}}}),flows=f.props().flows
+ assert.deepEqual(f.calls,[]);f.ctx.layout.selectPanel('qcu-market');f.render();f.ctx.layout.selectPanel(null);f.render();assert.deepEqual(f.calls,[])
+ const checks=flows.map(flow=>flow.status());await tick();assert.ok(flows.every(flow=>flow.state.phase==='checking'));assert.equal(f.calls.filter(c=>c.endpoint==='pluginManager/listBundles').length,flows.length)
+ assert.ok(flows.every(flow=>flow.pending===null));releaseRead();await Promise.all(checks)
+ assert.ok(flows.every(flow=>flow.state.phase==='idle'&&flow.state.status.state==='not-installed'))
+ assert.ok(f.calls.every(c=>['qcuMarket/status','pluginManager/listBundles'].includes(c.endpoint)))
+ await flows[0].prepare();const review=flows[0].state.review,generation=flows[0].generation
+ await Promise.all(flows.map(flow=>flow.status()));assert.equal(flows[0].state.review,review);assert.equal(flows[0].generation,generation);await assert.rejects(flows[1].prepare(),/其他条目/)
+ assert.equal(f.calls.filter(c=>c.endpoint==='pluginManager/installBundle'||c.endpoint.includes('Enabled')).length,0)
+})
+
+test('official scoped failed inventory is unavailable, not an installation failure or invented not-installed state',async t=>{
+ const f=await fixture(t,{answer:endpoint=>endpoint==='pluginManager/listBundles'?{ok:false,error:{code:'unavailable',message:'Inventory unavailable'}}:undefined})
+ await f.props().flow.status();assert.equal(f.props().flow.state.phase,'unavailable');assert.equal(f.props().flow.state.status,null);assert.match(f.render(),/状态检查不可用/);assert.match(f.render(),/Inventory unavailable/)
+ assert.deepEqual(f.calls.map(c=>c.endpoint),['qcuMarket/status','pluginManager/listBundles'])
+})
+
+test('official Client onConnected reset with no operation leaves every market card unchecked, with no automatic RPC or fictitious failure',async t=>{
+ const f=await fixture(t),flows=f.props().flows
+ assert.ok(flows.every(flow=>flow.state.phase==='idle'&&flow.state.status===null));assert.deepEqual(f.calls,[])
+ f.connect();assert.ok(flows.every(flow=>flow.state.phase==='idle'&&flow.state.status===null&&flow.state.review===null));assert.deepEqual(f.calls,[])
+ assert.doesNotMatch(f.render(),/操作未完成/);assert.match(f.render(),/状态待检查/)
+ await flows[0].prepare();const receipt=flows[0].state.review.receipt;f.connect();assert.equal(flows[0].state.review,null);assert.equal(flows[0].state.phase,'error');assert.ok(f.calls.some(c=>c.endpoint==='qcuMarket/cancel'&&c.args.id===receipt.id))
+ assert.equal(f.calls.filter(c=>c.endpoint==='pluginManager/installBundle'||c.endpoint.includes('Enabled')).length,0)
 })

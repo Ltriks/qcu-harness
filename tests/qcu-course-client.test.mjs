@@ -68,7 +68,7 @@ test('failed task browsing, reconnect and reconciliation are read-only and prese
  const task={id:'task_fixture',courseId:'course_fixture',state:'failed',message:'model-max-tokens',diagnostic},snapshot={profile:profile(),courses:[{id:'course_fixture',name:'Fixture'}],tasks:[task],references:[]}
  const c=new CourseController({dispatch:async payload=>{
   const raw=JSON.parse(payload),action=raw.request?.action??raw.action;calls.push(action)
-  assert.ok(['workspaces','snapshot','task'].includes(action))
+  assert.ok(['workspaces','model','snapshot','task'].includes(action))
   const value=action==='workspaces'?{version:VERSION,protocol:PROTOCOL,workspaces:[{id:'ws'}],model:{provider:'fixture',model:'fixture'}}:action==='task'?task:snapshot
   return {ok:true,value:JSON.stringify({ok:true,...(action==='workspaces'?value:{value})})}
  }})

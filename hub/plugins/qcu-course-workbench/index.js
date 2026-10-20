@@ -79,7 +79,7 @@ export function createGenerator(ctx){return async(input,refs,signal,expected)=>{
  }
 }}
 export class CourseService extends TypertRemoteService{
- constructor(ctx,framework){super(ctx,'qcuCourse');this.framework=framework;this.stores=new Map();this.owner=ctx;this.closed=false;ctx.effect(()=>()=>this.dispose())}
+ constructor(ctx,framework){super(ctx,'qcuCourse');this.framework=framework;this.stores=new Map();this.owner=ctx;this.closed=false;this.lookups=new Set();ctx.effect(()=>()=>this.dispose())}
  async store(workspaceId){
   check(typeof workspaceId==='string'&&workspaceId.length<=200,'invalid-workspace');const w=this.owner.workspaceRegistry.get(workspaceId);check(w,'workspace-not-found')
   let slot=this.stores.get(workspaceId)
@@ -93,9 +93,17 @@ export class CourseService extends TypertRemoteService{
   try{
    const raw=JSON.parse(payload)
    if(raw.action==='workspaces'){
-    exact(raw,['action']);let model=null,policyError
-    try{model=await resolveRoute(this.owner,signal)}catch(e){signal?.throwIfAborted();policyError=e.code==='model-not-configured'?'model-not-configured':'model-policy-unavailable'}
-    return JSON.stringify({ok:true,version:VERSION,protocol:PROTOCOL,workspaces:this.owner.workspaceRegistry.list().map(w=>({id:w.id,title:w.title,path:w.path})),model,...(policyError?{policyError}:{})})
+    exact(raw,['action'])
+    return JSON.stringify({ok:true,version:VERSION,protocol:PROTOCOL,workspaces:this.owner.workspaceRegistry.list().map(w=>({id:w.id,title:w.title,path:w.path}))})
+   }
+   if(raw.action==='model'){
+    exact(raw,['action']);const abort=new AbortController(),cancel=()=>abort.abort()
+    this.lookups.add(abort);signal?.addEventListener('abort',cancel,{once:true});if(signal?.aborted)cancel()
+    const timer=setTimeout(cancel,5000);let model=null,policyError
+    try{model=await resolveRoute(this.owner,abort.signal)}catch(e){policyError=e.code==='model-not-configured'?'model-not-configured':'model-policy-unavailable'}
+    finally{clearTimeout(timer);signal?.removeEventListener('abort',cancel);this.lookups.delete(abort)}
+    signal?.throwIfAborted();check(!this.closed,'plugin-stopped')
+    return JSON.stringify({ok:true,model,...(policyError?{policyError}:{})})
    }
    exact(raw,['workspaceId','request','expectedModel']);const store=await this.store(text(raw.workspaceId,200,true));signal?.throwIfAborted()
    let request=raw.request
@@ -110,7 +118,7 @@ export class CourseService extends TypertRemoteService{
    return JSON.stringify({ok:true,value:await store.dispatch(request)})
   }catch(e){return JSON.stringify({ok:false,error:['model-policy-unavailable','model-policy-changed','invalid-model-policy','model-not-configured','model-selection-changed','state-write-failed','store-limit','save-not-found','invalid-fields','invalid-text','invalid-id','invalid-enum','invalid-list','invalid-target','disabled-target','missing-targets','invalid-lesson','empty-profile','course-not-found','task-not-found','reference-required','reference-expired-or-course-mismatch','course-mismatch','model-consent-required','task-busy','stale-preview','file-changed','invalid-filename','unsupported-file-use-text','file-too-large','empty-material','reference-limit','idempotency-conflict','draft-not-ready','save-confirmation-required','unsafe-file','unsafe-directory','workspace-not-found','workspace-changed','workspace-limit','course-limit','task-limit','version-limit','save-limit','invalid-store','invalid-sequence','invalid-timing','missing-components','invalid-draft','draft-too-large'].includes(e.code)?e.code:'operation-failed'})}
  }
- async dispose(){this.closed=true;await Promise.all([...this.stores.values()].map(async s=>{const store=await s.promise;await store.dispose()}));this.stores.clear()}
+ async dispose(){this.closed=true;for(const abort of this.lookups)abort.abort();this.lookups.clear();await Promise.all([...this.stores.values()].map(async s=>{const store=await s.promise;await store.dispose()}));this.stores.clear()}
 }
 export function apply(ctx,config={enabled:true,frameworkJson:'{}'}){
  exact(config,['enabled','frameworkJson']);check(typeof config.enabled==='boolean','invalid-config');if(!config.enabled)return

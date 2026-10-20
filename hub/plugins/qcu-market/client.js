@@ -105,7 +105,7 @@ async function readProduct(manager,entry=release){
 }
 class DirectMarketFlow {
   constructor(remote,{entry=release,catalog=bundledCatalog,fingerprint=catalogSha256,peers=null,uuid=()=>crypto.randomUUID(),now=()=>Date.now()}={}){
-    this.remote=remote;this.entry=entry;this.catalog=catalog;this.fingerprint=fingerprint;this.releaseKey=releaseKeyOf(entry);this.peers=peers;this.uuid=uuid;this.now=now;this.listeners=new Set();this.state={phase:'idle',status:null,review:null,message:'',result:null};this.generation=0;this.pending=null;this.request=null;this.disposed=false
+    this.remote=remote;this.entry=entry;this.catalog=catalog;this.fingerprint=fingerprint;this.releaseKey=releaseKeyOf(entry);this.peers=peers;this.uuid=uuid;this.now=now;this.listeners=new Set();this.state={phase:'idle',status:null,review:null,message:'',result:null};this.generation=0;this.pending=null;this.request=null;this.disposed=false;this.statusGeneration=0;this.statusRead=null
     this.unlisten=remote.$on?.('plugin-manager/install-state',p=>this.progress(p))
   }
   snapshot=()=>this.state
@@ -119,7 +119,22 @@ class DirectMarketFlow {
     try{actual=JSON.parse(unwrap(await this.remote.qcuMarket.status()))}catch(e){throw new Error('市场 Host 尚未就绪；如刚更新或重装，请正常退出并重新打开 DSH 后再检查。未发起安装。详情：'+failure(e))}
     if(!same(actual,{...marketRuntime,catalogSha256:this.fingerprint}))throw new Error('市场 Host 与界面版本不一致，请正常重启 DSH 后再检查；未发起安装。')
   }
-  async status(){this.guard();const n=++this.generation;this.pending={kind:'status'};this.set({phase:'checking',review:null,message:''});try{await this.checkHost();this.valid(n);const s=await readProduct(this.remote.pluginManager,this.entry);this.valid(n);this.set({phase:'idle',status:s})}catch(e){if(n===this.generation)this.set({phase:'error',status:null,message:failure(e)})}finally{this.pending=null}}
+  async status(){
+    if(this.disposed)return
+    // Inventory reads hold no mutation/approval lock. An existing confirmation
+    // or operation on this entry owns its UI until explicitly completed.
+    if(this.pending||this.request||this.activation||this.state.review)return this.state.status
+    if(this.statusRead)return this.statusRead
+    const n=this.generation,read=++this.statusGeneration
+    this.set({phase:'checking',message:''})
+    const current=()=>!this.disposed&&n===this.generation&&read===this.statusGeneration&&!this.pending&&!this.request&&!this.activation&&!this.state.review
+    const promise=(async()=>{
+      try{await this.checkHost();if(!current())return;const status=await readProduct(this.remote.pluginManager,this.entry);if(current())this.set({phase:'idle',status,message:''});return status}
+      catch(e){if(current())this.set({phase:'unavailable',status:null,message:failure(e)})}
+    })()
+    this.statusRead=promise
+    try{return await promise}finally{if(this.statusRead===promise)this.statusRead=null}
+  }
   async prepare(){
     this.guard();const n=++this.generation,id=this.uuid(),abort=new AbortController();this.pending={kind:'prepare',id,abort};this.set({phase:'preparing',review:null,message:'',result:null})
     try{
@@ -286,8 +301,8 @@ class DirectMarketFlow {
       const next=await readProduct(this.remote.pluginManager,this.entry);this.valid(n);this.set({phase:'idle',status:next,result,message:result.application==='restart-required'?'需要你正常重启应用；此处不执行重启。':'启用操作已返回；以当前组件状态为准。'})
     }catch(e){if(n===this.generation)this.set({phase:'error',message:'启用结果需核对：'+failure(e)})}finally{this.pending=null}
   }
-  invalidate(){if(this.activation)this.activation.authorized=false;const receiptId=this.state.review?.receipt?.id;if(receiptId)void this.remote.qcuMarket.cancel(receiptId).catch(()=>{});++this.generation;this.pending?.abort?.abort();if(!this.request)this.set({phase:this.activation?'unconfirmed':'error',status:this.activation?this.state.status:null,review:null,message:'连接或目录变化，原确认已作废；已发出的启用操作需重新检查。'})}
-  dispose(){if(this.activation)this.activation.authorized=false;this.disposed=true;++this.generation;this.pending?.abort?.abort();const id=this.pending?.id||this.state.review?.receipt?.id;if(id)void this.remote.qcuMarket.cancel(id).catch(()=>{});if(this.request)void this.remote.pluginManager.cancelInstall(this.request.id).catch(()=>{});this.unlisten?.();this.listeners.clear()}
+  invalidate(){const hadOperation=this.pending||this.activation||this.state.review||this.state.result||['error','partial','unconfirmed'].includes(this.state.phase);++this.statusGeneration;this.statusRead=null;if(this.activation)this.activation.authorized=false;const receiptId=this.state.review?.receipt?.id;if(receiptId)void this.remote.qcuMarket.cancel(receiptId).catch(()=>{});++this.generation;this.pending?.abort?.abort();if(!this.request)this.set({phase:this.activation?'unconfirmed':hadOperation?'error':'idle',status:this.activation?this.state.status:null,review:null,message:hadOperation?'连接或目录变化，原确认已作废；已发出的启用操作需重新检查。':'连接已变化，状态待重新检查；未发起安装或启用。'})}
+  dispose(){++this.statusGeneration;this.statusRead=null;if(this.activation)this.activation.authorized=false;this.disposed=true;++this.generation;this.pending?.abort?.abort();const id=this.pending?.id||this.state.review?.receipt?.id;if(id)void this.remote.qcuMarket.cancel(id).catch(()=>{});if(this.request)void this.remote.pluginManager.cancelInstall(this.request.id).catch(()=>{});this.unlisten?.();this.listeners.clear()}
 }
 
 function createCatalogFlows(remote,{catalog=bundledCatalog,fingerprint=catalogSha256}={}){const flows=[];for(const item of catalog.entries)flows.push(new DirectMarketFlow(remote,{entry:item.release,catalog,fingerprint,peers:flows}));return flows}
@@ -602,7 +617,7 @@ const releaseHistory=parseVersionHistory("{\"sourceRevision\":\"pilot-market-p13
 const unavailableSnapshot=Object.freeze({phase:'unavailable',status:null,review:null,message:''})
 const noSubscribe=()=>()=>{}
 const statusLabels={'not-installed':'未安装','installed-disabled':'已安装 · 未启用','row-disabled':'包已启用 · 组件未启用','component-active':'组件已加载','restart-or-pending':'等待加载或重启',conflict:'需要核对版本',failed:'加载失败'}
-const phaseLabels={preparing:'正在准备安装',verifying:'正在复核',installing:'正在安装',cancelling:'正在请求取消',applying:'正在应用',checking:'正在检查',enabling:'正在启用',unconfirmed:'结果待核对',error:'操作未完成',cancelled:'已取消',declined:'未授权操作',review:'等待你的确认',partial:'启用部分完成 · 需核对'}
+const phaseLabels={unavailable:'状态检查不可用',preparing:'正在准备安装',verifying:'正在复核',installing:'正在安装',cancelling:'正在请求取消',applying:'正在应用',checking:'正在检查',enabling:'正在启用',unconfirmed:'结果待核对',error:'操作未完成',cancelled:'已取消',declined:'未授权操作',review:'等待你的确认',partial:'启用部分完成 · 需核对'}
 function createMarketViews(React){
  const h=React.createElement
  const {Guide,Tasks,Feedback}=createTeacherViews(React)
