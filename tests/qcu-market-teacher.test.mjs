@@ -8,7 +8,7 @@ test('three helpers map exactly to real existing Skills without new products or 
  assert.equal(bundledCatalog.entries.length,9);assert.equal(bundledCatalog.entries.filter(t=>t.kind==='skill').length,6)
  for(const t of taskTemplates){const e=bundledCatalog.entries.find(e=>e.id===t.skill);assert.equal(e.release.skill,t.skill)}
  assert.equal(marketRuntime.catalogSha256,catalogSha256)
- assert.equal(marketRuntime.version,'0.1.0-pilot.15.0');assert.equal(marketRuntime.protocol,5)
+ assert.equal(marketRuntime.version,'0.1.0-pilot.15.1');assert.equal(marketRuntime.protocol,6)
  const source=JSON.parse(catalogText)
  assert.deepEqual(bundledCatalog,source)
 })
@@ -29,7 +29,7 @@ test('feedback validates bounds, version context and human review gate; never de
  assert.equal(Object.keys(generateFeedback({}).errors).length,4)
  for(const f of feedbackFields)assert.ok(generateFeedback({...clean,[f.key]:'字'.repeat(f.max+1)}).errors[f.key])
  for(const ack of [false,undefined,1,'true']){const r=feedbackExport(clean,ack);assert.equal(r.text,'');assert.ok(r.errors.review)}
- const r=feedbackExport(clean,true);assert.match(r.text,/0.1.0-pilot.15.0/);assert.match(r.text,/非实际安装版本检测/);assert.match(r.text,/尚未提交/)
+ const r=feedbackExport(clean,true);assert.match(r.text,/0.1.0-pilot.15.1/);assert.match(r.text,/非实际安装版本检测/);assert.match(r.text,/尚未提交/)
  assert.equal(feedbackExport({...clean,actual:''},true).text,'')
 })
 test('redaction removes synthetic key, token, auth, JWT, docURL, email and home paths and is idempotent',()=>{

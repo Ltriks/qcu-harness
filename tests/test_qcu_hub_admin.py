@@ -36,6 +36,71 @@ SYNTHETIC_PASSWORD = 'Synthetic-only-admin-2026!'
 fixture = module('handoff_example', REPO / 'templates/qcu-submission/generate-example.py')
 
 
+class AdminPasswordPromptTest(unittest.TestCase):
+    @contextlib.contextmanager
+    def terminal(self):
+        with contextlib.redirect_stdout(io.StringIO()) as output:
+            with mock.patch.object(admin.sys.stdin, 'isatty', return_value=True), mock.patch.object(output, 'isatty', return_value=True):
+                yield output
+
+    def test_invalid_first_inputs_retry_before_credential_state(self):
+        invalid = ['short', 'x' * 129, 'Synthetic-NUL\0-input', '\ud800' * 12]
+        with tempfile.TemporaryDirectory(dir='/private/tmp', prefix='qcu-prompt-test-') as home:
+            root = Path(home) / 'state'
+            values = iter(invalid + [SYNTHETIC_PASSWORD] * 2)
+            def answer(_):
+                self.assertFalse(root.exists())
+                return next(values)
+            with self.terminal() as output, mock.patch.object(admin.getpass, 'getpass', side_effect=answer) as prompt:
+                password = admin.prompt_password()
+            self.assertEqual(password, SYNTHETIC_PASSWORD)
+            self.assertEqual(prompt.call_args_list, [mock.call('New password: ')] * 5 + [mock.call('Repeat password: ')])
+            rule = 'Password must be 12-128 characters, at most 512 UTF-8 bytes, with no NUL. Please try again.\n'
+            self.assertEqual(output.getvalue(), 'Local account: qcu-admin\n' + rule * len(invalid))
+            store = admin.Store(root, True, initial_password=password)
+            try:
+                self.assertIn('token', store.login(dict(account=admin.ACCOUNT, password=SYNTHETIC_PASSWORD)))
+            finally:
+                store.close()
+
+    def test_mismatch_reenters_both_values_without_echo(self):
+        values = [SYNTHETIC_PASSWORD, 'Synthetic-mismatch!', SYNTHETIC_PASSWORD, '\ud800' * 12, SYNTHETIC_PASSWORD, SYNTHETIC_PASSWORD]
+        with self.terminal() as output, mock.patch.object(admin.getpass, 'getpass', side_effect=values) as prompt:
+            self.assertEqual(admin.prompt_password(), SYNTHETIC_PASSWORD)
+        self.assertEqual(prompt.call_args_list, [mock.call('New password: '), mock.call('Repeat password: ')] * 3)
+        self.assertEqual(output.getvalue(), 'Local account: qcu-admin\n' + 'Passwords do not match. Please enter both again.\n' * 2)
+
+    def test_interruptions_and_no_echo_warning_never_initialize(self):
+        for prefix in ([], [SYNTHETIC_PASSWORD], ['short'], [SYNTHETIC_PASSWORD, 'Synthetic-mismatch!']):
+            for failure in (EOFError, KeyboardInterrupt, admin.getpass.GetPassWarning):
+                with self.subTest(prefix_count=len(prefix), failure=failure.__name__):
+                    values = iter(prefix)
+                    def answer(_):
+                        try:
+                            return next(values)
+                        except StopIteration:
+                            if failure is admin.getpass.GetPassWarning:
+                                admin.warnings.warn('Synthetic no-echo warning', failure)
+                                self.fail('getpass warning did not abort')
+                            raise failure()
+                    with self.terminal() as output, mock.patch.object(admin.getpass, 'getpass', side_effect=answer), mock.patch.object(admin, 'Store') as store, mock.patch.object(admin, 'password_auth') as auth, mock.patch.object(admin.sys, 'argv', ['server.py', '--state-root', '/private/tmp/unused-prompt-state', '--init']):
+                        self.assertEqual(admin.main(), 0 if failure is KeyboardInterrupt else 2)
+                    store.assert_not_called()
+                    auth.assert_not_called()
+                    self.assertNotIn('Synthetic', output.getvalue())
+                    self.assertNotIn('Traceback', output.getvalue())
+
+    def test_both_streams_require_tty_before_getpass(self):
+        for stdin, stdout in ((False, True), (True, False), (False, False)):
+            with self.subTest(stdin=stdin, stdout=stdout), self.terminal() as output:
+                with mock.patch.object(admin.sys.stdin, 'isatty', return_value=stdin), mock.patch.object(output, 'isatty', return_value=stdout), mock.patch.object(admin.getpass, 'getpass') as prompt:
+                    with self.assertRaises(admin.Refused) as caught:
+                        admin.prompt_password()
+                self.assertEqual(caught.exception.code, 'auth.tty_required')
+                prompt.assert_not_called()
+                self.assertEqual(output.getvalue(), '')
+
+
 class AdminTest(unittest.TestCase):
     def setUp(self):
         # /tmp on macOS is a symlink: use its actual private parent explicitly.
@@ -495,7 +560,7 @@ s.prepare(r['id'],dict(materialsDigest=r['materialsDigest'],proposalDigest=p['pr
                         break
                 prompts = output.count(b'New password:')+output.count(b'Repeat password:')
                 if sent < len(inputs) and prompts > sent:
-                    os.write(fd, inputs[sent].encode()+b'\n')
+                    os.write(fd, b'\x04' if inputs[sent] is None else inputs[sent].encode()+b'\n')
                     sent += 1
                 if expect_start and b'Local preparation only:' in output:
                     os.kill(pid, 2)
@@ -511,7 +576,8 @@ s.prepare(r['id'],dict(materialsDigest=r['materialsDigest'],proposalDigest=p['pr
                     _, found = os.waitpid(pid, 0)
                 status = found
             for password in inputs:
-                self.assertNotIn(password.encode(), output, 'PTY unexpectedly echoed synthetic input')
+                if password is not None:
+                    self.assertNotIn(password.encode(), output, 'PTY unexpectedly echoed synthetic input')
             return os.waitstatus_to_exitcode(status), output
         finally:
             os.close(fd)
@@ -525,10 +591,10 @@ s.prepare(r['id'],dict(materialsDigest=r['materialsDigest'],proposalDigest=p['pr
         result = subprocess.run(base+['--init'], input=b'Synthetic-not-accepted\n', capture_output=True, cwd=REPO)
         self.assertEqual(result.returncode, 2)
         self.assertFalse(root.exists())
-        code, _ = self.cli_pty(root, '--init', [SYNTHETIC_PASSWORD,'Synthetic-mismatch!'])
+        code, _ = self.cli_pty(root, '--init', [SYNTHETIC_PASSWORD,'Synthetic-mismatch!',None])
         self.assertEqual(code, 2)
         self.assertFalse(root.exists())
-        code, _ = self.cli_pty(root, '--init', ['short'])
+        code, _ = self.cli_pty(root, '--init', ['short',None])
         self.assertEqual(code, 2)
         self.assertFalse(root.exists())
         code, _ = self.cli_pty(root, '--init', [SYNTHETIC_PASSWORD]*2, expect_start=True)

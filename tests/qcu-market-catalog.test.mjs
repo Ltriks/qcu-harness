@@ -30,7 +30,7 @@ for(const [label,mutate] of Object.entries({
 test('catalog rejects malformed and byte oversized text',()=>{assert.throws(()=>parseMarketCatalog('{'));assert.throws(()=>parseMarketCatalog('界'.repeat(100000)))})
 function multiple(){const c=clone();c.entries=c.entries.slice(0,1);const item=structuredClone(c.entries[0]);item.id='qcu-synthetic-fixture';Object.assign(item.release,{id:item.id,skill:item.id,provider:item.id+'@'+item.release.version});item.release.file=`${item.id}-${item.release.version}-${item.release.sha256}.tgz`;c.entries.push(item);return parseMarketCatalog(JSON.stringify(c))}
 test('host selects reviewed entry by key and rejects unknown keys without downloading; replay revoked',async()=>{
- const catalog=multiple(),downloads=[],p=new PackagePreparation({catalog,download:async({entry})=>{downloads.push(entry.id);return '/cache/'+entry.file},verify:async()=>{}})
+ const catalog=multiple(),downloads=[],p=new PackagePreparation({authority:null,catalog,download:async({entry})=>{downloads.push(entry.id);return '/cache/'+entry.file},verify:async()=>{}})
  await assert.rejects(p.prepare(randomUUID(),'unreviewed'));assert.deepEqual(downloads,[])
  const id=randomUUID(),r=JSON.parse(await p.prepare(id,releaseKeyOf(catalog.entries[1].release)))
  assert.equal(r.entry.id,'qcu-synthetic-fixture');assert.equal(r.catalogSha256,catalogSha256)
@@ -38,7 +38,7 @@ test('host selects reviewed entry by key and rejects unknown keys without downlo
  p.fingerprint='0'.repeat(64);await assert.rejects(p.verify(id),/Release changed/);p.dispose()
 })
 test('two synthetic entries keep independent state, serialize review and mutations, cancel/reenter/dispose safely',async()=>{
- const catalog=multiple(),p=new PackagePreparation({catalog,download:async({entry})=>'/cache/'+entry.file,verify:async()=>{}}),installed=[],calls=[]
+ const catalog=multiple(),p=new PackagePreparation({authority:null,catalog,download:async({entry})=>'/cache/'+entry.file,verify:async()=>{}}),installed=[],calls=[]
  const ok=value=>({ok:true,value}),remote={qcuMarket:{status:async()=>ok(JSON.stringify(marketRuntime)),prepare:async(...a)=>ok(await p.prepare(...a)),verify:async(...a)=>ok(await p.verify(...a)),cancel:async id=>ok(p.cancel(id))},pluginManager:{listBundles:async()=>ok(installed),inspect:async()=>ok({status:'accepted',kind:'tarball',registry:null}),installBundle:async(path)=>{calls.push(path);const e=catalog.entries.find(i=>path.endsWith(i.release.file)).release;installed.push({name:e.id,version:e.version,installed:true,enabled:false});return ok({application:'applied',stage:'enable',target:e.id,bundle:e.id,enabled:false})}}}
  const flows=createCatalogFlows(remote,{catalog});assert.deepEqual(calls,[])
  await flows[0].prepare();assert.equal(flows[0].state.phase,'review');await assert.rejects(flows[1].prepare(),/其他条目/);assert.equal(flows[1].state.phase,'idle')

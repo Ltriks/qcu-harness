@@ -1,5 +1,7 @@
 # QCU Hub signed market publication / P15
 
+> 2026-10-23 后续：P14 已保留集成，P15.1 已固定公钥并部署现有 Hub 和 mini 默认 DSH；账号本人初始化及登录通过。本文保留 P15 本地候选阶段的记录与维护契约，历史“未部署/未集成”不再代表当前状态。当前固定包、路径、真实通过/未测范围见 [P15.1 部署记录](qcu-hub-market-p15.1-deployment.md)。
+
 Implementation candidate on `dev/qcu-hub-market-publication`, based on
 `0ea395cc51ff3244a7c3304fe8d24d0076e7c1f3`. No deployment, real credential, production key, model call or live DSH profile
 modification was made. Parent-reviewed source delivery is recorded in the artifact

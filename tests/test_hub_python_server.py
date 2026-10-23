@@ -39,6 +39,48 @@ class HubPythonServerTests(unittest.TestCase):
         (self.root / 'manifest.json').write_bytes(raw)
         return hashlib.sha256(raw).hexdigest()
 
+    def add_updates(self, raw):
+        (self.root / 'updates.json').write_bytes(raw)
+        self.manifest['files']['updates.json'] = {'bytes': len(raw), 'sha256': hashlib.sha256(raw).hexdigest()}
+        self.pin = self.save_manifest()
+
+    def test_updates_exact_bytes_json_no_store_and_private_helper_routes_with_overlay(self):
+        raw = b'{"payload": "synthetic signed public feed bytes", "signature":"synthetic"}\n'
+        self.add_updates(raw)
+        resources = hub.load_snapshot(self.root, self.pin)
+        self.assertEqual(resources['/updates.json'], raw)
+        class Overlay:
+            def read(self, path):
+                return b'{}' if path == '/market/catalog.signed.json' else None
+        server = hub.make_server(resources, port=0, publication=Overlay())
+        threading.Thread(target=server.serve_forever, daemon=True).start()
+        self.addCleanup(server.server_close)
+        self.addCleanup(server.shutdown)
+        url = 'http://127.0.0.1:%s' % server.server_port
+        opener = urllib.request.build_opener(urllib.request.ProxyHandler({}))
+        with opener.open(url + '/updates.json') as response:
+            self.assertEqual(response.read(), raw)
+            self.assertEqual(response.headers['Cache-Control'], 'no-store')
+            self.assertTrue(response.headers['Content-Type'].startswith('application/json'))
+        for method in ['POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS']:
+            with self.assertRaises(urllib.error.HTTPError) as e:
+                opener.open(urllib.request.Request(url + '/updates.json', method=method))
+            self.assertEqual(e.exception.code, 405)
+        for path in ['/updates.json?query=1', '/serve-hub.py', '/README.txt', '/admin', '/private/signing/key.pem', '/audit.jsonl']:
+            with self.assertRaises(urllib.error.HTTPError) as e:
+                opener.open(url + path)
+            self.assertEqual(e.exception.code, 404)
+
+    def test_invalid_updates_envelope_or_hash_is_refused(self):
+        for raw in [b'[]', b'{"payload":"x"}', b'{"payload":{},"signature":"x"}', b'not JSON']:
+            self.add_updates(raw)
+            with self.assertRaises((ValueError, json.JSONDecodeError)):
+                hub.load_snapshot(self.root, self.pin)
+        self.add_updates(b'{"payload":"x","signature":"x"}')
+        (self.root / 'updates.json').write_bytes(b'changed')
+        with self.assertRaisesRegex(ValueError, 'integrity-mismatch'):
+            hub.load_snapshot(self.root, self.pin)
+
     def test_valid_snapshot_and_nonservable_readme(self):
         resources = hub.load_snapshot(self.root, self.pin)
         self.assertEqual(resources['/plugins/' + self.file], self.package)

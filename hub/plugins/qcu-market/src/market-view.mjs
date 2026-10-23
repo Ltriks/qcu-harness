@@ -6,6 +6,7 @@ import {bundledCatalog} from './bundled-catalog.mjs'
 import {iconPaths,sceneIcon} from './icons.mjs'
 import {marketStyles} from './styles.mjs'
 import {createTeacherViews} from './teacher-view.mjs'
+import {createUpdateView} from './update-view.mjs'
 const unavailableSnapshot=Object.freeze({phase:'unavailable',status:null,review:null,message:''})
 const noSubscribe=()=>()=>{}
 const statusLabels={'not-installed':'未安装','installed-disabled':'已安装 · 未启用','row-disabled':'包已启用 · 组件未启用','component-active':'组件已加载','restart-or-pending':'等待加载或重启',conflict:'需要核对版本',failed:'加载失败'}
@@ -13,6 +14,7 @@ const phaseLabels={unavailable:'状态检查不可用',preparing:'正在准备�
 export function createMarketViews(React){
  const h=React.createElement
  const {Guide,Tasks,Feedback}=createTeacherViews(React)
+ const UpdatesView=createUpdateView(React)
  const useFlow=flow=>React.useSyncExternalStore(flow?.subscribe||noSubscribe,flow?.snapshot||(()=>unavailableSnapshot),flow?.snapshot||(()=>unavailableSnapshot))
  function Icon({name='market'}){return h('svg',{width:26,height:26,viewBox:'0 0 24 24',fill:'none',stroke:'currentColor',strokeWidth:1.6,'aria-hidden':true},...iconPaths[name].map((d,i)=>h('path',{key:i,d})))}
  const label=state=>phaseLabels[state.phase]||statusLabels[state.status?.state]||'状态待检查'
@@ -31,15 +33,15 @@ export function createMarketViews(React){
   return h('section',{className:'qcu-section qcu-versions','data-version-product':item.id},
    h('h2',null,standalone?item.title:'版本管理'),
    h('dl',{className:'qcu-facts'},h('div',null,h('dt',null,self?'当前界面版本':'当前审核版本'),h('dd',null,item.release.version)),self?null:h('div',null,h('dt',null,'本实例已安装'),h('dd',null,installedVersionLabel(s.status)))),
-   self?h('p',{className:'qcu-hint'},'市场更新通过官方插件页面安装，正常重启后生效。'):h('div',{className:'qcu-button-row'},h('button',{type:'button',className:'qcu-control',disabled:!flow||busy,onClick:check},'检查已安装版本'),h('button',{type:'button',className:'qcu-control',onClick:()=>onDetails(item.id)},'在官方页面管理版本')),
+   self?h('p',{className:'qcu-hint'},'可在上方检查并确认新版，正常重启后核验。'):h('div',{className:'qcu-button-row'},h('button',{type:'button',className:'qcu-control',disabled:!flow||busy,onClick:check},'检查已安装版本'),h('button',{type:'button',className:'qcu-control',onClick:()=>onDetails(item.id)},'在官方页面管理版本')),
    h('details',{className:'qcu-history'},h('summary',null,`历史版本（${versions.length}）`),versions.length?h(React.Fragment,null,h('p',{className:'qcu-hint'},'历史包保留原固定地址和校验信息。复制后在官方页面核对版本、安装影响并逐次确认；不会自动覆盖当前版本。'),...versions.map(version=>h('div',{key:version.version,className:'qcu-version-row'},h('h3',null,version.version),h('p',{className:'qcu-hint'},`${version.bytes} 字节；DSH ${version.dshVersions.join(', ')}`),h('code',{className:'qcu-hash'},version.sha256),h('button',{type:'button',className:'qcu-control',onClick:()=>{void copyMetadata(version)}},'复制 '+version.version+' 地址与校验信息')))):h('p',{className:'qcu-hint'},'暂无其他已审核版本。')),
    manual?h('textarea',{readOnly:true,value:manual,rows:4,'aria-label':item.title+'历史版本地址与校验信息',onFocus:e=>e.target.select()}):null,
    h('p',{className:'qcu-hint',role:'status'},message))
  }
- function VersionsPage({catalog,flowFor,onDetails}){
+ function VersionsPage({catalog,flowFor,onDetails,updater}){
   return h('div',{className:'qcu-aux-page'},h('h1',{tabIndex:-1,'data-page-heading':true},'版本管理'),h('p',{className:'qcu-muted'},'同一个工具保留一个入口。在这里核对当前版本、已安装版本与历史发布。'),
-   h(VersionPanel,{item:{id:'qcu-market',title:'QCU 市场',release:{version:marketRuntime.version}},self:true,standalone:true,onDetails}),
-   ...catalog.entries.map(item=>h(VersionPanel,{key:item.id,item,flow:flowFor(item),onDetails,standalone:true})))
+   h(UpdatesView,{updater,catalog,onDetails}),h('details',{className:'qcu-section'},h('summary',null,'历史版本与固定发行记录'),h(VersionPanel,{item:{id:'qcu-market',title:'QCU 市场',release:{version:marketRuntime.version}},self:true,standalone:true,onDetails}),
+   ...catalog.entries.map(item=>h(VersionPanel,{key:item.id,item,flow:flowFor(item),onDetails,standalone:true}))))
  }
  function Detail({item,flow,onBack,onDetails,unavailable}){
   const s=useFlow(flow),release=item.release,review=s.review,toolsOnly=item.capabilities[0]==='tools',workbench=item.capabilities[0]==='workbench',generic=release.releaseStatus==='published'
@@ -98,7 +100,7 @@ export function createMarketViews(React){
   const kindItems=catalog.entries.filter(e=>category==='all'||productKindOf(e)===(category==='skills'?'skill':'plugin'))
   const scenarios=[...new Set(kindItems.map(e=>e.scenario))]
   const visible=catalog.entries.filter(e=>(category==='all'||category==='plugins'&&productKindOf(e)==='plugin'||category==='skills'&&productKindOf(e)==='skill')&&(scenario==='all'||e.scenario===scenario)&&[e.title,e.purpose,e.scenario].join(' ').toLocaleLowerCase().includes(query.trim().toLocaleLowerCase()))
-  return h('section',{ref:root,className:'qcu-market','aria-label':'QCU市场'},h('style',null,marketStyles),h('div',{className:'qcu-content'},h('header',{className:'qcu-app-header'},h('div',{className:'qcu-wordmark'},h(Icon),h('span',null,'QCU 市场')),h('button',{type:'button',className:'qcu-control',disabled:!ready.refresh||ready.refreshing,onClick:()=>{void ready.refresh()}},'刷新市场'),h('button',{type:'button',className:'qcu-control qcu-exit',onClick:onBack},'← 返回对话')),h('p',{className:'qcu-hint',role:'status'},ready.refreshMessage||'',ready.lastRefresh?' · '+new Date(ready.lastRefresh).toLocaleTimeString():''),auxiliary,aux==='versions'?h(VersionsPage,{catalog,flowFor,onDetails:ready.onDetails}):aux==='guide'?h(Guide,{state:guide,setState:setGuide,onHome:()=>navigate(null)}):aux==='tasks'?h(Tasks,{drafts,setDrafts,selected:task,setSelected:setTask,onDetail:id=>{setDetailReturn('tasks');setAux(null);setSelected(id)}}):aux==='feedback'?h(Feedback):item?h(Detail,{key:item.id,item,flow:flowFor(item),onBack:()=>{setSelected(null);setAux(detailReturn);setDetailReturn(null)},onDetails:ready.onDetails,unavailable:ready.unavailable}):h(React.Fragment,null,
+  return h('section',{ref:root,className:'qcu-market','aria-label':'QCU市场'},h('style',null,marketStyles),h('div',{className:'qcu-content'},h('header',{className:'qcu-app-header'},h('div',{className:'qcu-wordmark'},h(Icon),h('span',null,'QCU 市场')),h('button',{type:'button',className:'qcu-control',disabled:!ready.refresh||ready.refreshing,onClick:()=>{void ready.refresh()}},'刷新市场'),h('button',{type:'button',className:'qcu-control qcu-exit',onClick:onBack},'← 返回对话')),h('p',{className:'qcu-hint',role:'status'},ready.refreshMessage||'',ready.lastRefresh?' · '+new Date(ready.lastRefresh).toLocaleTimeString():''),auxiliary,aux==='versions'?h(VersionsPage,{catalog,flowFor,onDetails:ready.onDetails,updater:ready.updates}):aux==='guide'?h(Guide,{state:guide,setState:setGuide,onHome:()=>navigate(null)}):aux==='tasks'?h(Tasks,{drafts,setDrafts,selected:task,setSelected:setTask,onDetail:id=>{setDetailReturn('tasks');setAux(null);setSelected(id)}}):aux==='feedback'?h(Feedback):item?h(Detail,{key:item.id,item,flow:flowFor(item),onBack:()=>{setSelected(null);setAux(detailReturn);setDetailReturn(null)},onDetails:ready.onDetails,unavailable:ready.unavailable}):h(React.Fragment,null,
    h('header',{className:'qcu-home-intro'},h('h1',null,'教学工具'),h('p',{className:'qcu-muted'},'按用途选择技能与插件，查看详情后再决定是否安装。')),
    h('section',{className:'qcu-onboarding','aria-label':'首次使用指引'},h('div',null,h('h2',null,guide.done?'随时回看使用步骤':'第一次使用，从这里开始'),h('p',{className:'qcu-hint'},guide.done?'已浏览引导（不代表已验收）；可随时从“新手指引”再看。':'5 步了解模型设置、技能选择和手动发送，可随时退出。')),h('button',{type:'button',className:'qcu-control',onClick:()=>navigate('guide')},guide.done?'再看指引':'开始浏览引导')),
    h('div',{className:'qcu-market-workspace'},h('aside',{className:'qcu-scenes','aria-label':'使用场景'},h('h2',null,'使用场景'),...['all',...scenarios].map(value=>h('button',{key:value,type:'button',className:'qcu-scene-filter','aria-pressed':scenario===value,onClick:()=>setScenario(value)},h('span',null,value==='all'?'全部场景':value),h('span',{'aria-hidden':true},kindItems.filter(e=>value==='all'||e.scenario===value).length)))),h('div',{className:'qcu-market-results'},h('div',{className:'qcu-toolbar'},h('nav',{'aria-label':'市场分类',className:'qcu-tabs'},...[['all','全部'],['skills','技能 Skill'],['plugins','插件 Plugin']].map(([key,text])=>h('button',{key,type:'button','aria-pressed':category===key,onClick:()=>{setCategory(key);setScenario('all')}},text))),h('label',{className:'qcu-search'},h('span',null,'搜索'),h('input',{type:'search',value:query,onChange:e=>setQuery(e.target.value),placeholder:'搜索名称或用途','aria-label':'搜索名称或用途'}))),

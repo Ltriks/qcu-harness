@@ -1,15 +1,25 @@
 import { TypertRemoteService } from '@deepseek-ai/dsh-typert-protocol'
 import { PackagePreparation } from './src/host-core.mjs'
 import { remoteContribution, marketRuntime } from './src/remote-contract.mjs'
+import {MarketUpdates} from './src/update-host.mjs'
+import {getDshRuntimeVersion} from '@deepseek-ai/dsh-app-boot'
 export const name='qcu-market'
 export const inject=['typert']
 class QcuPackageService extends TypertRemoteService {
-  constructor(ctx){super(ctx,'qcuMarket');this.packages=new PackagePreparation();ctx.effect(()=>()=>this.packages.dispose())}
+  constructor(ctx){super(ctx,'qcuMarket');this.packages=new PackagePreparation();ctx.effect(()=>()=>this.packages.dispose());ctx.inject(['profileContext','pluginManager'],scope=>{const updates=new MarketUpdates({profileDir:scope.profileContext.dir,runtime:getDshRuntimeVersion(),marketVersion:marketRuntime.version,inventory:async()=>({bundles:await scope.pluginManager.listBundles(),rows:await scope.pluginManager.listPlugins()})});this.updates=updates;scope.effect(()=>()=>{updates.dispose();this.updates=null})})}
+  updateService(){if(!this.updates)throw Error('当前profile更新服务尚未就绪');return this.updates}
   status(){return JSON.stringify(marketRuntime)}
   refresh(){return this.packages.refresh()}
   prepare(id,releaseKey,signal){return this.packages.prepare(id,releaseKey,signal)}
   verify(id,signal){return this.packages.verify(id,signal)}
   cancel(id){return this.packages.cancel(id)}
+  updatesCheck(signal){return this.updateService().check(signal)}
+  updatesPrepare(id,key,signal){return this.updateService().prepare(id,key,signal)}
+  updatesVerify(id){return this.updateService().verify(id)}
+  updatesCancel(id){return this.updateService().cancel(id)}
+  updatesJournal(id,requestId){return this.updateService().journal(id,requestId)}
+  updatesRecovery(){return this.updateService().recovery()}
+  updatesAcknowledge(requestId,state){return this.updateService().acknowledge(requestId,state)}
 }
 export function apply(ctx){
   new QcuPackageService(ctx)

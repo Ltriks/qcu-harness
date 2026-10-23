@@ -130,6 +130,12 @@ export const marketStyles = `
 .qcu-market .qcu-version-row h3 { margin:0;font-size:13px;font-weight:600; }
 .qcu-market .qcu-version-row code { display:block;max-width:100%;font-size:11px;line-height:1.8;overflow-wrap:anywhere; }
 .qcu-market .qcu-version-row .qcu-hint { margin:0; }
+.qcu-market .qcu-update-heading { display:flex;justify-content:space-between;align-items:start;gap:16px;flex-wrap:wrap; }
+.qcu-market .qcu-update-list { margin:18px 0;border-top:1px solid var(--dsw-alias-border-l3); }
+.qcu-market .qcu-update-item { display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding:14px 0;border-bottom:1px solid var(--dsw-alias-border-l3); }
+.qcu-market .qcu-update-item h3 { margin:0;font-size:14px;font-weight:600; }
+.qcu-market .qcu-update-item .qcu-hint { margin:4px 0; }
+.qcu-market .qcu-updates .qcu-review { margin:20px 0; }
 @media(max-width:860px) {
  .qcu-market .qcu-market-workspace { grid-template-columns:minmax(0,1fr);gap:16px; }
  .qcu-market .qcu-scenes { display:flex;flex-wrap:wrap;gap:6px; }

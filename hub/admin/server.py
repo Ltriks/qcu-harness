@@ -123,13 +123,23 @@ def prompt_password():
     try:
         with warnings.catch_warnings():
             warnings.simplefilter('error', getpass.GetPassWarning)
-            password = getpass.getpass('New password: ')
-            password_bytes(password)
-            confirmation = getpass.getpass('Repeat password: ')
-            need(secrets.compare_digest(password.encode('utf-8'), confirmation.encode('utf-8')), 'auth.invalid')
+            while True:
+                password = getpass.getpass('New password: ')
+                try:
+                    raw = password_bytes(password)
+                except Refused:
+                    print('Password must be 12-128 characters, at most 512 UTF-8 bytes, with no NUL. Please try again.', flush=True)
+                    continue
+                confirmation = getpass.getpass('Repeat password: ')
+                try:
+                    matches = secrets.compare_digest(raw, password_bytes(confirmation))
+                except Refused:
+                    matches = False
+                if matches:
+                    return password
+                print('Passwords do not match. Please enter both again.', flush=True)
     except getpass.GetPassWarning:
         raise Refused('auth.tty_required') from None
-    return password
 
 
 def preflight(envelope):

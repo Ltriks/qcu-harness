@@ -47,13 +47,13 @@ function fixture(){
  return {flow,manager,remote,receipt,inspection,calls,mutations,setBundles:b=>bundles=b,setRows:r=>rows=r,progress:p=>listener?.(p)}
 }
 test('Host receipts expire, cancellation revokes them, no manager or session dependency',async()=>{
- let now=0;const p=new PackagePreparation({now:()=>now,download:async()=>'/fixed',verify:async()=>{}})
+ let now=0;const p=new PackagePreparation({authority:null,now:()=>now,download:async()=>'/fixed',verify:async()=>{}})
  const receipt=JSON.parse(await p.prepare(id));assert.equal(receipt.path,'/fixed');assert.equal(JSON.parse(await p.verify(id)).id,id)
  p.cancel(id);await assert.rejects(p.verify(id),/expired or cancelled/)
  await p.prepare(id);now=300001;await assert.rejects(p.verify(id),/expired or cancelled/);p.dispose()
 })
 test('Host duplicate preparation and disposal abort download',async()=>{
- let started;const start=new Promise(r=>started=r);const p=new PackagePreparation({download:({signal})=>new Promise((resolve,reject)=>{started();signal.addEventListener('abort',()=>reject(Error('aborted')),{once:true})})})
+ let started;const start=new Promise(r=>started=r);const p=new PackagePreparation({authority:null,download:({signal})=>new Promise((resolve,reject)=>{started();signal.addEventListener('abort',()=>reject(Error('aborted')),{once:true})})})
  const running=p.prepare(id);await start;await assert.rejects(p.prepare(id),/running/);p.dispose();await assert.rejects(running,/aborted/)
 })
 test('download review performs zero mutations; decline means no installation and no automatic retry',async()=>{
@@ -115,9 +115,9 @@ test('metadata status never reads skill body or starts a session; missing bundle
  const f=fixture();assert.equal((await readCoach(f.manager)).state,'not-installed');assert.deepEqual(f.calls,['listBundles'])
  f.setBundles([{name:release.id,version:'old',installed:true}]);assert.equal((await readCoach(f.manager)).state,'conflict')
 })
-test('dispose releases subscriptions and requests cancellation, ignores late success',async()=>{
+test('dispose releases subscriptions without cancelling an official request, ignores late success',async()=>{
  const f=fixture();let finish;f.manager.installBundle=()=>new Promise(r=>finish=r);let cancelled=0;f.manager.cancelInstall=async()=>{cancelled++;return ok({status:'cancelled'})}
- await f.flow.prepare();const pending=f.flow.confirmInstall();await tick();const before=f.flow.state;f.flow.dispose();finish(ok({application:'applied',stage:'enable',target:release.id,enabled:false,bundle:release.id}));await pending;assert.equal(cancelled,1);assert.equal(f.flow.state,before)
+ await f.flow.prepare();const pending=f.flow.confirmInstall();await tick();const before=f.flow.state;f.flow.dispose();finish(ok({application:'applied',stage:'enable',target:release.id,enabled:false,bundle:release.id}));await pending;assert.equal(cancelled,0);assert.equal(f.flow.state,before)
 })
 
 for(const [field,value] of Object.entries({stage:'install',target:'other',bundle:'other',enabled:true}))test(`success with wrong ${field} stays unconfirmed`,async()=>{

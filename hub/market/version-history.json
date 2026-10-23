@@ -1,5 +1,5 @@
 {
-  "sourceRevision": "pilot-market-p13-1-unified-versions",
+  "sourceRevision": "pilot-market-p15-1-frozen-p14-integration",
   "origin": "http://192.168.1.68:8080",
   "entries": [
     {
@@ -178,6 +178,36 @@
       "file": "qcu-market-0.1.0-pilot.13.1-e17f3d38d7feed0048e19534ed779593e7531122b84265e4f4ca90e40234dbb3.tgz",
       "bytes": 50916,
       "sha256": "e17f3d38d7feed0048e19534ed779593e7531122b84265e4f4ca90e40234dbb3",
+      "dshVersions": [
+        "0.2.0-rc.2"
+      ]
+    },
+    {
+      "id": "qcu-market",
+      "version": "0.1.0-pilot.13.2",
+      "file": "qcu-market-0.1.0-pilot.13.2-a9a9bff172795ca1e42433d6cee725ab3f8f7dd096d69b69acb4e196ce0bbb45.tgz",
+      "bytes": 51343,
+      "sha256": "a9a9bff172795ca1e42433d6cee725ab3f8f7dd096d69b69acb4e196ce0bbb45",
+      "dshVersions": [
+        "0.2.0-rc.2"
+      ]
+    },
+    {
+      "id": "qcu-course-workbench",
+      "version": "0.1.0-pilot.1.2",
+      "file": "qcu-course-workbench-0.1.0-pilot.1.2-88a55b22561a5f6cf1e7af8d27ad28d074df13db4feb4c9340fddd208f5ad0ec.tgz",
+      "bytes": 51089,
+      "sha256": "88a55b22561a5f6cf1e7af8d27ad28d074df13db4feb4c9340fddd208f5ad0ec",
+      "dshVersions": [
+        "0.2.0-rc.2"
+      ]
+    },
+    {
+      "id": "qcu-market",
+      "version": "0.1.0-pilot.14.1",
+      "file": "qcu-market-0.1.0-pilot.14.1-afd2ada38d7039fac2d978314d17f9391bb420d5174fd095ff7d2f7a7be85ec3.tgz",
+      "bytes": 69089,
+      "sha256": "afd2ada38d7039fac2d978314d17f9391bb420d5174fd095ff7d2f7a7be85ec3",
       "dshVersions": [
         "0.2.0-rc.2"
       ]

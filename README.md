@@ -1,15 +1,15 @@
 # QCU Harness
 
-课程设计工作台：`dev/qcu-course-workbench`。[工作台 1.2 原生验收](docs/qcu-course1.2-native-acceptance.md)记录了一次真实生成成功、教学内容问题及尚待验收项；不能沿用早期“未安装真实 DSH”的结论。当前源码为 **1.3 本地候选（未部署）**，首用连接、完整修订和市场只读状态改进见[稳定性验证](docs/qcu-course-review-stability.md)。历史包、市场目录固定版本与旧失败任务保持原样。[Hub 单管理员本机登录与审核](docs/qcu-hub-single-admin.md)已实现，22项回归及真实 Chromium 合成流程通过，**未部署、未真实发布、未创建真实账号**；[历史双角色 MVP](docs/qcu-hub-submissions-mvp.md)保留原验收口径；完整后续边界见[发布计划](docs/qcu-hub-submission-workflow.md)。另见[交付包与验收](docs/qcu-course-workbench-delivery.md)和[数据/接口契约](docs/qcu-course-workbench-validation.md)。
+课程设计工作台：`dev/qcu-course-workbench`。[工作台 1.2 原生验收](docs/qcu-course1.2-native-acceptance.md)记录了一次真实生成成功、教学内容问题及尚待验收项；不能沿用早期“未安装真实 DSH”的结论。当前源码为 **1.3 本地候选（未部署）**，首用连接、完整修订和市场只读状态改进见[稳定性验证](docs/qcu-course-review-stability.md)。历史包、市场目录固定版本与旧失败任务保持原样。[Hub 单管理员本机登录与审核](docs/qcu-hub-single-admin.md)已实现，22项回归及真实 Chromium 合成流程通过，最新部署与真实账号状态见 [P15.1 部署验收](docs/qcu-hub-market-p15.1-deployment.md)；[历史双角色 MVP](docs/qcu-hub-submissions-mvp.md)保留原验收口径；完整后续边界见[发布计划](docs/qcu-hub-submission-workflow.md)。另见[交付包与验收](docs/qcu-course-workbench-delivery.md)和[数据/接口契约](docs/qcu-course-workbench-validation.md)。
 
-## Web 发布与 DSH 动态市场（P15，本地候选）
+## Web 发布与 DSH 动态市场（P15.1，已部署内部 Hub）
 
-开发分支 `dev/qcu-hub-market-publication`，固定 worktree 为 `$HOME/Repos/worktrees/qcu-harness/hub-market-publication`。已实现独立发布确认、签名目录、DSH 刷新、撤回和新修订恢复；浏览与刷新不安装，安装默认未启用，启用仍单独确认。当前**未部署，未创建生产密钥，候选包未固定生产公钥**；首次迁移须预览并确认保留已有产品，之后发布新产品无需每次重建市场。
+开发分支 `dev/qcu-hub-market-publication`，固定 worktree 为 `$HOME/Repos/worktrees/qcu-harness/hub-market-publication`。已实现独立发布确认、签名目录、DSH 刷新、撤回和新修订恢复；浏览与刷新不安装，安装默认未启用，启用仍单独确认。P15.1 已固定生产公钥并发布现有 Hub；已确认保留 9 项教师产品，mini 默认 DSH 完成14.1→15.1自升级、重启和签名目录刷新，管理员本人登录通过。真实新投稿的上传/批准/发布仍待单独验收，之后新增产品无需每次重建市场。详见[部署记录与下一次验收步骤](docs/qcu-hub-market-p15.1-deployment.md)。
 
 - [中文人工验收单](docs/qcu-hub-market-publication-acceptance.md)
 - [构建、测试、初始化、迁移与部署契约](docs/qcu-hub-market-publication.md)
-- 本地回归夹具在 `.work/hub-market-publication/`；交付证据在 `$HOME/Artifacts/qcu-harness/0.1.0-hub-market-publication.1/`，不入 Git。
-- 公开服务仍面向既有 `192.168.1.68:8080`，管理服务仅本机回环；本轮未变更实际部署。P14 其他线程的未提交改动未集成。
+- 本次夹具在 `.work/p15-rollout/`，固定包、截图和验收证据在 `$HOME/Artifacts/qcu-harness/0.1.0-pilot.15.1/`；早期 P15 本地证据保留原目录，不入 Git。
+- 公开服务沿用 `192.168.1.68:8080`，管理服务仅 mini 回环 `127.0.0.1:8975`。已按冻结并核验的 P14.1 源码保留检查更新能力，原工作树未改动；代码、产物、部署位置和恢复命令见上述部署记录。
 
 ## 本地开发入口与市场分支
 
@@ -38,7 +38,7 @@ P10离线维护工具已完成本地父审查：两版Python各51项通过、9�
 | `$HOME/Repos/worktrees/qcu-harness/market-integration` | P8工具插件目录集成，`dev/qcu-market-p8` |
 | `$HOME/Repos/worktrees/qcu-harness/market-onboarding` | P9新手体验，`dev/qcu-market-p9`；独立构建、预览与实机验收文档 |
 | `$HOME/Repos/worktrees/qcu-harness/market-maintenance` | P10离线检查器，`dev/qcu-market-p10`；只维护工具、示例与文档 |
-| `$HOME/Repos/worktrees/qcu-harness/hub-market-publication` | P15 发布与动态目录，`dev/qcu-hub-market-publication`；本地候选，未部署 |
+| `$HOME/Repos/worktrees/qcu-harness/hub-market-publication` | P15.1 发布与动态目录，`dev/qcu-hub-market-publication`；已部署 Hub 与 mini 默认 DSH |
 | `$HOME/Repos/worktrees/qcu-harness/hub-admin-account` | 当前单管理员本机迭代，`dev/qcu-hub-admin-account`；[交互式设置／恢复与合成证据](docs/qcu-hub-single-admin.md)；旧库不迁移、未部署 |
 | `$HOME/Repos/worktrees/qcu-harness/hub-submissions` | 本机投稿审核，`dev/qcu-hub-submissions`；无构建依赖，运行和验收见 [MVP说明](docs/qcu-hub-submissions-mvp.md)；未部署 |
 | `$HOME/Repos/worktrees/qcu-harness/hub-onboarding` | 当前教师网页入口，`dev/qcu-hub-onboarding`；首页静态源码，无构建依赖；测试/预览见[教师指南](docs/qcu-hub-teacher-install.md) |

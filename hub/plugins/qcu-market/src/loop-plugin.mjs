@@ -26,8 +26,8 @@ export function createLoopPlugin(React){
         // withdrawing it must not queue $unmount inside its own namespace teardown.
         ui=serviceCtx.inject(['remote.pluginManager','remote.qcuMarket'],async flowCtx=>{
           const runtime=new CatalogRuntime(flowCtx.remote,update)
-          update({refresh:()=>runtime.refresh(),catalog:{entries:[]}})
-          flowCtx.effect(()=>()=>{runtime.dispose();update({flow:null,flows:null,flowByKey:null,catalog:{entries:[]},unavailable:'服务已释放或连接能力变化，请等待服务恢复。'})})
+          update({refresh:()=>runtime.refresh(),updates:runtime.updates,catalog:{entries:[]}})
+          flowCtx.effect(()=>()=>{runtime.dispose();update({flow:null,flows:null,flowByKey:null,updates:null,refresh:null,catalog:{entries:[]},unavailable:'服务已释放或连接能力变化，请等待服务恢复。'})})
           flowCtx.on('connection/reset',()=>runtime.reset())
           await runtime.refresh()
         })

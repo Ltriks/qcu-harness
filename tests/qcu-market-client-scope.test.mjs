@@ -45,6 +45,7 @@ async function fixture(t,{manager=true,navigation=true,plugin,answer,autoActivat
    case 'pluginManager/cancelInstall':value={status:'cancelled'};break
    case 'pluginManager/waitForInstall':value=null;break
    case 'pluginManager/inspect':value={status:'accepted',kind:'tarball',bundle:null,registry:null};break
+   case 'qcuMarket/updatesRecovery':value='null';break
    case 'qcuMarket/refresh':value=JSON.stringify({mode:'legacy',state:'legacy',catalog:bundledCatalog,fingerprint:catalogSha256,message:'Legacy fixture'});break
    case 'qcuMarket/status':value=JSON.stringify(marketRuntime);break
    case 'qcuMarket/prepare':receipt.id=a.id;value=JSON.stringify(receipt);break
@@ -66,13 +67,13 @@ async function fixture(t,{manager=true,navigation=true,plugin,answer,autoActivat
 }
 test('Client starts in a real plugin fiber, checks inventory and prepares/declines through both guarded namespaces',async t=>{
  const f=await fixture(t);const p=f.props();assert.ok(p.flow,p.unavailable)
- assert.ok(f.calls.every(c=>['qcuMarket/status','qcuMarket/refresh'].includes(c.endpoint)),'startup is read-only catalog loading');f.calls.length=0
+ assert.ok(f.calls.every(c=>['qcuMarket/status','qcuMarket/updatesRecovery','qcuMarket/refresh'].includes(c.endpoint)),'startup is read-only catalog loading');f.calls.length=0
  await p.flow.status();assert.equal(p.flow.state.status?.state,'not-installed',p.flow.state.message)
  await p.flow.prepare();assert.equal(p.flow.state.phase,'review',p.flow.state.message)
  assert.match(f.render(),/等待你的确认/);assert.doesNotMatch(f.render(),/确认安装（保持未启用）/,'list never renders confirmation controls')
  p.onDetails();assert.deepEqual(f.details,[release.id])
  await p.flow.decline();assert.equal(p.flow.state.phase,'declined')
- assert.deepEqual(f.calls.map(c=>c.endpoint),['qcuMarket/status','pluginManager/listBundles','qcuMarket/status','pluginManager/listBundles','qcuMarket/prepare','pluginManager/inspect','qcuMarket/cancel'])
+ assert.deepEqual(f.calls.map(c=>c.endpoint),['qcuMarket/status','pluginManager/listBundles','qcuMarket/status','qcuMarket/updatesRecovery','pluginManager/listBundles','qcuMarket/prepare','pluginManager/inspect','qcuMarket/cancel'])
  await f.fork.dispose();assert.equal(f.ctx.slots.entriesOfSlot('main').length,0);assert.equal(f.ctx.get('remote.qcuMarket'),undefined)
 })
 
@@ -122,11 +123,11 @@ test('Client transport withdrawal clears flow, listeners and contributions; tran
  await tick();await tick()
  assert.ok(f.props().flow);assert.notEqual(f.props().flow,old);assert.equal(f.ctx.slots.entriesOfSlot('main').length,1)
 })
-test('dispose during an outstanding official install requests cancellation once and ignores its late result',async t=>{
+test('dispose retains an outstanding official install without cancellation and ignores its late result',async t=>{
  let finish
  const f=await fixture(t,{answer:endpoint=>endpoint==='pluginManager/installBundle'?new Promise(resolve=>{finish=resolve}):undefined}),flow=f.props().flow
  await flow.prepare();const running=flow.confirmInstall();await tick();assert.ok(finish)
- await f.fork.dispose();assert.equal(f.calls.filter(c=>c.endpoint==='pluginManager/cancelInstall').length,1)
+ await f.fork.dispose();assert.equal(f.calls.filter(c=>c.endpoint==='pluginManager/cancelInstall').length,0)
  const state=flow.state;finish({ok:true,value:{changed:false,application:'cancelled',stage:'install',target:'/cache/'+release.file}});await running;assert.equal(flow.state,state)
  assert.equal(f.ctx.get('remote.qcuMarket'),undefined)
 })
@@ -177,10 +178,10 @@ test('compiled Client4 tools entry passes official manager codecs with synthetic
  const preview=createPreviewFixture();t.after(()=>preview.flows.forEach(f=>f.dispose()))
  const plugin=await archivedClient(new URL('../.work/http-e2e/market/package/client.js',import.meta.url))
  const f=await fixture(t,{plugin,answer:async(endpoint,a)=>{
-  const [namespace,method]=endpoint.split('/');const params={status:[],refresh:[],prepare:[a.id,a.releaseKey],verify:[a.id],cancel:[a.id],listBundles:[],listPlugins:[],inspect:[a.spec,a.options],installBundle:[a.spec,a.options],setBundleEnabled:[a.name,a.enabled],setPluginEnabled:[a.id,a.enabled]}
+  const [namespace,method]=endpoint.split('/');const params={status:[],refresh:[],updatesRecovery:[],prepare:[a.id,a.releaseKey],verify:[a.id],cancel:[a.id],listBundles:[],listPlugins:[],inspect:[a.spec,a.options],installBundle:[a.spec,a.options],setBundleEnabled:[a.name,a.enabled],setPluginEnabled:[a.id,a.enabled]}
   assert.ok(params[method],endpoint);return preview.remote[namespace][method](...params[method])
  }}),flow=f.props().flows.find(f=>f.entry.id==='qcu-feishu-readonly')
- assert.ok(f.calls.every(c=>['qcuMarket/status','qcuMarket/refresh'].includes(c.endpoint)));f.calls.length=0;assert.equal(flow.entry.skill,null);await flow.prepare();assert.equal(flow.state.phase,'review',flow.state.message)
+ assert.ok(f.calls.every(c=>['qcuMarket/status','qcuMarket/updatesRecovery','qcuMarket/refresh'].includes(c.endpoint)));f.calls.length=0;assert.equal(flow.entry.skill,null);await flow.prepare();assert.equal(flow.state.phase,'review',flow.state.message)
  assert.equal(flow.state.review.receipt.entry.sha256,'37376ce5f03d4f0fb459dcf6f888b25f5f78df1f7734cd780c7cfd6d01e91b17')
  await flow.confirmInstall();assert.equal(flow.state.status.state,'installed-disabled');await flow.reviewActivate();assert.equal(flow.state.review.kind,'activate')
  assert.equal(f.calls.filter(c=>c.endpoint.endsWith('/setBundleEnabled')||c.endpoint.endsWith('/setPluginEnabled')).length,0)
@@ -190,7 +191,7 @@ test('compiled Client4 tools entry passes official manager codecs with synthetic
 test('official scoped startup/navigation do not auto-check; concurrent public inventory checks never manufacture peer-operation failures',async t=>{
  let releaseRead;const gate=new Promise(r=>releaseRead=r)
  const f=await fixture(t,{answer:async endpoint=>{if(endpoint==='pluginManager/listBundles'){await gate;return {ok:true,value:[]}}}}),flows=f.props().flows
- assert.ok(f.calls.every(c=>['qcuMarket/status','qcuMarket/refresh'].includes(c.endpoint)));f.calls.length=0;f.ctx.layout.selectPanel('qcu-market');f.render();f.ctx.layout.selectPanel(null);f.render();assert.deepEqual(f.calls,[])
+ assert.ok(f.calls.every(c=>['qcuMarket/status','qcuMarket/updatesRecovery','qcuMarket/refresh'].includes(c.endpoint)));f.calls.length=0;f.ctx.layout.selectPanel('qcu-market');f.render();f.ctx.layout.selectPanel(null);f.render();assert.deepEqual(f.calls,[])
  const checks=flows.map(flow=>flow.status());await tick();assert.ok(flows.every(flow=>flow.state.phase==='checking'));assert.equal(f.calls.filter(c=>c.endpoint==='pluginManager/listBundles').length,flows.length)
  assert.ok(flows.every(flow=>flow.pending===null));releaseRead();await Promise.all(checks)
  assert.ok(flows.every(flow=>flow.state.phase==='idle'&&flow.state.status.state==='not-installed'))

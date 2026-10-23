@@ -25,7 +25,7 @@ test('real nine-entry archived HTTP selects each pinned Skill or tools plugin an
  await tools.reviewActivate();assert.equal(h.state.mutations.length,flows.length+1);await tools.confirmActivate();assert.equal(tools.state.status.state,'component-active');assert.equal(h.state.mutations.length,flows.length+3)
 })
 test('actual archived Client → official HTTP → Gateway → archived Host prepares verified fixed bytes and decline never installs',async t=>{
- const {h,d,flow}=await fixture(t);assert.ok(h.calls.every(c=>['/api/qcuMarket/status','/api/qcuMarket/refresh'].includes(c.path)));h.calls.length=0
+ const {h,d,flow}=await fixture(t);assert.ok(h.calls.every(c=>['/api/qcuMarket/status','/api/qcuMarket/updatesRecovery','/api/qcuMarket/refresh'].includes(c.path)));h.calls.length=0
  await flow.status();assert.equal(flow.state.status.state,'not-installed',flow.state.message)
  await flow.prepare();assert.equal(flow.state.phase,'review',flow.state.message)
  const r=flow.state.review.receipt;assert.equal(r.entry.sha256,d.release.sha256);assert.equal((await readFile(r.path)).length,d.release.bytes);assert.equal(d.count(),1);assert.equal(h.state.mutations.length,0)

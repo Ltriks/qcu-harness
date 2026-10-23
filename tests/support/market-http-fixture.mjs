@@ -21,11 +21,11 @@ const {TypertRemoteService}=await load('@deepseek-ai/dsh-typert-protocol')
 const hostConnection=await load('@deepseek-ai/dsh-client-connection')
 const {TYPERT}=await load('@deepseek-ai/dsh-plugin-manager/typert')
 const {default:managerRemote}=await load('@deepseek-ai/dsh-plugin-manager/remote')
-export const work=fileURLToPath(new URL('../../.work/http-e2e/',import.meta.url))
+export const work=process.env.QCU_MARKET_HTTP_WORK||fileURLToPath(new URL('../../.work/http-e2e/',import.meta.url))
 export const archiveDir=join(work,'market/package')
 export const tick=()=>new Promise(r=>setImmediate(r))
 const methods=['listBundles','listPlugins','inspect','installBundle','waitForInstall','cancelInstall','setBundleEnabled','setPluginEnabled']
-export async function startHost({marketDir=archiveDir,marketModule,backend={}}={}){
+export async function startHost({marketDir=archiveDir,marketModule,backend={},authority=null}={}){
  const host=new Context(),routes=[],credentials=new Map(),calls=[]
  host.provide('credentials',{readRecord:async k=>credentials.get(k),modifyRecord:async(k,f)=>{const next=await f(credentials.get(k));if(next!==undefined)credentials.set(k,next);return next??credentials.get(k)}})
  host.provide('webServer',{register(route){routes.push(route);return()=>routes.splice(routes.indexOf(route),1)},registerUpgrade:()=>()=>{},tapIndex:()=>()=>{},port:0})
@@ -46,7 +46,9 @@ export async function startHost({marketDir=archiveDir,marketModule,backend={}}={
  }
  const manager=host.plugin({inject:['typert'],apply(ctx){new Manager(ctx);ctx.typert.register({...TYPERT,invocations:TYPERT.invocations.filter(d=>methods.includes(d.method)),schemas:[],model:{services:[],events:[],objects:[]}})}});await manager.await()
  const module=marketModule??await import(pathToFileURL(marketDir+'/index.js'))
- let fork=host.plugin(module);await fork.await()
+ // These legacy HTTP fixtures have no real profile or update journal.
+ const mount=async()=>{const fork=host.plugin(module);await fork.await();const service=host.get('qcuMarket');if(service){service.packages.authority=authority;service.updates={recovery:async()=>'null'}}return fork}
+ let fork=await mount()
  assert.equal(routes.length,1);assert.equal(routes[0].path,'/api')
  const server=createServer((request,response)=>{if(request.url.startsWith('/?')){if(host.connection.authorizeIndex(request,response)){response.writeHead(200);response.end('fixture')}return}calls.push({method:request.method,path:request.url});void routes[0].handler(request,response)})
  await new Promise((r,j)=>{server.once('error',j);server.listen(0,'127.0.0.1',r)})
@@ -55,7 +57,7 @@ export async function startHost({marketDir=archiveDir,marketModule,backend={}}={
  const cookie=login.headers.get('set-cookie').split(';',1)[0]
  const send=(path,init={})=>fetch(new URL(path,origin+'/'),{...init,headers:{...Object.fromEntries(new Headers(init.headers)),cookie}})
  const raw=(endpoint,args={},extra={})=>send('/api/'+endpoint,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({type:'client-request',rpcId:crypto.randomUUID(),method:endpoint,payload:{args}}),...extra})
- return {host,calls,state,origin,send,raw,module,get fork(){return fork},async remount(){await fork.dispose();fork=host.plugin(module);await fork.await()},async close(){await host.fiber.dispose();server.closeAllConnections();await new Promise(r=>server.close(r))}}
+ return {host,calls,state,origin,send,raw,module,get fork(){return fork},async remount(){await fork.dispose();fork=await mount()},async close(){await host.fiber.dispose();server.closeAllConnections();await new Promise(r=>server.close(r))}}
 }
 export async function attachDownload(h,{mode='ok'}={}){
  const dir=await mkdtemp(join(realpathSync(tmpdir()),'qcu-http-')),cache=join(dir,'cache')

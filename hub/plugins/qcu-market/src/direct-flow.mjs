@@ -42,22 +42,23 @@ export async function readProduct(manager,entry=release){
   return result({state:row.fiberPhase==='active'?'component-active':'restart-or-pending',entryId:row.entryId})
 }
 export class DirectMarketFlow {
-  constructor(remote,{entry=release,catalog=bundledCatalog,fingerprint=catalogSha256,dynamic=false,gate=null,peers=null,uuid=()=>crypto.randomUUID(),now=()=>Date.now()}={}){
+  constructor(remote,{entry=release,catalog=bundledCatalog,fingerprint=catalogSha256,dynamic=false,gate=null,peers=null,blocker=null,beforeOperation=null,uuid=()=>crypto.randomUUID(),now=()=>Date.now()}={}){
     this.dynamic=dynamic
-    this.gate=gate
+    this.gate=gate;this.blocker=blocker;this.beforeOperation=beforeOperation
     this.remote=remote;this.entry=entry;this.catalog=catalog;this.fingerprint=fingerprint;this.releaseKey=releaseKeyOf(entry);this.peers=peers;this.uuid=uuid;this.now=now;this.listeners=new Set();this.state={phase:'idle',status:null,review:null,message:'',result:null};this.generation=0;this.pending=null;this.request=null;this.disposed=false;this.statusGeneration=0;this.statusRead=null
     this.unlisten=remote.$on?.('plugin-manager/install-state',p=>this.progress(p))
   }
   snapshot=()=>this.state
   subscribe=fn=>{this.listeners.add(fn);return()=>this.listeners.delete(fn)}
   set(next){if(this.disposed)return;this.state={...this.state,...next};for(const fn of this.listeners)fn()}
-  guard(){if(this.gate?.refreshing)throw Error('目录刷新进行中；请等待刷新完成后重新操作');if(this.peers?.some(f=>f!==this&&(f.pending||f.request||f.activation||f.state.review)))throw new Error('其他条目已有操作进行中；请先完成或取消');if(this.disposed)throw new Error('市场已关闭');if(this.pending||this.request||this.activation)throw new Error('已有操作进行中；请等待或核对结果')}
+  guard(){if(this.blocker?.())throw Error('市场更新正在进行或尚待核对，请先在版本管理处理');if(this.gate?.refreshing)throw Error('目录刷新进行中；请等待刷新完成后重新操作');if(this.peers?.some(f=>f!==this&&(f.pending||f.request||f.activation||f.state.review)))throw new Error('其他条目已有操作进行中；请先完成或取消');if(this.disposed)throw new Error('市场已关闭');if(this.pending||this.request||this.activation)throw new Error('已有操作进行中；请等待或核对结果')}
   valid(n){if(this.disposed||n!==this.generation)throw new Error('操作已取消或目录已变化')}
   checkReceipt(r){if(!r||r.catalogSha256!==this.fingerprint||r.releaseKey!==this.releaseKey||!same(findMarketRelease(this.catalog,this.releaseKey),this.entry)||!same(r.entry,this.entry)||!Number.isSafeInteger(r.expiresAt)||r.expiresAt<=this.now()||typeof r.path!=='string'||!r.path.startsWith('/')||!r.path.endsWith('/'+this.entry.file))throw new Error('包来源、目录或有效期已变化；请重新准备并确认')}
-  async checkHost(){
+  async checkHost({readOnly=false}={}){
     let actual
     try{actual=JSON.parse(unwrap(await this.remote.qcuMarket.status()))}catch(e){throw new Error('市场 Host 尚未就绪；如刚更新或重装，请正常退出并重新打开 DSH 后再检查。未发起安装。详情：'+failure(e))}
     if(!same(actual,marketRuntime))throw new Error('市场 Host 与界面版本不一致，请正常重启 DSH 后再检查；未发起安装。')
+    if(!readOnly)await this.beforeOperation?.()
     if(this.dynamic){const s=JSON.parse(unwrap(await this.remote.qcuMarket.refresh()));if(s.mode!=='dynamic'||s.state!=='fresh'||s.fingerprint!==this.fingerprint||!same(findMarketRelease(s.catalog,this.releaseKey),this.entry))throw Error('签名目录失效、更新或撤回；请刷新市场并重新确认')}
   }
   async status(){
@@ -70,7 +71,7 @@ export class DirectMarketFlow {
     this.set({phase:'checking',message:''})
     const current=()=>!this.disposed&&n===this.generation&&read===this.statusGeneration&&!this.pending&&!this.request&&!this.activation&&!this.state.review
     const promise=(async()=>{
-      try{await this.checkHost();if(!current())return;const status=await readProduct(this.remote.pluginManager,this.entry);if(current())this.set({phase:'idle',status,message:''});return status}
+      try{await this.checkHost({readOnly:true});if(!current())return;const status=await readProduct(this.remote.pluginManager,this.entry);if(current())this.set({phase:'idle',status,message:''});return status}
       catch(e){if(current())this.set({phase:'unavailable',status:null,message:failure(e)})}
     })()
     this.statusRead=promise
@@ -215,7 +216,7 @@ export class DirectMarketFlow {
     const op=this.activation;if(!op||op.running||op.reconciling)return
     op.reconciling=true
     try{
-      await this.checkHost();const inventory=await this.refreshActivation(op)
+      await this.checkHost({readOnly:true});const inventory=await this.refreshActivation(op)
       // A lost reply never permits repeating that mutation. Only observed
       // enablement releases the lock, and any remaining row needs new consent.
       if((op.sent==='bundle'&&inventory.bundle.enabled)||(op.sent==='row'&&inventory.rows[0]?.enabled)){
@@ -243,10 +244,10 @@ export class DirectMarketFlow {
     }catch(e){if(n===this.generation)this.set({phase:'error',message:'启用结果需核对：'+failure(e)})}finally{this.pending=null}
   }
   invalidate(){const hadOperation=this.pending||this.activation||this.state.review||this.state.result||['error','partial','unconfirmed'].includes(this.state.phase);++this.statusGeneration;this.statusRead=null;if(this.activation)this.activation.authorized=false;const receiptId=this.state.review?.receipt?.id;if(receiptId)void this.remote.qcuMarket.cancel(receiptId).catch(()=>{});++this.generation;this.pending?.abort?.abort();if(!this.request)this.set({phase:this.activation?'unconfirmed':hadOperation?'error':'idle',status:this.activation?this.state.status:null,review:null,message:hadOperation?'连接或目录变化，原确认已作废；已发出的启用操作需重新检查。':'连接已变化，状态待重新检查；未发起安装或启用。'})}
-  dispose(){++this.statusGeneration;this.statusRead=null;if(this.activation)this.activation.authorized=false;this.disposed=true;++this.generation;this.pending?.abort?.abort();const id=this.pending?.id||this.state.review?.receipt?.id;if(id)void this.remote.qcuMarket.cancel(id).catch(()=>{});if(this.request)void this.remote.pluginManager.cancelInstall(this.request.id).catch(()=>{});this.unlisten?.();this.listeners.clear()}
+  dispose(){++this.statusGeneration;this.statusRead=null;if(this.activation)this.activation.authorized=false;this.disposed=true;++this.generation;this.pending?.abort?.abort();const id=this.pending?.id||this.state.review?.receipt?.id;if(id)void this.remote.qcuMarket.cancel(id).catch(()=>{});/* Sent official requests remain owned by the manager; unloading never cancels them. */this.unlisten?.();this.listeners.clear()}
 }
 
-export function createCatalogFlows(remote,{catalog=bundledCatalog,fingerprint=catalogSha256,dynamic=false,gate=null}={}){const flows=[];for(const item of catalog.entries)flows.push(new DirectMarketFlow(remote,{entry:item.release,catalog,fingerprint,dynamic,gate,peers:flows}));return flows}
+export function createCatalogFlows(remote,{catalog=bundledCatalog,fingerprint=catalogSha256,dynamic=false,gate=null,blocker=null,beforeOperation=null}={}){const flows=[];for(const item of catalog.entries)flows.push(new DirectMarketFlow(remote,{entry:item.release,catalog,fingerprint,dynamic,gate,peers:flows,blocker,beforeOperation}));return flows}
 
 // Compatibility export for existing coach regression fixtures.
 export const readCoach=readProduct
