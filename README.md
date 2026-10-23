@@ -2,6 +2,12 @@
 
 课程设计工作台：`dev/qcu-course-workbench`。[工作台 1.2 原生验收](docs/qcu-course1.2-native-acceptance.md)记录了一次真实生成成功、教学内容问题及尚待验收项；不能沿用早期“未安装真实 DSH”的结论。当前源码为 **1.3 本地候选（未部署）**，首用连接、完整修订和市场只读状态改进见[稳定性验证](docs/qcu-course-review-stability.md)。历史包、市场目录固定版本与旧失败任务保持原样。[Hub 单管理员本机登录与审核](docs/qcu-hub-single-admin.md)已实现，22项回归及真实 Chromium 合成流程通过，最新部署与真实账号状态见 [P15.1 部署验收](docs/qcu-hub-market-p15.1-deployment.md)；[历史双角色 MVP](docs/qcu-hub-submissions-mvp.md)保留原验收口径；完整后续边界见[发布计划](docs/qcu-hub-submission-workflow.md)。另见[交付包与验收](docs/qcu-course-workbench-delivery.md)和[数据/接口契约](docs/qcu-course-workbench-validation.md)。
 
+## 专家团自主收尾候选
+
+当前独立分支 `dev/qcu-expert-teams-hardening`，worktree `$HOME/Repos/worktrees/qcu-harness/expert-teams-hardening`。从原专家库 `0.2.0-pilot.1` 的固定公开源码快照继续，原专家团工作树不改。本轮专家团 `0.2.0-pilot.2`、协议3、存储schema2：新增容量显示、所选历史数据备份、绑定预览及明确确认的清理、失败/停止/中断报告，并修复异步刷新和窄屏列表问题。源码和精确解包候选各通过35项核心/复核、6项官方运行时与1项浏览器综合验收；合成模型、实际下载、明暗窄屏截图分别留证，不作为原生或教学质量通过。
+
+固定包57,940字节，SHA256 `4db68f807362f243f77039d66c09b1981a4b61a93185f37c43731ea001a96581`。验收说明和构建命令见[专家团收尾](docs/qcu-expert-teams-hardening.md)。最终交付及分阶段证据归档到 `$HOME/Artifacts/qcu-harness/0.2.0-expert-library.2/`；早期候选保留为stage-a，不能混作最终包。本轮候选尚未安装到真实DSH、发布Hub或调用真实模型；已使用教师Home迁移、原生文件选择和教师效果单列待验收。
+
 ## Web 发布与 DSH 动态市场（P15.1，已部署内部 Hub）
 
 开发分支 `dev/qcu-hub-market-publication`，固定 worktree 为 `$HOME/Repos/worktrees/qcu-harness/hub-market-publication`。已实现独立发布确认、签名目录、DSH 刷新、撤回和新修订恢复；浏览与刷新不安装，安装默认未启用，启用仍单独确认。P15.1 已固定生产公钥并发布现有 Hub；已确认保留 9 项教师产品，mini 默认 DSH 完成14.1→15.1自升级、重启和签名目录刷新，管理员本人登录通过。真实新投稿的上传/批准/发布仍待单独验收，之后新增产品无需每次重建市场。详见[部署记录与下一次验收步骤](docs/qcu-hub-market-p15.1-deployment.md)。
@@ -38,6 +44,7 @@ P10离线维护工具已完成本地父审查：两版Python各51项通过、9�
 | `$HOME/Repos/worktrees/qcu-harness/market-integration` | P8工具插件目录集成，`dev/qcu-market-p8` |
 | `$HOME/Repos/worktrees/qcu-harness/market-onboarding` | P9新手体验，`dev/qcu-market-p9`；独立构建、预览与实机验收文档 |
 | `$HOME/Repos/worktrees/qcu-harness/market-maintenance` | P10离线检查器，`dev/qcu-market-p10`；只维护工具、示例与文档 |
+| `$HOME/Repos/worktrees/qcu-harness/expert-teams-hardening` | 专家团0.2.0-pilot.2自主收尾，`dev/qcu-expert-teams-hardening`；原线程保留，候选与验收见[收尾说明](docs/qcu-expert-teams-hardening.md) |
 | `$HOME/Repos/worktrees/qcu-harness/hub-market-publication` | P15.1 发布与动态目录，`dev/qcu-hub-market-publication`；已部署 Hub 与 mini 默认 DSH |
 | `$HOME/Repos/worktrees/qcu-harness/hub-admin-account` | 当前单管理员本机迭代，`dev/qcu-hub-admin-account`；[交互式设置／恢复与合成证据](docs/qcu-hub-single-admin.md)；旧库不迁移、未部署 |
 | `$HOME/Repos/worktrees/qcu-harness/hub-submissions` | 本机投稿审核，`dev/qcu-hub-submissions`；无构建依赖，运行和验收见 [MVP说明](docs/qcu-hub-submissions-mvp.md)；未部署 |
