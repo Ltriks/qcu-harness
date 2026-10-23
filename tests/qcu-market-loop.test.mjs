@@ -1,6 +1,7 @@
 import {catalogSha256} from '../hub/plugins/qcu-market/src/bundled-catalog.mjs'
 import {releaseKeyOf} from '../hub/plugins/qcu-market/src/catalog-core.mjs'
 import {marketRuntime} from '../hub/plugins/qcu-market/src/remote-contract.mjs'
+import {realpathSync} from 'node:fs'
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { mkdtemp, readFile, readdir, rm, symlink, writeFile } from 'node:fs/promises'
@@ -13,7 +14,7 @@ const bytes=Buffer.from('bounded immutable fixture'),sha=digest(bytes)
 const entry={...release,bytes:bytes.length,sha256:sha,file:`qcu-study-coach-0.1.0-pilot.2-${sha}.tgz`}
 const agent={session:{id:'test',header:{cwd:'/synthetic'}}}
 const response=(body=bytes,options={})=>new Response(body,{status:200,headers:{'content-length':String(bytes.length)},...options})
-async function cache(t){const dir=await mkdtemp(join(tmpdir(),'qcu-loop-'));t.after(()=>rm(dir,{recursive:true,force:true}));return join(dir,'cache')}
+async function cache(t){const dir=await mkdtemp(join(realpathSync(tmpdir()),'qcu-loop-'));t.after(()=>rm(dir,{recursive:true,force:true}));return join(dir,'cache')}
 test('fixed catalog rejects arbitrary identity, origin, protocol, filename and size',()=>{
  for(const change of [{id:'other'},{origin:'https://evil.invalid'},{origin:'file:///tmp'},{file:'../anything'},{bytes:1048577},{sha256:'bad'}])assert.throws(()=>validateRelease({...entry,...change}))
  assert.equal(validateRelease(entry),`${entry.origin}/plugins/${entry.file}`)

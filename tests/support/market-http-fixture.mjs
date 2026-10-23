@@ -1,6 +1,7 @@
 // Actual official LIB Host Connection/Gateway + LIB Client Connection/Gateway.
 // Only credentials, UI slots, downloader destination and manager business backend are fixtures.
 import assert from 'node:assert/strict'
+import {realpathSync} from 'node:fs'
 import vm from 'node:vm'
 import {createRequire} from 'node:module'
 import {pathToFileURL,fileURLToPath} from 'node:url'
@@ -57,7 +58,7 @@ export async function startHost({marketDir=archiveDir,marketModule,backend={}}={
  return {host,calls,state,origin,send,raw,module,get fork(){return fork},async remount(){await fork.dispose();fork=host.plugin(module);await fork.await()},async close(){await host.fiber.dispose();server.closeAllConnections();await new Promise(r=>server.close(r))}}
 }
 export async function attachDownload(h,{mode='ok'}={}){
- const dir=await mkdtemp(join(tmpdir(),'qcu-http-')),cache=join(dir,'cache')
+ const dir=await mkdtemp(join(realpathSync(tmpdir()),'qcu-http-')),cache=join(dir,'cache')
  const {release}=await import(pathToFileURL(archiveDir+'/src/trusted-release.mjs'))
  const {bundledCatalog}=await import(pathToFileURL(archiveDir+'/src/bundled-catalog.mjs'))
  const {fetchPinned}=await import(pathToFileURL(archiveDir+'/src/host-core.mjs'))
@@ -88,7 +89,10 @@ export async function startClient(h,{marketDir=archiveDir}={}){
  new FixtureSlots(ctx)
  ctx.provide('layout',{selectPanel(){}});ctx.provide('pluginNavigation',{openBundle(){}})
  const plugin=await clientBundle(marketDir+'/client.js');let fork=ctx.plugin(plugin);await fork.await();await tick();await tick()
- const flows=()=>entries.find(e=>e.options.name==='main').options.inject().availability.snapshot().flows
+ const snapshot=()=>entries.find(e=>e.options.name==='main').options.inject().availability.snapshot()
+ const loaded=async()=>{for(let i=0;i<400;i++){if(snapshot().refreshing===false||snapshot().flows)return;await new Promise(r=>setTimeout(r,5))}throw Error('Initial catalog handshake did not settle')}
+ await loaded()
+ const flows=()=>snapshot().flows||[]
  const flow=()=>flows()[0]
- return {ctx,flow,flows,async remount(){await fork.dispose();fork=ctx.plugin(plugin);await fork.await();await tick();await tick()},async close(){await fork.dispose();await unmountManager();await ctx.fiber.dispose()}}
+ return {ctx,flow,flows,snapshot,async remount(){await fork.dispose();fork=ctx.plugin(plugin);await fork.await();await loaded()},async close(){await fork.dispose();await unmountManager();await ctx.fiber.dispose()}}
 }

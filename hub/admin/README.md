@@ -1,5 +1,7 @@
 # 本机 Hub 单管理员审核
 
+P15 已加入可选的独立签名发布与公开下载复核，配置、首次迁移及部署边界见[实施说明](../../docs/qcu-hub-market-publication.md)，人工步骤见[中文验收单](../../docs/qcu-hub-market-publication-acceptance.md)。不配置发布能力时仍只生成本机候选。当前未部署，未创建真实账号或生产签名密钥。
+
 Python 3.9+ 标准库、原生 JS/CSS，无安装步骤；独立于只读 `hub/release/serve-hub.py`，仅精确 IPv4 `127.0.0.1`。固定账号 `qcu-admin` 在一个页面／会话中导入同事 handoff、退回／批准、单独确认生成本机候选；无同事账号、注册或匿名投稿。
 
 本人在本机 TTY 设置密码（新状态目录须不存在，父目录已存在）：

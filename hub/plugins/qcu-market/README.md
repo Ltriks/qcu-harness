@@ -39,3 +39,18 @@ The canonical authors are lqtriks and QCU Harness contributors. Notes, reading a
 See `docs/qcu-market-p8-source.md` at the repository root for exact build, isolated official/runtime/HTTP/browser commands, evidence and deferred verification. Stable local roots use `$HOME/Repos/worktrees/qcu-harness/market-integration` and `$HOME/Artifacts/qcu-harness/0.1.0-pilot.8.1`. No dependency download is needed or authorized. Deterministic allowlisted tar/gzip archives use id/version/hash filenames and refuse different bytes at an existing archive path. Previous P7/P6/P6.1/P6.2/P6.3/P5.1/coach P2 artifacts and evidence are unchanged.
 
 `preview.mjs` uses the actual shared React views and flow with an unmistakably synthetic, independently keyed backend. It never ships, reads profiles or contacts Hub. Browser checks cover both categories, search/back focus, bounded metadata/provenance, entry independence, cross-entry lock, revocation, disabled install, separate installation and single compound activation consent, unknown outcomes, tool-only setup/readiness copy, parent/row error stops, external-request/React errors and narrow light/dark layout. Live Mini/Hub, fresh Home package-manager install and teacher/model acceptance remain with the parent. No deployment, commit, push or actual-profile install is part of this source deliverable.
+# P15 implementation candidate
+
+Version `0.1.0-pilot.15.0`, Host/Client protocol 5. Supports administrator-approved,
+Ed25519-signed live catalog publication and a visible “刷新市场” action. Publication,
+disabled installation and activation each require separate confirmation. Pending
+official operations block refresh. Dynamic errors never grant bundled permissions.
+
+This source has **no production public key configured** (`src/public-trust.mjs` is
+null): its distributable explicitly uses the legacy bundled catalog. Configure an
+out-of-band public SPKI with `scripts/configure-market-trust.mjs` before a separately
+reviewed dynamic release. No signing private key belongs in this package. Local
+acceptance uses ephemeral keys through direct test constructors only. Native DSH,
+Hub deployment and teacher acceptance remain untested. Operator setup, supported
+single-component boundary and exact checks: `docs/qcu-hub-market-publication.md`
+in the repository. Historical release notes below describe earlier versions.

@@ -42,20 +42,23 @@ export async function readProduct(manager,entry=release){
   return result({state:row.fiberPhase==='active'?'component-active':'restart-or-pending',entryId:row.entryId})
 }
 export class DirectMarketFlow {
-  constructor(remote,{entry=release,catalog=bundledCatalog,fingerprint=catalogSha256,peers=null,uuid=()=>crypto.randomUUID(),now=()=>Date.now()}={}){
+  constructor(remote,{entry=release,catalog=bundledCatalog,fingerprint=catalogSha256,dynamic=false,gate=null,peers=null,uuid=()=>crypto.randomUUID(),now=()=>Date.now()}={}){
+    this.dynamic=dynamic
+    this.gate=gate
     this.remote=remote;this.entry=entry;this.catalog=catalog;this.fingerprint=fingerprint;this.releaseKey=releaseKeyOf(entry);this.peers=peers;this.uuid=uuid;this.now=now;this.listeners=new Set();this.state={phase:'idle',status:null,review:null,message:'',result:null};this.generation=0;this.pending=null;this.request=null;this.disposed=false;this.statusGeneration=0;this.statusRead=null
     this.unlisten=remote.$on?.('plugin-manager/install-state',p=>this.progress(p))
   }
   snapshot=()=>this.state
   subscribe=fn=>{this.listeners.add(fn);return()=>this.listeners.delete(fn)}
   set(next){if(this.disposed)return;this.state={...this.state,...next};for(const fn of this.listeners)fn()}
-  guard(){if(this.peers?.some(f=>f!==this&&(f.pending||f.request||f.activation||f.state.review)))throw new Error('其他条目已有操作进行中；请先完成或取消');if(this.disposed)throw new Error('市场已关闭');if(this.pending||this.request||this.activation)throw new Error('已有操作进行中；请等待或核对结果')}
+  guard(){if(this.gate?.refreshing)throw Error('目录刷新进行中；请等待刷新完成后重新操作');if(this.peers?.some(f=>f!==this&&(f.pending||f.request||f.activation||f.state.review)))throw new Error('其他条目已有操作进行中；请先完成或取消');if(this.disposed)throw new Error('市场已关闭');if(this.pending||this.request||this.activation)throw new Error('已有操作进行中；请等待或核对结果')}
   valid(n){if(this.disposed||n!==this.generation)throw new Error('操作已取消或目录已变化')}
   checkReceipt(r){if(!r||r.catalogSha256!==this.fingerprint||r.releaseKey!==this.releaseKey||!same(findMarketRelease(this.catalog,this.releaseKey),this.entry)||!same(r.entry,this.entry)||!Number.isSafeInteger(r.expiresAt)||r.expiresAt<=this.now()||typeof r.path!=='string'||!r.path.startsWith('/')||!r.path.endsWith('/'+this.entry.file))throw new Error('包来源、目录或有效期已变化；请重新准备并确认')}
   async checkHost(){
     let actual
     try{actual=JSON.parse(unwrap(await this.remote.qcuMarket.status()))}catch(e){throw new Error('市场 Host 尚未就绪；如刚更新或重装，请正常退出并重新打开 DSH 后再检查。未发起安装。详情：'+failure(e))}
-    if(!same(actual,{...marketRuntime,catalogSha256:this.fingerprint}))throw new Error('市场 Host 与界面版本不一致，请正常重启 DSH 后再检查；未发起安装。')
+    if(!same(actual,marketRuntime))throw new Error('市场 Host 与界面版本不一致，请正常重启 DSH 后再检查；未发起安装。')
+    if(this.dynamic){const s=JSON.parse(unwrap(await this.remote.qcuMarket.refresh()));if(s.mode!=='dynamic'||s.state!=='fresh'||s.fingerprint!==this.fingerprint||!same(findMarketRelease(s.catalog,this.releaseKey),this.entry))throw Error('签名目录失效、更新或撤回；请刷新市场并重新确认')}
   }
   async status(){
     if(this.disposed)return
@@ -243,7 +246,7 @@ export class DirectMarketFlow {
   dispose(){++this.statusGeneration;this.statusRead=null;if(this.activation)this.activation.authorized=false;this.disposed=true;++this.generation;this.pending?.abort?.abort();const id=this.pending?.id||this.state.review?.receipt?.id;if(id)void this.remote.qcuMarket.cancel(id).catch(()=>{});if(this.request)void this.remote.pluginManager.cancelInstall(this.request.id).catch(()=>{});this.unlisten?.();this.listeners.clear()}
 }
 
-export function createCatalogFlows(remote,{catalog=bundledCatalog,fingerprint=catalogSha256}={}){const flows=[];for(const item of catalog.entries)flows.push(new DirectMarketFlow(remote,{entry:item.release,catalog,fingerprint,peers:flows}));return flows}
+export function createCatalogFlows(remote,{catalog=bundledCatalog,fingerprint=catalogSha256,dynamic=false,gate=null}={}){const flows=[];for(const item of catalog.entries)flows.push(new DirectMarketFlow(remote,{entry:item.release,catalog,fingerprint,dynamic,gate,peers:flows}));return flows}
 
 // Compatibility export for existing coach regression fixtures.
 export const readCoach=readProduct

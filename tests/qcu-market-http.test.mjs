@@ -25,7 +25,7 @@ test('real nine-entry archived HTTP selects each pinned Skill or tools plugin an
  await tools.reviewActivate();assert.equal(h.state.mutations.length,flows.length+1);await tools.confirmActivate();assert.equal(tools.state.status.state,'component-active');assert.equal(h.state.mutations.length,flows.length+3)
 })
 test('actual archived Client → official HTTP → Gateway → archived Host prepares verified fixed bytes and decline never installs',async t=>{
- const {h,d,flow}=await fixture(t);assert.equal(h.calls.length,0)
+ const {h,d,flow}=await fixture(t);assert.ok(h.calls.every(c=>['/api/qcuMarket/status','/api/qcuMarket/refresh'].includes(c.path)));h.calls.length=0
  await flow.status();assert.equal(flow.state.status.state,'not-installed',flow.state.message)
  await flow.prepare();assert.equal(flow.state.phase,'review',flow.state.message)
  const r=flow.state.review.receipt;assert.equal(r.entry.sha256,d.release.sha256);assert.equal((await readFile(r.path)).length,d.release.bytes);assert.equal(d.count(),1);assert.equal(h.state.mutations.length,0)
@@ -77,8 +77,7 @@ test('official Loader same-name P2 → actual archive reinstall retains old Host
  const stale=await startHost({marketModule:cached});const client=await startClient(stale)
  try{
   const raw=await stale.raw('qcuMarket/prepare',{id:id()});assert.equal(raw.status,404);assert.equal(stale.host.get('qcuMarket'),undefined)
-  await client.flow().prepare();assert.equal(client.flow().state.phase,'error');assert.equal(stale.state.mutations.length,0)
-  assert.match(client.flow().state.message,/正常.*重新打开|正常重启/)
+  assert.equal(client.flow(),undefined);assert.equal(stale.state.mutations.length,0);assert.match(client.snapshot().unavailable,/未就绪|正常.*重新打开|正常重启/)
  }finally{await client.close();await stale.close()}
  const fresh=spawnSync(process.execPath,['--expose-internals',new URL('./support/market-http-cold.mjs',import.meta.url).pathname,dir],{env:process.env,encoding:'utf8',timeout:20000})
  assert.equal(fresh.status,0,fresh.stderr);assert.match(fresh.stdout,/"cancel":true/);console.log(JSON.stringify({cacheReproduction:{diskVersion:disk.version,moduleIdentityUnchanged:true,http:404,coldProcess:JSON.parse(fresh.stdout.trim())}}))
@@ -96,7 +95,7 @@ test('actual archived protocol3 Host with Client4 and Host4 with Client3 both re
  for(const side of ['host','client']){
   const h=await startHost(side==='host'?{marketDir:previous}:{}),c=await startClient(h,side==='client'?{marketDir:previous}:{})
   try{
-   const flow=c.flow();await flow.prepare();assert.equal(flow.state.phase,'error');assert.match(flow.state.message,/版本不一致.*正常重启/)
+   const flow=c.flow();if(flow){await flow.prepare();assert.equal(flow.state.phase,'error');assert.match(flow.state.message,/版本不一致.*正常重启/)}else assert.match(c.snapshot().unavailable,/版本不一致.*正常重启/)
    assert.equal(h.state.mutations.length,0);assert.equal(h.host.get('qcuMarket').packages.pending.size,0);assert.equal(h.host.get('qcuMarket').packages.receipts.size,0)
    assert.ok(h.calls.every(call=>call.path.endsWith('/status')))
   }finally{await c.close();await h.close()}

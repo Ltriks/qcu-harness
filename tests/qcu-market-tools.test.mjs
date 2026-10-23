@@ -1,4 +1,5 @@
 // Fixed reviewed archive and metadata integration only; never executes CLI/auth/docs.
+import {realpathSync} from 'node:fs'
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import {readFile,mkdtemp,rm,readdir} from 'node:fs/promises'
@@ -16,7 +17,7 @@ const item=bundledCatalog.entries.find(e=>e.id==='qcu-feishu-readonly'),release=
 const clone=()=>JSON.parse(catalogText),tools=c=>c.entries.find(e=>e.id===item.id)
 test('paired reviewed schema4/protocol4 and strict frozen capabilities preserve all seven old releases',async()=>{
  assert.equal(bundledCatalog.schemaVersion,4);assert.equal(bundledCatalog.protocol,4);assert.equal(bundledCatalog.revision,6)
- assert.equal(marketRuntime.version,'0.1.0-pilot.13.2');assert.equal(marketRuntime.protocol,4);assert.equal(marketRuntime.catalogSha256,catalogSha256)
+ assert.equal(marketRuntime.version,'0.1.0-pilot.15.0');assert.equal(marketRuntime.protocol,5);assert.equal(marketRuntime.catalogSha256,catalogSha256)
  const read=async path=>JSON.parse(await readFile(path,'utf8'))
  for(const old of [await read('hub/market/coach-release.json'),...await read('hub/market/skill-releases.json'),await read('hub/market/external-skill-release.json')]){
   const entry=bundledCatalog.entries.find(e=>e.id===old.id);assert.deepEqual(entry.release,old);assert.deepEqual(entry.capabilities,['skill'])
@@ -38,7 +39,7 @@ for(const mask of [1,2,3,4,5,6,7])test(`Skill contract refuses null field combin
 test('Host refuses tools field tampering before cache writes or network and downloads actual reviewed archive',async t=>{
  const archive=process.env.QCU_FEISHU_ARCHIVE;assert.ok(archive,'QCU_FEISHU_ARCHIVE must be the fixed reviewed candidate')
  const bytes=await readFile(archive);assert.equal(bytes.length,11263);assert.equal(createHash('sha256').update(bytes).digest('hex'),release.sha256)
- const dir=await mkdtemp(join(tmpdir(),'qcu-tools-download-'));t.after(()=>rm(dir,{recursive:true,force:true}));const root=join(dir,'cache');let requests=0
+ const dir=await mkdtemp(join(realpathSync(tmpdir()),'qcu-tools-download-'));t.after(()=>rm(dir,{recursive:true,force:true}));const root=join(dir,'cache');let requests=0
  const fetcher=async(url,options)=>{requests++;assert.equal(url,release.origin+'/plugins/'+release.file);assert.equal(options.redirect,'manual');return new Response(bytes,{headers:{'content-length':String(bytes.length)}})}
  for(const k of ['skill','skillSha256','provider'])await assert.rejects(fetchPinned({entry:{...release,[k]:'fake'},root,fetcher}))
  assert.equal(requests,0);assert.deepEqual(await readdir(dir),[])
@@ -88,7 +89,7 @@ test('tool-only view never claims Skill readiness and keeps install and activati
   for(const peer of flows.filter(f=>f!==flow))assert.equal(peer.state.phase,'idle')
  }finally{flows.forEach(f=>f.dispose())}
 })
-for(const protocol of [3,5])test(`stale protocol ${protocol} stops tools preparation before download or inspection`,async()=>{
+for(const protocol of [4,6])test(`stale protocol ${protocol} stops tools preparation before download or inspection`,async()=>{
  const {flows,remote,calls}=createPreviewFixture(),flow=flows.find(f=>f.entry.id===release.id)
  remote.qcuMarket.status=async()=>({ok:true,value:JSON.stringify({...marketRuntime,protocol})})
  try{await flow.prepare();assert.equal(flow.state.phase,'error');assert.match(flow.state.message,/正常重启/);assert.deepEqual(calls,[])}finally{flows.forEach(f=>f.dispose())}

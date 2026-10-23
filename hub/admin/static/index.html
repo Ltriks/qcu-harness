@@ -4,14 +4,15 @@
 <body>
 <header><div class="brand">QCU Hub <span>本机投稿审核</span></div><div class="theme"><label for="theme">外观</label><select id="theme"><option value="system">跟随系统</option><option value="light">浅色</option><option value="dark">深色</option></select></div></header>
 <main>
-<div class="boundary">本机准备环境 · 候选不等于已发布，现有市场不会自动接纳新产品。</div>
+<div class="boundary">候选不等于已发布。签名发布需单独确认；教师安装与启用仍需分别确认。</div>
 <section id="access"><h1>管理员登录</h1><p>本机仅使用 qcu-admin 账号，负责导入同事材料、审核与单独确认候选。</p><form id="login" autocomplete="off"><label for="account">账号</label><input id="account" value="qcu-admin" autocomplete="off" required maxlength="32"><label for="password">密码</label><div class="inline"><input id="password" type="password" autocomplete="off" required maxlength="128"><button>进入工作区</button></div></form></section>
 <div id="workspace" hidden>
+<section id="publication-status" aria-label="公开市场状态"></section>
 <div class="toolbar"><span>导入与审核工作区</span><span id="role"></span><button id="logout" class="quiet">退出</button></div>
 <section id="upload-panel"><h1>导入同事交付材料</h1><p>选择完整 handoff 文件夹，包含 submission.json、TGZ 和全部证据。原文件夹不会被修改。</p><label for="folder">开发者 handoff 文件夹</label><input id="folder" type="file" webkitdirectory multiple><p id="selection">尚未选择文件夹</p><p class="muted">最多64个文件；单个1 MiB，JSON 256 KiB；总计10 MiB。只进行静态检查，始终需要人工审核。</p><button id="upload" disabled>上传并检查</button></section>
 <div class="workspace-grid"><section class="queue"><div class="section-title"><h2 id="queue-title">投稿记录</h2><button id="refresh" class="quiet">刷新</button></div><div id="queue"></div></section><section id="detail" aria-label="投稿详情"><p class="muted">选择一条投稿查看材料、状态和下一步。</p></section></div>
 </div>
 <p id="message" role="status" aria-live="polite"></p>
 </main>
-<footer>材料留在本机私有状态目录。未执行投稿代码、安装、启用或 Hub 发布。</footer>
+<footer>原始材料与审核记录留在私有目录。公开服务只提供已发布目录和固定归档；管理员流程不执行投稿代码或教师安装。</footer>
 </body></html>

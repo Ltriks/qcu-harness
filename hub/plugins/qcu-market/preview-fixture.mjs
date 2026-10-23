@@ -9,6 +9,7 @@ export function createPreviewFixture(){
  const record=(name,fn)=>(...args)=>{calls.push({name,args:args.slice(0,2)});return Promise.resolve().then(()=>fn(...args))}
  const remote={qcuMarket:{
   status:record('status',()=>ok(JSON.stringify(marketRuntime))),
+  refresh:record('refresh',()=>ok(JSON.stringify({mode:'legacy',state:'legacy',catalog:bundledCatalog,fingerprint:catalogSha256,message:'固定内置合成目录'}))),
   prepare:record('prepare',(id,key)=>{const entry=bundledCatalog.entries.find(e=>releaseKeyOf(e.release)===key).release;const receipt={id,entry,catalogSha256,releaseKey:key,path:'/synthetic/'+entry.file,expiresAt:Date.now()+300000};receipts.set(id,receipt);return ok(JSON.stringify(receipt))}),
   verify:record('verify',id=>ok(JSON.stringify(receipts.get(id)))),
   cancel:record('cancel',id=>{receipts.delete(id);return ok('{}')})

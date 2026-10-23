@@ -3,7 +3,7 @@ const $ = id => document.getElementById(id);
 const statuses = {'checking':'静态检查中','needs-changes':'需要补充材料','in-review':'待人工审核','approved':'已批准本机准备','preparing':'准备候选中','release-prepared':'本机候选已生成','recoverable-failure':'操作中断，需人工核对'};
 const next = {'needs-changes':'查看报告及退回理由，修改材料后重新投稿。','in-review':'维护者检查原始材料，记录证据边界后作出审核决定。','approved':'检查候选预览，再单独确认生成本机候选。','release-prepared':'下载并复核本机候选；真实发布与市场目录关联尚未实现。','recoverable-failure':'维护者核对私有状态目录中的中断记录；不要沿用未知写入，修改材料后创建新修订。'};
 const checklist = {source:'已人工复核来源与源码声明，并在理由中记录核验范围',license:'已人工复核许可与分发边界',permissions:'已人工复核权限、数据影响与依赖声明',evidenceBoundaries:'已区分声明、已测与未测；本机批准不证明原生或业务验收通过'};
-let token = '', records = [], selected = '', busy = false;
+let token = '', records = [], selected = '', busy = false, publication = null;
 function el(tag, text, cls) { const n = document.createElement(tag); if(['button','input','textarea','select'].includes(tag))n.disabled=busy; if(text !== undefined) n.textContent = text; if(cls) n.className = cls; return n; }
 function message(text) { $('message').textContent = text; }
 function jsonDetails(title, value) { const d = el('details'); d.append(el('summary',title),el('pre',JSON.stringify(value,null,2))); return d; }
@@ -23,7 +23,12 @@ async function download(path) {
  if(!response.ok)throw Error('下载未完成：'+(await response.json()).error);
  const blob=await response.blob(),url=URL.createObjectURL(blob),a=el('a');a.href=url;a.download=response.headers.get('Content-Disposition')?.match(/filename="([^"]+)"/)?.[1]||'material.bin';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
 }
-async function refresh() { records=await api('/api/submissions');renderQueue();if(selected){const r=records.find(r=>r.id===selected);if(r)renderDetail(r);} }
+async function refresh() {
+ records=await api('/api/submissions');publication=await api('/api/publication');
+ const status=$('publication-status');status.replaceChildren(el('h2','公开市场'),el('p',publication.message||'尚无公开发行。'));
+ if(publication.configured){status.append(el('p',`当前修订：${publication.current.revision} · ${publication.state}`));if(publication.current.revision)status.append(button('重新核对公开下载',async()=>{await api('/api/publication/recheck',{});await refresh();}));}
+ renderQueue();if(selected){const r=records.find(r=>r.id===selected);if(r)renderDetail(r);}
+}
 function renderQueue() {
  const queue=$('queue');queue.replaceChildren();
  if(!records.length){queue.append(el('p','暂无投稿。选择完整 handoff 文件夹开始。','muted'));return;}
@@ -41,13 +46,13 @@ function evidenceDescription(evidence) { return evidenceRows(evidence).map(row=>
 function localTime(value) { return new Date(value).toLocaleString('zh-CN',{timeZone:'Asia/Shanghai',hour12:false})+'（北京时间）'; }
 function attachments(parent, rows, base) { rows.forEach((row,i)=>{const line=el('div',undefined,'file-row');line.append(el('span',row.path+' · '+row.bytes+' 字节'),button('下载',()=>download(base+'/'+i),'quiet'));parent.append(line);}); }
 function renderDetail(r) {
- const d=$('detail'),m=r.metadata,base='/api/submissions/'+r.id;d.replaceChildren(el('h2',m.title||'未通过静态检查的投稿'),el('p',statuses[r.status]||r.status,'status'),el('p',next[r.status]||'检查任务状态。','next'));
+ const d=$('detail'),m=r.metadata,base='/api/submissions/'+r.id;d.replaceChildren(el('h2',m.title||'未通过静态检查的投稿'),el('p',statuses[r.status]||r.status,'status'),el('p',r.status==='release-prepared'&&publication?.configured?'本机候选已准备。请预览并单独确认公开发布。':next[r.status]||'检查任务状态。','next'));
  fields(d,[['产品 / 版本',(m.id||'待核对')+' / '+(m.version||'待核对')],['投稿编号',r.id],['接收时间',localTime(r.createdAt)]]);
  const report=r.report;
  if(report){
   d.append(el('h3','材料与证据'),el('p',report.staticChecksPassed?'静态检查通过，仍需人工核验。模式扫描不构成无密钥或安全认证。':'静态检查未通过，不能批准或生成候选。'));
   d.append(el('p','阶段证据（提交者声明）','muted'));fields(d,evidenceRows(report.evidence),'evidence');
-  fields(d,[['人工复核项',report.reviewRequirements.length+' 项'],['安装与发布权限','本机流程不授予安装、启用或真实发布权限']]);
+  fields(d,[['人工复核项',report.reviewRequirements.length+' 项'],['安装与发布权限','候选流程不授予教师安装或启用权限；公开发布须另行确认']]);
   d.append(jsonDetails('技术检查报告',report));
  }
  d.append(jsonDetails('材料摘要与字节清单',{materialsDigest:r.materialsDigest,inventory:r.inventory}));
@@ -56,6 +61,7 @@ function renderDetail(r) {
  }
  d.append(jsonDetails('审核与操作记录',r.audit));
  if(r.status==='in-review'){
+  if(publication?.configured)renderEntryForm(d,r);
   d.append(el('h3','人工审核决定'));
   const label=el('label','审核理由与核验范围');label.htmlFor='reason';const reason=el('textarea');reason.id='reason';reason.maxLength=2000;d.append(label,reason);
   for(const [key,text] of Object.entries(checklist)){const l=el('label',undefined,'check'),input=el('input');input.type='checkbox';input.id='check-'+key;l.append(input,el('span',text));d.append(l);}
@@ -71,6 +77,25 @@ function renderDetail(r) {
   d.append(button('查看发布候选确认',async()=>renderConfirmation(r,await api(base+'/preview'))));
  }
  if(r.candidate){const files=el('details');files.append(el('summary','下载本机候选文件'));attachments(files,r.candidate.inventory,base+'/candidate');d.append(files);}
+ if(r.status==='release-prepared'&&publication?.configured){
+  if(r.marketEntry){d.append(el('h3','独立公开发布'),el('p','发布只更新签名目录与固定归档，不安装或启用教师设备。撤回不卸载、不删除教师数据。'));
+   for(const [operation,text] of [['publish','预览公开发布'],['withdraw','预览撤回'],['rollback','预览恢复此版本']])d.append(button(text,async()=>renderPublishConfirmation(r,operation,await api(base+'/publication-preview',{operation}))));
+  }else d.append(el('p','未在审核前附加市场说明。本候选不能发布；请以新投稿重新提交市场说明并审核。'));
+ }
+}
+function renderEntryForm(parent,r){
+ const box=el('details');box.append(el('summary','市场说明（审核前保存，批准后冻结）'),el('p','仅支持包名相同的唯一组件：静态 Skill 提供方或工具插件。多组件须先拆成受支持的单组件交付，不会猜测用途。'));
+ const labels={purpose:'用途',scenario:'适用场景',prerequisites:'使用前提',example:'使用步骤或示例',risk:'权限与影响',testStatus:'已测与未测边界',author:'作者',upstreamSource:'上游来源',modifications:'修改说明'};
+ for(const [key,text] of Object.entries(labels)){const label=el('label',text),input=el('textarea');input.id='entry-'+key;input.maxLength=2000;input.rows=2;input.value=r.marketAttachment?.[key]||r.marketAttachment?.provenance?.[key]||'';label.htmlFor=input.id;box.append(label,input);}
+ const label=el('label','来源归属'),select=el('select');select.id='entry-ownership';for(const [value,text] of [['qcu','QCU自有'],['third-party','第三方改编']]){const o=el('option',text);o.value=value;select.append(o);}select.value=r.marketEntry?.provenance?.ownership||'qcu';label.htmlFor=select.id;box.append(label,select);
+ box.append(button('保存市场说明并预览',async()=>{const entry={};for(const key of ['purpose','scenario','prerequisites','example','risk','testStatus'])entry[key]=$('entry-'+key).value;entry.provenance={ownership:select.value,author:$('entry-author').value,upstreamSource:$('entry-upstreamSource').value,modifications:$('entry-modifications').value,pinnedRevision:r.metadata.sourceRevision,license:r.metadata.license};await api('/api/submissions/'+r.id+'/market-entry',{materialsDigest:r.materialsDigest,entry});await refresh();message('市场说明已保存；批准时将绑定此说明，需要重新完成审核清单。');}));
+ if(r.marketEntry)box.append(jsonDetails('冻结前市场条目预览',r.marketEntry));parent.append(box);
+}
+function renderPublishConfirmation(r,operation,preview){
+ $('publish-confirmation')?.remove();const box=el('section',undefined,'confirm');box.id='publish-confirmation';box.setAttribute('aria-label','公开发布确认');
+ const label={publish:'公开发布',withdraw:'撤回',rollback:'恢复此版本'}[operation];
+ box.append(el('h3',label+'前确认'),el('p','仅签名目录和精确TGZ会进入公开服务。发布后支持动态信任的新市场可刷新获取；旧固定目录客户端需先更新。回退同样创建更高修订，不重写历史。'),el('p',`${r.metadata.id} / ${r.metadata.version}；当前修订 ${preview.proposal.previous.revision}`),jsonDetails('精确发布提案',preview.proposal));
+ const l=el('label',undefined,'check'),check=el('input');check.type='checkbox';check.id='confirm-publish';l.append(check,el('span','确认本次'+label+'及精确材料；不授予教师安装或启用权限。'));box.append(l,button('确认'+label,async()=>{if(!check.checked)throw Error('请先确认公开发布提案。');const result=await api('/api/submissions/'+r.id+'/publish',{operation,previewDigest:preview.previewDigest,confirm:true});await refresh();message(result.state==='verified'?'公开指针已生效，HTTP下载复核通过。':'公开指针已生效，但下载验证未通过。请重新核对公开下载，不重复发布。');}));$('detail').append(box);box.scrollIntoView({block:'start'});
 }
 function renderConfirmation(r, preview) {
  document.getElementById('candidate-confirmation')?.remove();

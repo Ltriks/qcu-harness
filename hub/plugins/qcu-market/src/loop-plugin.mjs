@@ -1,4 +1,4 @@
-import {createCatalogFlows} from './direct-flow.mjs'
+import {CatalogRuntime} from './catalog-runtime.mjs'
 import {remoteContribution} from './remote-contract.mjs'
 import {release} from './trusted-release.mjs'
 import {createMarketViews} from './market-view.mjs'
@@ -24,11 +24,12 @@ export function createLoopPlugin(React){
         // Our namespace exists only after $mount; declaring it on the outer
         // plugin would deadlock startup. The manager is a consumer dependency only:
         // withdrawing it must not queue $unmount inside its own namespace teardown.
-        ui=serviceCtx.inject(['remote.pluginManager','remote.qcuMarket'],flowCtx=>{
-          const flows=createCatalogFlows(flowCtx.remote),flow=flows[0]
-          update({flow,flows,unavailable:''})
-          flowCtx.effect(()=>()=>{flows.forEach(f=>f.dispose());update({flow:null,flows:null,unavailable:'服务已释放或连接能力变化，请等待服务恢复。'})})
-          flowCtx.on('connection/reset',()=>flows.forEach(f=>f.invalidate()))
+        ui=serviceCtx.inject(['remote.pluginManager','remote.qcuMarket'],async flowCtx=>{
+          const runtime=new CatalogRuntime(flowCtx.remote,update)
+          update({refresh:()=>runtime.refresh(),catalog:{entries:[]}})
+          flowCtx.effect(()=>()=>{runtime.dispose();update({flow:null,flows:null,flowByKey:null,catalog:{entries:[]},unavailable:'服务已释放或连接能力变化，请等待服务恢复。'})})
+          flowCtx.on('connection/reset',()=>runtime.reset())
+          await runtime.refresh()
         })
       }catch(e){await ui?.dispose();await unmount?.();update({flow:null,unavailable:e.message});return}
       // Withdraw consumers before the namespace they use; both belong to this fiber.

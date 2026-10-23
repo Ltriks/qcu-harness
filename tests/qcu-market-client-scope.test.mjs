@@ -1,3 +1,4 @@
+import {bundledCatalog} from '../hub/plugins/qcu-market/src/bundled-catalog.mjs'
 import {catalogSha256} from '../hub/plugins/qcu-market/src/bundled-catalog.mjs'
 import {releaseKeyOf} from '../hub/plugins/qcu-market/src/catalog-core.mjs'
 import {marketRuntime} from '../hub/plugins/qcu-market/src/remote-contract.mjs'
@@ -44,6 +45,7 @@ async function fixture(t,{manager=true,navigation=true,plugin,answer,autoActivat
    case 'pluginManager/cancelInstall':value={status:'cancelled'};break
    case 'pluginManager/waitForInstall':value=null;break
    case 'pluginManager/inspect':value={status:'accepted',kind:'tarball',bundle:null,registry:null};break
+   case 'qcuMarket/refresh':value=JSON.stringify({mode:'legacy',state:'legacy',catalog:bundledCatalog,fingerprint:catalogSha256,message:'Legacy fixture'});break
    case 'qcuMarket/status':value=JSON.stringify(marketRuntime);break
    case 'qcuMarket/prepare':receipt.id=a.id;value=JSON.stringify(receipt);break
    case 'qcuMarket/verify':value=JSON.stringify(receipt);break
@@ -64,7 +66,7 @@ async function fixture(t,{manager=true,navigation=true,plugin,answer,autoActivat
 }
 test('Client starts in a real plugin fiber, checks inventory and prepares/declines through both guarded namespaces',async t=>{
  const f=await fixture(t);const p=f.props();assert.ok(p.flow,p.unavailable)
- assert.deepEqual(f.calls,[],'startup must not read inventory or download')
+ assert.ok(f.calls.every(c=>['qcuMarket/status','qcuMarket/refresh'].includes(c.endpoint)),'startup is read-only catalog loading');f.calls.length=0
  await p.flow.status();assert.equal(p.flow.state.status?.state,'not-installed',p.flow.state.message)
  await p.flow.prepare();assert.equal(p.flow.state.phase,'review',p.flow.state.message)
  assert.match(f.render(),/等待你的确认/);assert.doesNotMatch(f.render(),/确认安装（保持未启用）/,'list never renders confirmation controls')
@@ -154,7 +156,7 @@ test('real archived protocol3/4 Host and Client pairs refuse both stale directio
   const host=new Context();new TypertRegistry(host);const gateway=new TypertGatewayService(host,{}),module=await import(new URL('index.js',hostRoot));const owner=host.plugin(module);await owner.await()
   try{
    const f=await fixture(t,{plugin:await archivedClient(new URL('client.js',clientRoot)),answer:async(endpoint,args)=>{const [namespace,method]=endpoint.split('/');return namespace==='qcuMarket'?{ok:true,value:await gateway.invoke({namespace,method,args})}:undefined}})
-   assert.deepEqual(f.calls,[]);await f.props().flow.prepare();assert.equal(f.props().flow.state.phase,'error');assert.match(f.props().flow.state.message,/版本不一致.*正常重启/)
+   if(f.props().flow){await f.props().flow.prepare();assert.equal(f.props().flow.state.phase,'error');assert.match(f.props().flow.state.message,/版本不一致.*正常重启/)}else assert.match(f.props().unavailable,/版本不一致.*正常重启/)
    assert.deepEqual(f.calls.map(c=>c.endpoint),['qcuMarket/status']);assert.equal(host.get('qcuMarket').packages.pending.size,0);assert.equal(host.get('qcuMarket').packages.receipts.size,0)
   }finally{await host.fiber.dispose()}
  }
@@ -166,7 +168,7 @@ test('real archived P8/P9 same-protocol Host and Client pairs refuse both stale 
   const host=new Context();new TypertRegistry(host);const gateway=new TypertGatewayService(host,{}),module=await import(new URL('index.js',hostRoot));const owner=host.plugin(module);await owner.await()
   try{
    const f=await fixture(t,{plugin:await archivedClient(new URL('client.js',clientRoot)),answer:async(endpoint,args)=>{const [namespace,method]=endpoint.split('/');return namespace==='qcuMarket'?{ok:true,value:await gateway.invoke({namespace,method,args})}:undefined}})
-   assert.deepEqual(f.calls,[]);await f.props().flow.prepare();assert.equal(f.props().flow.state.phase,'error');assert.match(f.props().flow.state.message,/版本不一致.*正常重启/)
+   if(f.props().flow){await f.props().flow.prepare();assert.equal(f.props().flow.state.phase,'error');assert.match(f.props().flow.state.message,/版本不一致.*正常重启/)}else assert.match(f.props().unavailable,/版本不一致.*正常重启/)
    assert.deepEqual(f.calls.map(c=>c.endpoint),['qcuMarket/status']);assert.equal(host.get('qcuMarket').packages.pending.size,0);assert.equal(host.get('qcuMarket').packages.receipts.size,0)
   }finally{await host.fiber.dispose()}
  }
@@ -175,10 +177,10 @@ test('compiled Client4 tools entry passes official manager codecs with synthetic
  const preview=createPreviewFixture();t.after(()=>preview.flows.forEach(f=>f.dispose()))
  const plugin=await archivedClient(new URL('../.work/http-e2e/market/package/client.js',import.meta.url))
  const f=await fixture(t,{plugin,answer:async(endpoint,a)=>{
-  const [namespace,method]=endpoint.split('/');const params={status:[],prepare:[a.id,a.releaseKey],verify:[a.id],cancel:[a.id],listBundles:[],listPlugins:[],inspect:[a.spec,a.options],installBundle:[a.spec,a.options],setBundleEnabled:[a.name,a.enabled],setPluginEnabled:[a.id,a.enabled]}
+  const [namespace,method]=endpoint.split('/');const params={status:[],refresh:[],prepare:[a.id,a.releaseKey],verify:[a.id],cancel:[a.id],listBundles:[],listPlugins:[],inspect:[a.spec,a.options],installBundle:[a.spec,a.options],setBundleEnabled:[a.name,a.enabled],setPluginEnabled:[a.id,a.enabled]}
   assert.ok(params[method],endpoint);return preview.remote[namespace][method](...params[method])
  }}),flow=f.props().flows.find(f=>f.entry.id==='qcu-feishu-readonly')
- assert.deepEqual(f.calls,[]);assert.equal(flow.entry.skill,null);await flow.prepare();assert.equal(flow.state.phase,'review',flow.state.message)
+ assert.ok(f.calls.every(c=>['qcuMarket/status','qcuMarket/refresh'].includes(c.endpoint)));f.calls.length=0;assert.equal(flow.entry.skill,null);await flow.prepare();assert.equal(flow.state.phase,'review',flow.state.message)
  assert.equal(flow.state.review.receipt.entry.sha256,'37376ce5f03d4f0fb459dcf6f888b25f5f78df1f7734cd780c7cfd6d01e91b17')
  await flow.confirmInstall();assert.equal(flow.state.status.state,'installed-disabled');await flow.reviewActivate();assert.equal(flow.state.review.kind,'activate')
  assert.equal(f.calls.filter(c=>c.endpoint.endsWith('/setBundleEnabled')||c.endpoint.endsWith('/setPluginEnabled')).length,0)
@@ -188,7 +190,7 @@ test('compiled Client4 tools entry passes official manager codecs with synthetic
 test('official scoped startup/navigation do not auto-check; concurrent public inventory checks never manufacture peer-operation failures',async t=>{
  let releaseRead;const gate=new Promise(r=>releaseRead=r)
  const f=await fixture(t,{answer:async endpoint=>{if(endpoint==='pluginManager/listBundles'){await gate;return {ok:true,value:[]}}}}),flows=f.props().flows
- assert.deepEqual(f.calls,[]);f.ctx.layout.selectPanel('qcu-market');f.render();f.ctx.layout.selectPanel(null);f.render();assert.deepEqual(f.calls,[])
+ assert.ok(f.calls.every(c=>['qcuMarket/status','qcuMarket/refresh'].includes(c.endpoint)));f.calls.length=0;f.ctx.layout.selectPanel('qcu-market');f.render();f.ctx.layout.selectPanel(null);f.render();assert.deepEqual(f.calls,[])
  const checks=flows.map(flow=>flow.status());await tick();assert.ok(flows.every(flow=>flow.state.phase==='checking'));assert.equal(f.calls.filter(c=>c.endpoint==='pluginManager/listBundles').length,flows.length)
  assert.ok(flows.every(flow=>flow.pending===null));releaseRead();await Promise.all(checks)
  assert.ok(flows.every(flow=>flow.state.phase==='idle'&&flow.state.status.state==='not-installed'))
@@ -200,13 +202,13 @@ test('official scoped startup/navigation do not auto-check; concurrent public in
 
 test('official scoped failed inventory is unavailable, not an installation failure or invented not-installed state',async t=>{
  const f=await fixture(t,{answer:endpoint=>endpoint==='pluginManager/listBundles'?{ok:false,error:{code:'unavailable',message:'Inventory unavailable'}}:undefined})
- await f.props().flow.status();assert.equal(f.props().flow.state.phase,'unavailable');assert.equal(f.props().flow.state.status,null);assert.match(f.render(),/状态检查不可用/);assert.match(f.render(),/Inventory unavailable/)
+ f.calls.length=0;await f.props().flow.status();assert.equal(f.props().flow.state.phase,'unavailable');assert.equal(f.props().flow.state.status,null);assert.match(f.render(),/状态检查不可用/);assert.match(f.render(),/Inventory unavailable/)
  assert.deepEqual(f.calls.map(c=>c.endpoint),['qcuMarket/status','pluginManager/listBundles'])
 })
 
 test('official Client onConnected reset with no operation leaves every market card unchecked, with no automatic RPC or fictitious failure',async t=>{
  const f=await fixture(t),flows=f.props().flows
- assert.ok(flows.every(flow=>flow.state.phase==='idle'&&flow.state.status===null));assert.deepEqual(f.calls,[])
+ f.calls.length=0;assert.ok(flows.every(flow=>flow.state.phase==='idle'&&flow.state.status===null));assert.deepEqual(f.calls,[])
  f.connect();assert.ok(flows.every(flow=>flow.state.phase==='idle'&&flow.state.status===null&&flow.state.review===null));assert.deepEqual(f.calls,[])
  assert.doesNotMatch(f.render(),/操作未完成/);assert.match(f.render(),/状态待检查/)
  await flows[0].prepare();const receipt=flows[0].state.review.receipt;f.connect();assert.equal(flows[0].state.review,null);assert.equal(flows[0].state.phase,'error');assert.ok(f.calls.some(c=>c.endpoint==='qcuMarket/cancel'&&c.args.id===receipt.id))

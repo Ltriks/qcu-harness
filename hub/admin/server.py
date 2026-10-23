@@ -20,6 +20,7 @@ import sys
 import threading
 import time
 import warnings
+from types import SimpleNamespace
 from datetime import datetime, timezone
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
@@ -27,6 +28,9 @@ REPO = Path(__file__).absolute().parents[2]
 spec = importlib.util.spec_from_file_location('submission_checker', REPO / 'scripts/qcu-check-submission.py')
 checker = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(checker)
+publication_spec = importlib.util.spec_from_file_location('qcu_publication', REPO / 'hub/admin/publication.py')
+publication_module = importlib.util.module_from_spec(publication_spec)
+publication_spec.loader.exec_module(publication_module)
 MAX_BODY = 15 * 1048576
 MAX_FILE = 1048576
 MAX_JSON = 262144
@@ -321,10 +325,18 @@ class Store:
             raise
 
     def close(self):
+        if getattr(self, 'publication', None):
+            self.publication.close()
         self.sessions.clear()
         if self.lock_fd is not None:
             os.close(self.lock_fd)
             self.lock_fd = None
+
+    def configure_publication(self, public_root, trust, node, **options):
+        api = SimpleNamespace(REPO=REPO, checker=checker, Disk=Disk, Refused=Refused, need=need,
+                              parse=parse, sha=sha, now=now, validate_root=validate_root)
+        self.publication = publication_module.Publication(self, api, public_root, trust, node, **options)
+        return self.publication
 
     def save(self):
         try:
@@ -516,7 +528,11 @@ class Store:
             if body['action'] == 'approve':
                 need(all(body['checklist'].values()), 'review.checklist')
                 need(record['report']['staticChecksPassed'], 'review.static_failure', 409)
+                if record.get('marketEntry'):
+                    need(sha(publication_module.canonical(record['marketEntry'])) == record['marketEntryDigest'], 'entry.changed', 409)
             event = self.audit(body['action'], ACCOUNT, record['materialsDigest'], reason.strip(), checklist=body['checklist'])
+            if record.get('marketEntry'):
+                event['entryDigest'] = record['marketEntryDigest']
             record['audit'].append(event)
             record['approval'] = event if body['action'] == 'approve' else None
             record['status'] = 'approved' if body['action'] == 'approve' else 'needs-changes'
@@ -524,12 +540,15 @@ class Store:
             return copy.deepcopy(record)
 
     def proposal(self, record):
-        return dict(schemaVersion=1, status='local-candidate-not-published', marketAvailable=False,
+        proposal = dict(schemaVersion=1, status='local-candidate-not-published', marketAvailable=False,
                     catalogIntegrationRequired=True, submissionId=record['id'], materialsDigest=record['materialsDigest'],
                     metadata=record['metadata'], inventory=record['inventory'], archiveHash=record['archiveHash'],
                     checkerReportSha256=sha(encoded(record['report'])), approval=record['approval'],
                     audit=[event for event in record['audit'] if event['action'] != 'prepare'],
                     limitations=record['report']['limitations'], marketplaceCaveat=CAVEAT)
+        if record.get('marketEntry'):
+            proposal.update(marketEntry=record['marketEntry'], marketEntryDigest=record['marketEntryDigest'], catalogIntegrationRequired=False, marketplaceCaveat='候选尚未公开发布；需单独确认。支持动态信任的新市场可刷新目录；教师安装与启用仍需分别确认。')
+        return proposal
 
     def preview(self, sid):
         with self.mutex:
@@ -699,6 +718,11 @@ class Handler(BaseHTTPRequestHandler):
                     value = list(store.state['records'].values())
                 elif self.path == '/api/submissions' and self.command == 'POST':
                     value = store.upload(body)
+                elif self.path == '/api/publication' and self.command == 'GET':
+                    value = store.publication.status() if getattr(store, 'publication', None) else dict(configured=False, state='unavailable', message='未配置签名密钥、固定公钥、Node 与独立公开服务；发布不可用。')
+                elif self.path == '/api/publication/recheck' and self.command == 'POST':
+                    need(getattr(store, 'publication', None) is not None and body == {}, 'publication.unconfigured', 409)
+                    value = store.publication.self_check()
                 else:
                     parts = self.path.split('/')
                     need(len(parts) >= 4 and parts[1:3] == ['api', 'submissions'], 'http.route', 404)
@@ -709,6 +733,15 @@ class Handler(BaseHTTPRequestHandler):
                         action = parts[4] if len(parts) >= 5 else ''
                         if len(parts) == 5 and self.command == 'POST' and action == 'review':
                             value = store.review(record['id'], body)
+                        elif len(parts) == 5 and action in ('market-entry', 'publication-preview', 'publish') and self.command == 'POST':
+                            need(getattr(store, 'publication', None) is not None, 'publication.unconfigured', 409)
+                            if action == 'market-entry':
+                                value = store.publication.attach(record['id'], body)
+                            elif action == 'publication-preview':
+                                need(type(body) is dict and set(body) == {'operation'}, 'publication.fields')
+                                value = store.publication.preview(record['id'], body['operation'])
+                            else:
+                                value = store.publication.confirm(record['id'], body)
                         elif len(parts) == 5 and self.command == 'POST' and action == 'prepare':
                             value = store.prepare(record['id'], body)
                         elif len(parts) == 5 and self.command == 'GET' and action == 'preview':
@@ -769,6 +802,10 @@ def main():
     actions.add_argument('--reset-admin-password', action='store_true', help='Interactively reset while service is stopped')
     parser.add_argument('--bind', default='127.0.0.1', choices=['127.0.0.1'])
     parser.add_argument('--port', type=int, default=8765)
+    parser.add_argument('--publication-root', type=Path)
+    parser.add_argument('--public-trust', type=Path)
+    parser.add_argument('--node', type=Path, help='Trusted absolute Node executable (22+); never supplied by Web')
+    parser.add_argument('--init-publication', action='store_true', help='Create a NEW separate public root')
     args = parser.parse_args()
     store = server = None
     try:
@@ -779,6 +816,12 @@ def main():
             store.reset_password(prompt_password())
             print('Local password reset completed.', flush=True)
             return 0
+        if args.publication_root:
+            need(args.public_trust is not None and args.node is not None, 'publication.setup')
+            trust = parse(args.public_trust.read_bytes(), 4096)
+            store.configure_publication(args.publication_root, trust, args.node, initialize=args.init_publication)
+        else:
+            need(not (args.public_trust or args.node or args.init_publication), 'publication.setup')
         server = Server((args.bind, args.port), store)
         print('Local preparation only: ' + server.origin, flush=True)
         server.serve_forever()

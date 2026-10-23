@@ -74,7 +74,7 @@ def load_snapshot(root, manifest_pin):
     return resources
 
 
-def make_server(resources, host='127.0.0.1', port=8080, lan_approved=False):
+def make_server(resources, host='127.0.0.1', port=8080, lan_approved=False, publication=None):
     ip = ipaddress.ip_address(host)
     private_lan = ip.version == 4 and any(ip in ipaddress.ip_network(n) for n in ['10.0.0.0/8', '172.16.0.0/12', '192.168.0.0/16'])
     check(host == '127.0.0.1' or (lan_approved and private_lan), 'explicit-private-lan-bind-required')
@@ -98,15 +98,25 @@ def make_server(resources, host='127.0.0.1', port=8080, lan_approved=False):
         def do_POST(self):
             self.send_error(405)
 
+        do_PUT = do_POST
+        do_DELETE = do_POST
+        do_PATCH = do_POST
+        do_OPTIONS = do_POST
+
         def respond(self, head):
-            if self.headers.get('Host') != '%s:%s' % (host, self.server.server_port):
+            if self.headers.get_all('Host') != ['%s:%s' % (host, self.server.server_port)]:
                 self.send_error(403)
                 return
-            if self.path not in resources:
+            try:
+                dynamic = publication.read(self.path) if publication else None
+            except Exception:
+                self.send_error(503)
+                return
+            if self.path not in resources and dynamic is None:
                 self.send_error(404)
                 return
-            data = resources[self.path]
-            content_type = 'text/html; charset=utf-8' if self.path in {'/', '/index.html', '/themes.html'} else 'application/json; charset=utf-8' if self.path == '/catalog.json' else 'application/octet-stream'
+            data = dynamic if dynamic is not None else resources[self.path]
+            content_type = 'text/html; charset=utf-8' if self.path in {'/', '/index.html', '/themes.html'} else 'application/json; charset=utf-8' if self.path in {'/catalog.json','/market/catalog.signed.json'} else 'application/octet-stream'
             self.send_response(200)
             self.send_header('Content-Type', content_type)
             self.send_header('Content-Length', str(len(data)))
@@ -128,14 +138,27 @@ def main():
     parser.add_argument('--host', default='127.0.0.1')
     parser.add_argument('--port', type=int, default=8080)
     parser.add_argument('--lan-approved', action='store_true')
+    parser.add_argument('--publication-root', type=Path)
+    parser.add_argument('--public-trust', type=Path)
+    parser.add_argument('--node', type=Path)
     args = parser.parse_args()
     try:
         resources = load_snapshot(args.root, args.manifest_sha256)
+        publication = None
+        if args.publication_root:
+            check(args.public_trust is not None and args.node is not None, 'publication-setup')
+            import importlib.util
+            spec = importlib.util.spec_from_file_location('publication_reader', Path(__file__).absolute().parent / 'publication-reader.py')
+            reader = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(reader)
+            publication = reader.PublicationReader(args.publication_root, json.loads(args.public_trust.read_bytes()), args.node)
+        else:
+            check(not (args.public_trust or args.node), 'publication-setup')
         print(json.dumps({'verified': True, 'servableResources': len(resources), 'serviceStarted': False}), flush=True)
         if not args.serve:
             return
         check(1024 <= args.port <= 65535, 'nonprivileged-port-required')
-        with make_server(resources, args.host, args.port, args.lan_approved) as server:
+        with make_server(resources, args.host, args.port, args.lan_approved, publication) as server:
             print(json.dumps({'host': args.host, 'port': args.port, 'readOnly': True, 'authenticated': False}), flush=True)
             try:
                 server.serve_forever()

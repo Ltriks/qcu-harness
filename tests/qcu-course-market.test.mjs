@@ -1,3 +1,4 @@
+import {realpathSync} from 'node:fs'
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import {readFile,mkdtemp} from 'node:fs/promises'
@@ -32,7 +33,7 @@ with tarfile.open(${JSON.stringify(archive)}) as t:
 })
 test('workbench contract rejects forged Skill identity and Host downloads only the pinned bytes',async()=>{
  for(const change of [e=>e.release.skill=e.id,e=>e.id='qcu-fake-workbench',e=>e.release.provider='forged',e=>e.capabilities=['workbench','skill']]){const c=JSON.parse(catalogText);change(c.entries.find(i=>i.id===item.id));assert.throws(()=>parseMarketCatalog(JSON.stringify(c)))}
- const bytes=await readFile(process.env.QCU_COURSE_ARCHIVE),root=join(await mkdtemp(join(tmpdir(),'qcu-course-cache-')),'cache');let calls=0
+ const bytes=await readFile(process.env.QCU_COURSE_ARCHIVE),root=join(await mkdtemp(join(realpathSync(tmpdir()),'qcu-course-cache-')),'cache');let calls=0
  const path=await fetchPinned({entry:release,root,fetcher:async(url,options)=>{calls++;assert.equal(url,release.origin+'/plugins/'+release.file);assert.equal(options.redirect,'manual');return new Response(bytes,{headers:{'content-length':String(bytes.length)}})}})
  assert.deepEqual(await readFile(path),bytes);assert.equal(calls,1)
 })
