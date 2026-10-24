@@ -1,4 +1,10 @@
 // Shared bounded update data. Trust is established by the Host signature verifier.
+import {updatePolicy} from './update-policy.mjs'
+// The second signed projection is admitted only by the exact reviewed product policy.
+export function expertProjectionCapable(policy){
+ const actual=policy?.products,expected=updatePolicy.products
+ return actual&&Object.keys(actual).sort().join()===Object.keys(expected).sort().join()&&Object.entries(expected).every(([id,p])=>actual[id]?.capability===p.capability&&Object.keys(actual[id].peers??{}).sort().join()===Object.keys(p.peers).sort().join()&&Object.entries(p.peers).every(([k,v])=>actual[id].peers[k]===v))
+}
 export const updateOrigin='http://192.168.1.68:8080'
 export const updateAssert=(ok,message)=>{if(!ok)throw Error('更新检查：'+message)}
 export const updateExact=(obj,keys)=>updateAssert(obj&&typeof obj==='object'&&!Array.isArray(obj)&&Object.keys(obj).sort().join()===keys.slice().sort().join(),'字段不符')
@@ -19,7 +25,7 @@ export const updateFilePath=p=>typeof p==='string'&&p.length<=180&&(/^[a-zA-Z0-9
 export function parseUpdatePayload(payload,policy,now=Date.now()){
  updateAssert(typeof payload==='string'&&new TextEncoder().encode(payload).length<=262144,'清单过大')
  const feed=JSON.parse(payload);updateExact(feed,['schemaVersion','channel','revision','issuedAt','expiresAt','entries'])
- updateAssert(feed.schemaVersion===1&&feed.channel==='pilot'&&Number.isSafeInteger(feed.revision)&&feed.revision>0,'更新清单版本或通道不符')
+ updateAssert(feed.schemaVersion===1&&(feed.channel==='pilot'||(feed.channel==='pilot-experts'&&expertProjectionCapable(policy)))&&Number.isSafeInteger(feed.revision)&&feed.revision>0,'更新清单版本或通道不符')
  const issued=Date.parse(feed.issuedAt),expires=Date.parse(feed.expiresAt)
  updateAssert(typeof feed.issuedAt==='string'&&typeof feed.expiresAt==='string'&&Number.isFinite(issued)&&Number.isFinite(expires)&&issued<=now+300000&&expires>now&&expires>issued&&expires-issued<=30*86400000,'更新清单未生效或已过期，请联系发布者更新清单')
  updateAssert(Array.isArray(feed.entries)&&feed.entries.length>0&&feed.entries.length<=60,'更新清单数量无效')
@@ -34,6 +40,7 @@ export function parseUpdatePayload(payload,policy,now=Date.now()){
   updateAssert(typeof e.changes==='string'&&e.changes.length>0&&e.changes.length<=2000&&!/[\u0000-\u001f]/.test(e.changes),'更新说明无效')
   updateAssert(['preserve-config-no-migration','manual-review'].includes(e.upgradePolicy),'升级策略无效')
   updateAssert(e.peers&&typeof e.peers==='object'&&!Array.isArray(e.peers)&&Object.entries(e.peers).every(([k,v])=>known.peers[k]===v),'新增或改变依赖需要单独审核')
+  if(e.id==='qcu-expert-teams')updateAssert(Object.keys(e.peers).length===Object.keys(known.peers).length,'专家插件依赖必须与固定策略完全一致')
   updateAssert(Array.isArray(e.files)&&e.files.length>0&&e.files.length<=80,'包文件清单无效')
   const files=new Set();let total=0
   for(const f of e.files){updateExact(f,['path','bytes','sha256']);updateAssert(updateFilePath(f.path)&&!files.has(f.path)&&Number.isSafeInteger(f.bytes)&&f.bytes>=0&&f.bytes<=1048576&&/^[a-f0-9]{64}$/.test(f.sha256),'包文件指纹无效');files.add(f.path);total+=f.bytes}

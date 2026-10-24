@@ -1,4 +1,4 @@
-// Fixed publisher public key and ten product identities. No private key is shipped.
+// Fixed publisher public key and eleven product identities. No private key is shipped.
 export const updatePolicy={
   "publicKey": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEA6lQ5mWtzfd5p6eGsv8UjKT0FDU76c/eRo4wyJKxprHs=\n-----END PUBLIC KEY-----\n",
   "products": {
@@ -82,6 +82,22 @@ export const updatePolicy={
         "@deepseek-ai/dsh-client-ui-sidebar": "0.2.0-rc.2"
       }
     },
+    "qcu-expert-teams": {
+      "capability": "tools",
+      "peers": {
+        "@deepseek-ai/cordis": "4.0.4",
+        "@deepseek-ai/schemastery": "3.18.4",
+        "@deepseek-ai/dsh-typert-protocol": "0.2.0-rc.2",
+        "@deepseek-ai/dsh-typert-registry": "0.2.0-rc.2",
+        "@deepseek-ai/dsh-api-remotes": "0.2.0-rc.2",
+        "@deepseek-ai/dsh-llm": "0.2.0-rc.2",
+        "@deepseek-ai/dsh-workspace": "0.2.0-rc.2",
+        "@deepseek-ai/dsh-agent-default-model": "0.2.0-rc.2",
+        "@deepseek-ai/dsh-skill": "0.2.0-rc.2",
+        "@deepseek-ai/dsh-client-ui-layout": "0.2.0-rc.2",
+        "@deepseek-ai/dsh-client-ui-sidebar": "0.2.0-rc.2"
+      }
+    },
     "qcu-market": {
       "capability": "market",
       "peers": {
@@ -98,3 +114,6 @@ export const updatePolicy={
     }
   }
 }
+
+// Frozen P15.1 product projection; no broad admission or new permissions.
+export const legacyUpdatePolicy={publicKey:updatePolicy.publicKey,products:Object.fromEntries(Object.entries(updatePolicy.products).filter(([id])=>id!=='qcu-expert-teams'))}

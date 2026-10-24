@@ -1,5 +1,6 @@
 // Presentation metadata only. Historical entries never enter the Host install allowlist.
 export const productKindOf=item=>item.capabilities?.[0]==='skill'?'skill':'plugin'
+export const productLabelOf=item=>item.id==='qcu-expert-teams'?'专家协作插件':productKindOf(item)==='skill'?'技能':'插件'
 export function parseVersionHistory(text){
  const root=JSON.parse(text),origin='http://192.168.1.68:8080',seen=new Set()
  if(!root||root.origin!==origin||typeof root.sourceRevision!=='string'||!Array.isArray(root.entries)||root.entries.length>100)throw Error('Invalid reviewed version history')

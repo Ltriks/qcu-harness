@@ -1,5 +1,7 @@
 # QCU market — 0.1.0-pilot.13.2
 
+Current suite integration candidate: **0.1.0-pilot.15.2**; expert panel admission, legacy wire categorization, two signed feed projections and local-only evidence are documented in [suite integration](../../../docs/qcu-suite-integration-a.md). This candidate is not production-published.
+
 Previous P13.2 (`0.1.0-pilot.13.2`) integrates the reviewed fixed course workbench 1.2 archive (51089 bytes, SHA256 `88a55b22561a5f6cf1e7af8d27ad28d074df13db4feb4c9340fddd208f5ad0ec`, source `4354b04f09b7e22f12e3d6bfa9d36804d630674c`). Catalog revision is 6; market schema/protocol remain 4, all nine real products remain, and the other eight products are unchanged. Course 1.0's real model failure remains unresolved. Version 1.1 was installed and loaded on mini; its real retest confirmed a max-tokens failure at the 12000-token limit. Version 1.2 reduces reasoning through a capability-aware policy and a compact complete-generation prompt; 59 related offline checks and 16 synthetic renders passed. Native 1.2, real generation success, teacher and Office acceptance remain pending. The notes below describe prior releases.
 
 P13.2 preserves the deployed P13.1 unified Hub navigation, scenario filtering, capability-based classification (seven Skills and two plugins), and separate version management. Reviewed releases and explicitly queried installed versions are displayed separately; browsing makes no inventory request. Eighteen published archive records are read-only history, including deployed market P13.1; neither course 1.2 nor market P13.2 is historical before publication. Historical URL/hash copying never expands the nine-entry Host installation allowlist. Install review, activation consent, cancellation and official restart requirements remain unchanged. Frozen uncommitted P13.1 source is backed by deployed archive member equality and an exact deterministic rebuild, not a new Git revision; see `docs/qcu-market-p13.2-release.md` at the repository root.
@@ -39,29 +41,12 @@ The canonical authors are lqtriks and QCU Harness contributors. Notes, reading a
 See `docs/qcu-market-p8-source.md` at the repository root for exact build, isolated official/runtime/HTTP/browser commands, evidence and deferred verification. Stable local roots use `$HOME/Repos/worktrees/qcu-harness/market-integration` and `$HOME/Artifacts/qcu-harness/0.1.0-pilot.8.1`. No dependency download is needed or authorized. Deterministic allowlisted tar/gzip archives use id/version/hash filenames and refuse different bytes at an existing archive path. Previous P7/P6/P6.1/P6.2/P6.3/P5.1/coach P2 artifacts and evidence are unchanged.
 
 `preview.mjs` uses the actual shared React views and flow with an unmistakably synthetic, independently keyed backend. It never ships, reads profiles or contacts Hub. Browser checks cover both categories, search/back focus, bounded metadata/provenance, entry independence, cross-entry lock, revocation, disabled install, separate installation and single compound activation consent, unknown outcomes, tool-only setup/readiness copy, parent/row error stops, external-request/React errors and narrow light/dark layout. Live Mini/Hub, fresh Home package-manager install and teacher/model acceptance remain with the parent. No deployment, commit, push or actual-profile install is part of this source deliverable.
-# P15.1 integration candidate
+# P15.2 suite integration candidate
 
-Version `0.1.0-pilot.15.1`, Host/Client protocol 6. Supports administrator-approved,
-Ed25519-signed live catalog publication and a visible “刷新市场” action. Publication,
-disabled installation and activation each require separate confirmation. Pending
-official operations block refresh. Dynamic errors never grant bundled permissions.
+Version `0.1.0-pilot.15.2`, Host/Client protocol 6. The deployed publisher public key and origin remain fixed; no private key ships or was accessed. Catalog schema/protocol 4 admits the unchanged frozen expert panel with legacy `['tools']` no-Skill categorization, null Skill/hash/provider, and honest 专家协作插件 labels. This does not register DSH tools or a Skill. All other product metadata stays unchanged.
 
-This source has **no production public key configured** (`src/public-trust.mjs` is
-null): its distributable explicitly uses the legacy bundled catalog. Configure an
-out-of-band public SPKI with `scripts/configure-market-trust.mjs` before a separately
-reviewed dynamic release. No signing private key belongs in this package. Local
-acceptance uses ephemeral keys through direct test constructors only. Native DSH,
-Hub deployment and teacher acceptance remain untested. Operator setup, supported
-single-component boundary and exact checks: `docs/qcu-hub-market-publication.md`
-in the repository. Historical release notes below describe earlier versions.
+Publication, disabled installation and single-component activation retain separate confirmations. Pending official operations block refresh; refresh/unload never cancel sent mutations. The protocol6 handshake binds catalog and fixed update-policy digests. Only the exact expert identity and peers extend the update policy. Unknown update products remain rejected.
 
-P15.1 retains the frozen P14.1 signed update service and its separate pinned public
-publisher policy (ten products). The protocol6 handshake binds both bundled
-catalog and update-policy digests. Version management includes explicit update
-checks, per-product consent, preserved enablement/configuration and durable
-unknown-result/self-upgrade recovery. Refresh, ordinary install/activation and
-updates share one mutation gate; already sent official requests are never
-cancelled by refresh or unload. New signed dynamic products remain installable;
-updates outside the fixed policy are labelled for official-page review.
-`updates.json` stays an independent, manifest-pinned, no-store public resource.
-See `docs/qcu-market-p15.1-integration.md` for exact frozen sources and local evidence.
+`updates.json` retains the ten-product P15.1 projection, including market15.2 but excluding expert; `updates-v2.json` includes expert. New clients fall back only on genuine 404. Independent exact fingerprints and a shared revision floor protect both projections. Offline preparation requires explicit projections and records omissions. Both feeds are manifest-pinned, read-only, no-store resources. See [suite handoff](../../../docs/qcu-suite-integration-a.md) for reproduction and next-builder inputs.
+
+Focused local publication uses ephemeral keys and clearly simulated operator review of the actual frozen archive. The 47-file handoff contains optional attachments rejected by the existing admin policy (13 PNGs and source/pack.py); an explicit 33-file byte-preserving upload projection records all omissions and keeps the original material read-only. No admin validation was relaxed. Browser proof uses the real signed HTTP authority and official rc2 Gateway, with counted simulated install/activation effects only. New native DSH, real model/teacher acceptance, Windows, full application build and production publication remain pending with the parent.

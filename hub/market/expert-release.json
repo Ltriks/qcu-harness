@@ -1,0 +1,14 @@
+{
+  "id": "qcu-expert-teams",
+  "version": "0.2.0-pilot.2",
+  "skill": null,
+  "skillSha256": null,
+  "provider": null,
+  "origin": "http://192.168.1.68:8080",
+  "file": "qcu-expert-teams-0.2.0-pilot.2-4db68f807362f243f77039d66c09b1981a4b61a93185f37c43731ea001a96581.tgz",
+  "bytes": 57940,
+  "sha256": "4db68f807362f243f77039d66c09b1981a4b61a93185f37c43731ea001a96581",
+  "runtime": "0.2.0-rc.2",
+  "releaseStatus": "local-candidate-not-published",
+  "license": "MIT"
+}

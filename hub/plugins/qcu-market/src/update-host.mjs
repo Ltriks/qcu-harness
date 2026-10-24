@@ -3,7 +3,7 @@ import {join,dirname} from 'node:path'
 import {homedir} from 'node:os'
 import {realpath,lstat,open,link,unlink} from 'node:fs/promises'
 import {updatePolicy} from './update-policy.mjs'
-import {updateAssert,updateExact,parseUpdatePayload,updateCandidate,updateReleaseKey,updateOrigin} from './update-model.mjs'
+import {updateAssert,updateExact,parseUpdatePayload,updateCandidate,updateReleaseKey,updateOrigin,expertProjectionCapable} from './update-model.mjs'
 import {inspectUpdateArchive} from './update-archive.mjs'
 import {UpdateStorage,ownedUpdateDir,regularUpdateBytes} from './update-storage.mjs'
 const digest=b=>createHash('sha256').update(b).digest('hex')
@@ -13,9 +13,11 @@ export function verifyUpdateEnvelope(envelope,policy=updatePolicy,now=Date.now()
  updateAssert(verifySignature(null,Buffer.from(envelope.payload),policy.publicKey,Buffer.from(envelope.signature,'base64')),'发布者签名校验失败')
  return parseUpdatePayload(envelope.payload,policy,now)
 }
-async function boundedUpdateFetch(url,cap,fetcher,signal){
+async function boundedUpdateFetch(url,cap,fetcher,signal,{allowMissing=false}={}){
  const response=await fetcher(url,{redirect:'manual',credentials:'omit',headers:{'Accept-Encoding':'identity'},signal:AbortSignal.any([AbortSignal.timeout(30000),...(signal?[signal]:[])])})
  try{
+  signal?.throwIfAborted()
+  if(allowMissing&&response.status===404&&!response.redirected&&(!response.url||response.url===url))return null
   updateAssert(response.status===200&&!response.redirected&&(!response.url||response.url===url),'网络返回异常或发生跳转')
   updateAssert(!response.headers.get('content-encoding')||response.headers.get('content-encoding')==='identity','不接受压缩传输')
   const length=response.headers.get('content-length');updateAssert(length!==null&&/^\d+$/.test(length)&&Number(length)>0&&Number(length)<=cap&&response.body,'网络内容大小无效')
@@ -63,9 +65,18 @@ export class MarketUpdates{
   updateAssert(!this.pending&&!this.disposed,'已有更新操作进行中')
   const abort=new AbortController();this.pending=abort;this.feed=null;this.receipts.clear()
   try{
-   const raw=await boundedUpdateFetch(updateOrigin+'/updates.json',524288,this.fetcher,AbortSignal.any([abort.signal,...(signal?[signal]:[])])),envelope=JSON.parse(raw.toString('utf8')),feed=verifyUpdateEnvelope(envelope,this.policy,this.now()),fingerprint=digest(Buffer.from(envelope.payload)),saved=await this.storage.read('state.json')
-   if(saved){updateExact(saved,['revision','fingerprint','envelope']);updateAssert(Number.isSafeInteger(saved.revision)&&saved.revision>0&&/^[a-f0-9]{64}$/.test(saved.fingerprint),'本地更新状态损坏');updateAssert(feed.revision>saved.revision||feed.revision===saved.revision&&fingerprint===saved.fingerprint,'更新清单发生回退或同修订内容变化')}
-   await this.storage.write('state.json',{revision:feed.revision,fingerprint,envelope});abort.signal.throwIfAborted();updateAssert(!this.disposed,'市场已关闭')
+   const combined=AbortSignal.any([abort.signal,...(signal?[signal]:[])]),expertCapable=expertProjectionCapable(this.policy)
+   let path=expertCapable?'/updates-v2.json':'/updates.json'
+   let raw=await boundedUpdateFetch(updateOrigin+path,524288,this.fetcher,combined,{allowMissing:expertCapable})
+   if(raw===null){combined.throwIfAborted();path='/updates.json';raw=await boundedUpdateFetch(updateOrigin+path,524288,this.fetcher,combined)}
+   const envelope=JSON.parse(raw.toString('utf8')),feed=verifyUpdateEnvelope(envelope,this.policy,this.now()),fingerprint=digest(Buffer.from(envelope.payload)),stateFile=path==='/updates-v2.json'?'state-v2.json':'state.json'
+   updateAssert(feed.channel===(path==='/updates-v2.json'?'pilot-experts':'pilot'),'更新清单签名通道与请求地址不符')
+   // Each projection pins its own bytes; both share the publisher sequence floor.
+   for(const file of ['state.json','state-v2.json']){
+    const saved=await this.storage.read(file)
+    if(saved){updateExact(saved,['revision','fingerprint','envelope']);updateAssert(Number.isSafeInteger(saved.revision)&&saved.revision>0&&/^[a-f0-9]{64}$/.test(saved.fingerprint),'本地更新状态损坏');updateAssert(feed.revision>=saved.revision&&(file!==stateFile||feed.revision>saved.revision||fingerprint===saved.fingerprint),'更新清单发生回退或同修订内容变化')}
+   }
+   combined.throwIfAborted();await this.storage.write(stateFile,{revision:feed.revision,fingerprint,envelope});combined.throwIfAborted();updateAssert(!this.disposed,'市场已关闭')
    this.feed=feed;this.fingerprint=fingerprint
    return JSON.stringify({revision:feed.revision,fingerprint,expiresAt:feed.expiresAt,checkedAt:this.now(),bootId:this.bootId,runtime:this.runtime,items:await this.candidates()})
   }finally{this.pending=null}

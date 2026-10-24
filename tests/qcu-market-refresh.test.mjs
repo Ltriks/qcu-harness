@@ -13,18 +13,18 @@ const {Guide}=createTeacherViews(React)
 const nodes=el=>!React.isValidElement(el)?[]:[el,...React.Children.toArray(el.props.children).flatMap(nodes)]
 const action=(tree,text)=>nodes(tree).find(el=>el.type==='button'&&el.props.children===text).props
 
-test('real shared home renders nine navigation-only cards, separate exit and optional guide without RPC',()=>{
+test('real shared home renders ten navigation-only cards, separate exit and optional guide without RPC',()=>{
  const fixture=createPreviewFixture(),ready={flows:fixture.flows,onDetails(){}}
  try{
   const {MarketPage}=createMarketViews(React)
   const html=renderToStaticMarkup(React.createElement(MarketPage,{availability:{snapshot:()=>ready,subscribe:()=>()=>{}},onBack(){}}))
-  assert.equal((html.match(/class="qcu-product"/g)||[]).length,9)
+  assert.equal((html.match(/class="qcu-product"/g)||[]).length,10)
   assert.equal((html.match(/← 返回对话/g)||[]).length,1)
   assert.ok(html.indexOf('← 返回对话')<html.indexOf('aria-label="教学辅助"'))
   for(const name of ['home','guide','tasks','feedback'])assert.ok(html.includes(`data-aux="${name}"`))
   assert.match(html,/首次使用指引/);assert.match(html,/开始浏览引导/)
   assert.doesNotMatch(html,/下载并查看安装确认|确认启用|aria-current="step"/)
-  assert.equal((html.match(/状态待检查/g)||[]).length,9)
+  assert.equal((html.match(/状态待检查/g)||[]).length,10)
   assert.deepEqual(fixture.calls,[])
  }finally{fixture.flows.forEach(flow=>flow.dispose())}
 })

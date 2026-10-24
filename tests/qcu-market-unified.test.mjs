@@ -6,9 +6,9 @@ import {bundledCatalog} from '../hub/plugins/qcu-market/src/bundled-catalog.mjs'
 import {findMarketRelease,releaseKeyOf} from '../hub/plugins/qcu-market/src/catalog-core.mjs'
 import {readProduct} from '../hub/plugins/qcu-market/src/direct-flow.mjs'
 
-test('capabilities give seven Skills and two plugins without changing bundle identities',()=>{
+test('capabilities give seven Skills and three plugins without changing bundle identities',()=>{
  assert.equal(bundledCatalog.entries.filter(e=>productKindOf(e)==='skill').length,7)
- assert.equal(bundledCatalog.entries.filter(e=>productKindOf(e)==='plugin').length,2)
+ assert.equal(bundledCatalog.entries.filter(e=>productKindOf(e)==='plugin').length,3)
  const coach=bundledCatalog.entries.find(e=>e.id==='qcu-study-coach')
  assert.equal(coach.kind,'bundle');assert.equal(productKindOf(coach),'skill')
  assert.equal(productKindOf(bundledCatalog.entries.find(e=>e.id==='qcu-course-workbench')),'plugin')
@@ -16,14 +16,14 @@ test('capabilities give seven Skills and two plugins without changing bundle ide
 
 test('reviewed history is immutable, version sorted and never grants install authority',()=>{
  assert.ok(Object.isFrozen(releaseHistory.entries))
- assert.equal(releaseHistory.sourceRevision,'pilot-market-p15-1-frozen-p14-integration')
- assert.equal(releaseHistory.entries.length,21)
+ assert.equal(releaseHistory.sourceRevision,'pilot-market-p15-2-suite-integration-b')
+ assert.equal(releaseHistory.entries.length,23)
  assert.ok(releaseHistory.entries.some(e=>e.id==='qcu-market'&&e.version==='0.1.0-pilot.13.2'))
  assert.ok(releaseHistory.entries.some(e=>e.id==='qcu-course-workbench'&&e.version==='0.1.0-pilot.1.2'))
- assert.ok(!releaseHistory.entries.some(e=>e.id==='qcu-market'&&e.version==='0.1.0-pilot.15.1'))
- const versions=historyFor(releaseHistory,'qcu-market','0.1.0-pilot.15.1')
- assert.equal(versions[0].version,'0.1.0-pilot.14.1')
- assert.equal(versions[0].sha256,'afd2ada38d7039fac2d978314d17f9391bb420d5174fd095ff7d2f7a7be85ec3')
+ assert.ok(releaseHistory.entries.some(e=>e.id==='qcu-market'&&e.version==='0.1.0-pilot.15.1'))
+ const versions=historyFor(releaseHistory,'qcu-market','0.1.0-pilot.15.2')
+ assert.equal(versions[0].version,'0.1.0-pilot.15.1')
+ assert.equal(versions[0].sha256,'6b17dc4a16718ffd39f1c7381f6bde52d78599874f0e06249bad444090705c49')
  assert.equal(versions.find(e=>e.version==='0.1.0-pilot.13.1').sha256,'e17f3d38d7feed0048e19534ed779593e7531122b84265e4f4ca90e40234dbb3')
  assert.throws(()=>findMarketRelease(bundledCatalog,releaseKeyOf(versions[0])),/unreviewed release/)
  assert.ok(versions.findIndex(e=>e.version==='0.1.0-pilot.11.1')<versions.findIndex(e=>e.version==='0.1.0-pilot.9.1'))

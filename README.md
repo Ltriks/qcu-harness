@@ -1,10 +1,22 @@
 # QCU Harness
 
+## Mac rc4 集成候选（本地验证，未部署）
+
+当前集成分支 `dev/qcu-suite-integration`，独立 worktree 为 `$HOME/Repos/worktrees/qcu-harness/suite-integration`。新线程仍从主仓库进入；先核对各 worktree、分支及远端，不修改其他线程的工作目录。
+
+整包 `0.1.0-rc.4` 包含七项教学技能、飞书只读、课程工作台1.3、QCU市场15.2、专家团0.2.0-pilot.2和清蓝主题0.2.2，共11个产品、12项相对本地来源依赖。首次准备不下载依赖、不调用模型；安装、启用及任务发送仍保留对应确认。专家团从侧栏进入，为Host/Client协作插件，不提供独立Skill或DSH工具。
+
+构建入口 `scripts/build-integrated-teacher-macos.py`，实际ZIP验证入口 `scripts/verify-integrated-teacher-macos.py`；固定输入、已有官方依赖、构建和分层测试命令见[最终集成与验证](docs/qcu-suite-integration-final.md)。已验证产物在 `$HOME/Artifacts/qcu-harness/0.1.0-rc.4/mac-arm64/`，含已解压APP、ZIP和当前离线指南；同版本目录的 `verification/` 放日志和匿名截图，`operator/` 放待审核的Hub发布材料，`实际使用验收.md` 为人工步骤。大产物、临时数据和私有回执不入Git。
+
+本地检查通过不等于原生验收或上线：候选桌面启动、本人模型配置和一次真实教学任务仍待确认。本版默认数据目录 `~/Library/Application Support/QCU-DSH/teacher/0.1.0-rc.4/`，不自动读取旧数据；迁移仅由维护人员对受支持、已退出的旧版预览并确认。Hub仍沿用 `192.168.1.68:8080`（管理员仅mini回环8975），本轮未部署，公开签名清单核对仍为市场15.1；Windows本轮不重建，原包保留。
+
+[阶段A历史证据](docs/qcu-suite-integration-a.md)与[阶段B历史构建](docs/qcu-suite-integration-b.md)保留，最终版本和验收状态以以上最终集成说明及产物DELIVERY.md为准。
+
 课程设计工作台：`dev/qcu-course-workbench`。[工作台 1.2 原生验收](docs/qcu-course1.2-native-acceptance.md)记录了一次真实生成成功、教学内容问题及尚待验收项；不能沿用早期“未安装真实 DSH”的结论。当前源码为 **1.3 本地候选（未部署）**，首用连接、完整修订和市场只读状态改进见[稳定性验证](docs/qcu-course-review-stability.md)。历史包、市场目录固定版本与旧失败任务保持原样。[Hub 单管理员本机登录与审核](docs/qcu-hub-single-admin.md)已实现，22项回归及真实 Chromium 合成流程通过，最新部署与真实账号状态见 [P15.1 部署验收](docs/qcu-hub-market-p15.1-deployment.md)；[历史双角色 MVP](docs/qcu-hub-submissions-mvp.md)保留原验收口径；完整后续边界见[发布计划](docs/qcu-hub-submission-workflow.md)。另见[交付包与验收](docs/qcu-course-workbench-delivery.md)和[数据/接口契约](docs/qcu-course-workbench-validation.md)。
 
 ## 专家团自主收尾候选
 
-当前独立分支 `dev/qcu-expert-teams-hardening`，worktree `$HOME/Repos/worktrees/qcu-harness/expert-teams-hardening`。从原专家库 `0.2.0-pilot.1` 的固定公开源码快照继续，原专家团工作树不改。本轮专家团 `0.2.0-pilot.2`、协议3、存储schema2：新增容量显示、所选历史数据备份、绑定预览及明确确认的清理、失败/停止/中断报告，并修复异步刷新和窄屏列表问题。源码和精确解包候选各通过35项核心/复核、6项官方运行时与1项浏览器综合验收；合成模型、实际下载、明暗窄屏截图分别留证，不作为原生或教学质量通过。
+专家团收尾原独立分支 `dev/qcu-expert-teams-hardening`，worktree `$HOME/Repos/worktrees/qcu-harness/expert-teams-hardening`。从原专家库 `0.2.0-pilot.1` 的固定公开源码快照继续，原专家团工作树不改。本轮专家团 `0.2.0-pilot.2`、协议3、存储schema2：新增容量显示、所选历史数据备份、绑定预览及明确确认的清理、失败/停止/中断报告，并修复异步刷新和窄屏列表问题。源码和精确解包候选各通过35项核心/复核、6项官方运行时与1项浏览器综合验收；合成模型、实际下载、明暗窄屏截图分别留证，不作为原生或教学质量通过。
 
 固定包57,940字节，SHA256 `4db68f807362f243f77039d66c09b1981a4b61a93185f37c43731ea001a96581`。验收说明和构建命令见[专家团收尾](docs/qcu-expert-teams-hardening.md)。最终交付及分阶段证据归档到 `$HOME/Artifacts/qcu-harness/0.2.0-expert-library.2/`；早期候选保留为stage-a，不能混作最终包。本轮候选尚未安装到真实DSH、发布Hub或调用真实模型；已使用教师Home迁移、原生文件选择和教师效果单列待验收。
 

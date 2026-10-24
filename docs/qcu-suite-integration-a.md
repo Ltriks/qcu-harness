@@ -1,0 +1,30 @@
+# QCU-SUITE-INTEGRATION-A handoff
+
+Local source candidate only: market `0.1.0-pilot.15.2`, branding `0.2.1`. No production publication, real operator approval, native DSH acceptance, model call, teacher acceptance, Windows validation, ASAR edit or complete application rebuild. Parent owns commit/push/archive and the next builder stage. Evidence: `.work/suite-integration-a/RESULT.json` and adjacent logs/screenshots.
+
+The expert package stays frozen at `qcu-expert-teams@0.2.0-pilot.2`, 57,940 bytes, SHA256 `4db68f807362f243f77039d66c09b1981a4b61a93185f37c43731ea001a96581`, source `45bb6ed23e9990118e1ecd20114c32233e6c4b13`. All 15 source/archive members are compared byte for byte. It registers a Host/Client RPC panel, no DSH tools and no Skill. Default-model use sends the confirmed materials/upstream opinions and may cost money; workspace experts/teams/history are persisted; exports contain task data; cleanup requires preview and confirmation. Those boundaries remain in the frozen implementation.
+
+Schema 4/protocol 4 remains unchanged. Expert metadata keeps `capabilities: ['tools']`, with null Skill/hash/provider: this is the legacy no-Skill **wire categorization**, not a tool permission or registration claim. New UI calls this known identity **专家协作插件**, including dynamic publication. Other nine product entries stay byte-equivalent to P15.1 catalog data. The old parser still rejects invented capabilities and claimed Skills/providers. The fixed static expert entry is an unpublished candidate. The unchanged admin attachment policy rejects the original handoff’s 13 PNGs and source/pack.py. The focused test uploads an explicit 33-file projection, hashes all 14 omissions, and preserves every retained byte and the full frozen TGZ. Original screenshots/helper remain read-only at the supplied artifact path; no scanner/approval rule is relaxed. Signed publication tests use that projection, ephemeral test keys/credentials, and clearly simulated operator review; they do not constitute a real approval.
+
+## Compatible update preparation
+
+A single feed containing expert makes the frozen ten-product P15.1 parser reject the whole feed. No equally small one-feed projection lets both strict policies see their supported products. Therefore keep two explicit projections with the existing signature format:
+
+- `updates.json`: frozen ten-product policy; may advertise market15.2, excludes expert.
+- `updates-v2.json`: eleven fixed products; adds only expert and its exact frozen peers. `tools` is again the no-Skill wire category.
+
+`publish-market-updates.mjs` requires `job.projections` to be `["legacy"]`, `["v2"]`, or `["legacy","v2"]`; production preparation should choose both. Its `updates-review.json` records each omission and payload digest. Unknown identities fail before output; no private production key was accessed here. The CLI retains its pinned-public-key check. Both feeds must use the same increasing revision/issue time/expiry for a publication. Never replace a previously emitted feed at the same revision. Outputs use exclusive creation.
+
+New clients try v2 and fall back only on an exact, non-redirected 404. Signature/JSON/time/sequence errors, non-404 HTTP errors, wrong URLs, cancellation and timeout fail closed without retrying legacy. Each projection has its own exact fingerprint (`state.json` / `state-v2.json`) and both enforce a shared revision floor. This accepts a legitimate same-revision projection switch from an existing P15.1 cache while preserving same-projection substitution and cross-projection rollback rejection. No protocol or consent change is introduced.
+
+The existing Python snapshot server adds only the fixed `updates-v2.json` route to its allowlist, envelope-size check and JSON content-type mapping. The existing packer changes only its fixed release-version assertion. All new implementation/tests are JavaScript; no new dependencies. Both feeds must be included with exact bytes/hash in the next independently pinned snapshot manifest. The private `updates-review.json` is not a public route. Public reads stay GET/HEAD and no-store; private/helper routes and writes remain denied. No running server or production snapshot was changed.
+
+## Next builder stage
+
+Use `node hub/plugins/qcu-market/build.mjs`, then `python3 hub/plugins/qcu-market/pack-pilot.py NEW_OUTPUT` twice in distinct task output directories. The final manifest/digest and determinism result are in RESULT.json. The old market15.1 fixed archive is appended as read-only history; no old archives are replaced or granted install authority by history.
+
+Use `node scripts/build-teacher-theme.mjs NEW_BRANDING_OUTPUT` to build branding0.2.1. Registered `qcu-market` and `qcu-expert-teams` slots appear as 插件市场/专家团 in normal navigation; absent slots produce no links; other extra panels remain in maintenance. Navigation calls only `layout.selectPanel`. Existing clear-blue styling, workspace buttons, return navigation, managed updates and minimum-version policy are unchanged. The built theme manifest hashes all six output files; original r4/staged inputs remain read-only.
+
+The separate course1.3 fixed candidate is a parent builder input, not an update to this task's historical catalog or a production publication. Its archive is provided by the task; do not substitute course source for the older fixed catalog package. Build no new full app/ASAR in this stage.
+
+Relevant verification commands and counts are recorded in RESULT.json. Run integration tests after building the market archive into `.work/suite-integration-a/market-a` (or set `QCU_SUITE_MARKET_DIR` to the final archive directory); `QCU_OFFICIAL_DEPENDENCIES` points only at the provided trusted dependency tree. SDK tests use Node's existing `--experimental-transform-types` support for vendor source. Browser tests use a fresh `/private/tmp` profile, sandbox enabled, the provided headless binary, loopback servers and the existing publication fixture; all processes are stopped. Real Home/config, production keys and original artifact directories are never write targets.
