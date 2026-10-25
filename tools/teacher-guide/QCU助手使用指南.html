@@ -23,7 +23,7 @@
  <nav aria-label="使用指南目录">
   <a href="#start">第一次打开</a><a href="#api">配置自己的 API Key</a><a href="#first">完成第一次备课</a><a href="#skills">七项专属技能</a><a href="#studio">课程设计工作台</a><a href="#market-expert">插件市场与专家团</a><a href="#feishu">选读：飞书文档</a><a href="#help">遇到问题</a>
  </nav>
- <div class="edition">Mac 教师套件 0.1.0-rc.4<br>QCU清蓝主题 0.2.2<br>指南更新于 2026年10月24日<br>本页可断网阅读，也可打印。</div>
+ <div class="edition">Mac 教师套件 0.1.0-rc.4.1<br>QCU清蓝主题 0.2.3<br>指南更新于 2026年10月25日<br>本页可断网阅读，也可打印。</div>
 </aside>
 <main id="main" class="content">
  <header class="intro">
@@ -36,10 +36,10 @@
  <section class="section" id="start">
   <h2>第一次打开</h2>
   <p>先把收到的 ZIP <strong>完整解压</strong>到一个便于找到的文件夹，再启动助手。不要在压缩包内部直接双击程序。</p>
-  <div class="table-wrap"><table><caption class="small">按自己的电脑选择入口</caption><thead><tr><th scope="col">电脑</th><th scope="col">打开方法</th></tr></thead><tbody><tr><th scope="row">Mac</th><td>适用于 Apple Silicon（M 系列芯片）、macOS 13 及以上。双击 <strong>QCU助手.app</strong>。也可把整个 APP 放入“应用程序”。</td></tr><tr><th scope="row">Windows</th><td>本包仅为 Mac rc4 候选，Windows rc4 尚未发布。已有 Windows rc3 用户请继续使用原包及其随包说明。</td></tr></tbody></table></div>
+  <div class="table-wrap"><table><caption class="small">按自己的电脑选择入口</caption><thead><tr><th scope="col">电脑</th><th scope="col">打开方法</th></tr></thead><tbody><tr><th scope="row">Mac</th><td>适用于 Apple Silicon（M 系列芯片）、macOS 13 及以上。双击 <strong>QCU助手.app</strong>。也可把整个 APP 放入“应用程序”。</td></tr><tr><th scope="row">Windows</th><td>本包仅为 Mac rc4.1 候选，Windows rc4.1 尚未发布。已有 Windows rc3 用户请继续使用原包及其随包说明。</td></tr></tbody></table></div>
   <p>看到教学首页，以及侧栏的<strong>课程工作台、插件市场、专家团</strong>，就已进入本套件。七项教学技能、课程工作台、飞书只读工具、插件市场和专家团均已预装，无需老师手动搬运插件包或使用终端。</p>
   <div class="note"><strong>“离线预装”是什么意思？</strong><p>应用、技能和这份指南已在包里；使用云端模型回答问题仍需联网、配置模型账号和可用额度。套件不含本地模型权重或公共 API Key。</p></div>
-  <p>不必卸载旧 DSH。测试前先保存工作并正常退出旧版，避免同时打开两套助手。本版使用独立的 rc4 数据目录，不会自动导入旧版密钥、聊天或工作文件。如需保留旧环境，请由维护人员先核对、预览并确认迁移；首次在本版配置自己的模型。已在本版配置且能够回答时，可直接跳到<a href="#first">第一次备课</a>。</p>
+  <p>不必卸载旧 DSH。测试前先保存工作并正常退出旧版，避免同时打开两套助手。本版使用独立的 rc4.1 数据目录，不会自动导入旧版密钥、聊天或工作文件。如需保留旧环境，请由维护人员先核对、预览并确认迁移；首次在本版配置自己的模型。已在本版配置且能够回答时，可直接跳到<a href="#first">第一次备课</a>。</p>
   <p class="small">界面可能先显示英文。左下角 <strong>Settings → General → Language</strong> 可选择中文；中文界面对应“设置 → 通用 → 语言”。本手册同时标出常用英文名称。</p>
  </section>
  <section class="section" id="api">
@@ -114,15 +114,16 @@
  </section>
  <section class="section" id="help">
   <h2>遇到问题，先看这里</h2>
+  <p><strong>启动提示 QCU_DATA_RELEASE_MISMATCH：</strong>已有数据来自另一份测试构建，已保留。请使用对应安装包或联系维护人员核对版本，不要删除配置。本版 rc4.1 使用独立目录，不会自动导入 rc3/rc4 的 Key、设置或工作文件。</p>
   <h3 id="errors">模型连接的错误提示</h3>
   <div class="table-wrap"><table><thead><tr><th scope="col">看到的提示</th><th scope="col">先做什么</th></tr></thead><tbody><tr><th scope="row">401 / 认证失败</th><td>核对是否为所选服务商的有效 API Key，是否漏字或多了空格；必要时到服务商平台重建密钥，再在助手内更新。</td></tr><tr><th scope="row">402 / 余额不足</th><td>查看对应 API 平台的账户额度。学校统一账号请联系维护人员处理。</td></tr><tr><th scope="row">429 / 请求过多</th><td>暂停连续发送，稍后再试；不要反复点击。</td></tr><tr><th scope="row">500、503 / 服务异常或繁忙</th><td>稍后再试；持续出现则记录时间与错误码，交维护人员核对。</td></tr><tr><th scope="row">无可用模型 / 地址或模型报错</th><td>核对所选提供商、API 地址、协议和模型 ID 是否配套；不要照搬另一个入口的地址。</td></tr><tr><th scope="row">网络错误 / 一直无响应</th><td>确认电脑能访问所用模型服务；截图保留错误提示，交维护人员检查。课程工作台先查原任务状态，避免重复生成。</td></tr></tbody></table></div>
   <p class="small">DeepSeek 错误码依据：<a href="https://api-docs.deepseek.com/zh-cn/quick_start/error_codes/" target="_blank" rel="noopener noreferrer">官方错误码说明（联网）</a>，核对于2026年10月22日。其他服务商按其自己的说明处理。</p>
   <details class="skill"><summary>双击打不开，或系统提示阻止运行</summary><div class="body"><p>先确认已完整解压，并选择了适合自己电脑的包；Windows 的程序旁边需要保留全部文件夹。将提示文字、电脑系统和包名发给提供套件的维护人员。本候选版的分发签名和首次运行策略仍需学校终端验收，老师不需要关闭系统安全防护。</p></div></details>
   <details class="skill"><summary>看不到技能、课程工作台，或回答没有使用技能</summary><div class="body"><p>先核对左上角是否为“QCU助手”，确认启动的是本包入口。<strong>Plugins / 插件</strong>页可查看预装内容，但无需再次安装。会话中应能看到相应“加载技能”记录；找不到或加载失败时，让维护人员核对对应包和组件是否启用，不要反复安装其他版本。</p></div></details>
-  <details class="skill"><summary>移动应用后，我的设置还在吗？怎样备份？</summary><div class="body"><p>个人数据保存在应用包外。本 Mac rc4 候选：<code>~/Library/Application Support/QCU-DSH/teacher/0.1.0-rc.4/</code>。移动整个 APP 后仍使用该目录；不会自动导入 rc3 的模型密钥、聊天或工作文件。首次配置自己的 Key，旧数据迁移请联系维护人员。Windows rc4 尚未发布。</p><p>备份或换电脑时先正常退出助手，请维护人员协助处理个人目录及工作区。目录可能含密钥、聊天和文件，不能把自己的备份当成干净安装包发给其他老师。重新解压应用不等于清空个人设置。</p></div></details>
+  <details class="skill"><summary>移动应用后，我的设置还在吗？怎样备份？</summary><div class="body"><p>个人数据保存在应用包外。本 Mac rc4.1 候选：<code>~/Library/Application Support/QCU-DSH/teacher/0.1.0-rc.4.1/</code>。移动整个 APP 后仍使用该目录；不会自动导入 rc3 或 rc4 的模型密钥、聊天或工作文件。首次配置自己的 Key，旧数据迁移请联系维护人员。Windows rc4.1 尚未发布。</p><p>备份或换电脑时先正常退出助手，请维护人员协助处理个人目录及工作区。目录可能含密钥、聊天和文件，不能把自己的备份当成干净安装包发给其他老师。重新解压应用不等于清空个人设置。</p></div></details>
   <h3>请维护人员帮忙时，提供这些信息</h3><p>电脑是 Mac 还是 Windows、套件 ZIP 的完整名称、出问题的时间、你刚才做了哪一步，以及<strong>不含密钥和学生信息</strong>的错误提示。不要发送完整个人配置或 API Key。</p>
  </section>
- <footer class="footer"><p><strong>QCU助手教师预装版使用指南</strong><br>适用运行版本：Mac 0.1.0-rc.4；QCU清蓝主题：0.2.2；内置客户端：0.2.0-rc.2。七项主技能、课程工作台、飞书只读工具、插件市场和专家团已预装。Windows rc4 尚未发布。本文按本次冻结包编写，其他版本的界面和功能可能不同。</p><p>本页所有字体、样式、图标和操作脚本均随文件提供。只有你主动点击标有“联网”的官方链接时才会打开外部网站。复制按钮不可用时，直接选中文字复制即可。</p></footer>
+ <footer class="footer"><p><strong>QCU助手教师预装版使用指南</strong><br>适用运行版本：Mac 0.1.0-rc.4.1；QCU清蓝主题：0.2.3；内置客户端：0.2.0-rc.2。七项主技能、课程工作台、飞书只读工具、插件市场和专家团已预装。Windows rc4.1 尚未发布。本文按本次冻结包编写，其他版本的界面和功能可能不同。</p><p>本页所有字体、样式、图标和操作脚本均随文件提供。只有你主动点击标有“联网”的官方链接时才会打开外部网站。复制按钮不可用时，直接选中文字复制即可。</p></footer>
 </main>
 </div>
 <div id="status" role="status" aria-live="polite"></div>

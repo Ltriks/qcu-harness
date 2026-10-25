@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build only the pinned rc4 Mac suite from frozen public inputs. No install or network."""
+"""Build only the pinned rc4.1 Mac suite from frozen public inputs. No install or network."""
 import argparse
 import hashlib
 import importlib.util
@@ -64,14 +64,14 @@ def write_json(file, data):
     file.write_text(json.dumps(data, ensure_ascii=False, indent=2) + '\n')
 
 
-def run(*args):
-    subprocess.run([str(a) for a in args], check=True)
+def run(*args, env=None):
+    subprocess.run([str(a) for a in args], check=True, env=env)
 
 
 def build(config_file, out):
     config = json.loads(config_file.read_text())
-    if config['version'] != '0.1.0-rc.4' or config['target'] != 'mac-arm64':
-        raise ValueError('Only rc4 Mac is supported')
+    if config['version'] != '0.1.0-rc.4.1' or config['target'] != 'mac-arm64':
+        raise ValueError('Only rc4.1 Mac is supported')
     if config.get('packagePolicy') != {'autoInstallPeers': False, 'ignoreScripts': True, 'packageImportMethod': 'copy'}:
         raise ValueError('Unexpected twelve-source package policy')
     out = out.absolute()
@@ -102,11 +102,11 @@ def build(config_file, out):
     if len(products) != 11:
         raise ValueError('Expected eleven teaching products')
     theme_files = {f['path']: checked({**f, 'path': str(pins['themeManifest'].parent / 'qcu-branding' / f['path'])}).read_bytes() for f in theme['files']}
-    if theme['version'] != '0.2.2' or len(theme_files) != 6:
+    if theme['version'] != '0.2.3' or len(theme_files) != 6:
         raise ValueError('Frozen six-file branding required')
     data = sources.branding_archive(theme_files)
-    brand = {'id': 'qcu-branding', 'version': '0.2.2', 'bytes': len(data), 'sha256': sources.sha(data)}
-    brand['file'] = 'qcu-branding-0.2.2-local-build-' + brand['sha256'] + '.tgz'
+    brand = {'id': 'qcu-branding', 'version': '0.2.3', 'bytes': len(data), 'sha256': sources.sha(data)}
+    brand['file'] = 'qcu-branding-0.2.3-local-build-' + brand['sha256'] + '.tgz'
     archives[brand['id']] = data
     managed = products + [brand]
     members = {p['id']: sources.archive_files(archives[p['id']]) for p in managed}
@@ -184,15 +184,28 @@ def build(config_file, out):
         raise ValueError('Frozen r4 ASAR mismatch')
     write_json(kit / 'support/managed-updates.json', customization)
     (out / 'patched-main.mjs').write_bytes(updater.member((vendor / 'Contents/Resources/app.asar').read_bytes(), 'lib/main.js'))
-    run('node', ROOT / 'tools/teacher-branding/verify-managed-updates.cjs', out / 'patched-main.mjs')
+    # Isolate JS validation; OS signing tools retain their normal system environment.
+    test_home = out / 'build-test-home'
+    test_home.mkdir()
+    for name in ['empty-user.npmrc', 'empty-global.npmrc']:
+        (test_home / name).write_text('')
+    test_env = {k: os.environ[k] for k in ['PATH', 'TMPDIR', 'LANG'] if k in os.environ}
+    test_env.update(HOME=str(test_home), ELECTRON_RUN_AS_NODE='1',
+                    QCU_TEACHER_TEST_HOME=str(test_home / 'teacher'),
+                    XDG_CONFIG_HOME=str(test_home / 'config'),
+                    npm_config_userconfig=str(test_home / 'empty-user.npmrc'),
+                    npm_config_globalconfig=str(test_home / 'empty-global.npmrc'))
+    run(pins['trustedRuntime'], ROOT / 'tools/teacher-branding/verify-managed-updates.cjs', out / 'patched-main.mjs', env=test_env)
     seed = [{'path': 'seed/' + r['path'], 'bytes': r['bytes'], 'sha256': r['sha256'], 'mode': r['mode']} for r in inventory(kit / 'seed') if r['kind'] == 'file']
-    release = {**baseline, 'version': config['version'], 'products': products, 'branding': {'id': 'qcu-branding', 'version': '0.2.2'}, 'localSources': local_sources, 'seedFiles': seed, 'seedId': sources.sha(json.dumps(seed, ensure_ascii=False, separators=(',', ':')).encode()), 'marketIncluded': True, 'modelConfigured': False, 'managedUpdates': True, 'migrationBaselineSha256': digest(kit / 'support/migration-baseline.json')}
+    release = {**baseline, 'version': config['version'], 'products': products, 'branding': {'id': 'qcu-branding', 'version': '0.2.3'}, 'localSources': local_sources, 'seedFiles': seed, 'seedId': sources.sha(json.dumps(seed, ensure_ascii=False, separators=(',', ':')).encode()), 'marketIncluded': True, 'modelConfigured': False, 'managedUpdates': True, 'migrationBaselineSha256': digest(kit / 'support/migration-baseline.json')}
     release.pop('migrateFrom', None)
     write_json(kit / 'support/manifest.json', release)
     write_json(kit / 'support/integrated-inputs.json', config)
     infofile = app / 'Contents/Info.plist'
     info = plistlib.loads(infofile.read_bytes())
-    info.update(CFBundleVersion='4', CFBundleShortVersionString='0.1.0', CFBundleIdentifier='cn.qcu.assistant.teacher.rc4')
+    info.update(CFBundleVersion='4.1', CFBundleShortVersionString='0.1.0',
+                CFBundleIdentifier='cn.qcu.assistant.teacher.rc4-1.b' + release['seedId'][:12],
+                QCUReleaseVersion=config['version'])
     infofile.write_bytes(plistlib.dumps(info))
     # Save the base executable only in this disposable build for a signature-stripped comparison.
     binary = vendor / 'Contents/MacOS/DeepSeek Harness'
@@ -207,7 +220,17 @@ def build(config_file, out):
         if digest(before) != digest(after):
             raise ValueError('Vendor executable changed beyond signing metadata')
     run('/usr/bin/codesign', '--verify', '--deep', '--strict', vendor)
-    run('/usr/bin/codesign', '--force', '--sign', '-', app)
+    launcher = app / 'Contents/MacOS' / info['CFBundleExecutable']
+    with tempfile.TemporaryDirectory(prefix='.launcher-signature-', dir=out) as tmp:
+        before, after = (Path(tmp) / name for name in ['before', 'after'])
+        shutil.copy2(launcher, before)
+        run('/usr/bin/codesign', '--force', '--sign', '-', app)
+        shutil.copy2(launcher, after)
+        for file in [before, after]:
+            run('/usr/bin/codesign', '--remove-signature', file)
+        if digest(before) != digest(after):
+            raise ValueError('Base native launcher changed beyond signing metadata')
+        launcher_digest = digest(after)
     run('/usr/bin/codesign', '--verify', '--deep', '--strict', app)
     final_vendor = inventory(vendor)
     old, new = ({r['path']: r for r in rows} for rows in [original_vendor, final_vendor])
@@ -218,18 +241,18 @@ def build(config_file, out):
     write_json(out / 'vendor-proof.json', {'source': config['base'], 'modifiedFiles': differences, 'signatureStrippedExecutableUnchanged': True, 'allOtherBytesModesAndLinksUnchanged': True, 'original': original_vendor, 'candidate': final_vendor, 'customization': customization})
     write_json(out / 'manifest.json', release)
     write_json(out / 'app-files.json', inventory(app))
-    (out / 'README.txt').write_text('QCU助手 Mac 教师套件 0.1.0-rc.4 · Apple Silicon / macOS 13+\n\n解压后双击 QCU助手.app，可把整个 APP 移至应用程序。无需终端操作。\n十一项教学能力及清蓝主题已预装。点击“插件市场”或“专家团”只打开页面；生成任务与模型费用须另行确认。\n新数据目录：~/Library/Application Support/QCU-DSH/teacher/0.1.0-rc.4/\n不会自动迁移旧数据；如需迁移，请联系维护人员。首次由本人配置模型和飞书授权。\n此候选为本地临时签名，未经 Developer ID 签名或公证；尚待原生界面、模型与教师验收。\n请打开同目录的 QCU助手使用指南.html，按 Mac rc4 指南操作。Windows rc4 尚未发布。\n')
+    (out / 'README.txt').write_text('QCU助手 Mac 教师套件 0.1.0-rc.4.1 · Apple Silicon / macOS 13+\n\n解压后双击 QCU助手.app，可把整个 APP 移至应用程序。无需终端操作。\n十一项教学能力及清蓝主题已预装。点击“插件市场”或“专家团”只打开页面；生成任务与模型费用须另行确认。\n新数据目录：~/Library/Application Support/QCU-DSH/teacher/0.1.0-rc.4.1/\n不会自动导入 rc3/rc4 的配置、Key 或工作文件；如需迁移，请联系维护人员。首次由本人配置自己的 API Key 和飞书授权；模型服务可能产生费用。\n此候选为本地临时签名，未经 Developer ID 签名或公证；尚待原生界面、模型与教师验收。\n请打开同目录的 QCU助手使用指南.html，按 Mac rc4.1 指南操作。Windows rc4.1 尚未发布。\n')
     # Ship the actual current guide under its established entry filename.
     shutil.copy2(ROOT / 'tools/teacher-guide/QCU助手使用指南.html', out / 'QCU助手使用指南.html')
-    write_json(out / 'guide-package.json', {'schemaVersion': 1, 'runtimeVersion': config['version'], 'target': 'mac-arm64', 'themeVersion': '0.2.2', 'guide': {'file': 'QCU助手使用指南.html', 'sha256': digest(out / 'QCU助手使用指南.html'), 'updatedAt': '2026-10-24'}, 'baseArchive': config['base'], 'applicationChanged': True, 'personalDataIncluded': False, 'dataHomeChanged': True, 'automaticMigration': False, 'windowsRc4Released': False})
+    write_json(out / 'guide-package.json', {'schemaVersion': 1, 'runtimeVersion': config['version'], 'target': 'mac-arm64', 'themeVersion': '0.2.3', 'guide': {'file': 'QCU助手使用指南.html', 'sha256': digest(out / 'QCU助手使用指南.html'), 'updatedAt': '2026-10-25'}, 'baseArchive': config['base'], 'applicationChanged': True, 'personalDataIncluded': False, 'dataHomeChanged': True, 'automaticMigration': False, 'windowsRc4Released': False})
     if (out / '先读我.txt').exists():
         (out / '先读我.txt').rename(out / '原版rc3说明.txt')
     shutil.copy2(out / 'README.txt', out / '先读我.txt')
-    (out / '开始使用.html').write_text('<!doctype html><html lang="zh-CN"><meta charset="utf-8"><title>QCU助手 · 开始使用</title><style>body{font:20px/1.8 system-ui;max-width:780px;margin:64px auto;padding:24px;color:#16334a}h1{color:#16688d}</style><h1>QCU助手 · 教师套件</h1><p>解压后双击 <b>QCU助手.app</b>。可移动整个 APP，无需使用终端。</p><p>七项教学技能、飞书只读、课程设计工作台、插件市场与专家团已预装。侧栏按钮只打开对应页面；模型生成须另行确认。</p><p>本版使用独立的 rc4 数据目录。旧数据由维护人员协助迁移，首次模型配置和飞书授权由本人完成。</p><p>本地验收候选，尚待原生界面、模型与教师试用。<a href="QCU助手使用指南.html">打开 Mac rc4 完整使用指南</a>。Windows rc4 尚未发布。</p></html>')
-    archive = out / 'QCU-Teacher-0.1.0-rc.4-mac-arm64.zip'
-    # The archive lives inside rc4; stage its payload elsewhere so it cannot contain itself.
+    (out / '开始使用.html').write_text('<!doctype html><html lang="zh-CN"><meta charset="utf-8"><title>QCU助手 · 开始使用</title><style>body{font:20px/1.8 system-ui;max-width:780px;margin:64px auto;padding:24px;color:#16334a}h1{color:#16688d}</style><h1>QCU助手 · 教师套件</h1><p>解压后双击 <b>QCU助手.app</b>。可移动整个 APP，无需使用终端。</p><p>七项教学技能、飞书只读、课程设计工作台、插件市场与专家团已预装。侧栏按钮只打开对应页面；模型生成须另行确认。</p><p>本版数据目录：~/Library/Application Support/QCU-DSH/teacher/0.1.0-rc.4.1/。不会自动导入旧版配置、密钥或工作文件。旧数据迁移请联系维护人员；首次由本人配置自己的 API Key 和飞书授权，模型服务可能产生费用。</p><p>本地验收候选，尚待原生界面、模型与教师试用。<a href="QCU助手使用指南.html">打开 Mac rc4.1 完整使用指南</a>。Windows rc4.1 尚未发布。</p></html>')
+    archive = out / 'QCU-Teacher-0.1.0-rc.4.1-mac-arm64.zip'
+    # The archive lives inside rc4.1; stage its payload elsewhere so it cannot contain itself.
     with tempfile.TemporaryDirectory(prefix='.zip-', dir=out.parent) as tmp:
-        staged = Path(tmp) / 'QCU-Teacher-0.1.0-rc.4-mac-arm64'
+        staged = Path(tmp) / 'QCU-Teacher-0.1.0-rc.4.1-mac-arm64'
         staged.mkdir()
         for p in out.iterdir():
             if p.name == 'patched-main.mjs':
@@ -239,7 +262,7 @@ def build(config_file, out):
             else:
                 shutil.copy2(p, staged / p.name)
         run('/usr/bin/ditto', '-c', '-k', '--sequesterRsrc', '--keepParent', staged, archive)
-    result = {'version': release['version'], 'products': 11, 'directDependencies': 12, 'seedId': release['seedId'], 'archive': {'path': str(archive), 'bytes': archive.stat().st_size, 'sha256': digest(archive)}, 'adHocSignatures': True, 'notarized': False, 'vendorSignatureIntact': False, 'guiAccepted': False}
+    result = {'version': release['version'], 'products': 11, 'directDependencies': 12, 'seedId': release['seedId'], 'outerBundleIdentifier': info['CFBundleIdentifier'], 'releaseLabel': info['QCUReleaseVersion'], 'nativeLauncherReusedSignatureStrippedSha256': launcher_digest, 'archive': {'path': str(archive), 'bytes': archive.stat().st_size, 'sha256': digest(archive)}, 'adHocSignatures': True, 'notarized': False, 'vendorSignatureIntact': False, 'guiAccepted': False}
     write_json(out / 'BUILD.json', result)
     (out / 'SHA256SUMS').write_text(result['archive']['sha256'] + '  ' + archive.name + '\n')
     return result

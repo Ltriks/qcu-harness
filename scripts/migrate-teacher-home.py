@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Maintainer-only rc3 -> rc4 preview and digest-confirmed, exclusive local copy.
+"""Maintainer-only rc3 -> rc4.1 preview and digest-confirmed, exclusive local copy.
 
 Never auto-invoked by the launcher. Diagnostics contain no setting or file values.
 """
@@ -169,7 +169,7 @@ def baseline(kit):
     m = json.loads(metadata(kit / 'support/manifest.json'))
     file = kit / 'support/migration-baseline.json'
     data = metadata(file)
-    if m['version'] != '0.1.0-rc.4' or sha(data.encode()) != m['migrationBaselineSha256']:
+    if m['version'] != '0.1.0-rc.4.1' or sha(data.encode()) != m['migrationBaselineSha256']:
         raise ValueError('Untrusted migration kit')
     old = json.loads(data)
     if old['version'] != '0.1.0-rc.3' or old['seedId'] != '970260c6565d2adc5c886c95a5713aeb2b8b1dac334298d5ba1993809f721789':
@@ -295,7 +295,7 @@ def apply(kit, plan, confirm_digest):
         # A fresh preview catches source changes during the copy, and rechecks stopped/target.
         if preview(kit, source, target) != plan:
             raise ValueError('Source changed during copy; preserved')
-        # Validate exactly the same rc4 integrity gates used by subsequent native launches.
+        # Validate exactly the same rc4.1 integrity gates used by subsequent native launches.
         runtime = validation_runtime(kit)
         env = {'PATH': os.environ.get('PATH', '/usr/bin:/bin'), 'HOME': os.environ['HOME'], 'ELECTRON_RUN_AS_NODE': '1', 'QCU_TEACHER_TEST_HOME': str(stage)}
         result = subprocess.run([str(runtime), '--expose-internals', str(kit / 'support/start.cjs'), 'prepare', '--kit', str(kit)], capture_output=True, env=env, timeout=120)

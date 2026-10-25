@@ -1,5 +1,5 @@
 {
-  "version": "0.1.0-rc.4",
+  "version": "0.1.0-rc.4.1",
   "target": "mac-arm64",
   "base": {
     "path": "/Users/mcq/Repos/cowork/qcu-harness/releases/0.1.0-rc.3/QCU-Teacher-0.1.0-rc.3-mac-arm64-r3.zip",
@@ -17,9 +17,9 @@
     "sha256": "b3dac199cf39787b6b4d3897adaec085b8a5eb6e1b444e2acc5259729813b7c3"
   },
   "themeManifest": {
-    "path": ".work/suite-integration-final/theme/MANIFEST.json",
-    "bytes": 1056,
-    "sha256": "eadb3fa9511b84994a871a2894f6e5ba89d6ee73ad0136686e2d2bc6390e9df1"
+    "path": ".work/startup-fix/theme/MANIFEST.json",
+    "bytes": 908,
+    "sha256": "fe1ca0751c2ea2a5f617c146c093e1194bc4d5c1c0bace34498016632b48f84d"
   },
   "courseManifest": {
     "path": "/Users/mcq/Artifacts/qcu-harness/0.1.0-course-workbench.1.3/MANIFEST.json",
@@ -37,7 +37,7 @@
     "sha256": "7ad8447befdae8cc1d87156166dcd0b39c50429f0b57f88eddb9e80f919c9990"
   },
   "marketManifest": {
-    "path": ".work/suite-integration-b/market-final-a/MANIFEST.json",
+    "path": ".work/frozen-inputs/market/MANIFEST.json",
     "bytes": 4840,
     "sha256": "996c643cb2d56763cb50f19e977132ffc7caeaab35206a55872657204dda9212"
   },
@@ -59,7 +59,7 @@
     "sha256": "7c975b5464a642611b2ca8ca2891e8e44308e5de83370fd623d2b555d14a25ad"
   },
   "trustedRuntime": {
-    "path": "/Users/mcq/Applications/QCU助手.app/Contents/Resources/program/DeepSeek Harness.app/Contents/MacOS/DeepSeek Harness",
+    "path": "/Users/mcq/Applications/QCU\u52a9\u624b.app/Contents/Resources/program/DeepSeek Harness.app/Contents/MacOS/DeepSeek Harness",
     "bytes": 52752,
     "sha256": "86708c2c6e826ed2732766a45b75b11dc3cc940c88af48c129f9c6ecf2dc70df"
   },

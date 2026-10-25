@@ -1,6 +1,14 @@
 # QCU Harness
 
-## Mac rc4 集成候选（本地验证，未部署）
+## Mac rc4.1 启动修复候选（本地验证，未部署）
+
+本轮按任务指定分支 `dev/qcu-suite-startup-fix`、独立 worktree `$HOME/Repos/worktrees/qcu-harness/suite-startup-fix` 完成。rc4.1 使用独立 Home 和按 seed 区分的外层应用标识，严格保留旧回执及数据保护；启动失败输出固定安全中文诊断。清蓝主题0.2.3仅更新版本说明，11项产品、官方组件和复制安装策略保持冻结。
+
+37项窄范围 Node 检查及16项迁移安全检查先通过，再完成一次完整构建；沙箱签名预检失败目录保留。当前交付选择是文档修正后的新同级包 `.work/startup-fix/rc4.1-docs-final/`，先前完整包和全部候选均保留。实际 ZIP 验证、官方 pnpm11 安装/升级/损坏归档拒绝及32项实际 Client 无头布局检查的精确结果见 `.work/startup-fix/RESULT.json`；修改、校验口径与父级交接见[启动修复审查](docs/qcu-suite-startup-fix.md)。
+
+父级归档选择为 `$HOME/Artifacts/qcu-harness/0.1.0-rc.4.1/mac-arm64-final/`，含已解压APP、最终ZIP和当前指南；`verification/` 放分层证据，`diagnostics/` 保留原问题复现，`实际使用验收.md` 为后续步骤。较早中间包保留在 `mac-arm64/`，最终分发以 `mac-arm64-final/` 为准。本轮不部署Hub/mini，不重建Windows。源码审阅后只正常推送开发分支，不合并main。原生启动/CLI/GUI、真实模型及教师任务仍待继续确认。本版默认目录为 `~/Library/Application Support/QCU-DSH/teacher/0.1.0-rc.4.1/`，不自动导入 rc3/rc4 数据。旧包、旧 Home 和历史证据保留。
+
+## Mac rc4 历史集成候选（原阶段证据，未部署）
 
 当前集成分支 `dev/qcu-suite-integration`，独立 worktree 为 `$HOME/Repos/worktrees/qcu-harness/suite-integration`。新线程仍从主仓库进入；先核对各 worktree、分支及远端，不修改其他线程的工作目录。
 

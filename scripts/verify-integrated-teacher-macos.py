@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
-"""Verify the actual rc4 ZIP, permissions/links/signatures and cold native bootstrap."""
+"""Verify the actual rc4.1 ZIP, permissions/links/signatures and cold native bootstrap."""
 import argparse
 import importlib.util
 import json
 import os
 from pathlib import Path
+import plistlib
 import subprocess
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -44,13 +45,23 @@ def verify(archive, out, validation_runtime=None):
     if builder.inventory(vendor) != proof['candidate'] or not proof['allOtherBytesModesAndLinksUnchanged']:
         raise ValueError('Vendor proof mismatch')
     m = json.loads((kit / 'support/manifest.json').read_text())
+    info = plistlib.loads((app / 'Contents/Info.plist').read_bytes())
+    bundle_id = 'cn.qcu.assistant.teacher.rc4-1.b' + m['seedId'][:12]
+    if (m['version'] != '0.1.0-rc.4.1' or info.get('CFBundleIdentifier') != bundle_id
+            or info.get('QCUReleaseVersion') != m['version'] or info.get('CFBundleVersion') != '4.1'
+            or info.get('CFBundleDisplayName') != 'QCU助手'):
+        raise ValueError('Distinct outer release identity mismatch')
     guide = json.loads((package / 'guide-package.json').read_text())
-    if guide['runtimeVersion'] != '0.1.0-rc.4' or guide['themeVersion'] != '0.2.2' or builder.digest(package / guide['guide']['file']) != guide['guide']['sha256'] or (package / guide['guide']['file']).read_bytes() != (ROOT / 'tools/teacher-guide/QCU助手使用指南.html').read_bytes():
+    if guide['runtimeVersion'] != '0.1.0-rc.4.1' or guide['themeVersion'] != '0.2.3' or builder.digest(package / guide['guide']['file']) != guide['guide']['sha256'] or (package / guide['guide']['file']).read_bytes() != (ROOT / 'tools/teacher-guide/QCU助手使用指南.html').read_bytes():
         raise ValueError('Current guide identity mismatch')
+    for name in ['README.txt', '先读我.txt', '开始使用.html']:
+        text = (package / name).read_text()
+        if not all(token in text for token in ['0.1.0-rc.4.1', 'teacher/0.1.0-rc.4.1/', '不会自动导入', '预装', '自己的 API Key', '费用']):
+            raise ValueError('Current startup documentation incomplete: ' + name)
     policy = json.loads((kit / 'seed/profiles/desktop/pnpm-workspace.yaml').read_text())
     if policy != {'autoInstallPeers': False, 'ignoreScripts': True, 'packageImportMethod': 'copy'}:
         raise ValueError('Unexpected twelve-source pnpm policy')
-    if m['branding']['version'] != '0.2.2' or len(m['localSources']) != 12 or 'migrateFrom' in m:
+    if m['branding']['version'] != '0.2.3' or len(m['localSources']) != 12 or 'migrateFrom' in m:
         raise ValueError('Unexpected dependency/migration policy')
     home = out / '合成 教师 数据'
     env = {k: os.environ[k] for k in ['PATH', 'TMPDIR', 'LANG'] if k in os.environ}
@@ -58,6 +69,11 @@ def verify(archive, out, validation_runtime=None):
     sandbox_home.mkdir()
     env['HOME'] = str(sandbox_home)
     env['QCU_TEACHER_TEST_HOME'] = str(home)
+    guard = out / 'guard.cjs'
+    guard.write_text("require(process.env.QCU_OFFLINE_GUARD);\n"
+                     "const fs=require('node:fs');const deny=()=>{fs.appendFileSync(process.env.QCU_OFFLINE_TEST_LOG,JSON.stringify({event:'child-process-blocked'})+'\\n');throw Error('Child processes disabled for cold proof')};for(const k of ['spawn','spawnSync','exec','execSync','execFile','execFileSync','fork'])require('node:child_process')[k]=deny;\n")
+    env['QCU_OFFLINE_GUARD'] = str(kit / 'support/deny-network.cjs')
+    env['QCU_OFFLINE_TEST_LOG'] = str(out / 'preparation-guard.jsonl')
     native = app / 'Contents/MacOS/城院助手'
     if validation_runtime:
         pin = json.loads((kit / 'support/integrated-inputs.json').read_text())['trustedRuntime']
@@ -67,7 +83,7 @@ def verify(archive, out, validation_runtime=None):
         env['QCU_INTEGRATED_SDK_ONLY'] = '1'
     def preparation(app):
         resources = app / 'Contents/Resources'
-        return [validation_runtime, '--expose-internals', resources / 'support/start.cjs', 'prepare', '--kit', resources] if validation_runtime else [app / 'Contents/MacOS/城院助手', '--prepare-only']
+        return [validation_runtime, '--expose-internals', '--require', guard, resources / 'support/start.cjs', 'prepare', '--kit', resources] if validation_runtime else [app / 'Contents/MacOS/城院助手', '--prepare-only']
     first = run('prepare-first', preparation(app), env)
     if '"result":"prepared"' not in first:
         raise ValueError('First native preparation not confirmed')
@@ -84,14 +100,12 @@ def verify(archive, out, validation_runtime=None):
     package.rename(moved)
     app = moved / 'QCU助手.app'
     kit = app / 'Contents/Resources'
+    env['QCU_OFFLINE_GUARD'] = str(kit / 'support/deny-network.cjs')
     native = app / 'Contents/MacOS/城院助手'
     if 'already-prepared' not in run('prepare-moved-repeat', preparation(app), env) or patch.read_bytes() != before or not sentinel.exists():
         raise ValueError('Moved app did not preserve synthetic settings/work')
     executable = validation_runtime or kit / 'program/DeepSeek Harness.app/Contents/MacOS/DeepSeek Harness'
     # Guard cold JavaScript bootstrap and actual ASAR module loading; deny subprocesses too.
-    guard = out / 'guard.cjs'
-    guard.write_text('require(' + json.dumps(str(kit / 'support/deny-network.cjs')) + ');\n'
-                     "const fs=require('node:fs');const deny=()=>{fs.appendFileSync(process.env.QCU_OFFLINE_TEST_LOG,JSON.stringify({event:'child-process-blocked'})+'\\n');throw Error('Child processes disabled for cold proof')};for(const k of ['spawn','spawnSync','exec','execSync','execFile','execFileSync','fork'])require('node:child_process')[k]=deny;\n")
     probe_env = {**env, 'QCU_OFFLINE_TEST_LOG': str(out / 'guard-self-test.jsonl')}
     run('guard-self-test', [executable, '--require', guard, '-e', "const a=require('node:assert/strict');a.throws(()=>require('node:http').get('http://127.0.0.1:1'),/network access denied/);a.throws(()=>require('node:child_process').spawnSync('/usr/bin/true'),/Child processes disabled/);console.log('both guards refused before effects')"], probe_env)
     probe_events = [json.loads(line)['event'] for line in (out / 'guard-self-test.jsonl').read_text().splitlines()]
@@ -113,6 +127,10 @@ def verify(archive, out, validation_runtime=None):
     events = [json.loads(line) for line in (out / 'guard.jsonl').read_text().splitlines()]
     if len(cold['imports']) != 12 or not cold['networkGuard'] or any(e['event'] != 'guard-installed' for e in events):
         raise ValueError('Guarded offline resolution failed')
+    if validation_runtime:
+        preparation_events = [json.loads(line)['event'] for line in (out / 'preparation-guard.jsonl').read_text().splitlines()]
+        if preparation_events != ['guard-installed'] * 3:
+            raise ValueError('First/repeat/move guards reported an attempt')
     if any(p.name in ['.pnpm', '.npm', 'pnpm-lock.yaml', '.npmrc'] for p in fresh.rglob('*')):
         raise ValueError('Unexpected package manager invocation in first preparation')
     # Native CLI execution is part of native acceptance when OS quarantine blocks this copy.
@@ -120,8 +138,9 @@ def verify(archive, out, validation_runtime=None):
         run('native-cli', [fresh / 'bin/lark-cli', '--version'])
         if '1.0.84' not in (out / 'native-cli.log').read_text():
             raise ValueError('Native CLI baseline mismatch')
-    result = {'status': 'passed-with-native-execution-pending' if validation_runtime else 'passed', 'archive': {'path': str(archive), 'bytes': archive.stat().st_size, 'sha256': builder.digest(archive)}, 'actualZipInventoryFilesPermissionsLinksMatch': True, 'inventoryEntries': len(expected), 'linkCount': sum(r['kind'] == 'link' for r in expected), 'adHocInnerOuterSignaturesVerified': True, 'vendorSignatureIntact': False, 'vendorUnchangedOutsideFrozenExceptionsAndSigning': True, 'nativeFirstRepeatMoved': 'pending-OS-local-execution-approval' if validation_runtime else True, 'javascriptFirstRepeatMoved': True, 'validationRuntime': str(executable), 'validationRuntimeSha256': builder.digest(executable), 'syntheticSettingsSentinelPreserved': True, 'defaultHomeVersion': '0.1.0-rc.4', 'networkAttempts': 0, 'childProcessAttempts': 0, 'bootstrapPackageManagerCalls': 0, 'cold': cold, 'cliVersion': '1.0.84-byte-identical-base' if validation_runtime else '1.0.84', 'testApp': str(app), 'testHome': str(home), 'freshHome': str(fresh), 'guiAccepted': False, 'modelCalls': 0}
+    result = {'status': 'passed-with-native-execution-pending' if validation_runtime else 'passed', 'archive': {'path': str(archive), 'bytes': archive.stat().st_size, 'sha256': builder.digest(archive)}, 'actualZipInventoryFilesPermissionsLinksMatch': True, 'inventoryEntries': len(expected), 'linkCount': sum(r['kind'] == 'link' for r in expected), 'adHocInnerOuterSignaturesVerified': True, 'vendorSignatureIntact': False, 'vendorUnchangedOutsideFrozenExceptionsAndSigning': True, 'nativeFirstRepeatMoved': 'pending-OS-local-execution-approval' if validation_runtime else True, 'javascriptFirstRepeatMoved': True, 'validationRuntime': str(executable), 'validationRuntimeSha256': builder.digest(executable), 'syntheticSettingsSentinelPreserved': True, 'defaultHomeVersion': '0.1.0-rc.4.1', 'networkAttempts': 0, 'childProcessAttempts': 0, 'bootstrapPackageManagerCalls': 0, 'cold': cold, 'cliVersion': '1.0.84-byte-identical-base' if validation_runtime else '1.0.84', 'testApp': str(app), 'testHome': str(home), 'freshHome': str(fresh), 'guiAccepted': False, 'modelCalls': 0}
     result['client'] = client
+    result['outerIdentity'] = {k: info[k] for k in ['CFBundleIdentifier', 'CFBundleVersion', 'CFBundleDisplayName', 'QCUReleaseVersion']}
     result['guardDenialSelfTest'] = {'networkBlocked': True, 'childProcessBlocked': True, 'effectsExecuted': 0}
     result['guideCurrentIdentityAndHashVerified'] = True
     result['actualZipManagedUpdateDynamicChecks'] = True

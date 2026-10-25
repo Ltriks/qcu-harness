@@ -36,9 +36,9 @@ const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm'),asse
   assert.match(markup,/aria-label="主要功能"/);assert.match(markup,/aria-label="插件市场"/);assert.match(markup,/aria-label="专家团"/);
   for(const label of ['插件市场','专家团']){const button=buttons.find(p=>p?.['aria-label']===label);assert.ok(button?.onClick);button.onClick()}
   assert.deepEqual(selected,['qcu-market','qcu-expert-teams']);
-  const about=ctx.slots.entriesOfSlot('main').find(e=>e.options.key==='qcu-teacher-about');const aboutHtml=renderToStaticMarkup(React.createElement(about.component));assert.match(aboutHtml,/0\.1\.0-rc\.4/);assert.match(aboutHtml,/QCU清蓝 0\.2\.2/);assert.doesNotMatch(aboutHtml,/0\.1\.0-rc\.3/);fs.writeFileSync(path.join(out,'about.html'),aboutHtml);
+  const about=ctx.slots.entriesOfSlot('main').find(e=>e.options.key==='qcu-teacher-about');const aboutHtml=renderToStaticMarkup(React.createElement(about.component));assert.match(aboutHtml,/0\.1\.0-rc\.4\.1/);assert.match(aboutHtml,/QCU清蓝 0\.2\.3/);assert.doesNotMatch(aboutHtml,/0\.1\.0-rc\.3/);fs.writeFileSync(path.join(out,'about.html'),aboutHtml);
   assert.equal(ctx.get('remote'),undefined);
-  console.log('INTEGRATED_CLIENT:'+JSON.stringify({officialAsarSlotRegistry:true,actualZipClientArtifacts:true,aboutSuite:'0.1.0-rc.4',aboutTheme:'0.2.2',trustedReactSsr:true,syntheticLayoutProvider:true,mainPanels:main,sidebarLabels:['插件市场','专家团'],clickSelections:selected,modelCalls:0,installationCalls:0,networkGuard:globalThis.QCU_OFFLINE_NETWORK_GUARD===true}));
+  console.log('INTEGRATED_CLIENT:'+JSON.stringify({officialAsarSlotRegistry:true,actualZipClientArtifacts:true,aboutSuite:'0.1.0-rc.4.1',aboutTheme:'0.2.3',trustedReactSsr:true,syntheticLayoutProvider:true,mainPanels:main,sidebarLabels:['插件市场','专家团'],clickSelections:selected,modelCalls:0,installationCalls:0,networkGuard:globalThis.QCU_OFFLINE_NETWORK_GUARD===true}));
   layout.dispose();
  }finally{await ctx.fiber.dispose()}
 })().catch(e=>{console.error(e);process.exitCode=1});

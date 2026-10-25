@@ -1,12 +1,29 @@
-// rc4 launcher gates against the frozen public seed; disposable Homes only.
+// rc4.1 launcher gates against the frozen public seed; disposable Homes only.
 const {test}=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),os=require('node:os');
 const {prepare,identity,defaultHome}=require('../tools/teacher-suite/start.cjs');
 const kit=path.resolve(process.env.QCU_INTEGRATED_TEST_KIT),m=identity(kit);
 function fixture(t){const root=fs.mkdtempSync('/private/tmp/qcu-integrated-');t.after(()=>fs.rmSync(root,{recursive:true,force:true}));return {root,home:path.join(root,'合成 Home')}}
 const json=p=>JSON.parse(fs.readFileSync(p,'utf8'));
-test('rc4 exact identity and default namespace have no automatic old-Home migration',t=>{
- assert.equal(m.version,'0.1.0-rc.4');assert.equal(m.products.length,11);assert.equal(m.localSources.length,12);assert.equal(m.migrateFrom,undefined);
- assert.equal(defaultHome(m.version),path.join(os.homedir(),'Library/Application Support/QCU-DSH/teacher/0.1.0-rc.4'));
+test('an occupied rc4 namespace is untouched by separate rc4.1 first/repeat preparation',t=>{
+ const f=fixture(t),old=path.join(f.root,'teacher/0.1.0-rc.4'),fresh=path.join(f.root,'teacher',m.version);
+ fs.mkdirSync(old,{recursive:true});
+ const files={'qcu-teacher.json':JSON.stringify({version:'0.1.0-rc.4',seedId:'be65eb994c652a691c20f444b4bb65a67f4a7d5aef9e97d327b6388683c41b3f'}),'settings.json':'{"fixture":"synthetic retained setting"}','fake-key-sentinel.txt':'SYNTHETIC_NOT_A_REAL_KEY'};
+ for(const [name,value]of Object.entries(files))fs.writeFileSync(path.join(old,name),value);
+ assert.notEqual(defaultHome('0.1.0-rc.4'),defaultHome(m.version));
+ assert.equal(prepare(kit,fresh).result,'prepared');assert.equal(prepare(kit,fresh).result,'already-prepared');
+ for(const [name,value]of Object.entries(files))assert.equal(fs.readFileSync(path.join(old,name),'utf8'),value);
+ assert.deepEqual(fs.readdirSync(old).sort(),Object.keys(files).sort());
+});
+for(const kind of ['foreign-release','same-release-other-seed'])test(kind+' receipt refuses with a safe Chinese diagnosis and preserves all synthetic data',t=>{
+ const f=fixture(t);prepare(kit,f.home);const file=path.join(f.home,'qcu-teacher.json'),r=json(file);
+ if(kind==='foreign-release')r.version='0.1.0-rc.4';else r.seedId='a'.repeat(64);
+ fs.writeFileSync(file,JSON.stringify(r));const before=fs.readFileSync(file),note=path.join(f.home,'workspace/keep.txt');fs.writeFileSync(note,'Synthetic retained work');
+ assert.throws(()=>prepare(kit,f.home),e=>e.code==='QCU_DATA_RELEASE_MISMATCH'&&e.message.includes('已有数据来自另一份测试构建，已保留')&&e.message.includes('不要删除配置'));
+ assert.deepEqual(fs.readFileSync(file),before);assert.equal(fs.readFileSync(note,'utf8'),'Synthetic retained work');
+});
+test('rc4.1 exact identity and default namespace have no automatic old-Home migration',t=>{
+ assert.equal(m.version,'0.1.0-rc.4.1');assert.equal(m.products.length,11);assert.equal(m.localSources.length,12);assert.equal(m.migrateFrom,undefined);
+ assert.equal(defaultHome(m.version),path.join(os.homedir(),'Library/Application Support/QCU-DSH/teacher/0.1.0-rc.4.1'));
  const f=fixture(t);assert.throws(()=>prepare(kit,f.home,path.join(f.root,'old')),/explicit maintainer migration/);assert.equal(fs.existsSync(f.home),false);
 });
 test('first/repeat checks twelve source references and preserves valid teacher configuration choices',t=>{
