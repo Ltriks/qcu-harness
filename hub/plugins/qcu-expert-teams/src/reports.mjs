@@ -1,4 +1,9 @@
-import {errors,safeCode} from './protocol.mjs'
+import {errors,safeCode,REVIEW_CHAR_LIMIT,FINAL_CHAR_LIMIT} from './protocol.mjs'
+// Unicode codepoints excluding whitespace; never cut model text or trigger paid retries.
+export function outputLengthNotice(step,isFinal){
+ const count=Array.from(typeof step?.output==='string'?step.output.replace(/\s/gu,''):'').length,limit=isFinal?FINAL_CHAR_LIMIT:REVIEW_CHAR_LIMIT
+ return count>limit?'篇幅提示：'+count+'个非空白字符，超过建议的'+limit+'字符。完整内容已保留，请按任务要求复核；不会自动重试。':''
+}
 export const terminalRun=r=>['completed','failed','cancelled','interrupted'].includes(r?.status)
 export const stateLabel=value=>({running:'运行中',completed:'已完成',failed:'失败',cancelled:'已停止',interrupted:'已中断',queued:'等待中'}[value]??'未知状态')
 const time=value=>typeof value==='number'&&Number.isFinite(value)&&value>=0&&value<=8640000000000000?value:null
@@ -23,6 +28,7 @@ export function renderReport(run){
  for(const s of r.steps){
   lines.push('','## '+s.name+(s.id===r.outputId?'（最终汇总）':''),'','步骤状态：'+stateLabel(s.status)+' ('+s.status+')','开始：'+timestamp(s.startedAt)+' · 结束：'+timestamp(s.finishedAt)+' · '+duration(elapsed(s.startedAt,s.finishedAt)))
   if(s.error)lines.push('提示：'+s.error+' · '+errors[s.error])
+  const lengthNotice=outputLengthNotice(s,s.id===r.outputId);if(lengthNotice)lines.push('',lengthNotice)
   lines.push('',s.status==='completed'&&s.output.trim()?s.output:s.output.trim()?'未完成 / 部分输出（不可视为完整意见）：\n\n'+s.output:'未完成 / 无完整意见。')
  }
  return lines.join('\n')+'\n'

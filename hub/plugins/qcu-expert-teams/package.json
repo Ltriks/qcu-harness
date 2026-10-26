@@ -1,5 +1,5 @@
 {
- "name":"qcu-expert-teams","version":"0.2.0-pilot.2","private":true,"type":"module","license":"MIT",
+ "name":"qcu-expert-teams","version":"0.2.0-pilot.3","private":true,"type":"module","license":"MIT",
  "description":"QCU 专家团：角色、技能方法、依赖流程与教师复核",
  "exports":{".":"./index.js","./client":"./client.js","./package.json":"./package.json"},
  "dsh":{"bundle":{"patch":"./cordis.patch.yml"},"client":{"platform":"web","immediately":true,"inject":["@deepseek-ai/dsh-client-ui-layout","@deepseek-ai/dsh-client-ui-sidebar","@deepseek-ai/dsh-api-remotes"]}},

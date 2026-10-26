@@ -37,3 +37,15 @@ for(const late of ['history','poll'])test(`cleanup rejects late ${late} state an
  t.mock.timers.tick(800);await new Promise(setImmediate)
  assert.equal(c.state.runs.find(r=>r.id==='live').status,'completed');assert.ok(!calls.includes('start'))
 })
+
+test('length notices count Unicode characters including punctuation and numbers, retain text, and distinguish final role',async()=>{
+ const {outputLengthNotice,renderReport}=await import(new URL('src/reports.mjs',root))
+ assert.equal(outputLengthNotice({output:' 教 '.repeat(180)},false),'')
+ assert.match(outputLengthNotice({output:'教'.repeat(178)+'A1。'},false),/181个非空白字符/)
+ assert.equal(outputLengthNotice({output:'😀'.repeat(180)},false),'')
+ assert.equal(outputLengthNotice({output:'教'.repeat(181)},true),'')
+ assert.match(outputLengthNotice({output:'教'.repeat(601)},true),/601个非空白字符/)
+ assert.equal(outputLengthNotice(undefined,false),'')
+ const output='教'.repeat(601),run={team:{name:'Fixture',outputId:'end'},steps:[{id:'end',name:'Final',output,status:'completed'}],status:'completed',input:{task:'Fixture'}}
+ const report=renderReport(run);assert.ok(report.includes(output));assert.match(report,/超过建议的600字符/)
+})

@@ -1,4 +1,5 @@
-export const VERSION='0.2.0-pilot.2', PROTOCOL=3, OUTPUT_BUDGET=6000
+export const VERSION='0.2.0-pilot.3', PROTOCOL=3, OUTPUT_BUDGET=6000
+export const REVIEW_CHAR_LIMIT=180, FINAL_CHAR_LIMIT=600
 export function check(ok,code='invalid-input'){if(!ok)throw Object.assign(Error(code),{code})}
 export function exact(v,keys){check(v&&typeof v==='object'&&!Array.isArray(v)&&Object.keys(v).every(k=>keys.includes(k)),'invalid-fields');return v}
 export function text(v,max=1000,required=false){check(typeof v==='string'&&v.length<=max&&!/[\u0000-\u0008\u000b\u000c\u000e-\u001f]/.test(v)&&(!required||v.trim()),'invalid-text');return v.trim()}
