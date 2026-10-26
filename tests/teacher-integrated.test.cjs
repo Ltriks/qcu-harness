@@ -22,8 +22,8 @@ for(const kind of ['foreign-release','same-release-other-seed'])test(kind+' rece
  assert.deepEqual(fs.readFileSync(file),before);assert.equal(fs.readFileSync(note,'utf8'),'Synthetic retained work');
 });
 test('rc4.1 exact identity and default namespace have no automatic old-Home migration',t=>{
- assert.equal(m.version,'0.1.0-rc.4.1');assert.equal(m.products.length,11);assert.equal(m.localSources.length,12);assert.equal(m.migrateFrom,undefined);
- assert.equal(defaultHome(m.version),path.join(os.homedir(),'Library/Application Support/QCU-DSH/teacher/0.1.0-rc.4.1'));
+ assert.ok(['0.1.0-rc.4.1','0.1.0-rc.4.2'].includes(m.version));assert.equal(m.products.length,11);assert.equal(m.localSources.length,12);assert.equal(m.migrateFrom,undefined);
+ assert.equal(defaultHome(m.version),path.join(os.homedir(),'Library/Application Support/QCU-DSH/teacher/'+m.version));
  const f=fixture(t);assert.throws(()=>prepare(kit,f.home,path.join(f.root,'old')),/explicit maintainer migration/);assert.equal(fs.existsSync(f.home),false);
 });
 test('first/repeat checks twelve source references and preserves valid teacher configuration choices',t=>{
@@ -61,4 +61,9 @@ test('repeat rejects escaping package and nested symlinks, malformed core metada
  const f=fixture(t);prepare(kit,f.home);const module=path.join(f.home,'profiles/desktop/node_modules/qcu-market'),outside=path.join(f.root,'outside');fs.mkdirSync(outside);fs.symlinkSync(outside,path.join(module,'escape'));assert.throws(()=>prepare(kit,f.home),/leaves local/);fs.unlinkSync(path.join(module,'escape'));
  const file=path.join(f.home,'profiles/desktop/package.json'),pkg=json(file);pkg.dependencies['../escape']='1';fs.writeFileSync(file,JSON.stringify(pkg));assert.throws(()=>prepare(kit,f.home),/dependencies invalid/);
  const bad=path.join(f.root,'bad-kit');fs.cpSync(kit,bad,{recursive:true});fs.appendFileSync(path.join(bad,m.seedFiles[0].path),'tampered');assert.throws(()=>prepare(bad,path.join(f.root,'fresh')),/integrity failed/);assert.equal(fs.existsSync(path.join(f.root,'fresh')),false);
+});
+
+test('rc4.2 first preparation leaves an rc4.1 namespace and opaque synthetic settings untouched',t=>{
+ const f=fixture(t),old=path.join(f.root,'teacher/0.1.0-rc.4.1'),fresh=path.join(f.root,'teacher/0.1.0-rc.4.2');fs.mkdirSync(old,{recursive:true});const bytes=JSON.stringify({version:'0.1.0-rc.4.1',fixture:'not-a-real-key'});fs.writeFileSync(path.join(old,'qcu-teacher.json'),bytes);assert.equal(prepare(kit,fresh).result,'prepared');assert.equal(json(path.join(fresh,'qcu-teacher.json')).version,'0.1.0-rc.4.2');assert.equal(fs.readFileSync(path.join(old,'qcu-teacher.json'),'utf8'),bytes);assert.deepEqual(fs.readdirSync(old),['qcu-teacher.json']);
+ const {identity:accept}=require('../tools/teacher-suite/integrated.cjs');assert.throws(()=>accept({...m,version:'0.1.0-rc.4.3'}),/Unexpected/);assert.throws(()=>accept({...m,branding:{...m.branding,version:'9.9.9'}}),/Unexpected/);
 });

@@ -1,13 +1,13 @@
 'use strict';
-// Only the rc4.1 whole-suite seed. Legacy rc2/rc3 preparation stays in start.cjs.
+// Pinned rc4.1/rc4.2 whole-suite seeds. Legacy rc2/rc3 preparation stays in start.cjs.
 const fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto');
 const sha=b=>crypto.createHash('sha256').update(b).digest('hex'),json=p=>JSON.parse(fs.readFileSync(p,'utf8'));
-const VERSION='0.1.0-rc.4.1';
+const RELEASES={'0.1.0-rc.4.1':'0.2.3','0.1.0-rc.4.2':'0.2.4'};
 function releaseMismatch(){const error=Error('[QCU_DATA_RELEASE_MISMATCH] 已有数据来自另一份测试构建，已保留。请使用对应安装包或联系维护人员核对版本，不要删除配置。');error.code='QCU_DATA_RELEASE_MISMATCH';return error}
 const IDS=['qcu-study-coach','qcu-lesson-planning','qcu-tiered-practice','qcu-note-organizer','qcu-reading-outline','qcu-integrity-guard','qcu-team-briefing','qcu-feishu-readonly','qcu-course-workbench','qcu-market','qcu-expert-teams','qcu-branding'];
 function identity(m){
  const sources=m.localSources;
- if(m.version!==VERSION||m.target!=='mac-arm64'||m.products?.length!==11||m.branding?.version!=='0.2.3'||m.migrateFrom||!Array.isArray(sources)||sources.length!==12||new Set(sources.map(p=>p.id)).size!==12||IDS.some(id=>!sources.some(p=>p.id===id))||sha(Buffer.from(JSON.stringify(m.seedFiles)))!==m.seedId)throw Error('Unexpected integrated teacher release');
+ if(!Object.hasOwn(RELEASES,m.version)||m.target!=='mac-arm64'||m.products?.length!==11||m.branding?.version!==RELEASES[m.version]||m.migrateFrom||!Array.isArray(sources)||sources.length!==12||new Set(sources.map(p=>p.id)).size!==12||IDS.some(id=>!sources.some(p=>p.id===id))||sha(Buffer.from(JSON.stringify(m.seedFiles)))!==m.seedId)throw Error('Unexpected integrated teacher release');
  if(new Set(m.products.map(p=>p.id)).size!==11||IDS.filter(id=>id!=='qcu-branding').some(id=>!m.products.some(p=>p.id===id&&p.version===sources.find(s=>s.id===id).version)))throw Error('Unexpected integrated product selection');
  for(const p of sources)if(p.source!=='file:./.qcu-bundles/'+p.file||!/^[a-z0-9.-]+\.tgz$/.test(p.file)||!/^[a-f0-9]{64}$/.test(p.sha256))throw Error('Unexpected integrated source');
  return m;

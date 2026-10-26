@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Verify the actual rc4.1 ZIP, permissions/links/signatures and cold native bootstrap."""
+"""Verify the actual pinned Mac ZIP, permissions/links/signatures and cold native bootstrap."""
 import argparse
 import importlib.util
 import json
@@ -46,22 +46,23 @@ def verify(archive, out, validation_runtime=None):
         raise ValueError('Vendor proof mismatch')
     m = json.loads((kit / 'support/manifest.json').read_text())
     info = plistlib.loads((app / 'Contents/Info.plist').read_bytes())
-    bundle_id = 'cn.qcu.assistant.teacher.rc4-1.b' + m['seedId'][:12]
-    if (m['version'] != '0.1.0-rc.4.1' or info.get('CFBundleIdentifier') != bundle_id
-            or info.get('QCUReleaseVersion') != m['version'] or info.get('CFBundleVersion') != '4.1'
+    theme_version = {'0.1.0-rc.4.1': '0.2.3', '0.1.0-rc.4.2': '0.2.4'}.get(m['version'])
+    bundle_id = 'cn.qcu.assistant.teacher.' + m['version'].removeprefix('0.1.0-').replace('.', '-') + '.b' + m['seedId'][:12]
+    if (theme_version is None or info.get('CFBundleIdentifier') != bundle_id
+            or info.get('QCUReleaseVersion') != m['version'] or info.get('CFBundleVersion') != m['version'].removeprefix('0.1.0-rc.')
             or info.get('CFBundleDisplayName') != 'QCU助手'):
         raise ValueError('Distinct outer release identity mismatch')
     guide = json.loads((package / 'guide-package.json').read_text())
-    if guide['runtimeVersion'] != '0.1.0-rc.4.1' or guide['themeVersion'] != '0.2.3' or builder.digest(package / guide['guide']['file']) != guide['guide']['sha256'] or (package / guide['guide']['file']).read_bytes() != (ROOT / 'tools/teacher-guide/QCU助手使用指南.html').read_bytes():
+    if guide['runtimeVersion'] != m['version'] or guide['themeVersion'] != theme_version or builder.digest(package / guide['guide']['file']) != guide['guide']['sha256'] or (package / guide['guide']['file']).read_bytes() != (ROOT / 'tools/teacher-guide/QCU助手使用指南.html').read_bytes():
         raise ValueError('Current guide identity mismatch')
     for name in ['README.txt', '先读我.txt', '开始使用.html']:
         text = (package / name).read_text()
-        if not all(token in text for token in ['0.1.0-rc.4.1', 'teacher/0.1.0-rc.4.1/', '不会自动导入', '预装', '自己的 API Key', '费用']):
+        if not all(token in text for token in [m['version'], 'teacher/' + m['version'] + '/', '不会自动导入', '预装', '自己的 API Key', '费用']):
             raise ValueError('Current startup documentation incomplete: ' + name)
     policy = json.loads((kit / 'seed/profiles/desktop/pnpm-workspace.yaml').read_text())
     if policy != {'autoInstallPeers': False, 'ignoreScripts': True, 'packageImportMethod': 'copy'}:
         raise ValueError('Unexpected twelve-source pnpm policy')
-    if m['branding']['version'] != '0.2.3' or len(m['localSources']) != 12 or 'migrateFrom' in m:
+    if m['branding']['version'] != theme_version or len(m['localSources']) != 12 or 'migrateFrom' in m:
         raise ValueError('Unexpected dependency/migration policy')
     home = out / '合成 教师 数据'
     env = {k: os.environ[k] for k in ['PATH', 'TMPDIR', 'LANG'] if k in os.environ}
@@ -138,7 +139,7 @@ def verify(archive, out, validation_runtime=None):
         run('native-cli', [fresh / 'bin/lark-cli', '--version'])
         if '1.0.84' not in (out / 'native-cli.log').read_text():
             raise ValueError('Native CLI baseline mismatch')
-    result = {'status': 'passed-with-native-execution-pending' if validation_runtime else 'passed', 'archive': {'path': str(archive), 'bytes': archive.stat().st_size, 'sha256': builder.digest(archive)}, 'actualZipInventoryFilesPermissionsLinksMatch': True, 'inventoryEntries': len(expected), 'linkCount': sum(r['kind'] == 'link' for r in expected), 'adHocInnerOuterSignaturesVerified': True, 'vendorSignatureIntact': False, 'vendorUnchangedOutsideFrozenExceptionsAndSigning': True, 'nativeFirstRepeatMoved': 'pending-OS-local-execution-approval' if validation_runtime else True, 'javascriptFirstRepeatMoved': True, 'validationRuntime': str(executable), 'validationRuntimeSha256': builder.digest(executable), 'syntheticSettingsSentinelPreserved': True, 'defaultHomeVersion': '0.1.0-rc.4.1', 'networkAttempts': 0, 'childProcessAttempts': 0, 'bootstrapPackageManagerCalls': 0, 'cold': cold, 'cliVersion': '1.0.84-byte-identical-base' if validation_runtime else '1.0.84', 'testApp': str(app), 'testHome': str(home), 'freshHome': str(fresh), 'guiAccepted': False, 'modelCalls': 0}
+    result = {'status': 'passed-with-native-execution-pending' if validation_runtime else 'passed', 'archive': {'path': str(archive), 'bytes': archive.stat().st_size, 'sha256': builder.digest(archive)}, 'actualZipInventoryFilesPermissionsLinksMatch': True, 'inventoryEntries': len(expected), 'linkCount': sum(r['kind'] == 'link' for r in expected), 'adHocInnerOuterSignaturesVerified': True, 'vendorSignatureIntact': False, 'vendorUnchangedOutsideFrozenExceptionsAndSigning': True, 'nativeFirstRepeatMoved': 'pending-OS-local-execution-approval' if validation_runtime else True, 'javascriptFirstRepeatMoved': True, 'validationRuntime': str(executable), 'validationRuntimeSha256': builder.digest(executable), 'syntheticSettingsSentinelPreserved': True, 'defaultHomeVersion': m['version'], 'networkAttempts': 0, 'childProcessAttempts': 0, 'bootstrapPackageManagerCalls': 0, 'cold': cold, 'cliVersion': '1.0.84-byte-identical-base' if validation_runtime else '1.0.84', 'testApp': str(app), 'testHome': str(home), 'freshHome': str(fresh), 'guiAccepted': False, 'modelCalls': 0}
     result['client'] = client
     result['outerIdentity'] = {k: info[k] for k in ['CFBundleIdentifier', 'CFBundleVersion', 'CFBundleDisplayName', 'QCUReleaseVersion']}
     result['guardDenialSelfTest'] = {'networkBlocked': True, 'childProcessBlocked': True, 'effectsExecuted': 0}

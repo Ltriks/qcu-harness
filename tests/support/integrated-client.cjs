@@ -2,6 +2,7 @@
 const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm'),assert=require('node:assert/strict');
 (async()=>{
  const [kit,home,sdk,out]=process.argv.slice(2),{runtime}=require(path.join(kit,'support/offline.cjs'));
+ const manifest=JSON.parse(fs.readFileSync(path.join(kit,'support/manifest.json')));
  const api=await runtime(path.join(kit,'program/DeepSeek Harness.app/Contents/Resources'));
  const req=require('node:module').createRequire(path.join(sdk,'package.json')),React=req('react'),{renderToStaticMarkup}=req('react-dom/server');
  const buttons=[],react={...React,createElement(type,props,...children){if(type==='button')buttons.push(props);return React.createElement(type,props,...children)}};
@@ -36,9 +37,9 @@ const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm'),asse
   assert.match(markup,/aria-label="主要功能"/);assert.match(markup,/aria-label="插件市场"/);assert.match(markup,/aria-label="专家团"/);
   for(const label of ['插件市场','专家团']){const button=buttons.find(p=>p?.['aria-label']===label);assert.ok(button?.onClick);button.onClick()}
   assert.deepEqual(selected,['qcu-market','qcu-expert-teams']);
-  const about=ctx.slots.entriesOfSlot('main').find(e=>e.options.key==='qcu-teacher-about');const aboutHtml=renderToStaticMarkup(React.createElement(about.component));assert.match(aboutHtml,/0\.1\.0-rc\.4\.1/);assert.match(aboutHtml,/QCU清蓝 0\.2\.3/);assert.doesNotMatch(aboutHtml,/0\.1\.0-rc\.3/);fs.writeFileSync(path.join(out,'about.html'),aboutHtml);
+  const about=ctx.slots.entriesOfSlot('main').find(e=>e.options.key==='qcu-teacher-about');const aboutHtml=renderToStaticMarkup(React.createElement(about.component));assert.ok(aboutHtml.includes(manifest.version));assert.ok(aboutHtml.includes('QCU清蓝 '+manifest.branding.version));assert.doesNotMatch(aboutHtml,/0\.1\.0-rc\.3/);fs.writeFileSync(path.join(out,'about.html'),aboutHtml);
   assert.equal(ctx.get('remote'),undefined);
-  console.log('INTEGRATED_CLIENT:'+JSON.stringify({officialAsarSlotRegistry:true,actualZipClientArtifacts:true,aboutSuite:'0.1.0-rc.4.1',aboutTheme:'0.2.3',trustedReactSsr:true,syntheticLayoutProvider:true,mainPanels:main,sidebarLabels:['插件市场','专家团'],clickSelections:selected,modelCalls:0,installationCalls:0,networkGuard:globalThis.QCU_OFFLINE_NETWORK_GUARD===true}));
+  console.log('INTEGRATED_CLIENT:'+JSON.stringify({officialAsarSlotRegistry:true,actualZipClientArtifacts:true,aboutSuite:manifest.version,aboutTheme:manifest.branding.version,trustedReactSsr:true,syntheticLayoutProvider:true,mainPanels:main,sidebarLabels:['插件市场','专家团'],clickSelections:selected,modelCalls:0,installationCalls:0,networkGuard:globalThis.QCU_OFFLINE_NETWORK_GUARD===true}));
   layout.dispose();
  }finally{await ctx.fiber.dispose()}
 })().catch(e=>{console.error(e);process.exitCode=1});
