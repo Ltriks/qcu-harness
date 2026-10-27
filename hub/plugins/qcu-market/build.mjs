@@ -1,9 +1,11 @@
-import './build-catalog.mjs'
-import './build-versions.mjs'
+if(!process.argv.includes('--client-only')){
+ await import('./build-catalog.mjs')
+ await import('./build-versions.mjs')
+}
 import { readFile, writeFile } from 'node:fs/promises'
 import { Script } from 'node:vm'
 import {createHash} from 'node:crypto'
-import {marketRuntime} from './src/remote-contract.mjs'
+const {marketRuntime}=await import('./src/remote-contract.mjs')
 import {publicTrust} from './src/public-trust.mjs'
 import {validateTrust} from './src/catalog-authority.mjs'
 if(publicTrust)validateTrust(publicTrust)

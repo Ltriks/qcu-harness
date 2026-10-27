@@ -5,7 +5,7 @@ import argparse, gzip, hashlib, io, json, tarfile
 def build(root):
     manifest=json.loads((root/'package.json').read_text())
     assert manifest['name']=='qcu-course-workbench'
-    assert manifest['version']=='0.1.0-pilot.1.3'
+    assert manifest['version'] in ['0.1.0-pilot.1.3','0.1.0-pilot.1.3.font.1']
     assert not any(manifest.get(k) for k in ['scripts','dependencies','optionalDependencies','bundledDependencies'])
     assert json.loads((root/'cordis.patch.yml').read_text())==[{'insert':[{'id':'qcu-course-workbench','name':'qcu-course-workbench','disabled':True,'config':{'enabled':True,'frameworkJson':'{}'}}]}]
     files=sorted(['package.json',*manifest['files']]);assert len(files)==len(set(files))

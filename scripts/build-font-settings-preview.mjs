@@ -8,7 +8,7 @@ import {Script} from 'node:vm';
 
 export const sdk=process.env.QCU_OFFICIAL_DEPENDENCIES??'/Users/mcq/Documents/Codex/2026-09-30/task-7/host-lifecycle-mac/source';
 export const require=createRequire(join(resolve(sdk),'package.json'));
-export const out=resolve('.work/font-settings');
+export const out=resolve(process.env.QCU_FONT_SETTINGS_OUT??'.work/font-settings');
 export const themeRoot=join(sdk,'node_modules/@deepseek-ai/dsh-client-ui-theme');
 export const presenterPath=join(sdk,'node_modules/@deepseek-ai/dsh-client-ui-layout/src/client/theme-presenter.ts');
 export const sha256=v=>createHash('sha256').update(v).digest('hex');
@@ -28,10 +28,15 @@ export async function buildPreview(){
    const manifest=JSON.parse(await source(dir+'/package.json'));
    const parts=await Promise.all(names.map(n=>source(dir+'/src/'+n+'.mjs')));
    let client;
-   if(id==='qcu-branding'){
+   if(!baseline&&process.env.QCU_FONT_CLIENTS){
+    const actual=resolve(process.env.QCU_FONT_CLIENTS,id);
+    const actualManifest=JSON.parse(await readFile(join(actual,'package.json'),'utf8'));
+    if(actualManifest.name!==id||actualManifest.version!==manifest.version)throw Error('Actual client identity mismatch: '+id);
+    client=await readFile(join(actual,'client.js'),'utf8');
+   }else if(id==='qcu-branding'){
     const icon='data:image/svg+xml;base64,'+(await readFile('branding/qcu-assistant/icon.svg')).toString('base64');
     client=(await source(dir+'/client.template.js')).replace('__QCU_TEACHER_SOURCE__',()=>parts.join('\n').replace(/^export /gm,''))
-     .replace('__QCU_ICON_DATA__',icon).replace(/QCU清蓝 \d+\.\d+\.\d+/,()=> 'QCU清蓝 '+manifest.version);
+     .replace('__QCU_ICON_DATA__',icon).replace(/QCU清蓝 \d+\.\d+\.\d+(?:-[\w.]+)?/,()=> 'QCU清蓝 '+manifest.version);
    }else{
     const factory=id==='qcu-market'?'createLoopPlugin':'createPlugin';
     client=`// Generated source candidate; same lazy-CJS assembly as package build.mjs.\nwindow.__ModuleLoader__.load({id:${JSON.stringify(id)},factory(require){\nconst React=require('react');\n${parts.join('\n').replace(/^import .*\n/gm,'').replace(/\bexport /g,'')}\nreturn ${factory}(React);\n}});\n`;

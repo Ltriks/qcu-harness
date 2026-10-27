@@ -10,7 +10,7 @@ const parts=await Promise.all(['tasks','theme','view','plugin'].map(n=>readFile(
 const icon='data:image/svg+xml;base64,'+(await readFile(join(root,'branding/qcu-assistant/icon.svg'))).toString('base64');
 const template=await readFile(join(sourceRoot,'client.template.js'),'utf8');
 const client=template.replace('__QCU_TEACHER_SOURCE__',parts.join('\n').replace(/^export /gm,'')).replace('__QCU_ICON_DATA__',icon)
- .replace(/QCU清蓝 \d+\.\d+\.\d+/,()=> 'QCU清蓝 '+manifest.version);
+ .replace(/QCU清蓝 \d+\.\d+\.\d+(?:-[\w.]+)?/,()=> 'QCU清蓝 '+manifest.version);
 new Script(client,{filename:'qcu-branding/client.js'});
 await mkdir(out,{recursive:true});await writeFile(join(out,'client.js'),client);
 for(const name of ['package.json','index.js','cordis.patch.yml'])await copyFile(join(sourceRoot,name),join(out,name));

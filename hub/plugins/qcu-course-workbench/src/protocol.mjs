@@ -1,5 +1,5 @@
 // Shared, dependency-free contract. Never accepts a filesystem path or executable model output.
-export const VERSION='0.1.0-pilot.1.3'
+export const VERSION='0.1.0-pilot.1.3.font.1'
 export const PROTOCOL=3
 export const OUTPUT_BUDGET=12000
 // Detached, bounded capability facts only; provider descriptions never cross this boundary.
