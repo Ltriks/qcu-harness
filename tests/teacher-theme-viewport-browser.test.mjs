@@ -14,7 +14,7 @@ const out=resolve(process.env.QCU_THEME_BROWSER_OUT??'.work/theme-viewport/brows
 const executablePath=process.env.QCU_BROWSER_EXECUTABLE??'/Users/mcq/Library/Caches/ms-playwright/chromium_headless_shell-1234/chrome-headless-shell-mac-arm64/chrome-headless-shell';
 const sha256=value=>createHash('sha256').update(value).digest('hex');
 const results=[],outside=[],errors=[];
-let server,context,profile,url,clientHash,bundleHash,version;
+let server,context,profile,url,clientHash,bundleHash,version,setupError;
 
 const fixture=String.raw`
 const h=React.createElement,actions=[],slots=new Map,events=new Map,cleanups=[];
@@ -23,13 +23,14 @@ window.__ModuleLoader__={load:m=>window.plugin=m.factory(name=>{if(name!=='react
 CLIENT_CODE
 localStorage.clear();localStorage.setItem('qcu.teacher.initialized.v1','yes');
 function store(value){const listeners=new Set;return{getSnapshot:()=>value,subscribe:f=>{listeners.add(f);return()=>listeners.delete(f);},set:v=>{value=v;for(const f of listeners)f();}};}
-const panel=store({activePanelId:'qcu-teacher-home'}),collapsed=store(false),themeState={preference:'light',fontSize:18};
+const panel=store({activePanelId:'qcu-teacher-home'}),collapsed=store(false),themeState={preference:'light',fontSize:14};
 let tokens={};
-function paint(){for(const[k,v]of Object.entries(tokens))document.body.style.setProperty(k,v[themeState.preference]);}
+const presenter=new ThemePresenter;
+function paint(){presenter.apply({...themeState,active:{colorScheme:themeState.preference,tokens:Object.fromEntries(Object.entries(tokens).map(([k,v])=>[k,v[themeState.preference]]))}});}
 function forbidden(name){return()=>{actions.push([name]);throw Error('Forbidden side effect: '+name);};}
 const ctx={
  effect:f=>{const cleanup=f();if(cleanup)cleanups.push(cleanup);},
- theme:{getTheme:()=>themeState,setTheme:v=>{themeState.preference=v;paint();for(const f of events.get('theme/change')??[])f();},setFontSize:v=>{themeState.fontSize=v;},overrideTokens:(_id,t)=>{tokens=t;paint();return()=>{};}},
+ theme:{getTheme:()=>themeState,setTheme:v=>{themeState.preference=v;paint();for(const f of events.get('theme/change')??[])f();},setFontSize:v=>{themeState.fontSize=v;paint();for(const f of events.get('theme/change')??[])f();},overrideTokens:(_id,t)=>{tokens=t;paint();return()=>{tokens={};paint();};}},
  locale:{setLocale:()=>{}},on:(name,f)=>{const listeners=events.get(name)??new Set;listeners.add(f);events.set(name,listeners);return()=>listeners.delete(f);},
  layout:{panelInfo:panel,selectPanel:id=>{actions.push(['panel',id]);panel.set({activePanelId:id});},toggleSidebar:()=>{actions.push(['toggle']);collapsed.set(!collapsed.getSnapshot());}},
  workspaces:{list:store({phase:'ready',items:[{workspaceId:'synthetic',path:'自编示例工作文件夹',sessionIds:['existing']}],archivedSessionIds:[]})},
@@ -53,19 +54,21 @@ function Host(){
   h('main',null,h('header',null,h(Header)),h('section',{id:'panel'},Panel?h(Panel):h('h1',null,info.activePanelId))));
 }
 const root=createRoot(document.getElementById('host'));root.render(h(Host));
-window.fixture={themeState,cleanup:()=>{root.unmount();for(const f of cleanups.reverse())f();}};
+window.fixture={themeState,setFontSize:ctx.theme.setFontSize,cleanup:()=>{root.unmount();for(const f of cleanups.reverse())f();}};
 `;
 
 before(async()=>{
+ try{
  await mkdir(out,{recursive:true});
  const client=await readFile(join(packageDir,'client.js'),'utf8');clientHash=sha256(client);
  version=JSON.parse(await readFile(join(packageDir,'package.json'),'utf8')).version;
- const entry='import React from '+JSON.stringify(require.resolve('react'))+';import {createRoot} from '+JSON.stringify(require.resolve('react-dom/client'))+';'+fixture.replace('CLIENT_CODE',()=>client);
+ const entry='import {ThemePresenter} from '+JSON.stringify(join(sdk,'node_modules/@deepseek-ai/dsh-client-ui-layout/src/client/theme-presenter.ts'))+';import React from '+JSON.stringify(require.resolve('react'))+';import {createRoot} from '+JSON.stringify(require.resolve('react-dom/client'))+';'+fixture.replace('CLIENT_CODE',()=>client);
  const bundle=await require('esbuild').build({stdin:{contents:entry,resolveDir:process.cwd()},bundle:true,write:false});
  const javascript=bundle.outputFiles[0].contents;bundleHash=sha256(javascript);
  await writeFile(join(out,'app.js'),javascript);
  // Host geometry only: all sidebar/layout/scroll rules come from client.js.
- const html='<!doctype html><html lang="zh-CN" data-platform="darwin"><meta charset="utf-8"><style>html,body,#host{height:100%;margin:0}#host{display:flex}#side{height:100%;flex:none}main{flex:1;min-width:0;display:flex;flex-direction:column;background:var(--qcu-canvas)}main>header{flex:none;padding:8px}#panel{flex:1;min-height:0;display:flex}</style><div id="host"></div><script src="/app.js"></script></html>';
+ const officialCss=(await Promise.all(['base','design-platform'].map(n=>readFile(join(sdk,'node_modules/@deepseek-ai/dsh-client-ui-theme/src/styles',n+'.css'),'utf8')))).join('\n');
+ const html='<!doctype html><html lang="zh-CN" data-platform="darwin"><meta charset="utf-8"><style>'+officialCss+'body{font:14px/1.5 var(--dsw-font-family);color:var(--dsw-alias-label-primary);background:var(--dsw-alias-bg-base)}button,input,select,textarea{font:inherit}html,body,#host{height:100%;margin:0}#host{display:flex}#side{height:100%;flex:none}main{flex:1;min-width:0;display:flex;flex-direction:column;background:var(--qcu-canvas)}main>header{flex:none;padding:8px}#panel{flex:1;min-height:0;display:flex}</style><div id="host"></div><script src="/app.js"></script></html>';
  server=createServer((req,res)=>{
   if(req.url==='/')res.writeHead(200,{'content-type':'text/html; charset=utf-8'}).end(html);
   else if(req.url==='/app.js')res.writeHead(200,{'content-type':'text/javascript'}).end(javascript);
@@ -80,6 +83,7 @@ before(async()=>{
   if(!allowed)outside.push({url:request.url(),method:request.method()});
   return allowed?route.continue():route.abort();
  });
+ }catch(e){setupError={message:e.message,code:e.code};throw e;}
 },{timeout:30000});
 
 after(async()=>{
@@ -87,7 +91,7 @@ after(async()=>{
   try{if(server?.listening){server.closeAllConnections();await new Promise(r=>server.close(r));}}finally{
    if(profile)await rm(profile,{recursive:true,force:true});
    await writeFile(join(out,'RESULT.json'),JSON.stringify({syntheticHost:true,realReact:true,nativeDsh:false,version,packageDir,clientSha256:clientHash,bundleSha256:bundleHash,
-    chromiumSandbox:true,externalRequests:outside,errors,cases:results.length,passed:results.filter(r=>r.passed).length,results},null,2)+'\n');
+    chromiumSandbox:true,status:setupError?'blocked-before-browser-cases':'executed',setupError,externalRequests:outside,errors,cases:results.length,passed:results.filter(r=>r.passed).length,results},null,2)+'\n');
   }
  }
 });
@@ -97,7 +101,7 @@ async function geometry(page){return page.evaluate(()=>{
  return{sidebar:row('.qcu-side'),work:row('.qcu-side-work'),footer:row('.qcu-side-foot'),document:{width:innerWidth,scrollWidth:document.documentElement.scrollWidth},fontSize:getComputedStyle(document.querySelector('.qcu-side')).fontSize,background:getComputedStyle(document.querySelector('.qcu-side')).backgroundColor};
 });}
 
-for(const theme of ['light','dark'])for(const font of ['normal','large'])for(const mode of ['wide','collapsed'])for(const height of [900,700,600,480]){
+for(const theme of ['light','dark'])for(const font of [14,18,22])for(const mode of ['wide','collapsed'])for(const height of [900,700,600,480]){
  test(`sidebar ${theme} ${font} ${mode} ${height}`,{timeout:30000},async()=>{
   const page=await context.newPage(),id=`${theme}-${font}-${mode}-${height}`,result={id,height,theme,font,mode,clicks:[]};
   page.setDefaultTimeout(3000);page.on('pageerror',e=>errors.push(e.message));
@@ -111,11 +115,11 @@ for(const theme of ['light','dark'])for(const font of ['normal','large'])for(con
   };
   try{
    await page.setViewportSize({width:1024,height});await page.goto(url);await button('专家团').waitFor();
-   if(font==='large')await page.getByRole('button',{name:'使用大字模式',exact:true}).click();
+   await page.evaluate(n=>window.fixture.setFontSize(n),font);
    if(theme==='dark'){await page.locator('.qcu-home summary').click();await page.getByRole('button',{name:'深色',exact:true}).click();}
    if(mode==='collapsed')await button('收起导航').click();
    result.geometry=await geometry(page);
-   assert.equal(result.geometry.fontSize,font==='large'?'18px':'16px');
+   assert.equal(result.geometry.fontSize,font+'px');
    assert.equal(result.geometry.background,theme==='dark'?'rgb(20, 32, 45)':'rgb(240, 245, 250)');
    assert.equal(await side.locator('.qcu-side-nav>button').count(),6);
    assert.equal(await side.locator('.qcu-maintenance').getByRole('button',{name:'插件市场',exact:true}).count(),0);

@@ -4,7 +4,7 @@ export function createTeacherPlugin(React,icon) {
   ctx.effect(()=>ctx.theme.overrideTokens('qcu-branding',pairedTokens));
   ctx.effect(()=>{
    const tag=document.createElement('style');tag.dataset.plugin='qcu-branding';tag.textContent=teacherStyles;document.head.append(tag);document.body.setAttribute('data-qcu-teacher','');
-   return()=>{tag.remove();document.body.removeAttribute('data-qcu-teacher');document.body.removeAttribute('data-qcu-large');};
+   return()=>{tag.remove();document.body.removeAttribute('data-qcu-teacher');};
   });
   const preferences=createTeacherPreferences(ctx);
   ctx.effect(()=>()=>preferences.dispose());
@@ -51,16 +51,15 @@ export function createTeacherPlugin(React,icon) {
 }
 
 export function createTeacherPreferences(ctx) {
- const key='qcu.teacher.readability.v1',listeners=new Set();
- let large=false;
- try{large=localStorage.getItem(key)==='large';}catch{}
- // Apply teacher defaults once; subsequent launches respect settings chosen by the user.
- try{if(localStorage.getItem('qcu.teacher.initialized.v1')!=='yes'){ctx.locale.setLocale('zh');ctx.theme.setFontSize(18);localStorage.setItem('qcu.teacher.initialized.v1','yes');}}catch{}
+ const listeners=new Set();
+ // Preserve the existing one-time locale default; the host owns font persistence.
+ try{if(localStorage.getItem('qcu.teacher.initialized.v1')!=='yes'){ctx.locale.setLocale('zh');localStorage.setItem('qcu.teacher.initialized.v1','yes');}}catch{}
+ // Legacy QCU readability flags do not control the host font setting.
  let snapshot;
- function refresh(){const theme=ctx.theme.getTheme();snapshot={large,preference:theme.preference};document.body.toggleAttribute('data-qcu-large',large);for(const fn of listeners)fn();}
+ function refresh(){const theme=ctx.theme.getTheme();snapshot={fontSize:theme.fontSize,large:theme.fontSize>=18,preference:theme.preference};for(const fn of listeners)fn();}
  refresh();
  const off=ctx.on('theme/change',refresh);
- return {getSnapshot:()=>snapshot,subscribe:fn=>{listeners.add(fn);return()=>listeners.delete(fn);},setLarge(value){large=value;try{localStorage.setItem(key,large?'large':'normal');}catch{}ctx.theme.setFontSize(large?20:18);refresh();},dispose(){off();listeners.clear();}};
+ return {getSnapshot:()=>snapshot,subscribe:fn=>{listeners.add(fn);return()=>listeners.delete(fn);},setLarge(value){ctx.theme.setFontSize(value?18:14);},dispose(){off();listeners.clear();}};
 }
 
 export function createTeacherHomeState() {

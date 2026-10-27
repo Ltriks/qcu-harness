@@ -1,5 +1,9 @@
 # QCU Harness
 
+## 字号统一与窄屏排版候选
+
+`dev/qcu-teacher-font-settings` 位于 `$HOME/Repos/worktrees/qcu-harness/teacher-font-settings`。首页、菜单、教学工具、课程、市场与专家团共同跟随官方字号；默认正文14px、首页标题24px，修复窄屏课程标题挤压。39项目标回归、9项DOM模拟、13项字体浏览器及48项侧栏场景通过，真实渲染截图已复核；[行为、构建及验收边界](docs/qcu-teacher-font-settings.md)。本轮未打新安装包、修改版本或部署，既有已安装版本不自动改变。预览与证据在 `$HOME/Artifacts/qcu-harness/0.1.0-rc.4.1/font-settings-20261027/`。
+
 ## Mac rc4.1 启动修复候选（本地验证，未部署）
 
 本轮按任务指定分支 `dev/qcu-suite-startup-fix`、独立 worktree `$HOME/Repos/worktrees/qcu-harness/suite-startup-fix` 完成。rc4.1 使用独立 Home 和按 seed 区分的外层应用标识，严格保留旧回执及数据保护；启动失败输出固定安全中文诊断。清蓝主题0.2.3仅更新版本说明，11项产品、官方组件和复制安装策略保持冻结。

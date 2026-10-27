@@ -2,6 +2,24 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {teachingTasks,recentTasks,openTeachingDraft} from '../tools/teacher-branding/src/tasks.mjs';
 import {themeTokens} from '../tools/teacher-branding/src/theme.mjs';
+import {createTeacherPreferences} from '../tools/teacher-branding/src/plugin.mjs';
+
+for(const size of [14,16,20])for(const initialized of [false,true])test(`preferences preserve host ${size}px, stale large flag, initialized=${initialized}`,()=>{
+ const previous=Object.getOwnPropertyDescriptor(globalThis,'localStorage');
+ const storage=new Map([['qcu.teacher.readability.v1','large'],...(initialized?[['qcu.teacher.initialized.v1','yes']]:[])]),expected=new Map(storage);expected.set('qcu.teacher.initialized.v1','yes');
+ Object.defineProperty(globalThis,'localStorage',{configurable:true,value:{getItem:key=>storage.get(key)??null,setItem:(key,value)=>storage.set(key,value)}});
+ const writes=[],localeWrites=[],listeners=new Set,theme={fontSize:size,preference:'dark'};let locale='en';
+ const ctx={theme:{getTheme:()=>theme,setFontSize:n=>{writes.push(n);theme.fontSize=n;for(const f of listeners)f();}},locale:{setLocale:value=>{localeWrites.push(value);locale=value;}},on:(event,f)=>{assert.equal(event,'theme/change');listeners.add(f);return()=>listeners.delete(f);}};
+ try{
+  const p=createTeacherPreferences(ctx);assert.deepEqual(writes,[]);assert.deepEqual(localeWrites,initialized?[]:['zh']);assert.equal(locale,initialized?'en':'zh');assert.deepEqual(storage,expected);assert.equal(p.getSnapshot().fontSize,size);assert.equal(p.getSnapshot().large,size>=18);
+  let changes=0;p.subscribe(()=>changes++);
+  for(const n of [14,16,20,22,14]){theme.fontSize=n;for(const f of listeners)f();assert.equal(p.getSnapshot().fontSize,n);assert.equal(p.getSnapshot().large,n>=18);}
+  assert.deepEqual(writes,[]);assert.equal(changes,5);
+  p.setLarge(true);p.setLarge(false);assert.deepEqual(writes,[18,14]);assert.deepEqual(storage,expected);
+  p.dispose();assert.equal(listeners.size,0);assert.equal(p.getSnapshot().preference,'dark');
+  const again=createTeacherPreferences(ctx);assert.deepEqual(writes,[18,14]);assert.deepEqual(localeWrites,initialized?[]:['zh']);assert.deepEqual(storage,expected);again.dispose();assert.equal(listeners.size,0);
+ }finally{if(previous)Object.defineProperty(globalThis,'localStorage',previous);else delete globalThis.localStorage;}
+});
 
 test('recent tasks exclude blank and archived sessions and keep newest first',()=>{
  const rows=[{id:'old',updatedAt:2},{id:'blank',blank:true,updatedAt:100},{id:'archived',updatedAt:100},{id:'new',updatedAt:5}];

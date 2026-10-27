@@ -7,7 +7,7 @@ import {Script,createContext} from 'node:vm'
 import {CourseController} from '../hub/plugins/qcu-course-workbench/src/controller.mjs'
 const require=createRequire(resolve(process.env.QCU_OFFICIAL_DEPENDENCIES,'package.json')),React=require('react'),{renderToStaticMarkup}=require('react-dom/server')
 import {VERSION,PROTOCOL,profile,policyFor} from '../hub/plugins/qcu-course-workbench/src/protocol.mjs'
-const bundle=await readFile(new URL('../hub/plugins/qcu-course-workbench/client.js',import.meta.url),'utf8')
+const bundle=await readFile(process.env.QCU_COURSE_CLIENT??new URL('../hub/plugins/qcu-course-workbench/client.js',import.meta.url),'utf8')
 function load(react=React){let result;new Script(bundle).runInContext(createContext({window:{__ModuleLoader__:{load:({id,factory})=>{assert.equal(id,'qcu-course-workbench');result=factory(name=>{assert.equal(name,'react');return react})}}},setTimeout,clearTimeout,crypto:globalThis.crypto}));return result}
 function register(plugin){const slots=[],effects=[];plugin.apply({slots:{inject:(_s,fn)=>fn(),register:(opts,component)=>{slots.push({opts,component})}},layout:{selectPanel(){}},effect:fn=>effects.push(fn()),inject(){}});return {slots,effects}}
 test('actual lazy-CJS artifact executes, sidebar is an icon in official row, main renders while services connect',()=>{
