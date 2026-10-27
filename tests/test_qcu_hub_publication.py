@@ -209,6 +209,38 @@ class PublicationTest(unittest.TestCase):
         with self.assertRaises(admin.Refused):
             self.pub.attach(record['id'], dict(materialsDigest=record['materialsDigest'], entry=attachment(meta)))
 
+    def test_normal_admission_supports_only_exact_declared_course_skill_without_publishing(self):
+        files = fixture.example_files()
+        pkg = json.loads(files['package.json'])
+        pkg['name'] = 'qcu-course-workbench'
+        path = 'skills/qcu-course-draft/SKILL.md'
+        pkg['files'].append(path)
+        files['package.json'] = admin.encoded(pkg)
+        files[path] = b'# Anonymous course draft method'
+        files['cordis.patch.yml'] = admin.encoded([{'insert': [{'id': pkg['name'], 'name': pkg['name'], 'disabled': True}]}])
+        raw = fixture.archive(files)
+        meta = dict(id=pkg['name'], title='Synthetic course admission', productType='plugin', components=[pkg['name']], skills=['qcu-course-draft'], sourceRevision='0123456789abcdef0123456789abcdef01234567', license='MIT', runtime='0.2.0-rc.2', version=fixture.VERSION, testEvidence={}, permissionSummary=[], archive=dict(file=pkg['name']+'-'+fixture.VERSION+'-'+admin.sha(raw)+'.tgz', bytes=len(raw), sha256=admin.sha(raw)))
+        with mock.patch.object(self.store, 'verify', return_value={meta['archive']['file']: raw}):
+            entry = self.pub.entry({'metadata': meta}, attachment(meta))
+            self.assertEqual(entry['capabilities'], ['workbench'])
+            self.assertEqual(entry['release']['skill'], 'qcu-course-draft')
+            self.assertEqual(entry['release']['skillSha256'], admin.sha(files[path]))
+            for change in [dict(id='qcu-other'), dict(productType='skill'), dict(skills=['qcu-course-draft', 'qcu-other'])]:
+                with self.assertRaises(admin.Refused):
+                    self.pub.entry({'metadata': dict(meta, **change)}, attachment(meta))
+        for declared, present in [(False, True), (True, False)]:
+            changed = dict(files)
+            changed_pkg = dict(pkg, files=pkg['files'] if declared else [p for p in pkg['files'] if p != path])
+            changed['package.json'] = admin.encoded(changed_pkg)
+            if not present:
+                del changed[path]
+            archive = fixture.archive(changed)
+            with mock.patch.object(self.store, 'verify', return_value={meta['archive']['file']: archive}):
+                with self.assertRaises(admin.Refused) as caught:
+                    self.pub.entry({'metadata': meta}, attachment(meta))
+                self.assertEqual(caught.exception.code, 'entry.skill_missing')
+        self.assertEqual(self.pub.pointer()['revision'], 0)
+
     def test_newer_release_then_explicit_new_revision_rollback_retains_both_packages(self):
         first = self.prepare()
         self.pub.confirm(first['id'], self.body(first))

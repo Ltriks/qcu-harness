@@ -234,3 +234,7 @@ environment limitation was resolved by the parent test run, not by weakening cod
 The three added regressions bring distinct local coverage to 334 tests across the
 baseline and affected-suite rerun. Unchanged broad/browser suites were not
 needlessly repeated after the server-only bootstrap fix.
+
+## 2026-10-26 课程工作台发布修正
+
+普通投稿现支持已知单组件 `qcu-course-workbench` 与唯一内置 `qcu-course-draft` Skill；必须是plugin产品、精确声明并包含 `skills/qcu-course-draft/SKILL.md`，按真实字节生成摘要和workbench能力。其他不同名Skill、多组件及多Skill形状仍拒绝。修正不绕过P10、来源审核、候选和发布确认，也不改已有签名快照。线上部署与新目录发布须以本轮交付回执为准。

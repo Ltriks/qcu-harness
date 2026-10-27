@@ -133,7 +133,8 @@ class Publication:
         for key in fields - {'provenance'}:
             api.need(type(attachment[key]) is str and 0 < len(attachment[key]) <= 2000 and not re.search(r'[\x00-\x1f\x7f]', attachment[key]) and not api.checker.SECRET.search(attachment[key].encode()), 'entry.text')
         meta = record['metadata']
-        api.need(meta['components'] == [meta['id']] and meta['skills'] in ([], [meta['id']]) and meta['license'] in ('MIT', 'Apache-2.0'), 'entry.unsupported_shape_use_single_component', 409)
+        workbench = meta['id'] == 'qcu-course-workbench' and meta['productType'] == 'plugin' and meta['skills'] == ['qcu-course-draft']
+        api.need(meta['components'] == [meta['id']] and (workbench or meta['skills'] in ([], [meta['id']])) and meta['license'] in ('MIT', 'Apache-2.0'), 'entry.unsupported_shape_use_single_component', 409)
         api.need(meta['productType'] != 'skill' or meta['skills'] == [meta['id']], 'entry.skill_mismatch')
         provenance = attachment['provenance']
         api.need(type(provenance) is dict and set(provenance) == {'ownership', 'author', 'upstreamSource', 'pinnedRevision', 'license', 'modifications'}, 'entry.provenance')
@@ -142,15 +143,17 @@ class Publication:
         # P10 has already checked every member. Read only exact static declarations.
         with tarfile.open(fileobj=io.BytesIO(raw), mode='r:gz') as tar:
             files = {member.name: tar.extractfile(member).read() for member in tar.getmembers() if member.isfile()}
-        skill = meta['id'] if meta['skills'] else None
+        skill = 'qcu-course-draft' if workbench else meta['id'] if meta['skills'] else None
+        skill_path = 'skills/qcu-course-draft/SKILL.md' if workbench else 'SKILL.md'
         if skill:
-            api.need('package/SKILL.md' in files, 'entry.skill_missing')
+            package = api.checker.load_json(files['package/package.json'], 'package')
+            api.need(skill_path in package.get('files', []) and 'package/' + skill_path in files, 'entry.skill_missing')
         release = dict(id=meta['id'], version=meta['version'], skill=skill,
-                       skillSha256=api.sha(files['package/SKILL.md']) if skill else None,
+                       skillSha256=api.sha(files['package/' + skill_path]) if skill else None,
                        provider=meta['id'] + '@' + meta['version'] if skill else None,
                        origin=self.trust['origin'], runtime=meta['runtime'], releaseStatus='published', license=meta['license'], **meta['archive'])
         entry = dict(id=meta['id'], title=meta['title'], kind='skill' if meta['productType'] == 'skill' else 'bundle',
-                     capabilities=['skill' if skill else 'tools'], sourceLabel='QCU自有' if provenance.get('ownership') == 'qcu' else '第三方改编',
+                     capabilities=['workbench' if workbench else 'skill' if skill else 'tools'], sourceLabel='QCU自有' if provenance.get('ownership') == 'qcu' else '第三方改编',
                      release=release, **copy.deepcopy(attachment))
         # Evidence is an explicit administrator statement; immutable submission boundaries are appended verbatim.
         entry['testStatus'] += '；投稿声明：' + '; '.join(k + '=' + v['status'] for k, v in meta['testEvidence'].items())

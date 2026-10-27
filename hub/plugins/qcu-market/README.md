@@ -50,3 +50,9 @@ Publication, disabled installation and single-component activation retain separa
 `updates.json` retains the ten-product P15.1 projection, including market15.2 but excluding expert; `updates-v2.json` includes expert. New clients fall back only on genuine 404. Independent exact fingerprints and a shared revision floor protect both projections. Offline preparation requires explicit projections and records omissions. Both feeds are manifest-pinned, read-only, no-store resources. See [suite handoff](../../../docs/qcu-suite-integration-a.md) for reproduction and next-builder inputs.
 
 Focused local publication uses ephemeral keys and clearly simulated operator review of the actual frozen archive. The 47-file handoff contains optional attachments rejected by the existing admin policy (13 PNGs and source/pack.py); an explicit 33-file byte-preserving upload projection records all omissions and keeps the original material read-only. No admin validation was relaxed. Browser proof uses the real signed HTTP authority and official rc2 Gateway, with counted simulated install/activation effects only. New native DSH, real model/teacher acceptance, Windows, full application build and production publication remain pending with the parent.
+
+## 教师反馈（P16 候选）
+
+侧栏“工具市场”用于发现和安装，“教学工具”用于启动已有任务。问题反馈先生成脱敏预览，检查学生与私人资料后单独确认提交。未配置反馈收件箱或网络不可达时可复制本地记录。结果未知时只主动查询同一回执，不自动重发。本机只保存最多32条随机查询凭据、时间和版本，重开后仍需主动查询；反馈原文不写入本机回执日志。未知结果须查询原回执，或明确另建反馈并保留旧记录。维护者标记处理不等于教师确认有效。首次任务在“新手指引 → 进入首次任务指引”继续，在官方“设置 → 模型”填写自己的 Key，再打开匿名任务草稿并手动发送。
+
+父审查候选为 `0.1.0-pilot.16.1`，配套主题 `0.2.6-pilot.2`；初版16.0与主题pilot.1保留但被替代，均未部署。跨端恢复契约及维护/教师验收见 `docs/qcu-p16-parent-review.md`。本轮不重建完整Mac应用，不发布Hub或续期。

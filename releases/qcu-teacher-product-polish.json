@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "taskId": "QCU-TEACHER-PRODUCT-POLISH",
+  "status": "candidate-not-published",
+  "appRelease": null,
+  "supportedRuntime": "0.2.0-rc.2",
+  "versions": {
+    "branding": "0.2.6-pilot.2",
+    "market": "0.1.0-pilot.16.1",
+    "expert": "0.2.0-pilot.3.font.1"
+  },
+  "archives": []
+}

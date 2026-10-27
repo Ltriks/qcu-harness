@@ -31,6 +31,8 @@ spec.loader.exec_module(checker)
 publication_spec = importlib.util.spec_from_file_location('qcu_publication', REPO / 'hub/admin/publication.py')
 publication_module = importlib.util.module_from_spec(publication_spec)
 publication_spec.loader.exec_module(publication_module)
+feedback_spec = importlib.util.spec_from_file_location('qcu_feedback', REPO / 'hub/feedback.py')
+feedback_module = importlib.util.module_from_spec(feedback_spec); feedback_spec.loader.exec_module(feedback_module)
 MAX_BODY = 15 * 1048576
 MAX_FILE = 1048576
 MAX_JSON = 262144
@@ -337,6 +339,7 @@ class Store:
     def close(self):
         if getattr(self, 'publication', None):
             self.publication.close()
+        if getattr(self, 'feedback', None): self.feedback.close()
         self.sessions.clear()
         if self.lock_fd is not None:
             os.close(self.lock_fd)
@@ -347,6 +350,12 @@ class Store:
                               parse=parse, sha=sha, now=now, validate_root=validate_root)
         self.publication = publication_module.Publication(self, api, public_root, trust, node, **options)
         return self.publication
+
+    def configure_feedback(self, root):
+        protected = [self.root]
+        if getattr(self, 'publication', None): protected.append(self.publication.root)
+        self.feedback = feedback_module.Inbox(root, protected=protected)
+        return self.feedback
 
     def save(self):
         try:
@@ -728,6 +737,21 @@ class Handler(BaseHTTPRequestHandler):
                     value = list(store.state['records'].values())
                 elif self.path == '/api/submissions' and self.command == 'POST':
                     value = store.upload(body)
+                elif self.path == '/api/feedback' and self.command == 'GET':
+                    value = {'configured': bool(getattr(store, 'feedback', None)), 'records': store.feedback.list(lambda: store.principal(authorization)) if getattr(store, 'feedback', None) else []}
+                elif re.fullmatch(r'/api/feedback/[a-f0-9]{64}(?:/status)?', self.path):
+                    need(getattr(store, 'feedback', None) is not None, 'feedback.unconfigured', 409)
+                    rid = self.path.split('/')[3]
+                    if self.command == 'GET' and not self.path.endswith('/status'):
+                        value = store.feedback.detail(rid, lambda: store.principal(authorization))
+                    else:
+                        need(self.command == 'POST' and self.path.endswith('/status'), 'http.route', 404)
+                        value = store.feedback.update(rid, body, lambda: store.principal(authorization))
+                elif self.path == '/api/maintenance' and self.command == 'GET':
+                    value = store.maintenance.status() if getattr(store, 'maintenance', None) else {'configured': False, 'message': '未配置维护检查；请指定只读快照与可信 Node。'}
+                elif self.path == '/api/maintenance/refresh' and self.command == 'POST':
+                    need(body == {} and getattr(store, 'maintenance', None) is not None, 'maintenance.unconfigured', 409)
+                    value = store.maintenance.refresh()
                 elif self.path == '/api/publication' and self.command == 'GET':
                     value = store.publication.status() if getattr(store, 'publication', None) else dict(configured=False, state='unavailable', message='未配置签名密钥、固定公钥、Node 与独立公开服务；发布不可用。')
                 elif self.path == '/api/publication/recheck' and self.command == 'POST':
@@ -770,7 +794,7 @@ class Handler(BaseHTTPRequestHandler):
                         else:
                             raise Refused('http.route', 404)
                 return self.reply(200, encoded(display_value(value)))
-        except Refused as error:
+        except (Refused, feedback_module.Refused) as error:
             self.reply(error.status, encoded({'error': error.code}))
         except (TimeoutError, OSError, checker.Rejected, ValueError, KeyError, TypeError):
             self.reply(409, encoded({'error': 'operation.refused'}))
@@ -812,6 +836,8 @@ def main():
     actions.add_argument('--reset-admin-password', action='store_true', help='Interactively reset while service is stopped')
     parser.add_argument('--bind', default='127.0.0.1', choices=['127.0.0.1'])
     parser.add_argument('--port', type=int, default=8765)
+    parser.add_argument('--feedback-root', type=Path)
+    parser.add_argument('--maintenance-root', type=Path)
     parser.add_argument('--publication-root', type=Path)
     parser.add_argument('--public-trust', type=Path)
     parser.add_argument('--node', type=Path, help='Trusted absolute Node executable (22+); never supplied by Web')
@@ -831,13 +857,19 @@ def main():
             trust = parse(args.public_trust.read_bytes(), 4096)
             store.configure_publication(args.publication_root, trust, args.node, initialize=args.init_publication)
         else:
-            need(not (args.public_trust or args.node or args.init_publication), 'publication.setup')
+            need(not (args.public_trust or args.init_publication) and (not args.node or args.maintenance_root), 'publication.setup')
+        if args.feedback_root: store.configure_feedback(args.feedback_root)
+        if args.maintenance_root:
+            need(args.node is not None, 'maintenance.node')
+            spec = importlib.util.spec_from_file_location('qcu_maintenance', REPO / 'hub/admin/maintenance.py')
+            module = importlib.util.module_from_spec(spec); spec.loader.exec_module(module)
+            store.maintenance = module.Maintenance(args.maintenance_root, args.node, getattr(store, 'publication', None))
         server = Server((args.bind, args.port), store)
         print('Local preparation only: ' + server.origin, flush=True)
         server.serve_forever()
     except KeyboardInterrupt:
         pass
-    except Refused as error:
+    except (Refused, feedback_module.Refused) as error:
         print('store.legacy_state' if error.code == 'store.legacy_state' else 'startup.refused', flush=True)
         return 2
     except (checker.Rejected, OSError, ValueError, KeyError, TypeError, EOFError):

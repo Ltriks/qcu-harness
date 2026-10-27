@@ -27,6 +27,7 @@ async function refresh() {
  records=await api('/api/submissions');publication=await api('/api/publication');
  const status=$('publication-status');status.replaceChildren(el('h2','公开市场'),el('p',publication.message||'尚无公开发行。'));
  if(publication.configured){status.append(el('p',`当前修订：${publication.current.revision} · ${publication.state}`));if(publication.current.revision)status.append(button('重新核对公开下载',async()=>{await api('/api/publication/recheck',{});await refresh();}));}
+ await refreshMaintenance();await refreshFeedback();
  renderQueue();if(selected){const r=records.find(r=>r.id===selected);if(r)renderDetail(r);}
 }
 function renderQueue() {
@@ -108,7 +109,7 @@ function renderConfirmation(r, preview) {
  }));$('detail').append(box);box.scrollIntoView({block:'start'});
 }
 function clearSession() {
- token='';records=[];selected='';$('password').value='';$('folder').value='';$('selection').textContent='尚未选择文件夹';$('queue').replaceChildren();$('detail').replaceChildren();$('workspace').hidden=true;$('access').hidden=false;
+ token='';records=[];selected='';$('password').value='';$('folder').value='';$('selection').textContent='尚未选择文件夹';$('queue').replaceChildren();$('detail').replaceChildren();$('maintenance').replaceChildren();$('feedback-inbox').replaceChildren();$('workspace').hidden=true;$('access').hidden=false;
 }
 $('login').addEventListener('submit',event=>{event.preventDefault();run(async()=>{
  const body={account:$('account').value,password:$('password').value};$('password').value='';
@@ -132,3 +133,25 @@ $('upload').addEventListener('click',()=>run(async()=>{
  }
  const r=await api('/api/submissions',{files:rows});selected=r.id;await refresh();message('材料已冻结：'+statuses[r.status]+'。');
 }));
+
+async function refreshMaintenance(){
+ const m=await api('/api/maintenance'),box=$('maintenance');box.replaceChildren(el('h2','维护检查'),el('p',m.message));
+ if(m.configured){box.append(button('只读刷新公开状态',async()=>{await api('/api/maintenance/refresh',{});await refreshMaintenance();}));
+  if(m.lastCheck){const r=m.lastCheck;fields(box,[['检查时间',r.checkedAt],['目录签名',maintenanceLabel(r.catalog.verification)],['目录有效期',r.catalog.expiresAt||'未观察'],['目录时效',maintenanceLabel(r.catalog.freshness)],['产品数量',r.catalog.productCount??'未观察'],['目录归档 / HTTP',maintenanceLabel(r.catalog.integrity)+' / '+maintenanceLabel(r.catalog.http)],['旧更新源签名与完整性',maintenanceLabel(r.updates.verification)],['旧更新源有效期',r.updates.expiresAt||'未观察'],['旧更新源时效',maintenanceLabel(r.updates.freshness)],['专家更新源',maintenanceLabel(r.expertFeed.state)]]);if(r.coverage){box.append(el('h3','初装与更新覆盖'),el('p',r.coverage.gaps.length?'发现 '+r.coverage.gaps.length+' 项覆盖缺口。签名有效不代表已覆盖最新目录版本。':'已核对目录与更新源的版本覆盖。'));for(const row of r.coverage.gaps)box.append(el('p',(row.title||row.id)+'：目录 '+(row.catalogVersion||'未列出')+'，更新源 '+(row.effectiveLatest||'未覆盖')+'。'+row.action));}box.append(jsonDetails('技术信息与完整检查结果',r));}
+ }
+}
+async function refreshFeedback(){
+ const result=await api('/api/feedback'),box=$('feedback-inbox');box.replaceChildren(el('h2','反馈收件箱'));
+ if(!result.configured){box.append(el('p','未配置独立反馈目录；公开 Hub 保持只读。'));return;}
+ if(!result.records.length)box.append(el('p','暂无反馈。'));
+ for(const row of result.records)box.append(button(row.title+' · '+feedbackLabel(row.state),async()=>renderFeedback(await api('/api/feedback/'+row.receiptId))));
+}
+function feedbackLabel(s){return {'received':'已收到','in-progress':'处理中','resolved':'维护者已标记完成'}[s]||s;}
+function renderFeedback(r){
+ $('feedback-detail')?.remove();const box=el('section',undefined,'confirm');box.id='feedback-detail';box.setAttribute('aria-label','反馈详情');box.append(el('h3',r.payload.title),el('p',feedbackLabel(r.state)),el('pre',r.payload.text),el('p','标记完成仅表示维护者处理，不代表教师确认有效。'));
+ const label=el('label','公开处理说明（不含私人资料）'),input=el('textarea');input.id='feedback-message';input.maxLength=300;input.value=r.message;label.htmlFor=input.id;box.append(label,input);
+ for(const state of ['received','in-progress','resolved'])box.append(button({received:'标记为已收到','in-progress':'标记为处理中',resolved:'标记已处理'}[state],async()=>{await api('/api/feedback/'+r.receiptId+'/status',{revision:r.revision,state,message:input.value});await refreshFeedback();message('状态已更新；教师可主动查询回执。');}));
+ box.append(button('关闭反馈详情',async()=>box.remove()),jsonDetails('有限操作记录',r.audit));$('feedback-inbox').append(box);box.scrollIntoView({block:'start'});
+}
+
+function maintenanceLabel(value){return {'signature-verified':'签名已验证','signature-and-integrity-verified':'签名与完整性已验证','parsed-only':'仅解析（未验证签名）','unavailable':'不可用','unobserved':'未观察','verified':'已验证','failed':'未通过','not-checked':'未检查','fresh':'有效','near-expiry':'不足72小时即将过期','expired':'已过期','future':'尚未生效','supported-legacy-fallback':'支持回退旧更新源','invalid':'验证失败'}[value]||'未观察';}

@@ -9,7 +9,7 @@ def build(root):
     assert sorted(p.name for p in root.iterdir()) == files
     manifest = json.loads((root / 'package.json').read_text(encoding='utf8'))
     assert manifest['name'] == 'qcu-branding'
-    assert manifest['version'] == '0.2.5-font.1'
+    assert manifest['version'] in ['0.2.5-font.1', '0.2.6-pilot.1', '0.2.6-pilot.2']
     assert not any(k in manifest for k in ['scripts', 'dependencies', 'optionalDependencies', 'bundledDependencies', 'peerDependencies'])
     assert json.loads((root / 'cordis.patch.yml').read_text(encoding='utf8')) == [{'id': 'ui-brand-official', 'disabled': True}, {'id': 'ui-sidebar', 'disabled': True}, {'insert': [{'id': 'qcu-branding', 'name': 'qcu-branding'}]}]
     for p in [*manifest['exports'].values(), manifest['dsh']['bundle']['patch']]:

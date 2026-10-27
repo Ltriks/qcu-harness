@@ -1,3 +1,4 @@
+import {FeedbackFlow} from './feedback-flow.mjs'
 import {CatalogRuntime} from './catalog-runtime.mjs'
 import {remoteContribution} from './remote-contract.mjs'
 import {release} from './trusted-release.mjs'
@@ -8,7 +9,7 @@ export function createLoopPlugin(React){
     // Keep a visible unavailable panel while optional runtime services are absent.
     // Package-level dsh.client.inject does not declare Cordis service access.
     const unavailableDetails=()=>{throw new Error('官方详情服务不可用')}
-    let ready={flow:null,unavailable:'缺少官方管理或 QCU 包准备服务，不能安装。',onDetails:unavailableDetails}
+    let ready={openFirstTask:()=>{try{ctx.layout.selectPanel('qcu-teacher-help');return true}catch{return false}},flow:null,unavailable:'缺少官方管理或 QCU 包准备服务，不能安装。',onDetails:unavailableDetails}
     const listeners=new Set()
     const availability={snapshot:()=>ready,subscribe:fn=>{listeners.add(fn);return()=>listeners.delete(fn)}}
     const update=patch=>{ready={...ready,...patch};for(const fn of listeners)fn()}
@@ -25,10 +26,11 @@ export function createLoopPlugin(React){
         // plugin would deadlock startup. The manager is a consumer dependency only:
         // withdrawing it must not queue $unmount inside its own namespace teardown.
         ui=serviceCtx.inject(['remote.pluginManager','remote.qcuMarket'],async flowCtx=>{
+          const feedback=new FeedbackFlow(flowCtx.remote)
           const runtime=new CatalogRuntime(flowCtx.remote,update)
-          update({refresh:()=>runtime.refresh(),updates:runtime.updates,catalog:{entries:[]}})
-          flowCtx.effect(()=>()=>{runtime.dispose();update({flow:null,flows:null,flowByKey:null,updates:null,refresh:null,catalog:{entries:[]},unavailable:'服务已释放或连接能力变化，请等待服务恢复。'})})
-          flowCtx.on('connection/reset',()=>runtime.reset())
+          update({feedback,refresh:()=>runtime.refresh(),updates:runtime.updates,catalog:{entries:[]}})
+          flowCtx.effect(()=>()=>{feedback.dispose();runtime.dispose();update({feedback:null,flow:null,flows:null,flowByKey:null,updates:null,refresh:null,catalog:{entries:[]},unavailable:'服务已释放或连接能力变化，请等待服务恢复。'})})
+          flowCtx.on('connection/reset',()=>{feedback.invalidate();runtime.reset()})
           await runtime.refresh()
         })
       }catch(e){await ui?.dispose();await unmount?.();update({flow:null,unavailable:e.message});return}
@@ -36,6 +38,6 @@ export function createLoopPlugin(React){
       serviceCtx.effect(()=>async()=>{await ui.dispose();await unmount()})
     })
     ctx.slots.inject('main',()=>ctx.slots.register({name:'main',key:'qcu-market',inject:()=>({availability,onBack:()=>ctx.layout.selectPanel(null)})},MarketPage))
-    ctx.slots.inject('sidebar.panellist',()=>ctx.slots.register({name:'sidebar.panellist',id:'qcu-market',order:30,label:'QCU市场'},Icon))
+    ctx.slots.inject('sidebar.panellist',()=>ctx.slots.register({name:'sidebar.panellist',id:'qcu-market',order:30,label:'工具市场'},Icon))
   }}
 }

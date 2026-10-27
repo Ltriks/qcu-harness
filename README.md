@@ -1,5 +1,13 @@
 # QCU Harness
 
+## 教师助手与工具市场 P16（本地候选）
+
+开发分支 `dev/qcu-teacher-product-polish`，固定 worktree `$HOME/Repos/worktrees/qcu-harness/teacher-product-polish`。已实现紧凑首页/工具列表、四步首次任务指引、六类问题帮助、反馈提交—管理员处理—教师查询，以及发布维护检查。课程工作台本轮排除，由同事继续维护。当前最终组件为市场16.1、主题0.2.6-pilot.2；新机完整 Mac 候选为rc4.3，已有电脑保留原Home，后续走组件更新。
+
+组件193项定向检查、7组完整浏览器（108布局/35截图）通过；新Mac ZIP清单、内外临时签名、原生prepare-only首次/重复/移动、实际ASAR冷加载和12组件/7技能核对通过。原生GUI、其他新机系统信任、真实模型与教师效果仍待验收。未部署Hub/mini、续期签名清单或重建Windows。构建测试、精确版本/哈希、固定产物路径、部署边界与同事验收见 [P16交付和验收](docs/qcu-p16-delivery.md)。
+
+本机合成预览：`rtk proxy env QCU_PRODUCT_POLISH_OUT=.work/product-polish-review node scripts/serve-product-polish-preview.mjs`，只绑定回环并打印地址。组件包/截图/证据在 `$HOME/Artifacts/qcu-harness/0.1.0-pilot.16.1/`；完整候选在 `$HOME/Artifacts/qcu-harness/0.1.0-rc.4.3/mac-arm64/`。现有Hub仍为 `192.168.1.68:8080`，管理员仅mini回环8975。
+
 ## 字号统一与窄屏排版候选
 
 `dev/qcu-teacher-font-settings` 位于 `$HOME/Repos/worktrees/qcu-harness/teacher-font-settings`。首页、菜单、教学工具、课程、市场与专家团共同跟随官方字号；默认正文14px、首页标题24px，修复窄屏课程标题挤压。39项目标回归、9项DOM模拟、13项字体浏览器及48项侧栏场景通过，真实渲染截图已复核；[行为、构建及验收边界](docs/qcu-teacher-font-settings.md)。本轮未打新安装包、修改版本或部署，既有已安装版本不自动改变。预览与证据在 `$HOME/Artifacts/qcu-harness/0.1.0-rc.4.1/font-settings-20261027/`。

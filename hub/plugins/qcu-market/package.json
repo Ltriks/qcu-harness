@@ -1,6 +1,6 @@
 {
   "name": "qcu-market",
-  "version": "0.1.0-pilot.15.2.font.1",
+  "version": "0.1.0-pilot.16.1",
   "private": true,
   "type": "module",
   "license": "MIT",
@@ -56,7 +56,10 @@
     "src/update-archive.mjs",
     "src/update-policy.mjs",
     "src/update-storage.mjs",
-    "src/update-model.mjs"
+    "src/update-model.mjs",
+    "src/feedback-host.mjs",
+    "src/feedback-schema.mjs",
+    "src/feedback-storage.mjs"
   ],
   "description": "QCU 签名动态市场；独立发布、安装与启用确认",
   "icon": "./icon.svg"

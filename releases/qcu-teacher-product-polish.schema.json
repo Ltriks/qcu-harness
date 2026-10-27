@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "taskId", "status", "appRelease", "supportedRuntime", "versions", "archives"],
+  "properties": {
+    "schema": {"const": 1},
+    "taskId": {"const": "QCU-TEACHER-PRODUCT-POLISH"},
+    "status": {"const": "candidate-not-published"},
+    "appRelease": {"type": "null"},
+    "supportedRuntime": {"const": "0.2.0-rc.2"},
+    "versions": {
+      "type": "object", "additionalProperties": false, "required": ["branding", "market", "expert"],
+      "properties": {"branding": {"type": "string"}, "market": {"type": "string"}, "expert": {"type": "string"}}
+    },
+    "archives": {
+      "type": "array", "maxItems": 2,
+      "items": {
+        "type": "object", "additionalProperties": false, "required": ["id", "version", "path", "bytes", "sha256"],
+        "properties": {"id": {"enum": ["qcu-branding", "qcu-market"]}, "version": {"type": "string"}, "path": {"type": "string", "maxLength": 240}, "bytes": {"type": "integer", "minimum": 1, "maximum": 1048576}, "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}}
+      }
+    }
+  }
+}

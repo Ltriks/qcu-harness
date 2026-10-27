@@ -28,8 +28,8 @@ export const marketStyles = `
 .qcu-market .qcu-control:hover { background:var(--dsw-alias-interactive-bg-hover); }
 .qcu-market .qcu-control:active { background:var(--dsw-alias-interactive-bg-active); }
 .qcu-market .qcu-control[aria-pressed="true"] { background:var(--dsw-alias-button-ghost-active-fill);border-color:var(--dsw-alias-brand-primary);color:var(--dsw-alias-brand-text); }
-.qcu-market .qcu-primary { background:var(--dsw-alias-button-primary-fill);color:var(--dsw-alias-label-primary-foreground);border-color:transparent; }
-.qcu-market .qcu-primary:hover { background:var(--dsw-alias-button-primary-hover); }
+.qcu-market .qcu-primary { background:var(--dsw-alias-button-primary-fill);color:var(--qcu-market-primary-ink,var(--dsw-alias-label-primary-foreground));border-color:transparent; }
+.qcu-market .qcu-control.qcu-primary:is(:hover,:active) { background:var(--dsw-alias-button-primary-hover); }
 .qcu-market button:disabled { color:var(--dsw-alias-label-secondary);border-color:var(--dsw-alias-border-l2);background:var(--dsw-alias-bg-layer-2);cursor:not-allowed; }
 .qcu-market :is(button,summary,textarea,input,pre):focus-visible { outline:2px solid var(--dsw-alias-brand-primary);outline-offset:3px; }
 .qcu-market [data-page-heading]:focus { outline:none; }
@@ -167,4 +167,5 @@ export const marketStyles = `
  .qcu-market .qcu-head { flex-direction:column; }
 }
 @media(prefers-reduced-motion:reduce) { .qcu-market * { animation:none !important;transition:none !important;scroll-behavior:auto !important; } }
+.qcu-market .qcu-receipt-list{list-style:none;padding:0;display:grid;gap:8px}.qcu-market .qcu-receipt-list li{min-width:0}.qcu-market .qcu-receipt-list button{white-space:normal;overflow-wrap:anywhere}
 `

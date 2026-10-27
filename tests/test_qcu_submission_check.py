@@ -470,6 +470,29 @@ class SubmissionTests(unittest.TestCase):
         self.meta['skills'] = [example.PRODUCT]
         self.reject('skill.instructions_missing')
 
+    def test_exact_nested_workbench_skill_passes_but_missing_or_other_nested_shape_does_not(self):
+        files = example.example_files()
+        pkg = json.loads(files['package.json'])
+        pkg['name'] = 'qcu-course-workbench'
+        path = 'skills/qcu-course-draft/SKILL.md'
+        pkg['files'].append(path)
+        files['package.json'] = example.encoded(pkg)
+        files['cordis.patch.yml'] = example.encoded([{'insert': [{'id': pkg['name'], 'name': pkg['name'], 'disabled': True}]}])
+        files[path] = b'# Synthetic declared course method'
+        self.meta.update(id=pkg['name'], components=[pkg['name']], skills=['qcu-course-draft'])
+        self.replace_archive(example.archive(files), files)
+        report, status = self.check()
+        self.assertEqual(status, 0, report)
+        self.assertIn('skill.provider_discovery', self.codes(report, 'reviewRequirements'))
+        self.meta['skills'] = ['qcu-other']
+        self.reject('skill.instructions_missing')
+        self.meta['skills'] = ['qcu-course-draft']
+        del files[path]
+        pkg['files'].remove(path)
+        files['package.json'] = example.encoded(pkg)
+        self.replace_archive(example.archive(files), files)
+        self.reject('skill.instructions_missing')
+
     def test_reference_secret_and_evidence_file_required(self):
         secret = b'ghp_' + b'R' * 36
         (self.root / 'SOURCE.md').write_bytes(b'synthetic ' + secret)

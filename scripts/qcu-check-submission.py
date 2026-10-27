@@ -494,7 +494,10 @@ class Checker:
                 rows.append(row['id'])
         self.need(len(rows) == len(set(rows)) and set(rows) == set(meta['components']), 'patch.component_coverage', 'package.patch')
         if meta['skills']:
-            self.need('SKILL.md' in files, 'skill.instructions_missing', 'package')
+            # The only supported nested method is the reviewed single-component course workbench.
+            workbench = meta['id'] == 'qcu-course-workbench' and meta['productType'] == 'plugin' and meta['components'] == [meta['id']] and meta['skills'] == ['qcu-course-draft']
+            skill_path = 'skills/qcu-course-draft/SKILL.md' if workbench else 'SKILL.md'
+            self.need(skill_path in files and (not workbench or skill_path in listing), 'skill.instructions_missing', 'package')
             self.issue('skill.provider_discovery', 'skills', 'reviewRequirements')
         self.issue('package.host_component_review', 'components', 'reviewRequirements')
         self.issue('permissions.review', 'permissionSummary', 'reviewRequirements')

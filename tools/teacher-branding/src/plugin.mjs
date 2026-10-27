@@ -15,7 +15,7 @@ export function createTeacherPlugin(React,icon) {
   ctx.slots.inject('main',function*(){
    yield ctx.slots.register({name:'main',key:'qcu-teacher-home'},HomePanel);
    yield ctx.slots.register({name:'main',key:'qcu-teacher-tools'},()=>h(Tools,{ctx,onChoose:chooseTask}));
-   yield ctx.slots.register({name:'main',key:'qcu-teacher-help'},Help);
+   yield ctx.slots.register({name:'main',key:'qcu-teacher-help'},()=>h(Help,{ctx,preferences,homeState}));
    yield ctx.slots.register({name:'main',key:'qcu-teacher-about'},About);
   });
   // Preserve the host-owned workspace browser, settings/onboarding and footer actions.
@@ -23,7 +23,8 @@ export function createTeacherPlugin(React,icon) {
   children['sidebar.panellist']={kind:'list',scope:'root'};children['sidebar.footer.action']={kind:'list',scope:'root'};
   ctx.slots.inject('sidebar',()=>ctx.slots.register({name:'sidebar',priority:-10,children},props=>h(Sidebar,{...props,ctx,toggleSidebar:()=>ctx.layout.toggleSidebar()})));
   ctx.slots.inject('shell.leading',()=>ctx.slots.register({name:'shell.leading'},()=>h(HeaderNavigation,{ctx})));
-  ctx.slots.inject('settings.launcher',()=>ctx.slots.register({name:'settings.launcher',priority:-10},SettingsLauncher));
+  function PublicSettingsLauncher(props){React.useEffect(()=>{homeState.update({openSettings:props.openSettings});return()=>homeState.update({openSettings:null})},[props.openSettings]);return h(SettingsLauncher,props);}
+  ctx.slots.inject('settings.launcher',()=>ctx.slots.register({name:'settings.launcher',priority:-10},PublicSettingsLauncher));
   ctx.slots.inject('sidebar.brand.mark',()=>ctx.slots.register({name:'sidebar.brand.mark'},Mark));
   ctx.slots.inject('sidebar.brand.name',()=>ctx.slots.register({name:'sidebar.brand.name'},Name));
   ctx.slots.inject('conversation.hero.brand.mark',()=>ctx.slots.register({name:'conversation.hero.brand.mark'},Mark));
@@ -62,8 +63,12 @@ export function createTeacherPreferences(ctx) {
  return {getSnapshot:()=>snapshot,subscribe:fn=>{listeners.add(fn);return()=>listeners.delete(fn);},setLarge(value){ctx.theme.setFontSize(value?18:14);},dispose(){off();listeners.clear();}};
 }
 
-export function createTeacherHomeState() {
- let snapshot={selected:teachingTasks[0].id,drafts:{},workspaceId:''};
+export function createTeacherHomeState({storage,tasks=teachingTasks}={}) {
+ const key='qcu.teacher.first-task.v2';let saved=null;
+ try{storage??=globalThis.localStorage;const raw=storage?.getItem(key);if(raw&&raw.length<=512){const v=JSON.parse(raw);if(v&&Object.keys(v).sort().join()==='completed,schema,step,taskId,viewed'&&v.schema===2&&Number.isInteger(v.step)&&v.step>=0&&v.step<=3&&tasks.some(t=>t.id===v.taskId)&&typeof v.completed==='boolean'&&typeof v.viewed==='boolean')saved=v;}}catch{}
+ let snapshot={selected:saved?.taskId??tasks[0].id,drafts:{},workspaceId:'',guideStep:saved?.step??0,firstTaskDone:saved?.completed??false,viewed:saved?.viewed??false,draftOpened:false,openSettings:null};
  const listeners=new Set();
- return {getSnapshot:()=>snapshot,subscribe:fn=>{listeners.add(fn);return()=>listeners.delete(fn);},update(patch){snapshot={...snapshot,...patch};for(const fn of listeners)fn();},dispose(){listeners.clear();}};
+ return {getSnapshot:()=>snapshot,subscribe:fn=>{listeners.add(fn);return()=>listeners.delete(fn);},update(patch){snapshot={...snapshot,...patch};
+  if(['selected','guideStep','firstTaskDone','viewed'].some(k=>Object.hasOwn(patch,k)))try{storage?.setItem(key,JSON.stringify({schema:2,step:snapshot.guideStep,taskId:snapshot.selected,viewed:snapshot.viewed,completed:snapshot.firstTaskDone}));}catch{}
+  for(const fn of listeners)fn();},dispose(){listeners.clear();}};
 }

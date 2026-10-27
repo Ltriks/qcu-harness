@@ -10,6 +10,7 @@
 <section id="publication-status" aria-label="公开市场状态"></section>
 <div class="toolbar"><span>导入与审核工作区</span><span id="role"></span><button id="logout" class="quiet">退出</button></div>
 <section id="upload-panel"><h1>导入同事交付材料</h1><p>选择完整 handoff 文件夹，包含 submission.json、TGZ 和全部证据。原文件夹不会被修改。</p><label for="folder">开发者 handoff 文件夹</label><input id="folder" type="file" webkitdirectory multiple><p id="selection">尚未选择文件夹</p><p class="muted">最多64个文件；单个1 MiB，JSON 256 KiB；总计10 MiB。只进行静态检查，始终需要人工审核。</p><button id="upload" disabled>上传并检查</button></section>
+<section id="maintenance" aria-label="维护检查"></section><section id="feedback-inbox" aria-label="反馈收件箱"></section>
 <div class="workspace-grid"><section class="queue"><div class="section-title"><h2 id="queue-title">投稿记录</h2><button id="refresh" class="quiet">刷新</button></div><div id="queue"></div></section><section id="detail" aria-label="投稿详情"><p class="muted">选择一条投稿查看材料、状态和下一步。</p></section></div>
 </div>
 <p id="message" role="status" aria-live="polite"></p>

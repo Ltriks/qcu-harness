@@ -55,6 +55,8 @@ html[data-platform=darwin] .qcu-home-inner{padding-top:58px}
 .qcu-button{min-height:44px;border:1px solid var(--qcu-line);border-radius:8px;padding:8px 16px;background:var(--qcu-paper);color:var(--qcu-ink)}
 .qcu-button:hover:not(:disabled){background:var(--qcu-selected);border-color:var(--qcu-blue)}
 .qcu-button.primary{background:var(--qcu-button);border-color:var(--qcu-button);color:white}
+.qcu-button.primary:is(:hover,:active):not(:disabled){background:var(--qcu-button);border-color:var(--qcu-button)}
+body[data-qcu-teacher] .qcu-market{--qcu-market-primary-ink:#fff}
 .qcu-button.quiet{border-color:transparent;background:transparent;color:var(--qcu-blue)}
 .qcu-task-sheet{background:var(--qcu-paper);border:1px solid var(--qcu-line);border-top:4px solid var(--qcu-blue);border-radius:4px 4px 12px 12px;padding:28px 30px}
 .qcu-task-tabs{display:flex;flex-wrap:wrap;gap:6px;margin:18px 0 24px}
@@ -121,7 +123,20 @@ body[data-qcu-teacher] .qcu-course .btn{min-height:44px}
 body[data-qcu-teacher] .qcu-course input[type=checkbox]{accent-color:var(--qcu-blue);width:20px;height:20px}
 body[data-qcu-teacher] .qcu-course :focus-visible{outline-color:var(--qcu-blue)}
 body[data-qcu-teacher] .qcu-course .card{box-shadow:none}
-@container(max-width:800px){.qcu-home-inner{padding:32px 24px}.qcu-home-top{align-items:flex-start;flex-wrap:wrap}.qcu-lower{grid-template-columns:1fr}.qcu-task-sheet{padding:22px}.qcu-home h1{font-size:calc(var(--qcu-font) * 24 / 14)}}
-@container(max-width:480px){.qcu-home-inner{padding:28px 16px}.qcu-task-sheet{padding:18px 14px}.qcu-task-tabs{gap:2px}.qcu-task-tabs button{padding:8px 10px}.qcu-task-bottom>.qcu-button{width:100%}}
-@media(prefers-reduced-motion:reduce){.qcu-teacher *{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
+
+/* P16 compact teacher workspace; host font size and paired palette stay authoritative. */
+.qcu-home-inner{padding:24px 28px 28px;max-width:1120px}
+html[data-platform=darwin] .qcu-home-inner{padding-top:26px}
+.qcu-home-top{padding-bottom:16px}.qcu-home h2{font-size:calc(var(--qcu-font) * 18 / 14);margin-bottom:8px}
+.qcu-first-task{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:16px;font-size:var(--qcu-small)}
+.qcu-compose-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(180px,230px);gap:20px;align-items:start}
+.qcu-task-sheet{padding:16px 20px}.qcu-task-tabs{margin:8px 0 12px}.qcu-task-tabs button{min-height:40px;padding:6px 10px}
+.qcu-field{margin:12px 0;gap:6px}.qcu-field textarea{min-height:170px;padding:10px 12px}.qcu-field select{padding:8px 10px;min-height:40px}
+.qcu-button{min-height:40px;padding:6px 12px}.qcu-lower{display:block;margin-top:18px}.qcu-lower>aside{display:flex;gap:20px;flex-wrap:wrap}.qcu-lower>aside>section{flex:1;min-width:180px}
+.qcu-recent-section{padding-top:4px}.qcu-recent button{min-height:44px;padding:8px 0}.qcu-empty{padding:12px}
+.qcu-tool-list li{display:grid;grid-template-columns:minmax(0,1fr) auto;column-gap:16px;padding:12px 0}.qcu-tool-list strong{font-size:calc(var(--qcu-font) * 16 / 14)}.qcu-tool-list p{grid-column:1;margin:2px 0 4px}.qcu-tool-list button{grid-column:2;grid-row:1 / 4;align-self:center}
+.qcu-first-guide{border:1px solid var(--qcu-line);border-left:3px solid var(--qcu-blue);padding:16px;border-radius:6px}.qcu-first-guide .qcu-home-inner{padding:8px 0}.qcu-first-guide .qcu-compose-grid{grid-template-columns:minmax(0,1fr)}.qcu-first-guide .qcu-recent-section,.qcu-first-guide .qcu-lower{display:none}.qcu-first-guide .qcu-home{height:auto;overflow:visible}.qcu-first-guide>.qcu-toolbar{margin-top:16px}
+@container(max-width:800px){.qcu-compose-grid{grid-template-columns:1fr}.qcu-home-inner{padding:20px}.qcu-home-top{align-items:flex-start;flex-wrap:wrap}}
+@container(max-width:480px){.qcu-home-inner{padding:16px}.qcu-task-sheet{padding:12px}.qcu-task-bottom>.qcu-button{width:100%}.qcu-tool-list li{display:block}.qcu-tool-list button{margin-top:6px}.qcu-first-guide{padding:12px}}
+@media(prefers-reduced-motion:reduce){.qcu-teacher *,.qcu-market *{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
 `;
