@@ -1,0 +1,126 @@
+{
+  "version": "0.1.0-rc.4.3",
+  "target": "mac-arm64",
+  "base": {
+    "path": "/Users/mcq/Repos/cowork/qcu-harness/releases/0.1.0-rc.3/QCU-Teacher-0.1.0-rc.3-mac-arm64-r3.zip",
+    "bytes": 397489603,
+    "sha256": "db2614d10649d7fe05315fd85a4d94bc38e6f80469a975272d1bb44e9a7e0f63"
+  },
+  "legacyInputs": {
+    "path": "/Users/mcq/Repos/worktrees/qcu-harness/suite-startup-fix/.work/preinstalled-proof-inputs/INPUTS.json",
+    "bytes": 3948,
+    "sha256": "b06e8167b009fc9b708fbdee801d7c3cc945326c4d6a84c601c47791a3ef5eec"
+  },
+  "legacyManifest": {
+    "path": "/Users/mcq/Repos/worktrees/qcu-harness/suite-startup-fix/.work/preinstalled-proof-inputs/teacher-manifest.json",
+    "bytes": 23394,
+    "sha256": "b3dac199cf39787b6b4d3897adaec085b8a5eb6e1b444e2acc5259729813b7c3"
+  },
+  "themeManifest": {
+    "path": "/Users/mcq/Repos/worktrees/qcu-harness/teacher-product-delivery/.work/mac-rc43-candidate/final-theme/MANIFEST.json",
+    "bytes": 916,
+    "sha256": "3efd45b51fc37d0d085e5e9091198d381df34c37632d5f51a3e941cc4bd9e087"
+  },
+  "courseManifest": {
+    "path": "/Users/mcq/Artifacts/qcu-harness/0.1.0-rc.4.1/local-font-install-20261027/packages/qcu-course-workbench/MANIFEST.json",
+    "bytes": 2461,
+    "sha256": "5117f210e2fffc953cb8072f435b24ae6d3261e7aafe61dacc4690f06c383b41"
+  },
+  "courseSource": {
+    "path": "/Users/mcq/Artifacts/qcu-harness/0.1.0-course-workbench.1.3/SOURCE-COMMIT.json",
+    "bytes": 482,
+    "sha256": "bbfd0d1e95601e8b145c52ba384db5fcf798dcfe25a4c46816548517b76674eb"
+  },
+  "expertManifest": {
+    "path": "/Users/mcq/Artifacts/qcu-harness/0.1.0-rc.4.1/local-font-install-20261027/packages/qcu-expert-teams/MANIFEST.json",
+    "bytes": 2735,
+    "sha256": "c67dc10463e74a3282019489b17e9948b03c97d81dd88ab2068e67199c75a1ec"
+  },
+  "marketManifest": {
+    "path": "/Users/mcq/Artifacts/qcu-harness/0.1.0-pilot.16.1/packages/qcu-market/MANIFEST.json",
+    "bytes": 5418,
+    "sha256": "e802ba33606da9ef0d38ecacd46c4a2a84b8efdbf4931ef08b465085ba6d12ab"
+  },
+  "managedUpdatesScript": {
+    "path": "tools/teacher-branding/managed-updates.py",
+    "bytes": 7833,
+    "sha256": "11e672bb28e57e58a811996dcd52fafa95c3980d0ee0c878a270699a3d8f1d92"
+  },
+  "customAsarSha256": "759bf095f7e4e6b97380f6103a9a6b8c34fc980c4b7b9b34bd1c1cf1f8ed0583",
+  "officialSdk": "/Users/mcq/Documents/Codex/2026-09-30/task-7/host-lifecycle-mac/source",
+  "sdkAnchor": {
+    "path": "/Users/mcq/Documents/Codex/2026-09-30/task-7/host-lifecycle-mac/source/upstream/source/apps/desktop-host/package.json",
+    "bytes": 1371,
+    "sha256": "944496276b58e258b2ba5a604690deb9d21d6665f5d7171fb8f1a5b280233ca3"
+  },
+  "sdkRuntime": {
+    "path": "/Users/mcq/Documents/Codex/2026-09-30/task-7/qcu-candidate-cd5f532/rebuild/upstream/node_modules/.pnpm/electron@44.0.0/node_modules/electron/dist/Electron.app/Contents/MacOS/Electron",
+    "bytes": 33968,
+    "sha256": "7c975b5464a642611b2ca8ca2891e8e44308e5de83370fd623d2b555d14a25ad"
+  },
+  "trustedRuntime": {
+    "path": "/Users/mcq/Artifacts/qcu-harness/0.1.0-rc.4.1/mac-arm64-final/QCU助手.app/Contents/Resources/program/DeepSeek Harness.app/Contents/MacOS/DeepSeek Harness",
+    "bytes": 52752,
+    "sha256": "1063f4f74b81d332eca3f7b8ff0fcebdcd4e7f4e2267fde6b1b49da0a340dd77"
+  },
+  "packagePolicy": {
+    "autoInstallPeers": false,
+    "ignoreScripts": true,
+    "packageImportMethod": "copy"
+  },
+  "brandingVersion": "0.2.6-pilot.2",
+  "reviewedComponents": [
+    {
+      "id": "qcu-branding",
+      "version": "0.2.6-pilot.2",
+      "file": "qcu-branding-0.2.6-pilot.2-b57d69aeb6516a5650962a4afd5e1b28320c0b9c8dabc5c0e5b02dfe9fa40f2e.tgz",
+      "bytes": 16657,
+      "sha256": "b57d69aeb6516a5650962a4afd5e1b28320c0b9c8dabc5c0e5b02dfe9fa40f2e"
+    },
+    {
+      "id": "qcu-market",
+      "version": "0.1.0-pilot.16.1",
+      "file": "qcu-market-0.1.0-pilot.16.1-edcacdc3f9de83f08f2dca21f3f1f54e60161e314a58529ced819bc2ee4a3c69.tgz",
+      "bytes": 86390,
+      "sha256": "edcacdc3f9de83f08f2dca21f3f1f54e60161e314a58529ced819bc2ee4a3c69"
+    },
+    {
+      "id": "qcu-course-workbench",
+      "version": "0.1.0-pilot.1.3.font.1",
+      "file": "qcu-course-workbench-0.1.0-pilot.1.3.font.1-d46ba9e2deb27f7cd6296a5bfd24b3e8db0f0d99bcc4cddc734f82b794197411.tgz",
+      "bytes": 54521,
+      "sha256": "d46ba9e2deb27f7cd6296a5bfd24b3e8db0f0d99bcc4cddc734f82b794197411"
+    },
+    {
+      "id": "qcu-expert-teams",
+      "version": "0.2.0-pilot.3.font.1",
+      "file": "qcu-expert-teams-0.2.0-pilot.3.font.1-4835ab751ccef3f11089a5b5ad198ea22d1ef7d34a334ac231ef83052cdbad93.tgz",
+      "bytes": 59991,
+      "sha256": "4835ab751ccef3f11089a5b5ad198ea22d1ef7d34a334ac231ef83052cdbad93"
+    }
+  ],
+  "originalConfig": {
+    "sha256": "3c721d1ab3747ccb2195cacd21a5756495b0b73903db13cfa79925e79df3ead5",
+    "sourceCommit": "67768251d96aa189a2819c0da18a63d0f0d9bdec"
+  },
+  "brandingPackageManifest": {
+    "path": "/Users/mcq/Artifacts/qcu-harness/0.1.0-pilot.16.1/packages/qcu-branding/MANIFEST.json",
+    "bytes": 1295,
+    "sha256": "be3e2d884aa2e913fc15409097c5fb35d18e4d79123baeead5c60ae64a3f66a3"
+  },
+  "brandingArchive": {
+    "path": "/Users/mcq/Artifacts/qcu-harness/0.1.0-pilot.16.1/packages/qcu-branding/qcu-branding-0.2.6-pilot.2-b57d69aeb6516a5650962a4afd5e1b28320c0b9c8dabc5c0e5b02dfe9fa40f2e.tgz",
+    "bytes": 16657,
+    "sha256": "b57d69aeb6516a5650962a4afd5e1b28320c0b9c8dabc5c0e5b02dfe9fa40f2e"
+  },
+  "marketPackageManifest": {
+    "path": "/Users/mcq/Artifacts/qcu-harness/0.1.0-pilot.16.1/packages/qcu-market/MANIFEST.json",
+    "bytes": 5418,
+    "sha256": "e802ba33606da9ef0d38ecacd46c4a2a84b8efdbf4931ef08b465085ba6d12ab"
+  },
+  "marketArchive": {
+    "path": "/Users/mcq/Artifacts/qcu-harness/0.1.0-pilot.16.1/packages/qcu-market/qcu-market-0.1.0-pilot.16.1-edcacdc3f9de83f08f2dca21f3f1f54e60161e314a58529ced819bc2ee4a3c69.tgz",
+    "bytes": 86390,
+    "sha256": "edcacdc3f9de83f08f2dca21f3f1f54e60161e314a58529ced819bc2ee4a3c69"
+  }
+}
