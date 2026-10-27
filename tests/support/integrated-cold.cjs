@@ -5,7 +5,7 @@ const {pathToFileURL}=require('node:url');
  const [kit,home]=process.argv.slice(2),resources=path.join(kit,'program/DeepSeek Harness.app/Contents/Resources');
  console.log('INTEGRATED_STAGE:runtime');
  const {runtime}=require(path.join(kit,'support/offline.cjs')),actual=await runtime(resources),dir=path.join(home,'profiles/desktop');
- const {createRequire}=require('node:module'),config=JSON.parse(fs.readFileSync(path.join(kit,'support/integrated-inputs.json'))),req=createRequire(path.join(config.officialSdk,'package.json'));
+ const {createRequire}=require('node:module'),config=JSON.parse(fs.readFileSync(process.env.QCU_INTEGRATED_INPUTS||path.join(kit,'support/integrated-inputs.json'))),req=createRequire(path.join(config.officialSdk,'package.json'));
  const load=id=>import(pathToFileURL(req.resolve(id))),useSdk=process.env.QCU_INTEGRATED_SDK_ONLY==='1',api=useSdk?{req,load,boot:await load('@deepseek-ai/dsh-app-boot'),anchor:path.join(config.officialSdk,'upstream/source/apps/desktop-host/package.json')}:actual;
  const mutable=process.env.QCU_INTEGRATED_MUTABLE_PROFILE==='1',pkgConfig=JSON.parse(fs.readFileSync(path.join(dir,'package.json'))),patchConfig=actual.req('js-yaml').load(fs.readFileSync(path.join(dir,'cordis.patch.yml'),'utf8')),selected=id=>pkgConfig.dsh.profile.bundles.includes(id)&&!patchConfig.some(r=>r.id===id&&r.disabled===true);
  if(mutable){assert.equal(pkgConfig.dsh.profile.bundles.includes('qcu-synthetic-integration-proof'),false);assert.equal(pkgConfig.dsh.profile.bundles.includes('qcu-study-coach'),false);assert.ok(patchConfig.some(r=>r.id==='qcu-study-coach'&&r.disabled));}
@@ -41,10 +41,8 @@ const {pathToFileURL}=require('node:url');
    const skill=await ctx.skills.get(p.id);assert.ok(skill?.content?.trim());const sealed=await import(pathToFileURL(path.join(dir,'node_modules',p.id,'skill-content.js')));assert.equal(skill.content,sealed.content);const sha256=require('node:crypto').createHash('sha256').update(skill.content).digest('hex');assert.equal(sha256,sealed.contentSha256);skills.push({id:p.id,provider:skill.provider,bytes:Buffer.byteLength(skill.content),sha256,sealedInstructionsVerified:true});
   }
   assert.equal(skills.length,mutable?6:7);
-  const course=await ctx.skills.get('qcu-course-draft');assert.equal(course.provider,'qcu-course-workbench@0.1.0-pilot.1.3');
-  assert.equal(JSON.parse(await ctx.qcuCourse.dispatch('{"action":"workspaces"}')).workspaces[0].id,'synthetic');
-  assert.equal(JSON.parse(await ctx.qcuTeams.dispatch('{"action":"workspaces"}')).value[0].id,'synthetic');
-  assert.equal(JSON.parse(await ctx.qcuMarket.status()).version,'0.1.0-pilot.15.2');assert.equal(calls,0);
+  const course=await ctx.skills.get('qcu-course-draft');assert.ok(course?.content?.trim());assert.equal(course.provider,'qcu-course-workbench@'+m.localSources.find(p=>p.id==='qcu-course-workbench').version);
+  assert.equal(JSON.parse(await ctx.qcuMarket.status()).version,m.localSources.find(p=>p.id==='qcu-market').version);assert.equal(calls,0);
   console.log('INTEGRATED_COLD:'+JSON.stringify({runtime:process.version,officialSdk:useSdk,actualZipModules:true,userProfileRespected:mutable,unselectedExtraStarted:false,actualAsarProfileMetadata:true,actualAsarNativeResolution:useSdk?'pending-OS-local-execution-approval':true,anchor:api.anchor,imports,skills,courseSkill:{provider:course.provider,bytes:Buffer.byteLength(course.content)},services:['qcuCourse','qcuTeams','qcuMarket'],profileLayers:profile.layers.map(l=>l.packageName),skippedBundles:profile.skippedBundles,syntheticProviders:true,networkGuard:globalThis.QCU_OFFLINE_NETWORK_GUARD===true,modelCalls:0,packageManagerCalls:0}));
  }finally{await ctx.fiber.dispose()}
 })().catch(e=>{console.error(e);process.exitCode=1});

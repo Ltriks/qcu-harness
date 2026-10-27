@@ -1,7 +1,7 @@
 // Headless JS dispatch only, using the pinned reference interpreter and synthetic data.
 const {test}=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto'),{spawnSync}=require('node:child_process');
 const {startupDiagnostic}=require('../tools/teacher-suite/start.cjs');
-const kit=path.resolve(process.env.QCU_INTEGRATED_TEST_KIT),pin=JSON.parse(fs.readFileSync(path.join(kit,'support/integrated-inputs.json'))).trustedRuntime;
+const kit=path.resolve(process.env.QCU_INTEGRATED_TEST_KIT),pin=JSON.parse(fs.readFileSync(process.env.QCU_INTEGRATED_INPUTS||path.join(kit,'support/integrated-inputs.json'))).trustedRuntime;
 const bytes=fs.readFileSync(process.execPath);assert.equal(process.execPath,pin.path);assert.equal(bytes.length,pin.bytes);assert.equal(crypto.createHash('sha256').update(bytes).digest('hex'),pin.sha256);
 test('fixed startup diagnostics never echo arbitrary messages, parser fragments or codes',()=>{
  const secret='SYNTHETIC_NOT_A_REAL_KEY';

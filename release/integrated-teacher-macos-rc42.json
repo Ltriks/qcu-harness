@@ -1,0 +1,71 @@
+{
+  "version": "0.1.0-rc.4.2",
+  "target": "mac-arm64",
+  "base": {
+    "path": "/Users/mcq/Repos/cowork/qcu-harness/releases/0.1.0-rc.3/QCU-Teacher-0.1.0-rc.3-mac-arm64-r3.zip",
+    "bytes": 397489603,
+    "sha256": "db2614d10649d7fe05315fd85a4d94bc38e6f80469a975272d1bb44e9a7e0f63"
+  },
+  "legacyInputs": {
+    "path": "/Users/mcq/Repos/worktrees/qcu-harness/suite-startup-fix/.work/preinstalled-proof-inputs/INPUTS.json",
+    "bytes": 3948,
+    "sha256": "b06e8167b009fc9b708fbdee801d7c3cc945326c4d6a84c601c47791a3ef5eec"
+  },
+  "legacyManifest": {
+    "path": "/Users/mcq/Repos/worktrees/qcu-harness/suite-startup-fix/.work/preinstalled-proof-inputs/teacher-manifest.json",
+    "bytes": 23394,
+    "sha256": "b3dac199cf39787b6b4d3897adaec085b8a5eb6e1b444e2acc5259729813b7c3"
+  },
+  "themeManifest": {
+    "path": "/Users/mcq/Repos/cowork/qcu-harness/.work/rc41-acceptance-fixes/.work/rc42/theme/MANIFEST.json",
+    "bytes": 908,
+    "sha256": "2e4ab6f7343e80f858f0d8624ac487ea2a342ee6c14e2fc2157852a085a7c89d"
+  },
+  "courseManifest": {
+    "path": "/Users/mcq/Artifacts/qcu-harness/0.1.0-course-workbench.1.3/MANIFEST.json",
+    "bytes": 2447,
+    "sha256": "57c689fb7d9be9481697a942d95aa55d67217c2bfbb79714c27d0a0aa3f17f13"
+  },
+  "courseSource": {
+    "path": "/Users/mcq/Artifacts/qcu-harness/0.1.0-course-workbench.1.3/SOURCE-COMMIT.json",
+    "bytes": 482,
+    "sha256": "bbfd0d1e95601e8b145c52ba384db5fcf798dcfe25a4c46816548517b76674eb"
+  },
+  "expertManifest": {
+    "path": "/Users/mcq/Repos/cowork/qcu-harness/releases/rc4.1-fixes-20261026/expert-pilot3/MANIFEST.json",
+    "bytes": 2721,
+    "sha256": "7d4a55e16d91296469f7d2681d1bd2b611e44700fbb877e3e71eb2230ba8c6fd"
+  },
+  "marketManifest": {
+    "path": "/Users/mcq/Repos/worktrees/qcu-harness/suite-startup-fix/.work/frozen-inputs/market/MANIFEST.json",
+    "bytes": 4840,
+    "sha256": "996c643cb2d56763cb50f19e977132ffc7caeaab35206a55872657204dda9212"
+  },
+  "managedUpdatesScript": {
+    "path": "tools/teacher-branding/managed-updates.py",
+    "bytes": 7833,
+    "sha256": "11e672bb28e57e58a811996dcd52fafa95c3980d0ee0c878a270699a3d8f1d92"
+  },
+  "customAsarSha256": "759bf095f7e4e6b97380f6103a9a6b8c34fc980c4b7b9b34bd1c1cf1f8ed0583",
+  "officialSdk": "/Users/mcq/Documents/Codex/2026-09-30/task-7/host-lifecycle-mac/source",
+  "sdkAnchor": {
+    "path": "/Users/mcq/Documents/Codex/2026-09-30/task-7/host-lifecycle-mac/source/upstream/source/apps/desktop-host/package.json",
+    "bytes": 1371,
+    "sha256": "944496276b58e258b2ba5a604690deb9d21d6665f5d7171fb8f1a5b280233ca3"
+  },
+  "sdkRuntime": {
+    "path": "/Users/mcq/Documents/Codex/2026-09-30/task-7/qcu-candidate-cd5f532/rebuild/upstream/node_modules/.pnpm/electron@44.0.0/node_modules/electron/dist/Electron.app/Contents/MacOS/Electron",
+    "bytes": 33968,
+    "sha256": "7c975b5464a642611b2ca8ca2891e8e44308e5de83370fd623d2b555d14a25ad"
+  },
+  "trustedRuntime": {
+    "path": "/Users/mcq/Artifacts/qcu-harness/0.1.0-rc.4.1/mac-arm64-final/QCU助手.app/Contents/Resources/program/DeepSeek Harness.app/Contents/MacOS/DeepSeek Harness",
+    "bytes": 52752,
+    "sha256": "1063f4f74b81d332eca3f7b8ff0fcebdcd4e7f4e2267fde6b1b49da0a340dd77"
+  },
+  "packagePolicy": {
+    "autoInstallPeers": false,
+    "ignoreScripts": true,
+    "packageImportMethod": "copy"
+  }
+}
