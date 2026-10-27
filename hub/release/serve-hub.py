@@ -78,7 +78,7 @@ def load_snapshot(root, manifest_pin):
     return resources
 
 
-def make_server(resources, host='127.0.0.1', port=8080, lan_approved=False, publication=None, feedback=None):
+def make_server(resources, host='127.0.0.1', port=8080, lan_approved=False, publication=None, feedback=None, distribution=None):
     ip = ipaddress.ip_address(host)
     private_lan = ip.version == 4 and any(ip in ipaddress.ip_network(n) for n in ['10.0.0.0/8', '172.16.0.0/12', '192.168.0.0/16'])
     check(host == '127.0.0.1' or (lan_approved and private_lan), 'explicit-private-lan-bind-required')
@@ -116,6 +116,8 @@ def make_server(resources, host='127.0.0.1', port=8080, lan_approved=False, publ
             if self.headers.get_all('Host') != ['%s:%s' % (host, self.server.server_port)]:
                 self.send_error(403)
                 return
+            if distribution is not None and distribution.respond(self, head):
+                return
             try:
                 dynamic = publication.read(self.path) if publication else None
             except Exception:
@@ -151,8 +153,17 @@ def main():
     parser.add_argument('--publication-root', type=Path)
     parser.add_argument('--public-trust', type=Path)
     parser.add_argument('--node', type=Path)
+    parser.add_argument('--distribution-root', type=Path)
+    parser.add_argument('--distribution-manifest-sha256')
     args = parser.parse_args()
     try:
+        check((args.distribution_root is None) == (args.distribution_manifest_sha256 is None), 'distribution-setup')
+        distribution = None
+        if args.distribution_root is not None:
+            import importlib.util
+            spec = importlib.util.spec_from_file_location('qcu_distribution', Path(__file__).absolute().parents[1] / 'distribution.py')
+            module = importlib.util.module_from_spec(spec); spec.loader.exec_module(module)
+            distribution = module.Distribution(args.distribution_root, args.distribution_manifest_sha256)
         resources = load_snapshot(args.root, args.manifest_sha256)
         publication = None
         if args.publication_root:
@@ -169,13 +180,13 @@ def main():
             import importlib.util
             spec = importlib.util.spec_from_file_location('qcu_feedback', Path(__file__).absolute().parents[1] / 'feedback.py')
             module = importlib.util.module_from_spec(spec); spec.loader.exec_module(module)
-            inbox = module.Inbox(args.feedback_root, protected=[Path(args.root), *([args.publication_root] if args.publication_root else [])])
+            inbox = module.Inbox(args.feedback_root, protected=[Path(args.root), *([args.publication_root] if args.publication_root else []), *([args.distribution_root] if args.distribution_root is not None else [])])
             feedback = module.Receiver(inbox)
         print(json.dumps({'verified': True, 'servableResources': len(resources), 'serviceStarted': False}), flush=True)
         if not args.serve:
             return
         check(1024 <= args.port <= 65535, 'nonprivileged-port-required')
-        with make_server(resources, args.host, args.port, args.lan_approved, publication, feedback) as server:
+        with make_server(resources, args.host, args.port, args.lan_approved, publication, feedback, distribution) as server:
             print(json.dumps({'host': args.host, 'port': args.port, 'readOnly': feedback is None, 'feedbackEnabled': feedback is not None, 'authenticated': False}), flush=True)
             try:
                 server.serve_forever()
