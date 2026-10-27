@@ -11,7 +11,7 @@ python3 hub/release/serve-hub.py \
   --distribution-manifest-sha256 <externally-reviewed-manifest-sha256>
 ```
 
-默认只验证并退出。实际启动仍使用原来的 `--serve`、8080 端口及既有私有 LAN 绑定参数。此任务没有执行部署或服务切换。
+默认只验证并退出。实际启动仍使用原来的 `--serve`、8080 端口及既有私有 LAN 绑定参数。适配实现阶段没有执行部署或服务切换；后续已授权上线状态见 [P16部署记录](qcu-p16-deployment.md)。
 
 分发根目录示例：
 

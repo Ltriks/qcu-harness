@@ -1,10 +1,10 @@
 # QCU Harness
 
-## 教师助手与工具市场 P16（本地候选）
+## 教师助手与工具市场 P16（Hub与mini已部署，基础验证通过）
 
 开发分支 `dev/qcu-teacher-product-polish`，固定 worktree `$HOME/Repos/worktrees/qcu-harness/teacher-product-polish`。已实现紧凑首页/工具列表、四步首次任务指引、六类问题帮助、反馈提交—管理员处理—教师查询，以及发布维护检查。课程工作台本轮排除，由同事继续维护。当前最终组件为市场16.1、主题0.2.6-pilot.2；新机完整 Mac 候选为rc4.3，已有电脑保留原Home，后续走组件更新。
 
-组件193项定向检查、7组完整浏览器（108布局/35截图）通过；新Mac ZIP清单、内外临时签名、原生prepare-only首次/重复/移动、实际ASAR冷加载和12组件/7技能核对通过。原生GUI、其他新机系统信任、真实模型与教师效果仍待验收。未部署Hub/mini、续期签名清单或重建Windows。构建测试、精确版本/哈希、固定产物路径、部署边界与同事验收见 [P16交付和验收](docs/qcu-p16-delivery.md)。
+组件193项定向检查、7组完整浏览器（108布局/35截图）通过；新Mac ZIP清单、内外临时签名、原生prepare-only首次/重复/移动、实际ASAR冷加载和12组件/7技能核对通过。新机整包原生GUI、其他新机系统信任、真实模型与教师效果仍待验收。2026-10-27已部署Hub服务与固定下载，目录修订4／更新修订3验签及LAN完整下载通过；mini已完成市场16.1安装、正常重启和升级回执核验，成功刷新10款工具；主题已安装启用，字号／主题、重启保持与指引基础导航通过；单条授权合成生产反馈已处理并查询通过，完整原生反馈和教师实际任务仍待验收。Windows不重建。最新线上状态、下载、签名期限与恢复见 [P16部署](docs/qcu-p16-deployment.md)；构建测试、精确版本/哈希、固定产物路径和同事步骤见 [P16交付和验收](docs/qcu-p16-delivery.md)。
 
 本机合成预览：`rtk proxy env QCU_PRODUCT_POLISH_OUT=.work/product-polish-review node scripts/serve-product-polish-preview.mjs`，只绑定回环并打印地址。组件包/截图/证据在 `$HOME/Artifacts/qcu-harness/0.1.0-pilot.16.1/`；完整候选在 `$HOME/Artifacts/qcu-harness/0.1.0-rc.4.3/mac-arm64/`。现有Hub仍为 `192.168.1.68:8080`，管理员仅mini回环8975。
 
