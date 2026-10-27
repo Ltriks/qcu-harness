@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="QCU助手教师预装版离线使用指南：首次启动、API Key配置、七项专属技能、课程工作台与常见问题。">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; img-src data:; connect-src 'none'; font-src 'none'; base-uri 'none'; form-action 'none'">
+<title>QCU助手使用指南｜从第一次打开开始</title>
+<style>
+:root{--blue:#174f91;--ink:#17324d;--paper:#fff;--tint:#eff6fc;--line:#ccdce9;--green:#206346;--muted:#486079;font-size:18px;color-scheme:light}
+*{box-sizing:border-box}html{scroll-padding-top:24px}body{margin:0;background:var(--paper);color:var(--ink);font-family:"PingFang SC","Microsoft YaHei","Noto Sans CJK SC",sans-serif;line-height:1.85;overflow-wrap:anywhere}a{color:var(--blue);text-underline-offset:.22em}a:hover{text-decoration-thickness:2px}:focus-visible{outline:3px solid var(--blue);outline-offset:4px}button{font:inherit;cursor:pointer;border:1px solid var(--blue);background:var(--paper);color:var(--blue);border-radius:6px;padding:9px 16px;min-height:44px}button:hover{background:var(--tint)}button:disabled{cursor:wait}h1,h2,h3{line-height:1.4;color:var(--ink)}h1,h2{font-family:"Songti SC","STSong","SimSun",serif;font-weight:700}h1{font-size:clamp(2rem,4vw,3rem);margin:.5rem 0 1rem;letter-spacing:.02em}h2{font-size:1.8rem;margin:0 0 1rem}h3{font-size:1.2rem;margin:1.5rem 0 .5rem}p{margin:.7rem 0 1rem}strong{font-weight:650}small,.small{font-size:.88rem;color:var(--muted)}code{font-family:ui-monospace,"SFMono-Regular",Consolas,monospace;font-size:.9em;background:var(--tint);border-radius:3px;padding:2px 5px}ul,ol{padding-left:1.45rem}li{padding-left:.2rem;margin:.45rem 0}li::marker{color:var(--blue);font-weight:700}
+.skip{position:absolute;left:12px;top:-100px;background:white;z-index:9;padding:10px}.skip:focus{top:12px}.shell{max-width:1320px;margin:auto;display:grid;grid-template-columns:250px minmax(0,1fr)}.rail{padding:38px 26px;position:sticky;top:0;height:100vh;border-right:1px solid var(--line);display:flex;flex-direction:column}.brand{display:flex;align-items:center;gap:12px;font-size:1.3rem;font-weight:700;margin-bottom:30px}.brand svg{width:48px;height:48px;flex:none}.rail nav{display:grid;gap:5px}.rail nav a{display:block;padding:9px 10px;text-decoration:none;border-left:3px solid transparent}.rail nav a:hover,.rail nav a[aria-current="location"]{border-color:var(--blue);background:var(--tint)}.rail .edition{margin-top:auto;padding-top:28px;color:var(--muted);font-size:.8rem}.content{min-width:0;padding:44px clamp(24px,5vw,68px) 60px;max-width:970px}.intro{padding-bottom:40px}.intro .lead{font-size:1.2rem;max-width:34em}.actions{display:flex;gap:12px;flex-wrap:wrap;margin:22px 0}.primary{background:var(--blue);color:white;display:inline-flex;align-items:center;padding:10px 20px;border-radius:6px;text-decoration:none;min-height:48px}.primary:hover{background:#103e73}.route{display:grid;grid-template-columns:repeat(3,1fr);margin:30px 0 0;border-top:3px solid var(--blue);background:var(--tint)}.route a{padding:20px 16px;text-decoration:none}.route a+a{border-left:1px solid var(--line)}.route b{display:block;font-size:1.05rem}.route span{display:block;color:var(--muted);font-size:.9rem}.section{border-top:1px solid var(--line);padding:34px 0;scroll-margin-top:24px}.note{border-left:4px solid var(--blue);background:var(--tint);padding:15px 20px;margin:22px 0}.note p:last-child{margin-bottom:0}.success{border-color:var(--green);background:#f0f7f3}.steps{list-style:none;padding:0;counter-reset:step}.steps>li{position:relative;padding:0 0 20px 54px;margin:22px 0;border-bottom:1px solid var(--line);counter-increment:step}.steps>li:before{content:counter(step);position:absolute;left:0;top:0;width:34px;height:34px;border-radius:50%;background:var(--blue);color:white;text-align:center;line-height:34px;font-weight:700}.steps h3{margin:0 0 8px}.table-wrap{overflow:auto;margin:18px 0}table{width:100%;border-collapse:collapse;text-align:left;font-size:.95rem}th,td{padding:13px 12px;border-bottom:1px solid var(--line);vertical-align:top}th{background:var(--tint);font-weight:650}th:first-child{width:28%}.prompt{border:1px solid var(--line);border-radius:6px;margin:18px 0;overflow:hidden}.prompt-head{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 16px;background:var(--tint);font-size:.9rem}.prompt pre{white-space:pre-wrap;font:inherit;line-height:1.8;margin:0;padding:18px;user-select:text}.prompt button{padding:5px 12px;font-size:.9rem}.skill{border-bottom:1px solid var(--line);padding:0 0 8px}.skill summary{padding:20px 4px;cursor:pointer;font-weight:650;font-size:1.13rem;line-height:1.5}.skill summary span{display:block;font-size:.9rem;font-weight:400;color:var(--muted);margin:5px 0 0 23px}.skill .body{padding:0 4px 16px}.skill .body>p:first-child{margin-top:0}.link-list{display:flex;gap:10px 20px;flex-wrap:wrap}.badge{display:inline-block;background:var(--tint);color:var(--blue);font-size:.84rem;padding:2px 9px;border-radius:3px}.footer{border-top:3px solid var(--blue);padding-top:22px;font-size:.88rem;color:var(--muted)}#status{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:var(--ink);color:white;border-radius:6px;padding:10px 18px;z-index:10;max-width:90vw}#status:empty{display:none}.js-only{display:none}.js .js-only{display:inline-flex}
+@media(max-width:850px){.shell{display:block}.rail{position:static;height:auto;border-right:0;border-bottom:1px solid var(--line);padding:20px 24px}.brand{margin-bottom:14px}.rail nav{display:flex;flex-wrap:wrap;gap:2px 9px}.rail nav a{padding:6px 8px;border-left:0;border-bottom:2px solid transparent;font-size:.92rem}.rail .edition{margin:8px 0 0;padding:0}.content{padding:28px 24px}.route{grid-template-columns:1fr}.route a{padding:14px 18px}.route a+a{border-left:0;border-top:1px solid var(--line)}.steps>li{padding-left:46px}.prompt-head{align-items:flex-start}h2{font-size:1.6rem}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+@media print{:root{font-size:12pt}.shell{display:block}.rail,.actions,.copy,.js-only,#status,.skip{display:none!important}.content{padding:0;max-width:none}.section{padding:20px 0}.intro{padding-bottom:10px}.route{display:none}.prompt,.note{break-inside:avoid}details>summary{list-style:none}details::details-content{display:contents}a{color:inherit}.table-wrap{overflow:visible}.footer{margin-top:20px}h2,h3,summary{break-after:avoid}}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">跳到使用说明</a>
+<div class="shell">
+<aside class="rail">
+ <div class="brand"><svg aria-hidden="true" viewBox="0 0 64 64" fill="none"><rect width="64" height="64" rx="14" fill="#174F91"/><path d="M20 31V20C20 10 44 10 44 20V31H38V21C38 17 26 17 26 21V31H20Z" fill="#FFF"/><path d="M12 37C20 34 26 36 32 41C38 36 44 34 52 37V49C44 46 38 48 32 53C26 48 20 46 12 49V37Z" fill="#FFF"/><path d="M32 41V53" stroke="#174F91" stroke-width="2.5"/><path d="M16 42C21 41 25 42 28 44M36 44C39 42 43 41 48 42" stroke="#9AD5F1" stroke-width="2"/></svg>QCU助手</div>
+ <nav aria-label="使用指南目录">
+  <a href="#start">第一次打开</a><a href="#api">配置自己的 API Key</a><a href="#first">完成第一次备课</a><a href="#skills">七项专属技能</a><a href="#studio">课程设计工作台</a><a href="#market-expert">插件市场与专家团</a><a href="#feishu">选读：飞书文档</a><a href="#help">遇到问题</a>
+ </nav>
+ <div class="edition">Mac 教师套件 0.1.0-rc.4.2<br>QCU清蓝主题 0.2.4<br>指南更新于 2026年10月26日<br>本页可断网阅读，也可打印。</div>
+</aside>
+<main id="main" class="content">
+ <header class="intro">
+  <span class="badge">教师使用手册</span>
+  <h1>从第一次打开，<br>到备好一节课。</h1>
+  <p class="lead">把要求说清楚，让 QCU助手协助整理教学草案。先跟着下面三步完成一次练习，以后再按需要选择技能。</p>
+  <div class="actions"><a class="primary" href="#start">开始使用</a><button class="js-only" id="print" type="button">打印 / 保存为 PDF</button></div>
+  <div class="route" aria-label="首次使用顺序"><a href="#start"><b>1　打开助手</b><span>已预装，无需再装插件</span></a><a href="#api"><b>2　接通模型</b><span>配置自己的 API Key</span></a><a href="#first"><b>3　试一次备课</b><span>复制示例，审阅结果</span></a></div>
+ </header>
+ <section class="section" id="start">
+  <h2>第一次打开</h2>
+  <p>先把收到的 ZIP <strong>完整解压</strong>到一个便于找到的文件夹，再启动助手。不要在压缩包内部直接双击程序。</p>
+  <div class="table-wrap"><table><caption class="small">按自己的电脑选择入口</caption><thead><tr><th scope="col">电脑</th><th scope="col">打开方法</th></tr></thead><tbody><tr><th scope="row">Mac</th><td>适用于 Apple Silicon（M 系列芯片）、macOS 13 及以上。双击 <strong>QCU助手.app</strong>。也可把整个 APP 放入“应用程序”。</td></tr><tr><th scope="row">Windows</th><td>本包仅为 Mac rc4.2 候选，Windows rc4.2 尚未发布。已有 Windows rc3 用户请继续使用原包及其随包说明。</td></tr></tbody></table></div>
+  <p>看到教学首页，以及侧栏的<strong>课程工作台、插件市场、专家团</strong>，就已进入本套件。七项教学技能、课程工作台、飞书只读工具、插件市场和专家团均已预装，无需老师手动搬运插件包或使用终端。</p>
+  <div class="note"><strong>“离线预装”是什么意思？</strong><p>应用、技能和这份指南已在包里；使用云端模型回答问题仍需联网、配置模型账号和可用额度。套件不含本地模型权重或公共 API Key。</p></div>
+  <p>不必卸载旧 DSH。测试前先保存工作并正常退出旧版，避免同时打开两套助手。本版使用独立的 rc4.2 数据目录，不会自动导入旧版密钥、聊天或工作文件。如需保留旧环境，请由维护人员先核对、预览并确认迁移；首次在本版配置自己的模型。已在本版配置且能够回答时，可直接跳到<a href="#first">第一次备课</a>。</p>
+  <p class="small">界面可能先显示英文。左下角 <strong>Settings → General → Language</strong> 可选择中文；中文界面对应“设置 → 通用 → 语言”。本手册同时标出常用英文名称。</p>
+ </section>
+ <section class="section" id="api">
+  <h2>配置自己的 API Key</h2>
+  <p><strong>API Key（API 密钥）</strong>是让助手使用你所选模型服务的凭证。它不是登录密码，也不是一段提问。下面以本版本内置的 DeepSeek 为例，只需首次配置；学校已提供个人配置的，按学校说明操作。</p>
+  <ol class="steps">
+   <li><h3>在服务商平台创建自己的密钥</h3><p>联网打开 <a href="https://platform.deepseek.com/api_keys" target="_blank" rel="noopener noreferrer">DeepSeek 开放平台的 API keys 页面（联网）</a>，由本人完成注册或登录，再创建 API Key。复制新密钥，核对平台账户是否有可用额度。模型调用按服务商规则计费，网页聊天账号的权益不应直接当作 API 额度。</p><p class="small">平台页面可能改版；找不到密钥或学校统一配置不明时，先请维护人员协助。</p></li>
+   <li><h3>回到 QCU助手的“模型”设置</h3><p>点击助手左下角 <strong>设置 / Settings → 模型 / Models</strong>，在 <strong>DeepSeek</strong> 项目点击 <strong>编辑 / Edit</strong>。如果首次弹出“添加一个 API Key 开始使用”，可直接在该窗口填写。</p></li>
+   <li><h3>粘贴密钥，保留默认地址并保存</h3><p>把完整密钥粘贴到 <strong>API 密钥 / API key</strong>，不要加引号、空格或换行。内置 DeepSeek 的 <strong>API 地址 / API URL</strong>保持“提供商默认”；如需核对，该入口使用 <code>https://api.deepseek.com/anthropic</code>。</p><p>点击 <strong>保存 / Save</strong>；首次引导窗口则点击 <strong>保存并继续 / Save and continue</strong>。设置中显示“API 密钥已配置 / API key configured”说明已保存，接下来仍需发一句话验证连接。</p><div class="note"><strong>地址要与协议匹配。</strong><p>本版本内置 DeepSeek 使用 Anthropic Messages 兼容接口。其他教程里的 <code>https://api.deepseek.com</code>是另一种接口地址，勿直接替换到此入口。地址依据：<a href="https://api-docs.deepseek.com/zh-cn/" target="_blank" rel="noopener noreferrer">DeepSeek 官方 API 文档（联网）</a>。</p></div></li>
+   <li><h3>选择模型，发一句话验证</h3><p>关闭设置，进入 <strong>新会话 / New Session</strong>。在输入框旁的模型选择器中选择已配置的 DeepSeek 模型，发送下面这句。能收到实际回答，才说明密钥、网络和模型可一起工作。</p><div class="prompt"><div class="prompt-head"><span>连接测试，会调用模型</span><button class="copy js-only" data-copy="test-prompt" type="button">复制测试语句</button></div><pre id="test-prompt">你好，请只回答“连接成功”。</pre></div><p class="small">若列表为空或模型不可用，请先核对密钥及模型目录；不要随意填写模型 ID。ID 需与提供商当前目录一致。收到报错时看<a href="#errors">错误提示对照</a>。</p></li>
+  </ol>
+  <details class="skill"><summary>我使用其他模型服务，或学校提供的接口<span>请备齐 API 密钥、API 地址、API 协议和模型 ID</span></summary><div class="body"><p>在“模型 / Models”中点击 <strong>添加模型提供商 / Add model provider</strong>。内置目录有你的服务商时，选择“第三方模型提供商”，按该服务商文档填写密钥。</p><p>学校网关、自部署服务等，选择“自定义模型 API / Custom model API”。请让维护人员提供完整的<strong>接口地址、协议、模型 ID、个人密钥</strong>，逐项填写；自定义接口至少需要一个模型。显示名称可以自定，模型 ID 不可随意改写。支持的协议不同，地址写法也不同，不能只替换密钥。</p><p>课程工作台使用助手的<strong>默认模型</strong>，与某一会话单独选中的模型可能不同。工作台模型不可用或显示不符合预期时，让维护人员核对默认配置。</p></div></details>
+  <h3>密钥只填在助手设置里</h3><p>这份 HTML 只负责说明，没有密钥输入框，不保存或上传个人信息。不要把密钥发到聊天、群聊、截图或教学资料中，也不要把配置后的个人数据目录重新打包给别人。误泄露时，到原服务商平台停用该密钥、重新创建，再更新助手设置。</p>
+ </section>
+ <section class="section" id="first">
+  <h2>完成第一次备课</h2>
+  <p>先用下面的合成教学任务练习，不需要上传资料。打开 <strong>新会话 / New Session</strong>，复制整段文字，粘贴到助手输入框，再点击发送。</p>
+  <div class="prompt"><div class="prompt-head"><span>第一次练习：20 分钟课堂活动</span><button class="copy js-only" data-copy="lesson-first" type="button">复制备课示例</button></div><pre id="lesson-first">请先加载并使用 qcu-lesson-planning（备课教案）技能。
+为一节20分钟的“百分比变化”入门课设计教师审核草案。
+对象：已经会计算百分数的初学者；工具：纸和笔。
+目标：学生能选择正确的基数，解释先涨10%再降10%为什么不回到原价。
+请给出分分钟安排、教师提问、学生任务、预期作品、评价方式及2分钟退出检测。总时长必须为20分钟。
+全部使用合成例子，未知条件先向我确认。</pre></div>
+  <ol><li><strong>确认技能被加载。</strong>查看回答过程中的“加载技能 / Load skill”记录，确认名称是 <code>qcu-lesson-planning</code>。只看到一份通用教案，不能证明专属技能已加载；可追问“请先读取并使用该技能，再按要求修订”。仍未加载，交维护人员核对预装技能是否启用。</li><li><strong>核对结果。</strong>看时间加起来是不是20分钟、计算是否正确、活动是否适合自己的课堂。所有输出都按教师审阅草案处理。</li><li><strong>继续修改。</strong>例如回复：“班里只有纸笔，请减少讲解时间，多留5分钟小组讨论；仍保持总时长20分钟。”</li><li><strong>保留成果。</strong>选中需要的文字复制到自己的 Word 或教案中并保存。聊天中出现答案不等于已经生成或保存了文件。</li></ol>
+  <div class="note success"><strong>以后提问可按这个顺序：</strong><p>我要做什么 → 给谁用 → 有哪些资料 → 有什么限制 → 希望得到什么形式。告诉助手缺少的信息，比只说“帮我备课”更容易得到合用的草案。</p></div>
+ </section>
+ <section class="section" id="skills">
+  <h2>七项 QCU 专属技能</h2>
+  <p>技能是一套做事方法。在会话里说明要使用的技能，并提供材料或要求即可；它们不会自动连接教务系统、读取成绩或把结果发送出去。下面每段示例都可复制到新会话，按自己的情境修改后发送。</p>
+  <div class="link-list" aria-label="按工作选择技能"><a href="#skill-lesson">备课</a><a href="#skill-tiered">出练习</a><a href="#skill-study">做学习计划</a><a href="#skill-note">整理笔记</a><a href="#skill-reading">教材精读</a><a href="#skill-integrity">引用自查</a><a href="#skill-brief">教研简报</a></div>
+  <details class="skill" id="skill-lesson" open><summary>备课教案与课堂活动<span>qcu-lesson-planning｜把主题变成一节有目标、有活动、有评价的课</span></summary><div class="body"><p><strong>准备：</strong>课程、主题、时长、学生已有知识、学习目标和可用材料。<strong>得到：</strong>分时教案、提问、学生作品、评价和替代方案。可直接使用上面的<a href="#first">第一次备课示例</a>。</p><p><strong>教师核对：</strong>总时长、学科正确性、活动可执行性；课程规则未提供时，需要自己补充。</p></div></details>
+  <details class="skill" id="skill-tiered"><summary>分层练习<span>qcu-tiered-practice｜围绕同一个目标，准备不同支架和难度的题目</span></summary><div class="body"><p><strong>准备：</strong>共同目标、先备知识、各档题量、总时间及允许工具。<strong>得到：</strong>基础、进阶、迁移题单，以及单独的教师参考过程和评分要点。</p><div class="prompt"><div class="prompt-head"><span>合成练习</span><button class="copy js-only" data-copy="tiered-prompt" type="button">复制示例</button></div><pre id="tiered-prompt">请先加载并使用 qcu-tiered-practice 技能，帮我设计教师备课练习。
+共同目标：用正确基数解释百分比变化。学生已会百分数计算。
+基础、进阶、迁移各1题，总计12分钟，只用纸笔。
+学生题单与教师参考答案分开展示，附支架、常见误区和评分要点。只用合成数据。</pre></div><p><strong>教师核对：</strong>自行验算答案、题量和时间。不用历史成绩给学生固定贴“基础／进阶”标签；本示例用于日常练习设计。</p></div></details>
+  <details class="skill" id="skill-study"><summary>学习方法教练<span>qcu-study-coach｜把学习目标拆成今天能完成的行动</span></summary><div class="body"><p><strong>准备：</strong>课程、目标、截止日期、可用时间、已有材料和卡点。<strong>得到：</strong>小步计划、时间安排、完成标志和复盘问题。</p><div class="prompt"><div class="prompt-head"><span>合成学习计划</span><button class="copy js-only" data-copy="study-prompt" type="button">复制示例</button></div><pre id="study-prompt">请先加载并使用 qcu-study-coach 技能。
+我想在7天内学会用电子表格计算平均值，每天可用20分钟，目前只会录入数字。
+请安排今天的2到3个行动、完成标志和一个复盘问题。先给最小可完成任务，不代做作业。</pre></div><p><strong>使用时核对：</strong>计划是否符合真实时间；按完成情况调整，不承诺成绩或代写作业。</p></div></details>
+  <details class="skill" id="skill-note"><summary>课堂笔记整理<span>qcu-note-organizer｜把零散记录整理为概念、疑问与复习行动</span></summary><div class="body"><p><strong>准备：</strong>自己有权使用、已去除姓名等信息的笔记片段，并标出来源。<strong>得到：</strong>结构化笔记、关键概念、待确认问题和复习行动；不会自动读取录音。</p><div class="prompt"><div class="prompt-head"><span>合成笔记片段</span><button class="copy js-only" data-copy="note-prompt" type="button">复制示例</button></div><pre id="note-prompt">请先加载并使用 qcu-note-organizer 技能，只整理下面的合成课堂笔记。
+用途：复习百分比变化。片段1：变化率等于变化量除以原值。片段2：先涨后降的基数不同。片段3：我还不懂“下降10%后涨多少才能恢复”。
+请按概念、重点、疑问整理，保留片段来源，给出3个复习行动。不要编造课堂没讲过的内容或考试重点。</pre></div><p><strong>教师核对：</strong>整理是否忠实于原笔记，疑问有没有被误写成结论。</p></div></details>
+  <details class="skill" id="skill-reading"><summary>教材精读提纲<span>qcu-reading-outline｜围绕一段材料提炼问题、概念和自测</span></summary><div class="body"><p><strong>准备：</strong>有权使用的教材摘录、学习目标、基础、时间和已知来源。<strong>得到：</strong>阅读主问题、概念关系、自测题及待确认点。</p><div class="prompt"><div class="prompt-head"><span>合成阅读材料</span><button class="copy js-only" data-copy="reading-prompt" type="button">复制示例</button></div><pre id="reading-prompt">请先加载并使用 qcu-reading-outline 技能。
+目标：10分钟内理解百分比变化。已有基础：会计算百分数。
+以下为我写的合成材料，不是真实教材引文：“百分比变化用变化量除以原值表示。100增加到110，增加10%；110减少到100，减少约9.09%。”
+请只据此给阅读主问题、概念关系和3道自测题；资料没有的内容标为待确认。</pre></div><p><strong>教师核对：</strong>提纲是否对应所给摘录，来源、页码未提供时是否明确留空；不让助手假装已读完整本教材。</p></div></details>
+  <details class="skill" id="skill-integrity"><summary>学术诚信提示与引用自查<span>qcu-integrity-guard｜找出需要来源支持的表述和缺失的引用信息</span></summary><div class="body"><p><strong>准备：</strong>匿名草稿、已有引文列表，以及明确的课程 AI 使用规则。<strong>得到：</strong>待核验论断、来源缺项、补查步骤和披露建议。</p><div class="prompt"><div class="prompt-head"><span>合成引用检查</span><button class="copy js-only" data-copy="integrity-prompt" type="button">复制示例</button></div><pre id="integrity-prompt">请先加载并使用 qcu-integrity-guard 技能。
+以下是合成草稿：“有研究表明，所有学生使用复习卡后成绩都会提高。”目前没有提供来源，课程AI使用规则也未知。
+请标出哪些论断需要证据、引用还缺什么，以及我应怎样核验。不要编造作者、论文、DOI、页码或查重率。</pre></div><p><strong>教师核对：</strong>自己打开原文核验引文。这不是查重软件或作弊鉴定，不提供“AI生成概率”。</p></div></details>
+  <details class="skill" id="skill-brief"><summary>教研简报与工作总结<span>qcu-team-briefing｜把已有事实整理成面向特定读者的简报</span></summary><div class="body"><p><strong>准备：</strong>读者、用途、时间范围和匿名事实清单。<strong>得到：</strong>可编辑的简报、总结或问答草案，区分已完成、进行中、计划和未知。</p><div class="prompt"><div class="prompt-head"><span>合成教研记录</span><button class="copy js-only" data-copy="brief-prompt" type="button">复制示例</button></div><pre id="brief-prompt">请先加载并使用 qcu-team-briefing 技能。
+为教研组写一份300字以内的本周简报，语气平实。
+合成事实：已完成2节公开课观摩；正在整理匿名课堂反馈；下周计划讨论分层练习；参与人数尚未核实。
+只使用上述事实，分清已完成、进行中、下周计划和待确认，不虚构成效，也不代我发送。</pre></div><p><strong>教师核对：</strong>事实、数量、时间和对外口径。这项技能不自动收邮件、查日程或连接飞书。</p></div></details>
+  <p class="small">材料先去除学生姓名、学号、联系方式等信息；只提交有权使用的必要内容。技能输出供本人审阅，不能代替学科判断。</p>
+ </section>
+ <section class="section" id="studio">
+  <h2>课程设计工作台</h2>
+  <p>侧栏的 <strong>Course Studio</strong> 会打开“课程设计工作台”。需要从资料生成并保存课程成果时使用它；无需新建对话，也无需重新安装插件。</p>
+  <ol class="steps"><li><h3>选工作区，创建一门课程</h3><p>先在助手侧栏建立或选好工作区；进入工作台，在“DSH 工作区”选择它，填写“新课程名称”，点击“创建课程”。工作区是你保存成果的地方，没有可选项时请维护人员协助建立。</p></li><li><h3>加入资料，写清学习目标</h3><p>至少选一份自己有权使用的匿名参考资料。支持 TXT、MD、CSV、DOCX、PPTX；每份不超过8 MB，提取文字不超过60,000字符，合计不超过240,000字符。<strong>PDF、扫描件和旧 DOC/PPT 不支持</strong>，可改用自己核对过的文字摘录。</p></li><li><h3>先选一个小成果，再确认生成</h3><p>首次建议只选“导学案”或“退出检测”，填写学习目标、时长和输出语言。生成前核对参考内容、所用模型及本次选择，确认后再点击生成；所选资料会交给已配置的模型，可能产生调用费用。</p></li><li><h3>预览、修订，再明确保存</h3><p>阅读草案，修改后先“应用修改”，再查看保存位置并明确保存。成果保存在所选工作区的 <code>Course Studio/&lt;course_id&gt;/</code> 下。看到预览不等于文件已经保存，以保存结果为准。</p></li></ol>
+  <p>工作台还可生成 PPT、HTML 幻灯片、思维导图、复习卡、分层作业和互动测验。交互几何、二次函数图像、板书布局、微课脚本、易错点和数学文化等属于实验组件，先少量试用并核对内容。</p>
+  <div class="note"><strong>换任务时重新选资料。</strong><p>参考资料只临时保留，30分钟后过期；一次生成后会消费本次参考选择，重启或新任务都需要重新选择。超时、断连或结果未确认时，先查看原任务，不连续点击生成；需要重启处理的任务请维护人员协助。</p></div>
+ </section>
+ <section class="section" id="market-expert">
+  <h2>插件市场与专家团</h2>
+  <p>侧栏“插件市场”只打开市场页面，“专家团”只打开专家页面；打开页面不会安装插件或调用模型。先选择需要的能力，再查看说明、来源、权限和预览，确认后按页面提示执行。安装、升级或启用须本人明确确认，新增组件不会因重新打开助手而自动启用。</p>
+  <p>专家团请先选择有权限的工作文件夹，浏览专家和任务，核对上下文与预览后，再确认生成。模型生成使用本人配置的模型和额度，结果需教师审核。不要把密钥或未经授权的师生资料放进任务。</p>
+ </section>
+ <section class="section" id="feishu">
+  <h2>选读：读取一篇飞书文档</h2>
+  <p>这是可选工具，第一次备课可以跳过。模型的 API Key 与飞书授权是两件事；飞书工具需要<strong>本人账号授权</strong>，并明确指定一篇允许读取的文档。</p>
+  <ol><li>请维护人员协助完成本机飞书授权，在插件设置中核对“本机 CLI 路径”和“授权文档链接”。套件已包含所需工具，老师不必自行安装命令行软件。</li><li>文档链接需为飞书的 <code>/docx/</code> 或 <code>/wiki/</code> 链接，去掉问号参数和井号锚点。表格、多维表格和云盘文件夹不适用。</li><li>在会话中提出：“请用飞书只读工具列出已授权文档的目录，先不要读取正文。”待看到目录后，再明确指定一个章节读取。</li><li>工具先列目录，再读指定的一节；不写入、删除或扫描其他文档。更换链接后需要重新列目录。</li></ol>
+  <p class="small">需要向维护人员说明时，可提供工具名 <code>qcu_feishu_outline</code> 与 <code>qcu_feishu_section</code>。本手册未将真实飞书账号授权或读取标为已验收。</p>
+ </section>
+ <section class="section" id="help">
+  <h2>遇到问题，先看这里</h2>
+  <p><strong>启动提示 QCU_DATA_RELEASE_MISMATCH：</strong>已有数据来自另一份测试构建，已保留。请使用对应安装包或联系维护人员核对版本，不要删除配置。本版 rc4.2 使用独立目录，不会自动导入 rc3/rc4 的 Key、设置或工作文件。</p>
+  <h3 id="errors">模型连接的错误提示</h3>
+  <div class="table-wrap"><table><thead><tr><th scope="col">看到的提示</th><th scope="col">先做什么</th></tr></thead><tbody><tr><th scope="row">401 / 认证失败</th><td>核对是否为所选服务商的有效 API Key，是否漏字或多了空格；必要时到服务商平台重建密钥，再在助手内更新。</td></tr><tr><th scope="row">402 / 余额不足</th><td>查看对应 API 平台的账户额度。学校统一账号请联系维护人员处理。</td></tr><tr><th scope="row">429 / 请求过多</th><td>暂停连续发送，稍后再试；不要反复点击。</td></tr><tr><th scope="row">500、503 / 服务异常或繁忙</th><td>稍后再试；持续出现则记录时间与错误码，交维护人员核对。</td></tr><tr><th scope="row">无可用模型 / 地址或模型报错</th><td>核对所选提供商、API 地址、协议和模型 ID 是否配套；不要照搬另一个入口的地址。</td></tr><tr><th scope="row">网络错误 / 一直无响应</th><td>确认电脑能访问所用模型服务；截图保留错误提示，交维护人员检查。课程工作台先查原任务状态，避免重复生成。</td></tr></tbody></table></div>
+  <p class="small">DeepSeek 错误码依据：<a href="https://api-docs.deepseek.com/zh-cn/quick_start/error_codes/" target="_blank" rel="noopener noreferrer">官方错误码说明（联网）</a>，核对于2026年10月22日。其他服务商按其自己的说明处理。</p>
+  <details class="skill"><summary>双击打不开，或系统提示阻止运行</summary><div class="body"><p>先确认已完整解压，并选择了适合自己电脑的包；Windows 的程序旁边需要保留全部文件夹。将提示文字、电脑系统和包名发给提供套件的维护人员。本候选版的分发签名和首次运行策略仍需学校终端验收，老师不需要关闭系统安全防护。</p></div></details>
+  <details class="skill"><summary>看不到技能、课程工作台，或回答没有使用技能</summary><div class="body"><p>先核对左上角是否为“QCU助手”，确认启动的是本包入口。<strong>Plugins / 插件</strong>页可查看预装内容，但无需再次安装。会话中应能看到相应“加载技能”记录；找不到或加载失败时，让维护人员核对对应包和组件是否启用，不要反复安装其他版本。</p></div></details>
+  <details class="skill"><summary>移动应用后，我的设置还在吗？怎样备份？</summary><div class="body"><p>个人数据保存在应用包外。本 Mac rc4.2 候选：<code>~/Library/Application Support/QCU-DSH/teacher/0.1.0-rc.4.2/</code>。移动整个 APP 后仍使用该目录；不会自动导入旧版（包括 rc4.1）的模型密钥、聊天或工作文件。首次配置自己的 Key，旧数据迁移请联系维护人员。Windows rc4.2 尚未发布。</p><p>备份或换电脑时先正常退出助手，请维护人员协助处理个人目录及工作区。目录可能含密钥、聊天和文件，不能把自己的备份当成干净安装包发给其他老师。重新解压应用不等于清空个人设置。</p></div></details>
+  <h3>请维护人员帮忙时，提供这些信息</h3><p>电脑是 Mac 还是 Windows、套件 ZIP 的完整名称、出问题的时间、你刚才做了哪一步，以及<strong>不含密钥和学生信息</strong>的错误提示。不要发送完整个人配置或 API Key。</p>
+ </section>
+ <footer class="footer"><p><strong>QCU助手教师预装版使用指南</strong><br>适用运行版本：Mac 0.1.0-rc.4.2；QCU清蓝主题：0.2.4；内置客户端：0.2.0-rc.2。七项主技能、课程工作台、飞书只读工具、插件市场和专家团已预装；专家团为修正后的 pilot.3。Windows rc4.2 尚未发布。本文按本次冻结包编写，其他版本的界面和功能可能不同。</p><p>本页所有字体、样式、图标和操作脚本均随文件提供。只有你主动点击标有“联网”的官方链接时才会打开外部网站。复制按钮不可用时，直接选中文字复制即可。</p></footer>
+</main>
+</div>
+<div id="status" role="status" aria-live="polite"></div>
+<script>
+document.documentElement.classList.add('js');
+let statusTimer;
+function notify(message){const el=document.getElementById('status');el.textContent=message;clearTimeout(statusTimer);statusTimer=setTimeout(()=>{el.textContent='';},5000);}
+async function copyText(button){const source=document.getElementById(button.dataset.copy);const text=source.textContent;try{if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(text);}else{const selection=window.getSelection();const range=document.createRange();range.selectNodeContents(source);selection.removeAllRanges();selection.addRange(range);if(!document.execCommand('copy'))throw new Error('manual-copy');selection.removeAllRanges();}notify('已复制。回到 QCU助手，粘贴后再发送。');}catch{const range=document.createRange();range.selectNodeContents(source);const selection=window.getSelection();selection.removeAllRanges();selection.addRange(range);notify('已选中示例，请按 Ctrl+C（Mac：⌘C）复制。');}}
+document.querySelectorAll('[data-copy]').forEach(button=>button.addEventListener('click',()=>copyText(button)));
+document.querySelectorAll('a[href^="#"]').forEach(link=>link.addEventListener('click',()=>{const target=document.getElementById(link.hash.slice(1));if(target&&target.tagName==='DETAILS')target.open=true;}));
+if('IntersectionObserver' in window){const observer=new IntersectionObserver(entries=>{for(const entry of entries){if(entry.isIntersecting){document.querySelectorAll('.rail nav a').forEach(a=>{if(a.hash==='#'+entry.target.id)a.setAttribute('aria-current','location');else a.removeAttribute('aria-current');});}}},{rootMargin:'-5% 0px -65% 0px'});document.querySelectorAll('main>section').forEach(section=>observer.observe(section));}
+let printState=[];window.addEventListener('beforeprint',()=>{printState=Array.from(document.querySelectorAll('details'),d=>[d,d.open]);printState.forEach(([d])=>d.open=true);});window.addEventListener('afterprint',()=>{printState.forEach(([d,open])=>d.open=open);});document.getElementById('print').addEventListener('click',()=>window.print());
+</script>
+</body>
+</html>

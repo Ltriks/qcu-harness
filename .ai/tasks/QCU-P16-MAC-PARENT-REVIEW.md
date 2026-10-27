@@ -1,0 +1,11 @@
+# QCU-P16-MAC-PARENT-REVIEW
+
+After source prep completes, recheck these confirmed integration issues before actual rc4.3 build. Same scope/boundaries as MAC-PREP; no blind package normalization, used Homes/Keys, network/model/nativeGUI/security changes, commits/pushes.
+
+1. Current generator expects manifest.id and manifest.runtime for every package, but the REAL fixed qcu-market16.1 packer manifest uses package:"qcu-market" and has no runtime top field. Its exact peerDependencies are the runtime evidence. Parent verified current finalmarket at /Users/mcq/Repos/worktrees/qcu-harness/teacher-product-polish/.work/product-polish-review/packages/final/qcu-market/MANIFEST.json and TGZ (86354bytes SHAfc25da801af9da4c583225c95352547791c5eb59feb4bc2febdfd2f8df0d6f8f,24members). Support the EXISTING exact market manifest shape and plain identity+peers; do not change, overwrite or fake-normalize immutable market manifests. Brand/course/expert existing formats remain exact. Require the known market peers, not arbitrary omissions. Add a regression using the real manifest read-only or its accurate copied shape and actual fixed TGZ through inspect_package/prepare_inputs. Synthetic id/runtime-only fixtures previously missed this mismatch.
+
+2. Cold test currently replaced fixed course provider assertion with content-nonempty only. Preserve package identity evidence without doing course business acceptance: assert provider equals "qcu-course-workbench@" + frozen manifest localSources version (works historical/frozenfont.1). Do not dispatch course/expert business actions or touch module/testfiles beyond generic coldhelper.
+
+3. Native prepare-only/reference diagnostics may fail. Capture exact code/stdout/stderr/timeout and distinguish reference JavaScript contract pass vs native executable failure. No repeated probe loops, trust/quarantine/xattr changes, fakepassedcode or waived regressions. Existing startup diagnostic tests should use an appropriate existing reference JS interpreter if their purpose is pure JS; assert actual CLI error code behavior, not weaken match to generic failure. Native candidate acceptance is separate.
+
+Parent will provide final reviewed branding3 manifest/TGZ later, after P16-finalchecks. You may fix1/2 and test now, but actual fullApp build still waits that gate.

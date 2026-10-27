@@ -1,4 +1,4 @@
-// rc4.1 launcher gates against the frozen public seed; disposable Homes only.
+// Pinned integrated launcher gates against the frozen public seed; disposable Homes only.
 const {test}=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),os=require('node:os');
 const {prepare,identity,defaultHome}=require('../tools/teacher-suite/start.cjs');
 const kit=path.resolve(process.env.QCU_INTEGRATED_TEST_KIT),m=identity(kit);
@@ -21,10 +21,19 @@ for(const kind of ['foreign-release','same-release-other-seed'])test(kind+' rece
  assert.throws(()=>prepare(kit,f.home),e=>e.code==='QCU_DATA_RELEASE_MISMATCH'&&e.message.includes('已有数据来自另一份测试构建，已保留')&&e.message.includes('不要删除配置'));
  assert.deepEqual(fs.readFileSync(file),before);assert.equal(fs.readFileSync(note,'utf8'),'Synthetic retained work');
 });
-test('rc4.1 exact identity and default namespace have no automatic old-Home migration',t=>{
- assert.equal(m.version,'0.1.0-rc.4.1');assert.equal(m.products.length,11);assert.equal(m.localSources.length,12);assert.equal(m.migrateFrom,undefined);
- assert.equal(defaultHome(m.version),path.join(os.homedir(),'Library/Application Support/QCU-DSH/teacher/0.1.0-rc.4.1'));
+test('pinned release exact identity and default namespace have no automatic old-Home migration',t=>{
+ assert.ok(['0.1.0-rc.4.1','0.1.0-rc.4.2','0.1.0-rc.4.3'].includes(m.version));assert.equal(m.products.length,11);assert.equal(m.localSources.length,12);assert.equal(m.migrateFrom,undefined);
+ assert.equal(defaultHome(m.version),path.join(os.homedir(),'Library/Application Support/QCU-DSH/teacher/'+m.version));
  const f=fixture(t);assert.throws(()=>prepare(kit,f.home,path.join(f.root,'old')),/explicit maintainer migration/);assert.equal(fs.existsSync(f.home),false);
+});
+test('only exact historical/current compositions are admitted, and prior release namespaces stay untouched',t=>{
+ const {identity:accept}=require('../tools/teacher-suite/integrated.cjs');
+ for(const version of ['0.1.0-rc.4.0','0.1.0-rc.4.4','0.1.0-rc.4.3-extra','toString'])assert.throws(()=>accept({...m,version}),/Unexpected/);
+ assert.throws(()=>accept({...m,branding:{...m.branding,version:'9.9.9'}}),/Unexpected/);
+ const f=fixture(t),prior=['0.1.0-rc.4','0.1.0-rc.4.1','0.1.0-rc.4.2'].filter(v=>v!==m.version);
+ for(const version of prior){const dir=path.join(f.root,version);fs.mkdirSync(dir);fs.writeFileSync(path.join(dir,'qcu-teacher.json'),'SYNTHETIC OPAQUE PRIOR RECEIPT');}
+ prepare(kit,f.home);
+ for(const version of prior)assert.equal(fs.readFileSync(path.join(f.root,version,'qcu-teacher.json'),'utf8'),'SYNTHETIC OPAQUE PRIOR RECEIPT');
 });
 test('first/repeat checks twelve source references and preserves valid teacher configuration choices',t=>{
  const f=fixture(t);assert.equal(prepare(kit,f.home).directDependencies,12);
