@@ -1,0 +1,3 @@
+# QCU study coach pilot.2
+
+New qcu-study-coach skill identity; the immutable pilot.1 package and legacy skill are unchanged. Canonical content is skills/qcu-study-coach/SKILL.md. This MIT derivative corrects time budgeting, absolute claims about missed review, and invalid accuracy comparisons. It registers guidance in memory; no tools, network, file reads or model calls. Registration checks duplicate global identity; the market additionally checks the target session for shadows. Default bundle row disabled. Official installation and explicit row activation are required. Model quality acceptance is pending; deterministic content tests are not a learning-outcome assessment.

@@ -1,0 +1,12 @@
+{
+  "name": "qcu-branding",
+  "version": "0.1.0",
+  "type": "module",
+  "license": "MIT",
+  "description": "QCU助手界面标识",
+  "exports": {".": "./index.js", "./client": "./client.js", "./package.json": "./package.json"},
+  "dsh": {
+    "bundle": {"patch": "./cordis.patch.yml"},
+    "client": {"platform": "web", "inject": ["@deepseek-ai/dsh-client-ui-renderer", "@deepseek-ai/dsh-client-ui-sidebar", "@deepseek-ai/dsh-client-ui-conversation"]}
+  }
+}

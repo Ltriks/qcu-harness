@@ -1,0 +1,9 @@
+qcu-team-briefing third-party adaptation
+Copyright 2026 Anthropic, PBC.
+Upstream: https://github.com/anthropics/skills/tree/dbd4588f9e1033efb41dad4bef2f7947c8993d44/skills/internal-comms
+Original six files in third_party/anthropic-internal-comms are unmodified, licensed Apache-2.0.
+Modified files: SKILL.md and its embedded copy in skill-content.js, adapted by QCU Harness contributors: Chinese teacher/research drafting; four guideline modes inlined; user-provided text only, no service/tool/file/model operations; explicit uncertainty and teacher review.
+Apache-2.0 applies to these instructions; LICENSE retains upstream copyright and full license.
+Provider index.js is the unchanged QCU MIT wrapper; WRAPPER-LICENSE retains its MIT attribution.
+SOURCE.json records exact upstream paths, revision, bytes and SHA256. Repository-wide upstream third-party notices were reviewed: listed software/fonts are not included in these six text files or this bundle. No unrelated dependency or font is vendored.
+No upstream endorsement is implied.

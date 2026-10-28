@@ -1,0 +1,12 @@
+{
+  "name": "qcu-branding",
+  "version": "0.2.0",
+  "type": "module",
+  "license": "MIT",
+  "description": "QCU清蓝教师主题、教学首页与任务入口",
+  "exports": {".": "./index.js", "./client": "./client.js", "./package.json": "./package.json"},
+  "dsh": {
+    "bundle": {"patch": "./cordis.patch.yml"},
+    "client": {"platform": "web", "inject": ["@deepseek-ai/dsh-client-ui-renderer", "@deepseek-ai/dsh-client-ui-sidebar", "@deepseek-ai/dsh-client-ui-conversation", "@deepseek-ai/dsh-client-ui-theme", "@deepseek-ai/dsh-client-ui-layout", "@deepseek-ai/dsh-client-ui-workspace"]}
+  }
+}

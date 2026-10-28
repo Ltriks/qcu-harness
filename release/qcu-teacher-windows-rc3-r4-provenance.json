@@ -1,0 +1,121 @@
+{
+  "schemaVersion": 1,
+  "version": "0.1.0-rc.3",
+  "target": "win-x64",
+  "packagingRevision": "r4",
+  "tag": "qcu-teacher-v0.1.0-rc.3-win-x64-r4",
+  "archive": {
+    "file": "QCU-Teacher-0.1.0-rc.3-win-x64-r4.zip",
+    "bytes": 401560353,
+    "sha256": "6653d40071b70d9f22880a50b16b06bdc64ae2390720fd5930ef08293ca1c2bf"
+  },
+  "coreVersion": "0.2.0-rc.2",
+  "seedId": "5ac3d0dbb84e7d80dc9492b17657350d0d2363f29de330e4169635216b3adc39",
+  "sourceSnapshot": "release/snapshots/windows-rc3-r4/FILES.json",
+  "sourceArchiveMethod": "Existing immutable binary, source archival only; not rebuilt for GitHub publication.",
+  "officialClient": {
+    "file": "deepseek-harness-0.2.0-rc.2-win-x64.exe",
+    "bytes": 289313640,
+    "sha256": "d61cd8882f8b8a1251144320493ad27920d15139503eba2465b9579eee720cfc",
+    "source": "https://download.deepseek.com/dsh-desk/bin/win-x64/deepseek-harness-0.2.0-rc.2-win-x64.exe"
+  },
+  "products": [
+    {
+      "id": "qcu-study-coach",
+      "version": "0.1.0-pilot.2",
+      "file": "qcu-study-coach-0.1.0-pilot.2-4ac9b2489ece90098faea5f5d0cf79c6efb2989214eaf74f4e38c4841c2eb060.tgz",
+      "bytes": 3445,
+      "sha256": "4ac9b2489ece90098faea5f5d0cf79c6efb2989214eaf74f4e38c4841c2eb060",
+      "componentId": "qcu-study-coach",
+      "teachingPreset": true,
+      "license": "MIT"
+    },
+    {
+      "id": "qcu-lesson-planning",
+      "version": "0.1.0-pilot.1.1",
+      "file": "qcu-lesson-planning-0.1.0-pilot.1.1-6f8930d4f12f8f52c93422b41cadd050db374c0fe4ce5c06e8b824e69d672bd4.tgz",
+      "bytes": 4429,
+      "sha256": "6f8930d4f12f8f52c93422b41cadd050db374c0fe4ce5c06e8b824e69d672bd4",
+      "componentId": "qcu-lesson-planning",
+      "teachingPreset": true,
+      "license": "MIT"
+    },
+    {
+      "id": "qcu-tiered-practice",
+      "version": "0.1.0-pilot.1.1",
+      "file": "qcu-tiered-practice-0.1.0-pilot.1.1-183e63eab27bb13dc98f4bec437028126284459c0eeef294e1ee87e819711052.tgz",
+      "bytes": 4434,
+      "sha256": "183e63eab27bb13dc98f4bec437028126284459c0eeef294e1ee87e819711052",
+      "componentId": "qcu-tiered-practice",
+      "teachingPreset": true,
+      "license": "MIT"
+    },
+    {
+      "id": "qcu-note-organizer",
+      "version": "0.1.0-pilot.1.1",
+      "file": "qcu-note-organizer-0.1.0-pilot.1.1-9c8f1e50ac4f3aff613678c8c094b4e8f53c0393ca011e7a41ceaa5ab96f67e7.tgz",
+      "bytes": 4660,
+      "sha256": "9c8f1e50ac4f3aff613678c8c094b4e8f53c0393ca011e7a41ceaa5ab96f67e7",
+      "componentId": "qcu-note-organizer",
+      "teachingPreset": true,
+      "license": "MIT"
+    },
+    {
+      "id": "qcu-reading-outline",
+      "version": "0.1.0-pilot.1.1",
+      "file": "qcu-reading-outline-0.1.0-pilot.1.1-a0ab4dd00ce1a2b259126a1b11fb1c7f4e7599e13a2318ae3009e03b2cab7a79.tgz",
+      "bytes": 4748,
+      "sha256": "a0ab4dd00ce1a2b259126a1b11fb1c7f4e7599e13a2318ae3009e03b2cab7a79",
+      "componentId": "qcu-reading-outline",
+      "teachingPreset": true,
+      "license": "MIT"
+    },
+    {
+      "id": "qcu-integrity-guard",
+      "version": "0.1.0-pilot.1.1",
+      "file": "qcu-integrity-guard-0.1.0-pilot.1.1-3136b795de94ffd38d522c3ba5e8ac630fca4759386288aad09dfa15baea62bf.tgz",
+      "bytes": 5153,
+      "sha256": "3136b795de94ffd38d522c3ba5e8ac630fca4759386288aad09dfa15baea62bf",
+      "componentId": "qcu-integrity-guard",
+      "teachingPreset": true,
+      "license": "MIT"
+    },
+    {
+      "id": "qcu-team-briefing",
+      "version": "0.1.0-pilot.1",
+      "file": "qcu-team-briefing-0.1.0-pilot.1-11a6a616c488afbebc0b1781f3e40039c2e49c697cadee0fc095f2e151d6c2bf.tgz",
+      "bytes": 18882,
+      "sha256": "11a6a616c488afbebc0b1781f3e40039c2e49c697cadee0fc095f2e151d6c2bf",
+      "componentId": "qcu-team-briefing",
+      "teachingPreset": true,
+      "license": "Apache-2.0"
+    },
+    {
+      "id": "qcu-feishu-readonly",
+      "version": "0.1.0-pilot.1.1",
+      "file": "qcu-feishu-readonly-0.1.0-pilot.1.1-37376ce5f03d4f0fb459dcf6f888b25f5f78df1f7734cd780c7cfd6d01e91b17.tgz",
+      "bytes": 11263,
+      "sha256": "37376ce5f03d4f0fb459dcf6f888b25f5f78df1f7734cd780c7cfd6d01e91b17",
+      "componentId": "qcu-feishu-readonly",
+      "teachingPreset": false,
+      "license": "MIT"
+    },
+    {
+      "id": "qcu-course-workbench",
+      "version": "0.1.0-pilot.1.2",
+      "file": "qcu-course-workbench-0.1.0-pilot.1.2-88a55b22561a5f6cf1e7af8d27ad28d074df13db4feb4c9340fddd208f5ad0ec.tgz",
+      "bytes": 51089,
+      "sha256": "88a55b22561a5f6cf1e7af8d27ad28d074df13db4feb4c9340fddd208f5ad0ec",
+      "componentId": "qcu-course-workbench",
+      "teachingPreset": false,
+      "license": "MIT"
+    }
+  ],
+  "branding": {
+    "id": "qcu-branding",
+    "version": "0.1.0"
+  },
+  "personalDataIncluded": false,
+  "modelConfigured": false,
+  "newNativeGUIAccepted": false
+}
