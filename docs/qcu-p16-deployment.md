@@ -1,5 +1,7 @@
 # QCU P16 部署与验证（2026-10-27）
 
+2026-10-28运行时修复：原验签运行器依赖的桌面App路径不存在，曾使在线目录返回503；现已改用服务目录内固定Node并恢复200，发布目录、包、公钥和账号不变。[原因、当前进程与验证边界](qcu-hub-runtime-repair-20261028.md)。以下历史部署记录保留，恢复命令的Node参数已更新。
+
 后续状态：mini官方应用曾升级为0.2.1-rc.3，导致固定0.2.0-rc.2的QCU包被拒绝加载；经用户明确同意，已仅恢复原官方App并验证市场10款工具、7个QCU包无异常，详见[2026-10-27恢复记录](qcu-p16-official-update-recovery.md)。下文保留此前部署检查点。
 
 已按用户确认部署现有局域网 Hub：新版公开接收器、管理员反馈收件箱与维护检查、固定市场16.1和主题2，以及新机 Mac rc4.3候选下载。源码分支 `dev/qcu-teacher-product-polish`，固定 worktree `$HOME/Repos/worktrees/qcu-harness/teacher-product-polish`；服务代码为 `b9263f01d802e2338951d52a32c664870a888890`，组件仍为先前审阅的固定归档，未重新构建。
@@ -60,11 +62,11 @@ mini预检核对51个最小服务文件及三份分发资源，影子回环服�
 没有增加LaunchAgent或定时任务。机器重启后由维护者先核对8080和8975没有现有服务，再分别以前台方式恢复（长路径已正确引用）：
 
 ```sh
-/usr/bin/python3 -B /Users/lqtriks/Services/qcu-hub-p16/releases/p16.1-b9263f0-34a48e474a03/hub/admin/server.py --state-root '/Users/lqtriks/Library/Application Support/qcu-hub-admin' --publication-root /Users/lqtriks/qcu-hub-market-publication --public-trust /Users/lqtriks/Services/qcu-hub-p16/releases/p16.1-b9263f0-34a48e474a03/public-trust.json --node /Users/lqtriks/Services/qcu-hub-p16/releases/p16.1-b9263f0-34a48e474a03/node-official --port 8975 --feedback-root '/Users/lqtriks/Library/Application Support/qcu-hub-feedback' --maintenance-root /Users/lqtriks/Services/qcu-hub-p16/snapshots/static-p16.1-edcacdc3f9de
+/usr/bin/python3 -B /Users/lqtriks/Services/qcu-hub-p16/releases/p16.1-b9263f0-34a48e474a03/hub/admin/server.py --state-root '/Users/lqtriks/Library/Application Support/qcu-hub-admin' --publication-root /Users/lqtriks/qcu-hub-market-publication --public-trust /Users/lqtriks/Services/qcu-hub-p16/releases/p16.1-b9263f0-34a48e474a03/public-trust.json --node /Users/lqtriks/Services/qcu-hub-p16/runtimes/node-v24.21.0-darwin-arm64-1e1fdfc3001a/node --port 8975 --feedback-root '/Users/lqtriks/Library/Application Support/qcu-hub-feedback' --maintenance-root /Users/lqtriks/Services/qcu-hub-p16/snapshots/static-p16.1-edcacdc3f9de
 ```
 
 ```sh
-/usr/bin/python3 -B /Users/lqtriks/Services/qcu-hub-p16/releases/p16.1-b9263f0-34a48e474a03/hub/release/serve-hub.py --root /Users/lqtriks/Services/qcu-hub-p16/snapshots/static-p16.1-edcacdc3f9de --manifest-sha256 08dbf1b0ae11a1c2f769aff7a5f23203524b7a71ff47f0a646a2813f7dd12584 --serve --host 192.168.1.68 --port 8080 --lan-approved --publication-root /Users/lqtriks/qcu-hub-market-publication --public-trust /Users/lqtriks/Services/qcu-hub-p16/releases/p16.1-b9263f0-34a48e474a03/public-trust.json --node /Users/lqtriks/Services/qcu-hub-p16/releases/p16.1-b9263f0-34a48e474a03/node-official --feedback-root '/Users/lqtriks/Library/Application Support/qcu-hub-feedback' --distribution-root /Users/lqtriks/Services/qcu-hub-p16/distribution/rc4.3-7fb9278133fa --distribution-manifest-sha256 30f1661b0fb8f8c2f69f73d44a315809b5c6e87797481cf04df541379f6bd05d
+/usr/bin/python3 -B /Users/lqtriks/Services/qcu-hub-p16/releases/p16.1-b9263f0-34a48e474a03/hub/release/serve-hub.py --root /Users/lqtriks/Services/qcu-hub-p16/snapshots/static-p16.1-edcacdc3f9de --manifest-sha256 08dbf1b0ae11a1c2f769aff7a5f23203524b7a71ff47f0a646a2813f7dd12584 --serve --host 192.168.1.68 --port 8080 --lan-approved --publication-root /Users/lqtriks/qcu-hub-market-publication --public-trust /Users/lqtriks/Services/qcu-hub-p16/releases/p16.1-b9263f0-34a48e474a03/public-trust.json --node /Users/lqtriks/Services/qcu-hub-p16/runtimes/node-v24.21.0-darwin-arm64-1e1fdfc3001a/node --feedback-root '/Users/lqtriks/Library/Application Support/qcu-hub-feedback' --distribution-root /Users/lqtriks/Services/qcu-hub-p16/distribution/rc4.3-7fb9278133fa --distribution-manifest-sha256 30f1661b0fb8f8c2f69f73d44a315809b5c6e87797481cf04df541379f6bd05d
 ```
 
 运行期间保持清单文件静止，不原地写入。大包使用单独的固定manifest流式白名单下载，原快照32MiB／64MiB限制不变，见[适配边界](qcu-p16-distribution.md)。

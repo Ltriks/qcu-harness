@@ -2,6 +2,8 @@
 
 ## 教师助手与工具市场 P16（Hub与mini已部署，基础验证通过）
 
+2026-10-28已修复Hub在线目录503：验签服务改用独立固定Node，不再依赖桌面DSH路径；目录及25项固定包校验通过，原两项更新覆盖提示保留。见[修复记录](docs/qcu-hub-runtime-repair-20261028.md)。
+
 当前QCU包固定支持官方DSH **0.2.0-rc.2**。QCU更新请走“工具市场→版本管理”；左下“新版本／安装并重启”属于官方内核升级。mini曾升级0.2.1-rc.3导致插件被兼容检查拒绝，2026-10-27经用户确认已恢复原官方版本并验证市场和插件列表，见[异常与恢复记录](docs/qcu-p16-official-update-recovery.md)。
 
 开发分支 `dev/qcu-teacher-product-polish`，固定 worktree `$HOME/Repos/worktrees/qcu-harness/teacher-product-polish`。已实现紧凑首页/工具列表、四步首次任务指引、六类问题帮助、反馈提交—管理员处理—教师查询，以及发布维护检查。课程工作台本轮排除，由同事继续维护。当前最终组件为市场16.1、主题0.2.6-pilot.2；新机完整 Mac 候选为rc4.3，已有电脑保留原Home，后续走组件更新。
