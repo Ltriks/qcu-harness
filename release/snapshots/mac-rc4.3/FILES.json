@@ -1,0 +1,785 @@
+{
+  "schemaVersion": 1,
+  "archive": {
+    "file": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64.zip",
+    "bytes": 390492068,
+    "sha256": "7fb9278133fa62499765dfbc4f8d62578e05bdcf6d5549eb12d789cdd513421c"
+  },
+  "files": [
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-study-coach/LICENSE",
+      "bytes": 1093,
+      "sha256": "79832ece489707e2f1c9d5ddeaa9c38958a3bbce2a0d5b67645af5a4039ad787",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-study-coach-0.1.0-pilot.2-4ac9b2489ece90098faea5f5d0cf79c6efb2989214eaf74f4e38c4841c2eb060.tgz!package/LICENSE"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-study-coach/README.md",
+      "bytes": 681,
+      "sha256": "b2269cba360cf4094bceb2558416ee7ca56bd5d909e2622bd9e1d763315c77f0",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-study-coach-0.1.0-pilot.2-4ac9b2489ece90098faea5f5d0cf79c6efb2989214eaf74f4e38c4841c2eb060.tgz!package/README.md"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-study-coach/SKILL.md",
+      "bytes": 1841,
+      "sha256": "80ebebe91ae9edd71670cf22f7e5c7880d527e39c483fa193e6e819e8cd7ef4b",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-study-coach-0.1.0-pilot.2-4ac9b2489ece90098faea5f5d0cf79c6efb2989214eaf74f4e38c4841c2eb060.tgz!package/SKILL.md"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-study-coach/cordis.patch.yml",
+      "bytes": 200,
+      "sha256": "31c48d98144596188b81ef359a7033a5d7426484217e7924ca681b633fa08482",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-study-coach-0.1.0-pilot.2-4ac9b2489ece90098faea5f5d0cf79c6efb2989214eaf74f4e38c4841c2eb060.tgz!package/cordis.patch.yml"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-study-coach/index.js",
+      "bytes": 787,
+      "sha256": "0006db3db0ed47c0c0d3f66a111da2d40692f495d648d886e16e4572707805c7",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-study-coach-0.1.0-pilot.2-4ac9b2489ece90098faea5f5d0cf79c6efb2989214eaf74f4e38c4841c2eb060.tgz!package/index.js"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-study-coach/package.json",
+      "bytes": 592,
+      "sha256": "f71eba98f1a88cbbe1d629cd486591051bb559b7a36ee485bc5ddb4d7a4c099f",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-study-coach-0.1.0-pilot.2-4ac9b2489ece90098faea5f5d0cf79c6efb2989214eaf74f4e38c4841c2eb060.tgz!package/package.json"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-study-coach/skill-content.js",
+      "bytes": 1995,
+      "sha256": "04a68c05809cc49ef51a7267be589a667b1e8f3af2eeb63ca3aa3b1ecee35faa",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-study-coach-0.1.0-pilot.2-4ac9b2489ece90098faea5f5d0cf79c6efb2989214eaf74f4e38c4841c2eb060.tgz!package/skill-content.js"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-integrity-guard/LICENSE",
+      "bytes": 1093,
+      "sha256": "79832ece489707e2f1c9d5ddeaa9c38958a3bbce2a0d5b67645af5a4039ad787",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-integrity-guard-0.1.0-pilot.1.1-3136b795de94ffd38d522c3ba5e8ac630fca4759386288aad09dfa15baea62bf.tgz!package/LICENSE"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-integrity-guard/README.md",
+      "bytes": 762,
+      "sha256": "68aa97aacf0f217541648ae2d22c158cd671c2069eebe4d90379c4e3a86537c9",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-integrity-guard-0.1.0-pilot.1.1-3136b795de94ffd38d522c3ba5e8ac630fca4759386288aad09dfa15baea62bf.tgz!package/README.md"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-integrity-guard/SKILL.md",
+      "bytes": 3680,
+      "sha256": "f8d52df632c57d57a8395b2b2aa1d6ca74ef931fd7d3b296e251b6475e731714",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-integrity-guard-0.1.0-pilot.1.1-3136b795de94ffd38d522c3ba5e8ac630fca4759386288aad09dfa15baea62bf.tgz!package/SKILL.md"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-integrity-guard/SOURCE.json",
+      "bytes": 708,
+      "sha256": "b4a03d0f7d7b42984a81ff187dceedd01d240a99440ba73c9c71c47bfc6fa83a",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-integrity-guard-0.1.0-pilot.1.1-3136b795de94ffd38d522c3ba5e8ac630fca4759386288aad09dfa15baea62bf.tgz!package/SOURCE.json"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-integrity-guard/cordis.patch.yml",
+      "bytes": 208,
+      "sha256": "3f4496b7fba512b6b09986b86ddfae71a3b1055afc03ae29b1bf11dbce6b33c8",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-integrity-guard-0.1.0-pilot.1.1-3136b795de94ffd38d522c3ba5e8ac630fca4759386288aad09dfa15baea62bf.tgz!package/cordis.patch.yml"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-integrity-guard/index.js",
+      "bytes": 1479,
+      "sha256": "8eac56f70338d3619928d08f9c3d91446432a7f3e998b03fa5fb0fb701b1c393",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-integrity-guard-0.1.0-pilot.1.1-3136b795de94ffd38d522c3ba5e8ac630fca4759386288aad09dfa15baea62bf.tgz!package/index.js"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-integrity-guard/package.json",
+      "bytes": 747,
+      "sha256": "b68753575ed541a9d3d6f0c7d409fb6512ed42f3c9ec054d8ce490d05b40a306",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-integrity-guard-0.1.0-pilot.1.1-3136b795de94ffd38d522c3ba5e8ac630fca4759386288aad09dfa15baea62bf.tgz!package/package.json"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-integrity-guard/skill-content.js",
+      "bytes": 4149,
+      "sha256": "4bc77e4a66490f07d97d61a41475b3b2508ee43442495756e371c5a9c0d053e8",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-integrity-guard-0.1.0-pilot.1.1-3136b795de94ffd38d522c3ba5e8ac630fca4759386288aad09dfa15baea62bf.tgz!package/skill-content.js"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-reading-outline/LICENSE",
+      "bytes": 1093,
+      "sha256": "79832ece489707e2f1c9d5ddeaa9c38958a3bbce2a0d5b67645af5a4039ad787",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-reading-outline-0.1.0-pilot.1.1-a0ab4dd00ce1a2b259126a1b11fb1c7f4e7599e13a2318ae3009e03b2cab7a79.tgz!package/LICENSE"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-reading-outline/README.md",
+      "bytes": 759,
+      "sha256": "ed5a1d5a76deab435494f1b1eadfc53f7d5721f78eb1cd3684ce84a3531aa22a",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-reading-outline-0.1.0-pilot.1.1-a0ab4dd00ce1a2b259126a1b11fb1c7f4e7599e13a2318ae3009e03b2cab7a79.tgz!package/README.md"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-reading-outline/SKILL.md",
+      "bytes": 2917,
+      "sha256": "11a311f73a09be808b9844f5b919f08766cc7f653666a54a9ade658cec073c31",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-reading-outline-0.1.0-pilot.1.1-a0ab4dd00ce1a2b259126a1b11fb1c7f4e7599e13a2318ae3009e03b2cab7a79.tgz!package/SKILL.md"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-reading-outline/SOURCE.json",
+      "bytes": 708,
+      "sha256": "717ccbe3e02316da717ee05af953623dda3b93ddecf8e884228de06cd631950c",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-reading-outline-0.1.0-pilot.1.1-a0ab4dd00ce1a2b259126a1b11fb1c7f4e7599e13a2318ae3009e03b2cab7a79.tgz!package/SOURCE.json"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-reading-outline/cordis.patch.yml",
+      "bytes": 208,
+      "sha256": "cb8bddf58a260cf13850cad3a39fb99939430a2603e6eb76036e697c404a7867",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-reading-outline-0.1.0-pilot.1.1-a0ab4dd00ce1a2b259126a1b11fb1c7f4e7599e13a2318ae3009e03b2cab7a79.tgz!package/cordis.patch.yml"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-reading-outline/index.js",
+      "bytes": 1479,
+      "sha256": "8eac56f70338d3619928d08f9c3d91446432a7f3e998b03fa5fb0fb701b1c393",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-reading-outline-0.1.0-pilot.1.1-a0ab4dd00ce1a2b259126a1b11fb1c7f4e7599e13a2318ae3009e03b2cab7a79.tgz!package/index.js"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-reading-outline/package.json",
+      "bytes": 749,
+      "sha256": "e146143f9a921f907e48c185e28990d32e606a790ed6d56c967f6749f40989ac",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-reading-outline-0.1.0-pilot.1.1-a0ab4dd00ce1a2b259126a1b11fb1c7f4e7599e13a2318ae3009e03b2cab7a79.tgz!package/package.json"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-reading-outline/skill-content.js",
+      "bytes": 3381,
+      "sha256": "97f910de462b23f0ee83e9758d01f721479968eea080d1e63a06b25d16527fe3",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-reading-outline-0.1.0-pilot.1.1-a0ab4dd00ce1a2b259126a1b11fb1c7f4e7599e13a2318ae3009e03b2cab7a79.tgz!package/skill-content.js"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-feishu-readonly/LICENSE",
+      "bytes": 1073,
+      "sha256": "989967e129b2ecb69eb8d34053ae5d2904de7093450663cac33e71e993561e55",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-feishu-readonly-0.1.0-pilot.1.1-37376ce5f03d4f0fb459dcf6f888b25f5f78df1f7734cd780c7cfd6d01e91b17.tgz!package/LICENSE"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-feishu-readonly/NOTICE",
+      "bytes": 412,
+      "sha256": "82a6c355a5521919c8b31579a2ebe7bbe853f7520ab23b50cd2c056152d0f837",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-feishu-readonly-0.1.0-pilot.1.1-37376ce5f03d4f0fb459dcf6f888b25f5f78df1f7734cd780c7cfd6d01e91b17.tgz!package/NOTICE"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-feishu-readonly/README.md",
+      "bytes": 5633,
+      "sha256": "c5fdff6c6f93c1c51254c676bee2f22c3bc49e816129ba7c37d951d766f79062",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-feishu-readonly-0.1.0-pilot.1.1-37376ce5f03d4f0fb459dcf6f888b25f5f78df1f7734cd780c7cfd6d01e91b17.tgz!package/README.md"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-feishu-readonly/cordis.patch.yml",
+      "bytes": 145,
+      "sha256": "ba892229c142691e9be5e1602f060072bd169aae7d30dc678d60902ba5da0417",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-feishu-readonly-0.1.0-pilot.1.1-37376ce5f03d4f0fb459dcf6f888b25f5f78df1f7734cd780c7cfd6d01e91b17.tgz!package/cordis.patch.yml"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-feishu-readonly/index.js",
+      "bytes": 4007,
+      "sha256": "594e00801ff4fb6353f6a7d8d0e4686f0746c113c86f695f0f6c2d2a8871b3d3",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-feishu-readonly-0.1.0-pilot.1.1-37376ce5f03d4f0fb459dcf6f888b25f5f78df1f7734cd780c7cfd6d01e91b17.tgz!package/index.js"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-feishu-readonly/package.json",
+      "bytes": 656,
+      "sha256": "3e501476a6c577eb1f6205457fd0446b670afbb60c38bb10f440e6277c41d913",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-feishu-readonly-0.1.0-pilot.1.1-37376ce5f03d4f0fb459dcf6f888b25f5f78df1f7734cd780c7cfd6d01e91b17.tgz!package/package.json"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-feishu-readonly/src/authority.mjs",
+      "bytes": 2259,
+      "sha256": "b0a927f2b7a94a2e530580b02852f46e0f9053c0bd51a388e7d34f01782d1171",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-feishu-readonly-0.1.0-pilot.1.1-37376ce5f03d4f0fb459dcf6f888b25f5f78df1f7734cd780c7cfd6d01e91b17.tgz!package/src/authority.mjs"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-feishu-readonly/src/core.mjs",
+      "bytes": 12551,
+      "sha256": "a397d0696d5855c8cf2d5d3f851886abcaf8dfba128f45c3ef90c91bbfb25020",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-feishu-readonly-0.1.0-pilot.1.1-37376ce5f03d4f0fb459dcf6f888b25f5f78df1f7734cd780c7cfd6d01e91b17.tgz!package/src/core.mjs"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-branding/LICENSE",
+      "bytes": 1093,
+      "sha256": "79832ece489707e2f1c9d5ddeaa9c38958a3bbce2a0d5b67645af5a4039ad787",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-branding-0.2.6-pilot.2-b57d69aeb6516a5650962a4afd5e1b28320c0b9c8dabc5c0e5b02dfe9fa40f2e.tgz!package/LICENSE"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-branding/client.js",
+      "bytes": 45978,
+      "sha256": "18c32ab7c183fad25fce334313c0f5f88e604c38f72a1e540c3ecc8308e24177",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-branding-0.2.6-pilot.2-b57d69aeb6516a5650962a4afd5e1b28320c0b9c8dabc5c0e5b02dfe9fa40f2e.tgz!package/client.js"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-branding/cordis.patch.yml",
+      "bytes": 138,
+      "sha256": "168fcdc0a56bc00aaefd7aa2f41089cb111e77e44c083458ea294f415280a8e7",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-branding-0.2.6-pilot.2-b57d69aeb6516a5650962a4afd5e1b28320c0b9c8dabc5c0e5b02dfe9fa40f2e.tgz!package/cordis.patch.yml"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-branding/icon.svg",
+      "bytes": 539,
+      "sha256": "d94844d367536e89d656f6f4a7fa02e7b638eff4946683332ac2c81c44c9a616",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-branding-0.2.6-pilot.2-b57d69aeb6516a5650962a4afd5e1b28320c0b9c8dabc5c0e5b02dfe9fa40f2e.tgz!package/icon.svg"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-branding/index.js",
+      "bytes": 61,
+      "sha256": "5da217e80517d15115db06ddf892477cfc2f75dd67f3e189ce2b25b64afdfc5f",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-branding-0.2.6-pilot.2-b57d69aeb6516a5650962a4afd5e1b28320c0b9c8dabc5c0e5b02dfe9fa40f2e.tgz!package/index.js"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-branding/package.json",
+      "bytes": 610,
+      "sha256": "d1fdb5168dd815cbd2bc6652f7ba3511be4b96756f5e4849753c8384d443ecdb",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-branding-0.2.6-pilot.2-b57d69aeb6516a5650962a4afd5e1b28320c0b9c8dabc5c0e5b02dfe9fa40f2e.tgz!package/package.json"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-team-briefing/LICENSE",
+      "bytes": 11345,
+      "sha256": "bc6b3af2f331cbc7fb0da1344efb2cbe5877a31498b4d70dbc7000f3405a1362",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-team-briefing-0.1.0-pilot.1-11a6a616c488afbebc0b1781f3e40039c2e49c697cadee0fc095f2e151d6c2bf.tgz!package/LICENSE"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-team-briefing/NOTICE",
+      "bytes": 1040,
+      "sha256": "3f400bcb2748670e59968eeb6b0369042e1031c5bd6938d9786eb88085cfb7cf",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-team-briefing-0.1.0-pilot.1-11a6a616c488afbebc0b1781f3e40039c2e49c697cadee0fc095f2e151d6c2bf.tgz!package/NOTICE"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-team-briefing/README.md",
+      "bytes": 821,
+      "sha256": "8424608bf9cf87a8064470873c49907ff983e09e7ee44ac123102d51422651d9",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-team-briefing-0.1.0-pilot.1-11a6a616c488afbebc0b1781f3e40039c2e49c697cadee0fc095f2e151d6c2bf.tgz!package/README.md"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-team-briefing/SKILL.md",
+      "bytes": 5652,
+      "sha256": "cbe698fa9539c83e6a49088d7388f441c95844837a65596600ac984125e95a84",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-team-briefing-0.1.0-pilot.1-11a6a616c488afbebc0b1781f3e40039c2e49c697cadee0fc095f2e151d6c2bf.tgz!package/SKILL.md"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-team-briefing/SOURCE.json",
+      "bytes": 2261,
+      "sha256": "237c84ab8d8f6fade053f83bf252da1ac6e340eae3f53e837f81f8210abc0e34",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-team-briefing-0.1.0-pilot.1-11a6a616c488afbebc0b1781f3e40039c2e49c697cadee0fc095f2e151d6c2bf.tgz!package/SOURCE.json"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-team-briefing/WRAPPER-LICENSE",
+      "bytes": 1093,
+      "sha256": "79832ece489707e2f1c9d5ddeaa9c38958a3bbce2a0d5b67645af5a4039ad787",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-team-briefing-0.1.0-pilot.1-11a6a616c488afbebc0b1781f3e40039c2e49c697cadee0fc095f2e151d6c2bf.tgz!package/WRAPPER-LICENSE"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-team-briefing/cordis.patch.yml",
+      "bytes": 204,
+      "sha256": "1a7e4010df6e2086f54930ec6dbd78e5eedff421ca15e02b7c5855ee3e5e96f0",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-team-briefing-0.1.0-pilot.1-11a6a616c488afbebc0b1781f3e40039c2e49c697cadee0fc095f2e151d6c2bf.tgz!package/cordis.patch.yml"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-team-briefing/index.js",
+      "bytes": 1479,
+      "sha256": "8eac56f70338d3619928d08f9c3d91446432a7f3e998b03fa5fb0fb701b1c393",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-team-briefing-0.1.0-pilot.1-11a6a616c488afbebc0b1781f3e40039c2e49c697cadee0fc095f2e151d6c2bf.tgz!package/index.js"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-team-briefing/package.json",
+      "bytes": 1197,
+      "sha256": "862e34399995064dbd69d2b6613356960be5e3c0f65782b5a366ec146979220a",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-team-briefing-0.1.0-pilot.1-11a6a616c488afbebc0b1781f3e40039c2e49c697cadee0fc095f2e151d6c2bf.tgz!package/package.json"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-team-briefing/skill-content.js",
+      "bytes": 6138,
+      "sha256": "5e7e349ee05ea1ff73d15daf8f9420a424edac913b90a8a06580e90a65b3b319",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-team-briefing-0.1.0-pilot.1-11a6a616c488afbebc0b1781f3e40039c2e49c697cadee0fc095f2e151d6c2bf.tgz!package/skill-content.js"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-team-briefing/third_party/anthropic-internal-comms/LICENSE.txt",
+      "bytes": 11345,
+      "sha256": "bc6b3af2f331cbc7fb0da1344efb2cbe5877a31498b4d70dbc7000f3405a1362",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-team-briefing-0.1.0-pilot.1-11a6a616c488afbebc0b1781f3e40039c2e49c697cadee0fc095f2e151d6c2bf.tgz!package/third_party/anthropic-internal-comms/LICENSE.txt"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-team-briefing/third_party/anthropic-internal-comms/SKILL.md",
+      "bytes": 1511,
+      "sha256": "067b7587a344a928fc6534ef66b1bcd591fc7c26d207ea7ca3334aeb678d6475",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-team-briefing-0.1.0-pilot.1-11a6a616c488afbebc0b1781f3e40039c2e49c697cadee0fc095f2e151d6c2bf.tgz!package/third_party/anthropic-internal-comms/SKILL.md"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-team-briefing/third_party/anthropic-internal-comms/examples/3p-updates.md",
+      "bytes": 3274,
+      "sha256": "087e4363c0f3513728a7e695eeb9ead5c3ecd12a4681b59340691180e65b68fc",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-team-briefing-0.1.0-pilot.1-11a6a616c488afbebc0b1781f3e40039c2e49c697cadee0fc095f2e151d6c2bf.tgz!package/third_party/anthropic-internal-comms/examples/3p-updates.md"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-team-briefing/third_party/anthropic-internal-comms/examples/company-newsletter.md",
+      "bytes": 3295,
+      "sha256": "30f81cfbdb03858a006169c72169024089c7c5d3d32611d337782da4f38c86b5",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-team-briefing-0.1.0-pilot.1-11a6a616c488afbebc0b1781f3e40039c2e49c697cadee0fc095f2e151d6c2bf.tgz!package/third_party/anthropic-internal-comms/examples/company-newsletter.md"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-team-briefing/third_party/anthropic-internal-comms/examples/faq-answers.md",
+      "bytes": 2366,
+      "sha256": "5ecd3356cd6666937f2ebefa753253edfdbdca15e368d07baf398bfcced72484",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-team-briefing-0.1.0-pilot.1-11a6a616c488afbebc0b1781f3e40039c2e49c697cadee0fc095f2e151d6c2bf.tgz!package/third_party/anthropic-internal-comms/examples/faq-answers.md"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-team-briefing/third_party/anthropic-internal-comms/examples/general-comms.md",
+      "bytes": 602,
+      "sha256": "4d3a4bb198a77626bcf018e96b2b45a2dbabed172d4ade0fcd70d23ae8a47a47",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-team-briefing-0.1.0-pilot.1-11a6a616c488afbebc0b1781f3e40039c2e49c697cadee0fc095f2e151d6c2bf.tgz!package/third_party/anthropic-internal-comms/examples/general-comms.md"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-course-workbench/LICENSE",
+      "bytes": 1093,
+      "sha256": "79832ece489707e2f1c9d5ddeaa9c38958a3bbce2a0d5b67645af5a4039ad787",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-course-workbench-0.1.0-pilot.1.3.font.1-d46ba9e2deb27f7cd6296a5bfd24b3e8db0f0d99bcc4cddc734f82b794197411.tgz!package/LICENSE"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-course-workbench/README.md",
+      "bytes": 5088,
+      "sha256": "b0371b0b6607362461d211c31311c8a1bc6644496f5422e0ee5abec918978dda",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-course-workbench-0.1.0-pilot.1.3.font.1-d46ba9e2deb27f7cd6296a5bfd24b3e8db0f0d99bcc4cddc734f82b794197411.tgz!package/README.md"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-course-workbench/client.js",
+      "bytes": 76925,
+      "sha256": "9030191b4c911fde5bb02b74c52d7b7094d498258477bdfa22580072196fcf3a",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-course-workbench-0.1.0-pilot.1.3.font.1-d46ba9e2deb27f7cd6296a5bfd24b3e8db0f0d99bcc4cddc734f82b794197411.tgz!package/client.js"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-course-workbench/cordis.patch.yml",
+      "bytes": 138,
+      "sha256": "ae0aa3bea24905d9a9cf3c186f9cb132ad848a0f6b0f66fc2e2e5065563377ef",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-course-workbench-0.1.0-pilot.1.3.font.1-d46ba9e2deb27f7cd6296a5bfd24b3e8db0f0d99bcc4cddc734f82b794197411.tgz!package/cordis.patch.yml"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-course-workbench/index.js",
+      "bytes": 11197,
+      "sha256": "1be66a40edda3dad84b6f828f265f74011826b3488113ca21ce945e017184cb2",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-course-workbench-0.1.0-pilot.1.3.font.1-d46ba9e2deb27f7cd6296a5bfd24b3e8db0f0d99bcc4cddc734f82b794197411.tgz!package/index.js"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-course-workbench/package.json",
+      "bytes": 1264,
+      "sha256": "36e2ace14d9f90414740109ac0a255f4272fc487aec6f8d9fd9baf7cc5cb9078",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-course-workbench-0.1.0-pilot.1.3.font.1-d46ba9e2deb27f7cd6296a5bfd24b3e8db0f0d99bcc4cddc734f82b794197411.tgz!package/package.json"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-course-workbench/skills/qcu-course-draft/SKILL.md",
+      "bytes": 1955,
+      "sha256": "7eb7f221fbf1abb66e33258a1b7f5f337275a7b1861d1fe172bf6cbdedba61ba",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-course-workbench-0.1.0-pilot.1.3.font.1-d46ba9e2deb27f7cd6296a5bfd24b3e8db0f0d99bcc4cddc734f82b794197411.tgz!package/skills/qcu-course-draft/SKILL.md"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-course-workbench/src/artifact-html.mjs",
+      "bytes": 8343,
+      "sha256": "b11e90168b119679e23210834e99833d33c4fbf63a0610a92ffabf7ed28514c2",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-course-workbench-0.1.0-pilot.1.3.font.1-d46ba9e2deb27f7cd6296a5bfd24b3e8db0f0d99bcc4cddc734f82b794197411.tgz!package/src/artifact-html.mjs"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-course-workbench/src/export.mjs",
+      "bytes": 10453,
+      "sha256": "29dd68de2f0eca04e9ab5bd0aab10b20aa428dc888a4d1f470c11dc9cf0fa0f3",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-course-workbench-0.1.0-pilot.1.3.font.1-d46ba9e2deb27f7cd6296a5bfd24b3e8db0f0d99bcc4cddc734f82b794197411.tgz!package/src/export.mjs"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-course-workbench/src/files.mjs",
+      "bytes": 5184,
+      "sha256": "7a3a0748a7b57360b9dcb34a31938c4d5285b8d6d43fc375011f62c0db176593",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-course-workbench-0.1.0-pilot.1.3.font.1-d46ba9e2deb27f7cd6296a5bfd24b3e8db0f0d99bcc4cddc734f82b794197411.tgz!package/src/files.mjs"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-course-workbench/src/prompt.mjs",
+      "bytes": 6071,
+      "sha256": "fec3e28a483d7feba7189729ad57c353a2d55070770d6f43043ac1a0258be300",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-course-workbench-0.1.0-pilot.1.3.font.1-d46ba9e2deb27f7cd6296a5bfd24b3e8db0f0d99bcc4cddc734f82b794197411.tgz!package/src/prompt.mjs"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-course-workbench/src/protocol.mjs",
+      "bytes": 12976,
+      "sha256": "f6373521a8994353cb6fb43dc2a573ca7361564d488883220359a4f4a8aa53ab",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-course-workbench-0.1.0-pilot.1.3.font.1-d46ba9e2deb27f7cd6296a5bfd24b3e8db0f0d99bcc4cddc734f82b794197411.tgz!package/src/protocol.mjs"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-course-workbench/src/store.mjs",
+      "bytes": 13825,
+      "sha256": "5ff14e647d68b3aa8fb4ce824bd231be5be8d0b6c7035aeffdfb24ca21169588",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-course-workbench-0.1.0-pilot.1.3.font.1-d46ba9e2deb27f7cd6296a5bfd24b3e8db0f0d99bcc4cddc734f82b794197411.tgz!package/src/store.mjs"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-tiered-practice/LICENSE",
+      "bytes": 1093,
+      "sha256": "79832ece489707e2f1c9d5ddeaa9c38958a3bbce2a0d5b67645af5a4039ad787",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-tiered-practice-0.1.0-pilot.1.1-183e63eab27bb13dc98f4bec437028126284459c0eeef294e1ee87e819711052.tgz!package/LICENSE"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-tiered-practice/README.md",
+      "bytes": 759,
+      "sha256": "d84c33d7b9c7bcaf6413ad9b158b06972662988caf4e1b636b865fa81c039a96",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-tiered-practice-0.1.0-pilot.1.1-183e63eab27bb13dc98f4bec437028126284459c0eeef294e1ee87e819711052.tgz!package/README.md"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-tiered-practice/SKILL.md",
+      "bytes": 2427,
+      "sha256": "90e0e9c9c6dfaea5de10c10ca4a20dcc09710a87615e641299ae547b3d5a2b69",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-tiered-practice-0.1.0-pilot.1.1-183e63eab27bb13dc98f4bec437028126284459c0eeef294e1ee87e819711052.tgz!package/SKILL.md"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-tiered-practice/SOURCE.json",
+      "bytes": 722,
+      "sha256": "ded4479444cf9a401399227e27be46eebb3a67d4dacca972380ae8a7e8f9d6cd",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-tiered-practice-0.1.0-pilot.1.1-183e63eab27bb13dc98f4bec437028126284459c0eeef294e1ee87e819711052.tgz!package/SOURCE.json"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-tiered-practice/cordis.patch.yml",
+      "bytes": 208,
+      "sha256": "b19d51046226fb6a2e8631f743075d635974e9c8fa1bce51e4373a5bfd7f0fbe",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-tiered-practice-0.1.0-pilot.1.1-183e63eab27bb13dc98f4bec437028126284459c0eeef294e1ee87e819711052.tgz!package/cordis.patch.yml"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-tiered-practice/index.js",
+      "bytes": 1479,
+      "sha256": "8eac56f70338d3619928d08f9c3d91446432a7f3e998b03fa5fb0fb701b1c393",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-tiered-practice-0.1.0-pilot.1.1-183e63eab27bb13dc98f4bec437028126284459c0eeef294e1ee87e819711052.tgz!package/index.js"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-tiered-practice/package.json",
+      "bytes": 703,
+      "sha256": "b139ae91da129e430bea4adb9fa58d355dcd337e7dd881d80b37dba937be4a7c",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-tiered-practice-0.1.0-pilot.1.1-183e63eab27bb13dc98f4bec437028126284459c0eeef294e1ee87e819711052.tgz!package/package.json"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-tiered-practice/skill-content.js",
+      "bytes": 2825,
+      "sha256": "295557660c63e0a36c9571b6e6afadc50e920fac511d8952491d47b88db53118",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-tiered-practice-0.1.0-pilot.1.1-183e63eab27bb13dc98f4bec437028126284459c0eeef294e1ee87e819711052.tgz!package/skill-content.js"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-note-organizer/LICENSE",
+      "bytes": 1093,
+      "sha256": "79832ece489707e2f1c9d5ddeaa9c38958a3bbce2a0d5b67645af5a4039ad787",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-note-organizer-0.1.0-pilot.1.1-9c8f1e50ac4f3aff613678c8c094b4e8f53c0393ca011e7a41ceaa5ab96f67e7.tgz!package/LICENSE"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-note-organizer/README.md",
+      "bytes": 761,
+      "sha256": "19fde5195f7baa2f939a8ff1e5bdc5aa8b21c405a11f37fe07adc4a1402999f0",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-note-organizer-0.1.0-pilot.1.1-9c8f1e50ac4f3aff613678c8c094b4e8f53c0393ca011e7a41ceaa5ab96f67e7.tgz!package/README.md"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-note-organizer/SKILL.md",
+      "bytes": 2798,
+      "sha256": "876d47bb444465afd7148c8afc24d4e9904197bd6b6a6e286fc4ce9153615460",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-note-organizer-0.1.0-pilot.1.1-9c8f1e50ac4f3aff613678c8c094b4e8f53c0393ca011e7a41ceaa5ab96f67e7.tgz!package/SKILL.md"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-note-organizer/SOURCE.json",
+      "bytes": 706,
+      "sha256": "783a7950ac2a7c9caffaf9cf8862eb5fd1a4a1c7c355a3dde343b1cbd52a2fbb",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-note-organizer-0.1.0-pilot.1.1-9c8f1e50ac4f3aff613678c8c094b4e8f53c0393ca011e7a41ceaa5ab96f67e7.tgz!package/SOURCE.json"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-note-organizer/cordis.patch.yml",
+      "bytes": 206,
+      "sha256": "4cdcc886acb9ccccc56f01e105c96c7130038f7e0648f126aa4351f8c8b03b2d",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-note-organizer-0.1.0-pilot.1.1-9c8f1e50ac4f3aff613678c8c094b4e8f53c0393ca011e7a41ceaa5ab96f67e7.tgz!package/cordis.patch.yml"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-note-organizer/index.js",
+      "bytes": 1479,
+      "sha256": "8eac56f70338d3619928d08f9c3d91446432a7f3e998b03fa5fb0fb701b1c393",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-note-organizer-0.1.0-pilot.1.1-9c8f1e50ac4f3aff613678c8c094b4e8f53c0393ca011e7a41ceaa5ab96f67e7.tgz!package/index.js"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-note-organizer/package.json",
+      "bytes": 747,
+      "sha256": "dbccb58118c4cb715ac976db50bd77800ba152d3b3afe83411b4dfa0d8fc415d",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-note-organizer-0.1.0-pilot.1.1-9c8f1e50ac4f3aff613678c8c094b4e8f53c0393ca011e7a41ceaa5ab96f67e7.tgz!package/package.json"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-note-organizer/skill-content.js",
+      "bytes": 3261,
+      "sha256": "5f13ab08f60325e18da677c288b9312ad1a9e9c35294eeb14a7bbfd6dd99c6dc",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-note-organizer-0.1.0-pilot.1.1-9c8f1e50ac4f3aff613678c8c094b4e8f53c0393ca011e7a41ceaa5ab96f67e7.tgz!package/skill-content.js"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-market/LICENSE",
+      "bytes": 1093,
+      "sha256": "79832ece489707e2f1c9d5ddeaa9c38958a3bbce2a0d5b67645af5a4039ad787",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-market-0.1.0-pilot.16.1-edcacdc3f9de83f08f2dca21f3f1f54e60161e314a58529ced819bc2ee4a3c69.tgz!package/LICENSE"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-market/README.md",
+      "bytes": 17239,
+      "sha256": "3bf59697ef8b80bf4282e2d09dad58e8f25348bd2feab4b132530fb032c05441",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-market-0.1.0-pilot.16.1-edcacdc3f9de83f08f2dca21f3f1f54e60161e314a58529ced819bc2ee4a3c69.tgz!package/README.md"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-market/client.js",
+      "bytes": 178177,
+      "sha256": "6309ecf0819d3e1abd995dc582fe2e79d349cdd91e0ecbdfacfb50b1656ba275",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-market-0.1.0-pilot.16.1-edcacdc3f9de83f08f2dca21f3f1f54e60161e314a58529ced819bc2ee4a3c69.tgz!package/client.js"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-market/cordis.patch.yml",
+      "bytes": 71,
+      "sha256": "b98edf16629859557d480042df67740baf1d2e0b458ace8d60ba69cbb7bce6dc",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-market-0.1.0-pilot.16.1-edcacdc3f9de83f08f2dca21f3f1f54e60161e314a58529ced819bc2ee4a3c69.tgz!package/cordis.patch.yml"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-market/icon.svg",
+      "bytes": 347,
+      "sha256": "9714cc8e5ef5e32d7079e89241fb34e3ab2b9784d9c89dc30f0773b3341c584a",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-market-0.1.0-pilot.16.1-edcacdc3f9de83f08f2dca21f3f1f54e60161e314a58529ced819bc2ee4a3c69.tgz!package/icon.svg"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-market/index.js",
+      "bytes": 2915,
+      "sha256": "a7d03cf0406d693f94e1a149359ef0d26016df23d73d1f024837845e3fdfb2e4",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-market-0.1.0-pilot.16.1-edcacdc3f9de83f08f2dca21f3f1f54e60161e314a58529ced819bc2ee4a3c69.tgz!package/index.js"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-market/locale/en.json",
+      "bytes": 153,
+      "sha256": "ba9059abbf09a42ffa7e5e6506e4e5413f16d6fa7418197d18cce9a38c2306ce",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-market-0.1.0-pilot.16.1-edcacdc3f9de83f08f2dca21f3f1f54e60161e314a58529ced819bc2ee4a3c69.tgz!package/locale/en.json"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-market/locale/zh.json",
+      "bytes": 152,
+      "sha256": "a2338245b1d5081bc9e52a630297edbdbe1df7b177ee6b284fb4459db68f0de9",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-market-0.1.0-pilot.16.1-edcacdc3f9de83f08f2dca21f3f1f54e60161e314a58529ced819bc2ee4a3c69.tgz!package/locale/zh.json"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-market/package.json",
+      "bytes": 1843,
+      "sha256": "6270755c57c13a38da68dc85929e63d473a208a794d8eca91ca3aa7115fc84f2",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-market-0.1.0-pilot.16.1-edcacdc3f9de83f08f2dca21f3f1f54e60161e314a58529ced819bc2ee4a3c69.tgz!package/package.json"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-market/src/bundled-catalog.mjs",
+      "bytes": 21276,
+      "sha256": "774ccf91cc52c6fc90745d9166dcaf87b30e51ed722074f3078253e8ebd32a0f",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-market-0.1.0-pilot.16.1-edcacdc3f9de83f08f2dca21f3f1f54e60161e314a58529ced819bc2ee4a3c69.tgz!package/src/bundled-catalog.mjs"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-market/src/catalog-authority.mjs",
+      "bytes": 8372,
+      "sha256": "2639c4b7162e1e7c751db2501ad4b2c5ce3cfce163d70c108327271f9d912de8",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-market-0.1.0-pilot.16.1-edcacdc3f9de83f08f2dca21f3f1f54e60161e314a58529ced819bc2ee4a3c69.tgz!package/src/catalog-authority.mjs"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-market/src/catalog-core.mjs",
+      "bytes": 4694,
+      "sha256": "0eb18fb593f790ed68c7d9b627762f324e812fd495423c4a88b1c96d93562361",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-market-0.1.0-pilot.16.1-edcacdc3f9de83f08f2dca21f3f1f54e60161e314a58529ced819bc2ee4a3c69.tgz!package/src/catalog-core.mjs"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-market/src/feedback-host.mjs",
+      "bytes": 4505,
+      "sha256": "fa467c3df56030868dcea808e08b318e875d47bd4a1bc97731b6c706c012bba0",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-market-0.1.0-pilot.16.1-edcacdc3f9de83f08f2dca21f3f1f54e60161e314a58529ced819bc2ee4a3c69.tgz!package/src/feedback-host.mjs"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-market/src/feedback-schema.mjs",
+      "bytes": 2896,
+      "sha256": "95a68e27303daa1e8add12a0e653c0ecd7b900b6a6e08ea603043ffab2c0b208",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-market-0.1.0-pilot.16.1-edcacdc3f9de83f08f2dca21f3f1f54e60161e314a58529ced819bc2ee4a3c69.tgz!package/src/feedback-schema.mjs"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-market/src/feedback-storage.mjs",
+      "bytes": 4830,
+      "sha256": "2250dca596431216653442d9a5c9c5c29b85510e07ae8fa3655fc72276d4d517",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-market-0.1.0-pilot.16.1-edcacdc3f9de83f08f2dca21f3f1f54e60161e314a58529ced819bc2ee4a3c69.tgz!package/src/feedback-storage.mjs"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-market/src/host-core.mjs",
+      "bytes": 7860,
+      "sha256": "0cfebd0642d8cb6bfa72dfc163dafc2cf4b60fc301c6a6a062cd6e6ada24ff6c",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-market-0.1.0-pilot.16.1-edcacdc3f9de83f08f2dca21f3f1f54e60161e314a58529ced819bc2ee4a3c69.tgz!package/src/host-core.mjs"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-market/src/public-trust.mjs",
+      "bytes": 301,
+      "sha256": "ee9af2bebc957465d4d7f50bc5cd7bee9183fc18bcc396158f4715841e14d0fd",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-market-0.1.0-pilot.16.1-edcacdc3f9de83f08f2dca21f3f1f54e60161e314a58529ced819bc2ee4a3c69.tgz!package/src/public-trust.mjs"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-market/src/remote-contract.mjs",
+      "bytes": 3579,
+      "sha256": "acab61eaa1ec7a8cffb39dcb118f3cba560a3202905248da506b4652d05d6a45",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-market-0.1.0-pilot.16.1-edcacdc3f9de83f08f2dca21f3f1f54e60161e314a58529ced819bc2ee4a3c69.tgz!package/src/remote-contract.mjs"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-market/src/trusted-release.mjs",
+      "bytes": 660,
+      "sha256": "9c22a264ef1918bf0f0842f122a2e8664631b02cb2e9d9c80bbb50c7eac30061",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-market-0.1.0-pilot.16.1-edcacdc3f9de83f08f2dca21f3f1f54e60161e314a58529ced819bc2ee4a3c69.tgz!package/src/trusted-release.mjs"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-market/src/update-archive.mjs",
+      "bytes": 3362,
+      "sha256": "79f09555e0de81b4c24128ccaf6ff3b439e96a28271928ea86df454fe6596f53",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-market-0.1.0-pilot.16.1-edcacdc3f9de83f08f2dca21f3f1f54e60161e314a58529ced819bc2ee4a3c69.tgz!package/src/update-archive.mjs"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-market/src/update-host.mjs",
+      "bytes": 14328,
+      "sha256": "11185a1c0aa73839cef70cd8be20fffc6ae133a1c096700eb30678fe36194959",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-market-0.1.0-pilot.16.1-edcacdc3f9de83f08f2dca21f3f1f54e60161e314a58529ced819bc2ee4a3c69.tgz!package/src/update-host.mjs"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-market/src/update-model.mjs",
+      "bytes": 5782,
+      "sha256": "c58d97c50ebaceea44cb39ac4552ea2c9e0e39714a6ed90e1e2eb87389d37026",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-market-0.1.0-pilot.16.1-edcacdc3f9de83f08f2dca21f3f1f54e60161e314a58529ced819bc2ee4a3c69.tgz!package/src/update-model.mjs"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-market/src/update-policy.mjs",
+      "bytes": 4238,
+      "sha256": "bd4db6782479abf7a03332f6755c84bca95762c6e1d1609b81ea1e24c8bf3fe6",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-market-0.1.0-pilot.16.1-edcacdc3f9de83f08f2dca21f3f1f54e60161e314a58529ced819bc2ee4a3c69.tgz!package/src/update-policy.mjs"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-market/src/update-storage.mjs",
+      "bytes": 1970,
+      "sha256": "6a4133a6605a2e6676de12f05ac9e24db2ba2b859271c3f2472ffb8cf15e18a7",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-market-0.1.0-pilot.16.1-edcacdc3f9de83f08f2dca21f3f1f54e60161e314a58529ced819bc2ee4a3c69.tgz!package/src/update-storage.mjs"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-lesson-planning/LICENSE",
+      "bytes": 1093,
+      "sha256": "79832ece489707e2f1c9d5ddeaa9c38958a3bbce2a0d5b67645af5a4039ad787",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-lesson-planning-0.1.0-pilot.1.1-6f8930d4f12f8f52c93422b41cadd050db374c0fe4ce5c06e8b824e69d672bd4.tgz!package/LICENSE"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-lesson-planning/README.md",
+      "bytes": 768,
+      "sha256": "f67a264a91ef6b5c16298874f382395964e3ff155e8d059e894d88e1a8a6ad54",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-lesson-planning-0.1.0-pilot.1.1-6f8930d4f12f8f52c93422b41cadd050db374c0fe4ce5c06e8b824e69d672bd4.tgz!package/README.md"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-lesson-planning/SKILL.md",
+      "bytes": 2440,
+      "sha256": "ae1c27f034ea4af8bf65432e52f98be21db9387bb7b5df53382211ee83c944d9",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-lesson-planning-0.1.0-pilot.1.1-6f8930d4f12f8f52c93422b41cadd050db374c0fe4ce5c06e8b824e69d672bd4.tgz!package/SKILL.md"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-lesson-planning/SOURCE.json",
+      "bytes": 722,
+      "sha256": "994e40c7a7bd787a7e36f78768b59c9be0b347013f3c9aec3cb55d2af8b04557",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-lesson-planning-0.1.0-pilot.1.1-6f8930d4f12f8f52c93422b41cadd050db374c0fe4ce5c06e8b824e69d672bd4.tgz!package/SOURCE.json"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-lesson-planning/cordis.patch.yml",
+      "bytes": 208,
+      "sha256": "e267fa39621128a52ec1a8c9b2356f2416490de577bbe9da312c8f19a1c93c9b",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-lesson-planning-0.1.0-pilot.1.1-6f8930d4f12f8f52c93422b41cadd050db374c0fe4ce5c06e8b824e69d672bd4.tgz!package/cordis.patch.yml"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-lesson-planning/index.js",
+      "bytes": 1479,
+      "sha256": "8eac56f70338d3619928d08f9c3d91446432a7f3e998b03fa5fb0fb701b1c393",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-lesson-planning-0.1.0-pilot.1.1-6f8930d4f12f8f52c93422b41cadd050db374c0fe4ce5c06e8b824e69d672bd4.tgz!package/index.js"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-lesson-planning/package.json",
+      "bytes": 706,
+      "sha256": "51387d66b247555ad5221279bfb27b582d39ae61df88e74c10a36019cc271110",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-lesson-planning-0.1.0-pilot.1.1-6f8930d4f12f8f52c93422b41cadd050db374c0fe4ce5c06e8b824e69d672bd4.tgz!package/package.json"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-lesson-planning/skill-content.js",
+      "bytes": 2841,
+      "sha256": "614bb72db3390d670098a2ec20aa0afed20900514526f43dc233b4449247048f",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-lesson-planning-0.1.0-pilot.1.1-6f8930d4f12f8f52c93422b41cadd050db374c0fe4ce5c06e8b824e69d672bd4.tgz!package/skill-content.js"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-expert-teams/LICENSE",
+      "bytes": 1093,
+      "sha256": "79832ece489707e2f1c9d5ddeaa9c38958a3bbce2a0d5b67645af5a4039ad787",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-expert-teams-0.2.0-pilot.3.font.1-4835ab751ccef3f11089a5b5ad198ea22d1ef7d34a334ac231ef83052cdbad93.tgz!package/LICENSE"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-expert-teams/README.md",
+      "bytes": 4223,
+      "sha256": "e2a82791d1c10576aab97d9bd2921cc8082f57ace42f7b420b6337b5a3f6ba27",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-expert-teams-0.2.0-pilot.3.font.1-4835ab751ccef3f11089a5b5ad198ea22d1ef7d34a334ac231ef83052cdbad93.tgz!package/README.md"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-expert-teams/build.mjs",
+      "bytes": 713,
+      "sha256": "1613ca96b5834ed365175e7ea8e31c665c06a344818a03bb172e8fe49d05f59d",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-expert-teams-0.2.0-pilot.3.font.1-4835ab751ccef3f11089a5b5ad198ea22d1ef7d34a334ac231ef83052cdbad93.tgz!package/build.mjs"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-expert-teams/client.js",
+      "bytes": 80005,
+      "sha256": "b9d431bfc4bcdee03a185d79c2ec591a746bd21627168a726f14db3c89f1b5fe",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-expert-teams-0.2.0-pilot.3.font.1-4835ab751ccef3f11089a5b5ad198ea22d1ef7d34a334ac231ef83052cdbad93.tgz!package/client.js"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-expert-teams/cordis.patch.yml",
+      "bytes": 109,
+      "sha256": "ca3dafb122a18ed5efac98b9949f1fcf250f7335f5d1573edd24388a4ff0d384",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-expert-teams-0.2.0-pilot.3.font.1-4835ab751ccef3f11089a5b5ad198ea22d1ef7d34a334ac231ef83052cdbad93.tgz!package/cordis.patch.yml"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-expert-teams/index.js",
+      "bytes": 5155,
+      "sha256": "41a2d27513b380706f97e905f5566dab3e521d79c6a666463cccc85456638ed0",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-expert-teams-0.2.0-pilot.3.font.1-4835ab751ccef3f11089a5b5ad198ea22d1ef7d34a334ac231ef83052cdbad93.tgz!package/index.js"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-expert-teams/package.json",
+      "bytes": 1223,
+      "sha256": "de26c5bbb748f7a47d18f0dace90814d82414a0385423c7c671a1c1c34d6a62a",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-expert-teams-0.2.0-pilot.3.font.1-4835ab751ccef3f11089a5b5ad198ea22d1ef7d34a334ac231ef83052cdbad93.tgz!package/package.json"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-expert-teams/src/controller.mjs",
+      "bytes": 15425,
+      "sha256": "32bda1e513210cb5c3942e36fefddea885c1a8c2c2feed27a030aeca009b20f3",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-expert-teams-0.2.0-pilot.3.font.1-4835ab751ccef3f11089a5b5ad198ea22d1ef7d34a334ac231ef83052cdbad93.tgz!package/src/controller.mjs"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-expert-teams/src/model.mjs",
+      "bytes": 5468,
+      "sha256": "227a22ee1e6c5e62293e78b79ad6bf564c209333b6a51783f81c6407de2734eb",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-expert-teams-0.2.0-pilot.3.font.1-4835ab751ccef3f11089a5b5ad198ea22d1ef7d34a334ac231ef83052cdbad93.tgz!package/src/model.mjs"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-expert-teams/src/plugin.mjs",
+      "bytes": 1510,
+      "sha256": "f7c6a826f90c9e309b9d984217ec3de9bcbe94b75eb698e2095d01a80aab74a9",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-expert-teams-0.2.0-pilot.3.font.1-4835ab751ccef3f11089a5b5ad198ea22d1ef7d34a334ac231ef83052cdbad93.tgz!package/src/plugin.mjs"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-expert-teams/src/presets.mjs",
+      "bytes": 2040,
+      "sha256": "42945154c470e474d6ab95423b34ddf87e3b63b9c7290bf5fbdd5efa7ce46901",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-expert-teams-0.2.0-pilot.3.font.1-4835ab751ccef3f11089a5b5ad198ea22d1ef7d34a334ac231ef83052cdbad93.tgz!package/src/presets.mjs"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-expert-teams/src/protocol.mjs",
+      "bytes": 9361,
+      "sha256": "bcf99e2813abb1c0ba67067ba47141707e54dbd3fee90218c873307ba9fadd41",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-expert-teams-0.2.0-pilot.3.font.1-4835ab751ccef3f11089a5b5ad198ea22d1ef7d34a334ac231ef83052cdbad93.tgz!package/src/protocol.mjs"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-expert-teams/src/reports.mjs",
+      "bytes": 4109,
+      "sha256": "4fb21cc809b16e165067091257a0dc58e112a0af4f191e5c086f225f936ca1f0",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-expert-teams-0.2.0-pilot.3.font.1-4835ab751ccef3f11089a5b5ad198ea22d1ef7d34a334ac231ef83052cdbad93.tgz!package/src/reports.mjs"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-expert-teams/src/store.mjs",
+      "bytes": 18324,
+      "sha256": "f4cdaf730ec32965863fac5737a2d1394a6b0ba0ba13538a6c05cac4259b3fdf",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-expert-teams-0.2.0-pilot.3.font.1-4835ab751ccef3f11089a5b5ad198ea22d1ef7d34a334ac231ef83052cdbad93.tgz!package/src/store.mjs"
+    },
+    {
+      "path": "release/snapshots/mac-rc4.3/components/qcu-expert-teams/src/view.mjs",
+      "bytes": 50133,
+      "sha256": "ed5668627b5f666dc34d635c8d59ee03a1c194163db34f21eae7d0a8dee0be6e",
+      "from": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64/QCU助手.app/Contents/Resources/seed/profiles/desktop/.qcu-bundles/qcu-expert-teams-0.2.0-pilot.3.font.1-4835ab751ccef3f11089a5b5ad198ea22d1ef7d34a334ac231ef83052cdbad93.tgz!package/src/view.mjs"
+    }
+  ],
+  "purpose": "Exact QCU component source bytes extracted from immutable release; independent of later working-tree edits."
+}

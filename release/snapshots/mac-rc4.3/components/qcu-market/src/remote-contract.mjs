@@ -1,0 +1,18 @@
+import {catalogSha256} from './bundled-catalog.mjs'
+// Explicit public Typert descriptors, shared by Host and Client. No private renderer/controller imports.
+const uuidCodec={mode:'strict',typeSymbol:'qcu-market#ReceiptId',create:()=>({parse(value){if(typeof value!=='string'||!/^([a-f0-9]{8}-)([a-f0-9]{4}-){3}[a-f0-9]{12}$/i.test(value))throw new Error('Expected receipt UUID');return value}})}
+const resultCodec={mode:'strict',typeSymbol:'qcu-market#JsonReply',create:()=>({parse(value){if(typeof value!=='string'||new TextEncoder().encode(value).length>524288)throw new Error('Invalid QCU reply');JSON.parse(value);return value}})}
+const keyCodec={mode:'strict',typeSymbol:'qcu-market#ReleaseKey',create:()=>({parse(value){if(typeof value!=='string'||value.length>250||!/^qcu-[a-z0-9-]+@[0-9a-z.-]+\+[a-f0-9]{64}$/.test(value))throw new Error('Expected reviewed release key');return value}})}
+export const marketRuntime={version:'0.1.0-pilot.16.1',protocol:6,catalogSha256,updatePolicySha256:'bd4db6782479abf7a03332f6755c84bca95762c6e1d1609b81ea1e24c8bf3fe6'}
+export const remoteContribution={package:'qcu-market',descriptors:['status','refresh','prepare','verify','cancel'].map(method=>({id:`qcu-market#qcuMarket/${method}`,service:'qcuMarket',namespace:'qcuMarket',method,invocation:{kind:'direct'},parameters:['status','refresh'].includes(method)?[]:[{name:'id',wire:'id',source:'json',codec:uuidCodec},...(method==='prepare'?[{name:'releaseKey',wire:'releaseKey',source:'json',codec:keyCodec}]:[])],...(['cancel','status','refresh'].includes(method)?{}:{cancellation:{parameter:'signal'}}),result:resultCodec}))}
+
+const updateJsonCodec={mode:'strict',typeSymbol:'qcu-market#UpdateReply',create:()=>({parse(value){if(typeof value!=='string'||new TextEncoder().encode(value).length>65536)throw Error('Invalid update reply');JSON.parse(value);return value}})}
+const updateStateCodec={mode:'strict',typeSymbol:'qcu-market#AcknowledgedState',create:()=>({parse(value){if(!['verified','failed'].includes(value))throw Error('Invalid acknowledgement');return value}})}
+for(const [method,args,cancellable] of [['updatesCheck',[],true],['updatesPrepare',[['id',uuidCodec],['releaseKey',keyCodec]],true],['updatesVerify',[['id',uuidCodec]],false],['updatesCancel',[['id',uuidCodec]],false],['updatesJournal',[['id',uuidCodec],['requestId',uuidCodec]],false],['updatesRecovery',[],false],['updatesAcknowledge',[['requestId',uuidCodec],['state',updateStateCodec]],false]]){
+ remoteContribution.descriptors.push({id:`qcu-market#qcuMarket/${method}`,service:'qcuMarket',namespace:'qcuMarket',method,invocation:{kind:'direct'},parameters:args.map(([name,codec])=>({name,wire:name,source:'json',codec})),...(cancellable?{cancellation:{parameter:'signal'}}:{}),result:updateJsonCodec})
+}
+
+const feedbackCodec={mode:'strict',typeSymbol:'qcu-market#FeedbackJson',create:()=>({parse(value){if(typeof value!=='string'||new TextEncoder().encode(value).length>16384)throw Error('Invalid feedback payload');JSON.parse(value);return value}})}
+for(const method of ['feedbackSubmit','feedbackStatus'])remoteContribution.descriptors.push({id:`qcu-market#qcuMarket/${method}`,service:'qcuMarket',namespace:'qcuMarket',method,invocation:{kind:'direct'},parameters:[{name:'payload',wire:'payload',source:'json',codec:feedbackCodec}],cancellation:{parameter:'signal'},result:feedbackCodec})
+
+remoteContribution.descriptors.push({id:'qcu-market#qcuMarket/feedbackReceipts',service:'qcuMarket',namespace:'qcuMarket',method:'feedbackReceipts',invocation:{kind:'direct'},parameters:[],result:feedbackCodec})

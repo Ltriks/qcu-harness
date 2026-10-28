@@ -1,0 +1,14 @@
+[
+  {
+    "insert": [
+      {
+        "id": "qcu-lesson-planning",
+        "name": "qcu-lesson-planning",
+        "disabled": true,
+        "config": {
+          "enabled": true
+        }
+      }
+    ]
+  }
+]

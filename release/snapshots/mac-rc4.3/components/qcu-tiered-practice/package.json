@@ -1,0 +1,31 @@
+{
+  "name": "qcu-tiered-practice",
+  "version": "0.1.0-pilot.1.1",
+  "type": "module",
+  "private": true,
+  "license": "MIT",
+  "description": "面向教师的基础、进阶和迁移练习草案；对齐同一目标并附教师审核要点。",
+  "exports": {
+    ".": "./index.js",
+    "./package.json": "./package.json"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  },
+  "peerDependencies": {
+    "@deepseek-ai/cordis": "4.0.4",
+    "@deepseek-ai/dsh-skill": "0.2.0-rc.2",
+    "@deepseek-ai/dsh-scope": "0.2.0-rc.2"
+  },
+  "files": [
+    "LICENSE",
+    "README.md",
+    "SKILL.md",
+    "SOURCE.json",
+    "cordis.patch.yml",
+    "index.js",
+    "skill-content.js"
+  ]
+}

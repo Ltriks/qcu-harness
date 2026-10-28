@@ -1,0 +1,66 @@
+{
+  "name": "qcu-market",
+  "version": "0.1.0-pilot.16.1",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "exports": {
+    ".": "./index.js",
+    "./client": "./client.js",
+    "./package.json": "./package.json",
+    "./locale/*.json": "./locale/*.json"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "immediately": true,
+      "inject": [
+        "@deepseek-ai/dsh-client-ui-layout",
+        "@deepseek-ai/dsh-client-ui-sidebar",
+        "@deepseek-ai/dsh-api-remotes",
+        "@deepseek-ai/dsh-client-ui-plugin-manager"
+      ]
+    }
+  },
+  "peerDependencies": {
+    "@deepseek-ai/cordis": "4.0.4",
+    "@deepseek-ai/dsh-client-ui-layout": "0.2.0-rc.2",
+    "@deepseek-ai/dsh-client-ui-sidebar": "0.2.0-rc.2",
+    "@deepseek-ai/dsh-plugin-manager": "0.2.0-rc.2",
+    "@deepseek-ai/dsh-api-remotes": "0.2.0-rc.2",
+    "@deepseek-ai/dsh-client-ui-plugin-manager": "0.2.0-rc.2",
+    "@deepseek-ai/dsh-typert-registry": "0.2.0-rc.2",
+    "@deepseek-ai/dsh-typert-protocol": "0.2.0-rc.2",
+    "@deepseek-ai/dsh-app-boot": "0.2.0-rc.2"
+  },
+  "files": [
+    "index.js",
+    "client.js",
+    "cordis.patch.yml",
+    "README.md",
+    "LICENSE",
+    "icon.svg",
+    "locale/zh.json",
+    "locale/en.json",
+    "src/host-core.mjs",
+    "src/trusted-release.mjs",
+    "src/remote-contract.mjs",
+    "src/catalog-core.mjs",
+    "src/bundled-catalog.mjs",
+    "src/catalog-authority.mjs",
+    "src/public-trust.mjs",
+    "src/update-host.mjs",
+    "src/update-archive.mjs",
+    "src/update-policy.mjs",
+    "src/update-storage.mjs",
+    "src/update-model.mjs",
+    "src/feedback-host.mjs",
+    "src/feedback-schema.mjs",
+    "src/feedback-storage.mjs"
+  ],
+  "description": "QCU 签名动态市场；独立发布、安装与启用确认",
+  "icon": "./icon.svg"
+}

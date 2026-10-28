@@ -1,0 +1,31 @@
+{
+  "name": "qcu-note-organizer",
+  "version": "0.1.0-pilot.1.1",
+  "type": "module",
+  "private": true,
+  "license": "MIT",
+  "description": "面向教师的匿名课堂要点与复习材料整理，也辅导学生整理已有笔记；保留来源与待确认项，不写应交终稿。",
+  "exports": {
+    ".": "./index.js",
+    "./package.json": "./package.json"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  },
+  "peerDependencies": {
+    "@deepseek-ai/cordis": "4.0.4",
+    "@deepseek-ai/dsh-skill": "0.2.0-rc.2",
+    "@deepseek-ai/dsh-scope": "0.2.0-rc.2"
+  },
+  "files": [
+    "LICENSE",
+    "README.md",
+    "SKILL.md",
+    "SOURCE.json",
+    "cordis.patch.yml",
+    "index.js",
+    "skill-content.js"
+  ]
+}

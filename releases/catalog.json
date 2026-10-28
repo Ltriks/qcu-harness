@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "updatedAt": "2026-10-28",
+  "repository": "https://github.com/Ltriks/qcu-harness",
+  "scope": "Fixed two-platform pre-release archives; not a live Hub catalog.",
+  "releases": [
+    {
+      "id": "qcu-teacher-v0.1.0-rc.4.3-mac-arm64",
+      "version": "0.1.0-rc.4.3",
+      "packagingRevision": null,
+      "target": "mac-arm64",
+      "status": "prerelease",
+      "tag": "qcu-teacher-v0.1.0-rc.4.3-mac-arm64",
+      "sourceBranch": "dev/qcu-release-archive-20261028",
+      "releaseUrl": "https://github.com/Ltriks/qcu-harness/releases/tag/qcu-teacher-v0.1.0-rc.4.3-mac-arm64",
+      "downloadUrl": "https://github.com/Ltriks/qcu-harness/releases/download/qcu-teacher-v0.1.0-rc.4.3-mac-arm64/QCU-Teacher-0.1.0-rc.4.3-mac-arm64.zip",
+      "file": "QCU-Teacher-0.1.0-rc.4.3-mac-arm64.zip",
+      "bytes": 390492068,
+      "sha256": "7fb9278133fa62499765dfbc4f8d62578e05bdcf6d5549eb12d789cdd513421c",
+      "coreVersion": "0.2.0-rc.2",
+      "marketIncluded": true,
+      "newNativeGUIAccepted": false,
+      "notarized": false
+    },
+    {
+      "id": "qcu-teacher-v0.1.0-rc.3-win-x64-r4",
+      "version": "0.1.0-rc.3",
+      "packagingRevision": "r4",
+      "target": "win-x64",
+      "status": "prerelease",
+      "tag": "qcu-teacher-v0.1.0-rc.3-win-x64-r4",
+      "sourceBranch": "dev/qcu-windows-r4-source-archive",
+      "releaseUrl": "https://github.com/Ltriks/qcu-harness/releases/tag/qcu-teacher-v0.1.0-rc.3-win-x64-r4",
+      "downloadUrl": "https://github.com/Ltriks/qcu-harness/releases/download/qcu-teacher-v0.1.0-rc.3-win-x64-r4/QCU-Teacher-0.1.0-rc.3-win-x64-r4.zip",
+      "file": "QCU-Teacher-0.1.0-rc.3-win-x64-r4.zip",
+      "bytes": 401560353,
+      "sha256": "6653d40071b70d9f22880a50b16b06bdc64ae2390720fd5930ef08293ca1c2bf",
+      "coreVersion": "0.2.0-rc.2",
+      "marketIncluded": false,
+      "newNativeGUIAccepted": false,
+      "notarized": null
+    }
+  ]
+}

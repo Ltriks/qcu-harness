@@ -1,5 +1,9 @@
 # QCU Harness
 
+## 固定安装包与 GitHub 预发布
+
+Mac **rc4.3**、Windows **rc3-r4** 分平台归档为预发布；下载、SHA256、指南、源码标签、构建测试、产物及部署位置见[发布索引](releases/README.md)和[本次发布记录](docs/qcu-github-release-publication-20261028.md)。当前归档分支 `dev/qcu-release-archive-20261028`，不合并或推送main。Windows不含当前市场／专家团，不继承Mac P16验收。新机GUI、系统信任与教师真实任务保持待验收。
+
 ## 教师助手与工具市场 P16（Hub与mini已部署，基础验证通过）
 
 当前QCU包固定支持官方DSH **0.2.0-rc.2**。QCU更新请走“工具市场→版本管理”；左下“新版本／安装并重启”属于官方内核升级。mini曾升级0.2.1-rc.3导致插件被兼容检查拒绝，2026-10-27经用户确认已恢复原官方版本并验证市场和插件列表，见[异常与恢复记录](docs/qcu-p16-official-update-recovery.md)。
