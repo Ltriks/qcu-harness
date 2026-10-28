@@ -30,3 +30,11 @@ rtk proxy python3 -B -m unittest discover -s tests -p test_integrated_macos_prep
 先以独立标签建立draft prerelease，上传白名单附件；核对GitHub返回的文件名、字节及SHA256 digest，再公开为prerelease，不标记latest。原400MB级ZIP不重压缩，正文明确未公证／代码签名和未完成验收。额外自动源码包不是桌面安装包。
 
 本地发布结果、公开URL及服务器附件核验记录归档到各版本`github-release-20261028/`。完整新机GUI、系统信任、真实模型与教师验收仍待执行；本轮无新模型调用、无安装、无环境迁移。正式稳定版另需相应验收和授权。
+
+## 发布完成核验
+
+2026-10-28两个Release均已公开，`draft=false / prerelease=true`，未设为latest。Mac9项附件、Windows10项附件，服务器文件名、大小和SHA256逐项匹配。随后通过公开地址、未使用认证完整下载两个ZIP，均首次匹配原始字节与SHA256；只流式核对，没有存重复400MB文件。
+
+[机器可读发布及下载结果](../releases/publication-20261028.json)；[Mac预发布](https://github.com/Ltriks/qcu-harness/releases/tag/qcu-teacher-v0.1.0-rc.4.3-mac-arm64)；[Windows预发布](https://github.com/Ltriks/qcu-harness/releases/tag/qcu-teacher-v0.1.0-rc.3-win-x64-r4)。源码标签分别为`12777da42ac4977aaab1c01792341d21542534f7`、`759f3d558868820fcf1f121a7f6efc55df94c042`；后续这条发布回执提交不移动标签。
+
+本轮归档快照保留第三方样例原有行尾空格，保证逐字节摘要，不格式化历史内容。自编发布文档差异检查通过。主仓库仍为原main提交和原3项本地修改，P16原开发工作树保持干净；未安装、未迁移数据、未调整在线Hub或mini。源码归档与上传任务完成，预发布中列出的新机／教学验收仍待完成。

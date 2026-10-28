@@ -27,3 +27,5 @@ Windows 必须解压到本地磁盘后运行 `QCU助手/QCU助手.exe`，不能�
 Mac原包在 `$HOME/Artifacts/qcu-harness/0.1.0-rc.4.3/mac-arm64/`；Windows原包仍在主仓库的 `releases/0.1.0-rc.3/`，本次未移动。发布附件与上传核验放各版本 `github-release-20261028/`。开发回归命令和精确验收分类见[发布记录](../docs/qcu-github-release-publication-20261028.md)。
 
 现有在线Hub仍仅办公室局域网 `192.168.1.68:8080`，管理员在mini回环8975；GitHub附件提供离线包下载，不替代市场的签名目录、审核发布与反馈服务。本次不修改Hub、mini、已安装App或Home。
+
+[2026-10-28发布结果](publication-20261028.json)：19个附件服务器摘要及两个公开整包下载校验均通过。
