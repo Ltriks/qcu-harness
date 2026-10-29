@@ -1,6 +1,6 @@
 # QCU 材料伴读 R1a 实施报告
 
-任务：`QCU-READING-R1A`；父任务：`qcu-standalone-learning-tools-20261029`。候选版本 `qcu-reading@0.1.0-pilot.1`，基于 [演进计划](qcu-standalone-learning-plan.md)。本报告供父任务审查与接续；无提交、推送、部署、原生安装或真实付费模型调用。
+任务：`QCU-READING-R1A`；父任务：`qcu-standalone-learning-tools-20261029`。候选版本 `qcu-reading@0.1.0-pilot.1`，基于 [演进计划](qcu-standalone-learning-plan.md)。本报告包含执行器实施及父级复核结果。本轮无部署、原生安装或真实付费模型调用；父级已提交开发分支，精确源码提交与远端核验见固定交付目录的 `SOURCE-COMMIT.json`。
 
 ## 已实现
 
