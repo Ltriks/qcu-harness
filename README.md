@@ -1,10 +1,10 @@
 # QCU Harness
 
-## 单机材料伴读 R1b（本地候选，未部署）
+## 单机材料伴读 R1b（本机已安装、未启用；Hub未发布）
 
 `qcu-reading@0.1.0-pilot.2` 在首版上新增本机文字型 PDF / DOCX 解析：PDF 保留物理页，Word 按章节、段落和表格行列定位；原始字节、来源快照、逐次确认问答与 Markdown 导出均可追溯。提取遗漏可见，扫描件需先做 OCR。自包含候选不需要教师安装 Python、Docker、native canvas 或解析服务。
 
-构建：`rtk node hub/plugins/qcu-reading/build.mjs`。支持范围、合成测试及精确 TGZ 证据见 [R1b 实施与验收](docs/qcu-reading-r1b.md)和 [插件说明](hub/plugins/qcu-reading/README.md)。[演进计划](docs/qcu-standalone-learning-plan.md)仍按伴读 → 个人资料架 → 教师题库推进；[R1a 固定记录](docs/qcu-reading-r1a.md)保持原样。开发分支 `dev/qcu-teacher-reading`，worktree `$HOME/Repos/worktrees/qcu-harness/teacher-reading`；安装包、截图和证据在 `$HOME/Artifacts/qcu-harness/0.1.0-reading.2/`。维护者本地验收 46 项通过，另独立验证实际 PDF/Word 文件与旧记录；[短验收步骤](docs/qcu-reading-r1b-checklist.md)可在合成预览中核对。源码由开发分支交付，本轮未部署或触碰真实教师材料/Key；原生 DSH、真实文件选择器、真实模型与教师使用验收仍未测，现有部署位置不变。
+构建：`rtk node hub/plugins/qcu-reading/build.mjs`。支持范围、合成测试及精确 TGZ 证据见 [R1b 实施与验收](docs/qcu-reading-r1b.md)和 [插件说明](hub/plugins/qcu-reading/README.md)。[演进计划](docs/qcu-standalone-learning-plan.md)仍按伴读 → 个人资料架 → 教师题库推进；[R1a 固定记录](docs/qcu-reading-r1a.md)保持原样。开发分支 `dev/qcu-teacher-reading`，worktree `$HOME/Repos/worktrees/qcu-harness/teacher-reading`；安装包、截图和证据在 `$HOME/Artifacts/qcu-harness/0.1.0-reading.2/`。维护者本地验收 46 项通过，另独立验证实际 PDF/Word 文件与旧记录；[短验收步骤](docs/qcu-reading-r1b-checklist.md)可在合成预览中核对。源码由开发分支交付。已通过本机官方 DSH 0.2.0-rc.2 安装，29 个文件逐字节匹配固定包；按用户要求保持未启用，原有 12 个插件状态保留。启用、原生文件选择和真实模型仍未测；Hub/mini未发布，未触碰真实教师材料或Key。
 
 ## 教师助手与工具市场 P16（Hub与mini已部署，基础验证通过）
 
