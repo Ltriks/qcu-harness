@@ -1,5 +1,5 @@
-export const VERSION = '0.1.0-pilot.1', PROTOCOL = 1, OUTPUT_BUDGET = 2000
-export const LIMITS = Object.freeze({fileBytes:262144, documents:24, paragraphs:2000, notes:200, runs:50, storeBytes:8000000, answerChars:24000, questionChars:2000, snippetChars:1800, sources:4})
+export const VERSION = '0.1.0-pilot.2', PROTOCOL = 2, OUTPUT_BUDGET = 2000
+export const LIMITS = Object.freeze({fileBytes:262144, binaryBytes:2097152, requestChars:3000000, extractedBytes:524288, pages:120, items:40000, zipEntries:256, zipEntryBytes:2097152, zipTotalBytes:8388608, zipRatio:100, parseMilliseconds:15000, documents:24, paragraphs:2000, notes:200, runs:50, storeBytes:8000000, answerChars:24000, questionChars:2000, snippetChars:1800, sources:4})
 export function check(ok, code = 'invalid-input') {
   if (!ok) throw Object.assign(Error(code), {code})
 }
@@ -19,6 +19,43 @@ export function parseImport(raw) {
   const content = text(raw.content, LIMITS.fileBytes).replace(/^\ufeff/, '').replace(/\r\n?/g, '\n')
   check(new TextEncoder().encode(content).length <= LIMITS.fileBytes, 'file-too-large')
   return {name, content}
+}
+export function binaryImport(raw) {
+  exact(raw, ['name', 'base64'])
+  const name = text(raw.name, 180)
+  check(!/[\\/:\u0000-\u001f\u007f\u202a-\u202e\u2066-\u2069]/.test(name) && name.trim() === name && !name.startsWith('.'), 'invalid-name')
+  check(/\.(pdf|docx)$/i.test(name), 'unsupported-format')
+  check(typeof raw.base64 === 'string' && raw.base64.length > 0 && raw.base64.length <= 4 * Math.ceil(LIMITS.binaryBytes / 3), 'binary-too-large')
+  check(raw.base64.length % 4 === 0 && /^[A-Za-z0-9+/]*={0,2}$/.test(raw.base64), 'invalid-binary')
+  return {name, base64:raw.base64, format:name.toLowerCase().endsWith('.pdf') ? 'pdf' : 'docx'}
+}
+export const formatOf = d => d.format ?? (d.name?.toLowerCase().endsWith('.md') ? 'md' : 'txt')
+export function sourceLabel(source) {
+  const l = source.location
+  if (l?.format === 'pdf') return 'PDF 第 ' + l.page + ' 页 · 段落 ' + l.paragraph
+  if (l?.format === 'docx') return (l.section.length ? l.section.join(' / ') + ' · ' : '') + (l.table ? '表 ' + l.table.index + ' · 第 ' + l.table.row + ' 行 · 第 ' + l.table.cell + ' 格 · 段落 ' + l.table.paragraph : '段落 ' + l.paragraph)
+  return source.locator
+}
+export const warningLabels = {
+  'pdf-review':'PDF 显示提取文本；阅读顺序、分栏、表格与公式请对照原件复核。',
+  'page-no-text':'本页未提取到文字（空白或扫描页），如有内容请先做 OCR。',
+  'images-omitted':'图片未转写，请对照原件核对。', 'math-review':'公式可能不完整，请对照原件核对。',
+  'layout-review':'检测到分栏或表格布局，文字顺序需核对。', 'encoding-review':'字体或编码资源未完整解析，本页文字可能缺失。',
+  'page-incomplete':'本页存在未完整解析的内容，请对照原件核对。',
+  'docx-review':'Word 按正文结构定位，不提供固定页码；表格位置按源 XML 行列标记。',
+  'equations-omitted':'Word 公式未转写，请对照原件核对。',
+  'comments-omitted':'批注未导入。', 'footnotes-omitted':'脚注或尾注未导入。', 'headers-omitted':'页眉或页脚未导入。',
+  'objects-omitted':'嵌入对象、文本框或不支持的正文未导入，请对照原件核对。',
+  'table-merge-review':'表格含合并单元格，行列位置按源结构标记，请核对。',
+  'external-labels-only':'外部链接只保留正文标签，未访问链接。', 'revisions-review':'修订按接受变更后的正文提取：保留插入/移入，略去删除/移出，请对照原件核对。'
+}
+export function extractionNotices(extraction) {
+  const groups = new Map()
+  for (const w of extraction?.warnings ?? []) {
+    if (!groups.has(w.code)) groups.set(w.code, [])
+    if (w.page) groups.get(w.code).push(w.page)
+  }
+  return [...groups].map(([code, pages]) => (pages.length ? '第 ' + [...new Set(pages)].join('、') + ' 页：' : '') + warningLabels[code])
 }
 export function paragraphsFor(content) {
   const paragraphs = []
@@ -49,13 +86,31 @@ export function searchDocument(document, query, limit = 20) {
   }).filter(p => p.score).sort((a, b) => b.score - a.score || a.start - b.start).slice(0, limit)
 }
 export function evidenceFor(document, question) {
-  return searchDocument(document, question, LIMITS.sources).map((p, i) => {
-    const first = Math.min(...p.matched.map(t => p.text.toLowerCase().indexOf(t)))
+  let selected = searchDocument(document, question, LIMITS.sources)
+  if (document.format === 'docx') {
+    const expanded = [], seen = new Set(), rows = new Set()
+    const add = p => { if (p && !seen.has(p.locator) && expanded.length < LIMITS.sources) { expanded.push(p); seen.add(p.locator) } }
+    for (const hit of selected) {
+      add(hit)
+      const table = hit.location?.table
+      if (!table) continue
+      const key = table.index + ':' + table.row
+      if (rows.has(key)) continue
+      rows.add(key)
+      // One nearest same-row cell per matched row, before unrelated hits. Every cell remains
+      // a separate exact source, visible in confirmation; no concatenated or hidden value text.
+      const peer = document.paragraphs.filter(p => p.location?.table?.index === table.index && p.location.table.row === table.row && p.location.table.cell !== table.cell && !seen.has(p.locator)).sort((a, b) => Math.abs(a.location.table.cell - table.cell) - Math.abs(b.location.table.cell - table.cell) || a.start - b.start)[0]
+      if (peer) add({...peer, matched:[]})
+    }
+    selected = expanded
+  }
+  return selected.map((p, i) => {
+    const first = p.matched.length ? Math.min(...p.matched.map(t => p.text.toLowerCase().indexOf(t))) : 0
     let offset = Math.max(0, first - 100)
     if (offset && /[\udc00-\udfff]/.test(p.text[offset])) offset--
     let end = Math.min(p.text.length, offset + LIMITS.snippetChars)
     if (end < p.text.length && /[\udc00-\udfff]/.test(p.text[end])) end--
-    return {id:'S' + (i + 1), locator:p.locator, start:p.start + offset, end:p.start + end, text:p.text.slice(offset, end), clipped:offset > 0 || end < p.text.length}
+    return {id:'S' + (i + 1), locator:p.locator, start:p.start + offset, end:p.start + end, text:p.text.slice(offset, end), clipped:offset > 0 || end < p.text.length, ...(p.location ? {format:document.format, location:p.location} : {})}
   })
 }
 export function parseRoute(raw) {
@@ -76,7 +131,16 @@ export const sameRoute = (a, b) => JSON.stringify(parseRoute(a)) === JSON.string
 export const errors = {
   'invalid-input':'输入无效，请检查后重试。', 'invalid-fields':'请求包含不支持的字段。',
   'invalid-text':'文字为空、过长或包含无效字符。', 'invalid-name':'文件名无效，请使用不含路径的普通文件名。',
-  'unsupported-format':'本版仅支持 UTF-8 TXT 和 Markdown；PDF、DOCX 与 OCR 已列入后续计划。',
+  'unsupported-format':'请选择 UTF-8 TXT、Markdown、文字型 PDF 或 DOCX；不支持 DOC、DOCM 或扫描件 OCR。',
+  'binary-too-large':'PDF / DOCX 每份最多 2 MiB，请拆分后导入。', 'invalid-binary':'文件字节编码无效，请重新选择原文件。',
+  'invalid-pdf':'PDF 损坏或结构不受支持，请重新导出文字型 PDF。', 'encrypted-pdf':'不支持加密或密码保护的 PDF，请先导出未加密副本。',
+  'ocr-needed':'PDF 未提取到文字；扫描件请先做 OCR，再导入文字型 PDF。', 'empty-docx':'DOCX 未提取到正文文字，请检查是否只有图片或嵌入对象。',
+  'pdf-encoding':'PDF 字体或编码资源不足，未能提取文字，未保存材料；请重新导出含可复制文字的 PDF，扫描件请先做 OCR。',
+  'invalid-docx':'DOCX ZIP 或 XML 损坏、不安全或结构不受支持，请重新另存为 DOCX。',
+  'unsafe-docx':'不支持含宏或加密内容的 Word 文件，请另存为普通 DOCX。',
+  'parse-limit':'文件页数、结构、解压大小或提取文本超过本版上限，请拆分后导入。',
+  'parse-busy':'当前已有材料在解析，请稍后再导入。', 'parse-cancelled':'已取消解析，未保存材料。',
+  'parse-timeout':'解析超时，已停止且未保存材料；请拆分或重新导出文件。', 'parse-worker-failed':'解析进程停止，未保存材料；请拆分或重新导出文件。',
   'invalid-utf8':'文件不是有效的 UTF-8 文本，请先转存为 UTF-8。', 'file-too-large':'单个文件最多 256 KiB，请拆分后导入。',
   'paragraph-limit':'材料需包含 1–2000 个非空段落，请拆分长材料。', 'document-not-found':'材料不存在，请重新选择。',
   'note-invalid':'摘录须为所选段落中实际存在的文字，最多 4000 字符。', 'run-not-found':'问答记录不存在。',
@@ -97,4 +161,4 @@ export const errors = {
 }
 export const safeCode = e => Object.hasOwn(errors, e?.code) ? e.code : 'operation-failed'
 const codec = (symbol, max) => ({mode:'strict', typeSymbol:'qcu-reading#' + symbol, create:() => ({parse(value) { check(typeof value === 'string' && value.length <= max, 'invalid-fields'); JSON.parse(value); return value }})})
-export const remoteContribution = {package:'qcu-reading', descriptors:[{id:'qcu-reading#qcuReading/dispatch', service:'qcuReading', namespace:'qcuReading', method:'dispatch', invocation:{kind:'direct'}, parameters:[{name:'payload', wire:'payload', source:'json', codec:codec('request', 600000)}], cancellation:{parameter:'signal'}, result:codec('reply', 10000000)}]}
+export const remoteContribution = {package:'qcu-reading', descriptors:[{id:'qcu-reading#qcuReading/dispatch', service:'qcuReading', namespace:'qcuReading', method:'dispatch', invocation:{kind:'direct'}, parameters:[{name:'payload', wire:'payload', source:'json', codec:codec('request', LIMITS.requestChars)}], cancellation:{parameter:'signal'}, result:codec('reply', 10000000)}]}

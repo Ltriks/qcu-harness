@@ -4,7 +4,7 @@ import {lstat, realpath} from 'node:fs/promises'
 import {ReadingStore} from './src/store.mjs'
 import {createGenerator, resolveRoute} from './src/model.mjs'
 import {dispatchStore} from './src/dispatch.mjs'
-import {exact, text, check, remoteContribution, VERSION, PROTOCOL, safeCode} from './src/protocol.mjs'
+import {exact, text, check, remoteContribution, VERSION, PROTOCOL, LIMITS, safeCode} from './src/protocol.mjs'
 
 export const name = 'qcu-reading', inject = ['typert', 'workspaceRegistry']
 export const Config = z.object({enabled:z.boolean().default(true)})
@@ -32,9 +32,9 @@ export class ReadingService extends TypertRemoteService {
   async dispatch(payload, signal) {
     const controller = new AbortController(), cancel = () => controller.abort(signal?.reason)
     this.lookups.add(controller); signal?.addEventListener('abort', cancel, {once:true}); if (signal?.aborted) cancel()
-    const timer = setTimeout(() => controller.abort(), 15000)
+    const timer = setTimeout(() => controller.abort(), 30000)
     try {
-      check(!this.closed, 'plugin-stopped'); check(typeof payload === 'string' && payload.length <= 600000, 'invalid-input')
+      check(!this.closed, 'plugin-stopped'); check(typeof payload === 'string' && payload.length <= LIMITS.requestChars, 'invalid-input')
       const request = JSON.parse(payload)
       check(request && typeof request === 'object', 'invalid-fields')
       let value

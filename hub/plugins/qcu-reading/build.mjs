@@ -1,5 +1,7 @@
 import {readFile, writeFile} from 'node:fs/promises'
 import {Script} from 'node:vm'
+import {verifyVendor} from './vendor.mjs'
+await verifyVendor()
 const root = new URL('./', import.meta.url)
 const parts = await Promise.all(['protocol', 'reports', 'controller', 'view', 'plugin'].map(async name =>
   (await readFile(new URL('src/' + name + '.mjs', root), 'utf8')).replace(/^import .*\n/gm, '').replace(/\bexport /g, '')))

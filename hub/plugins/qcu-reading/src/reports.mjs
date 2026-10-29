@@ -1,4 +1,4 @@
-import {errors} from './protocol.mjs'
+import {errors, sourceLabel, formatOf, extractionNotices} from './protocol.mjs'
 export const statusLabel = status => ({running:'生成中', completed:'已生成草案', failed:'失败 · 不完整', cancelled:'已取消 · 不完整', interrupted:'已中断 · 不完整'}[status] ?? '不完整')
 export function citationParts(answer, sources) {
   const valid = new Set(sources.map(s => s.id)), result = []
@@ -31,13 +31,15 @@ export function exportRun(run) {
     '状态：' + statusLabel(run.status),
     run.status === 'completed' ? '' : '本记录不完整。' + (errors[run.error] ?? ''),
     '文档名称：\n' + quoted(run.document.name),
-    '文档身份 / 版本：SHA-256 ' + run.document.id + '（规范化 UTF-8 文本，版本由内容确定）',
+    '文档格式：' + formatOf(run.document).toUpperCase(),
+    '文档身份 / 版本：SHA-256 ' + run.document.id + (run.document.identity === 'original-bytes-sha256' ? '（原始文件字节，版本由原始字节确定）' : '（规范化 UTF-8 文本，版本由内容确定）'),
+    ...(run.document.contentHash ? ['提取文本 SHA-256：' + run.document.contentHash, '解析器：' + run.document.extraction.parser, '提取内容待核对：\n' + extractionNotices(run.document.extraction).join('\n')] : []),
     '记录：' + run.id + '\n\n时间：' + new Date(run.createdAt).toISOString(),
     '模型 / 提供方：\n' + quoted(run.route.model + ' / ' + run.route.provider),
     '推理策略：' + run.route.policy.effort + '；宿主默认：' + (run.route.policy.defaultEffort ?? '未声明') + '；支持档位：' + (run.route.policy.supportedEfforts.join(', ') || '未声明') + '；输出上限：' + run.route.policy.outputBudget,
     '## 问题\n\n' + quoted(run.question),
     '## 本次确认的完整来源片段',
-    ...run.sources.map(s => '### [' + s.id + '] ' + s.locator + '（字符 ' + s.start + '–' + s.end + (s.clipped ? '，段落节选' : '') + '）\n\n' + quoted(s.text)),
+    ...run.sources.map(s => '### [' + s.id + '] ' + (s.format ? s.format.toUpperCase() + ' · ' : '') + s.locator + '（字符 ' + s.start + '–' + s.end + (s.clipped ? '，段落节选' : '') + '）\n\n' + (s.format ? '位置：\n' + quoted(sourceLabel(s)) + '\n\n' : '') + quoted(s.text)),
     '## 模型草案\n\n' + quoted(run.answer || '（无完整回答）'),
     review.needsReview ? '来源待核对：回答缺少合法引用或包含未知引用。' : '引用标记可定位到上述片段；内容正确性仍待教师复核。'
   ].filter(Boolean).join('\n\n') + '\n'

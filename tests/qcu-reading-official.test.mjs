@@ -10,6 +10,7 @@ import {Context} from '@deepseek-ai/cordis'
 import {TypertRegistry} from '@deepseek-ai/dsh-typert-registry'
 import {TypertGatewayService} from '@deepseek-ai/dsh-api-gateway'
 import {LlmRuntime, LlmAdapter} from '@deepseek-ai/dsh-llm'
+import {pdfFixture, docxFixture} from './fixtures/qcu-reading-binary.mjs'
 
 const root = process.env.QCU_OFFICIAL_DEPENDENCIES
 assert.ok(root, 'QCU_OFFICIAL_DEPENDENCIES must point to the existing audited SDK')
@@ -63,6 +64,23 @@ test('official Cordis/Typert/LLM adapter sends exact confirmed snippets, fixed l
   assert.equal((await f.invoke({action:'import', workspaceId:f.workspace.id, file:{name:'x.md', content:'x', path:'/etc/passwd'}})).error, 'invalid-fields')
   await assert.rejects(f.gateway.invoke({namespace:'qcuReading', method:'dispatch', args:{payload:4}}), /boundary validation/)
   await f.fork.dispose(); await assert.rejects(f.invoke({action:'workspaces'}), /withdrawn|unavailable/)
+})
+
+test('official remote accepts original PDF/DOCX bytes, carries exact source locations to confirmation/model/history/export, no implicit calls', async t => {
+  const f = await setup(t)
+  for (const [name, bytes, question, label] of [['自编.pdf', pdfFixture(), 'final feedback', /PDF 第 5 页/], ['自编.docx', await docxFixture(), '表格反馈建议', /第 1 行 · 第 2 格/]]) {
+    const count = f.adapter.calls.length
+    const d = (await f.call({action:'import', file:{name, base64:bytes.toString('base64')}, importId:crypto.randomUUID()})).document
+    await f.call({action:'search', documentId:d.id, query:question})
+    const p = await f.call({action:'prepare', documentId:d.id, question})
+    assert.equal(f.adapter.calls.length, count); assert.ok(p.sources.every(s => s.location && s.format === d.format))
+    const run = await f.call(request(p)), done = await settle(f, run)
+    assert.equal(done.status, 'completed'); assert.deepEqual(done.sources, p.sources)
+    const sent = JSON.parse(f.adapter.calls.at(-1).messages[0].content[0].text)
+    assert.deepEqual(sent, {question, sources:p.sources}); assert.equal(JSON.stringify(sent).includes(bytes.toString('base64')), false)
+    assert.match((await f.call({action:'export', runId:run.id})).markdown, label)
+  }
+  assert.equal((await f.call({action:'importStatus', importId:'not-active'})).stage, 'idle')
 })
 
 test('official route changes stop before adapter; max-token and abnormal finishes preserve incomplete status and partial export', async t => {

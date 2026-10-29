@@ -3,7 +3,7 @@ import {VERSION, PROTOCOL, LIMITS, errors, check} from './protocol.mjs'
 export class ReadingController {
   constructor(remote, {storage = globalThis.localStorage} = {}) {
     this.remote = remote; this.storage = storage; this.listeners = new Set(); this.epoch = 0; this.pollEpoch = 0
-    this.state = {workspaces:[], workspaceId:'', documents:[], notes:[], runs:[], document:null, selected:'', query:'', hits:[], searched:false, question:'', prepared:null, consent:false, run:null, excerpt:'', comment:'', busy:false, loading:true, error:'', notice:'', pane:'original', showMaterials:false}
+    this.state = {workspaces:[], workspaceId:'', documents:[], notes:[], runs:[], document:null, selected:'', query:'', hits:[], searched:false, question:'', prepared:null, consent:false, run:null, excerpt:'', comment:'', busy:false, parsing:null, loading:true, error:'', notice:'', pane:'original', showMaterials:false}
   }
   subscribe = fn => { this.listeners.add(fn); return () => this.listeners.delete(fn) }
   snapshot = () => this.state
@@ -21,7 +21,7 @@ export class ReadingController {
     const epoch = this.epoch
     this.set({busy:true, error:'', notice:''})
     try { await fn(epoch); return epoch === this.epoch }
-    catch (e) { if (epoch === this.epoch) this.set({error:this.message(e)}); return false }
+    catch (e) { if (epoch === this.epoch) this.set({error:this.message(e), notice:''}); return false }
     finally { if (epoch === this.epoch) this.set({busy:false}) }
   }
   forgetConfirmation() {
@@ -29,7 +29,7 @@ export class ReadingController {
     if (s.prepared) void this.call({action:'dismiss', workspaceId:s.workspaceId, intentId:s.prepared.id}).catch(() => {})
     this.set({prepared:null, consent:false})
   }
-  invalidate() { this.forgetConfirmation(); this.epoch++; this.set({busy:false, error:'', notice:''}) }
+  invalidate() { this.forgetConfirmation(); this.stopImport(); this.epoch++; this.set({busy:false, parsing:null, error:'', notice:''}) }
   async boot() {
     const epoch = ++this.epoch
     this.set({loading:true})
@@ -78,22 +78,56 @@ export class ReadingController {
   }
   async importFile(file) {
     const workspaceId = this.state.workspaceId
+    this.forgetConfirmation()
     await this.action(async epoch => {
-      check(file && file.size <= LIMITS.fileBytes, 'file-too-large')
-      check(/\.(txt|md)$/i.test(file.name), 'unsupported-format')
-      let content
-      try { content = new TextDecoder('utf-8', {fatal:true}).decode(await file.arrayBuffer()) }
-      catch { check(false, 'invalid-utf8') }
+      check(file && /\.(txt|md|pdf|docx)$/i.test(file.name), 'unsupported-format')
+      const binary = /\.(pdf|docx)$/i.test(file.name)
+      check(file.size <= (binary ? LIMITS.binaryBytes : LIMITS.fileBytes), binary ? 'binary-too-large' : 'file-too-large')
+      const importId = crypto.randomUUID(), task = {id:importId, workspaceId, cancelled:false}
+      this.importTask = task; this.set({parsing:{stage:'opening', done:0, total:0}})
+      let input
+      try {
+        const bytes = new Uint8Array(await file.arrayBuffer())
+        check(bytes.length <= (binary ? LIMITS.binaryBytes : LIMITS.fileBytes), binary ? 'binary-too-large' : 'file-too-large')
+        if (binary) {
+          let ascii = ''; for (let i = 0; i < bytes.length; i += 8192) ascii += String.fromCharCode(...bytes.subarray(i, i + 8192))
+          input = {name:file.name, base64:btoa(ascii)}
+        } else {
+          let content
+          try { content = new TextDecoder('utf-8', {fatal:true}).decode(bytes) } catch { check(false, 'invalid-utf8') }
+          input = {name:file.name, content}
+        }
       // Navigation during file decoding never imports into the newly selected workspace.
       if (epoch !== this.epoch) return
-      const result = await this.call({action:'import', workspaceId, file:{name:file.name, content}})
+      check(!task.cancelled, 'parse-cancelled')
+      if (binary) this.pollImport(task, epoch)
+      const result = await this.call({action:'import', workspaceId, importId, file:input})
       if (epoch !== this.epoch) return
       await this.refresh(epoch)
       if (epoch !== this.epoch) return
       this.forgetConfirmation()
       this.set({document:result.document, selected:'', excerpt:'', comment:'', query:'', hits:[], searched:false, showMaterials:false, notice:result.duplicate ? '相同内容已存在，已打开原快照。' : '材料已保存为本地快照。'})
+      } finally {
+        clearTimeout(task.timer)
+        if (this.importTask === task) { this.importTask = null; this.set({parsing:null}) }
+      }
     })
   }
+  pollImport(task, epoch) {
+    task.timer = setTimeout(async () => {
+      if (this.importTask !== task || epoch !== this.epoch) return
+      try {
+        const progress = await this.call({action:'importStatus', workspaceId:task.workspaceId, importId:task.id})
+        if (this.importTask === task && epoch === this.epoch) { if (progress.stage !== 'idle') this.set({parsing:progress}); this.pollImport(task, epoch) }
+      } catch {}
+    }, 200)
+  }
+  stopImport() {
+    const task = this.importTask; if (!task) return
+    task.cancelled = true; clearTimeout(task.timer)
+    void this.call({action:'cancelImport', workspaceId:task.workspaceId, importId:task.id}).catch(() => {})
+  }
+  cancelImport() { this.stopImport(); this.set({notice:'正在停止解析…'}) }
   async search() {
     await this.action(async epoch => {
       const s = this.state, query = s.query
@@ -162,5 +196,5 @@ export class ReadingController {
     })
   }
   async reconnect() { this.invalidate(); clearTimeout(this.timer); ++this.pollEpoch; await this.boot() }
-  dispose() { this.forgetConfirmation(); clearTimeout(this.timer); ++this.epoch; ++this.pollEpoch; this.closed = true; this.listeners.clear() }
+  dispose() { this.forgetConfirmation(); this.stopImport(); clearTimeout(this.timer); ++this.epoch; ++this.pollEpoch; this.closed = true; this.listeners.clear() }
 }
