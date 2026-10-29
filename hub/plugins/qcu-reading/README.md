@@ -1,6 +1,10 @@
-# QCU 材料伴读 R1b
+# QCU 材料伴读 R1b · 工作区刷新
 
-`qcu-reading@0.1.0-pilot.2`，协议 2、存储 schema 2，独立 DSH Host / Client 本地候选，默认停用。复用官方 Cordis 4.0.4 / DSH 0.2.0-rc.2；不读取或保存 Key，未加入 Hub、部署或安装到真实 DSH。目标为教师 Mac，当前验证为 Apple Silicon / Node 25.8.1，未宣称 Windows 或原生多平台验收。
+`qcu-reading@0.1.0-pilot.3`，协议 2、存储 schema 2，独立 DSH Host / Client 本地候选，默认停用。复用官方 Cordis 4.0.4 / DSH 0.2.0-rc.2；不读取或保存 Key，未加入 Hub、部署或安装到真实 DSH。目标为教师 Mac，本轮验证使用 Apple Silicon / Node 24.19.0，未宣称 Windows 或原生多平台验收。
+
+在 DSH 添加工作区后，点击工作区选择框旁的“刷新”，即可更新列表，无需重启或重新连接。按钮支持键盘操作，刷新期间显示忙碌状态；失败后可重试。仍有效的当前工作区、打开材料、摘录、问题草稿、发送确认及勾选状态和运行状态均保留；新工作区出现时不会自动选择或读取其材料。只有显式切换工作区才沿用原有的隔离和确认失效规则。
+
+当前工作区若已不在列表中，界面要求重新选择并使本地发送确认失效；旧异步回复不能恢复确认。已保存的快照、摘录、问答历史不会删除，Host 中已开始的问答不会因列表刷新被取消。刷新仅请求工作区列表，不导入文件、不调用模型、不启动或取消问答。解析、存储、来源、模型路由和逐次发送确认语义保持原样。
 
 ## 导入与来源
 
@@ -39,7 +43,8 @@ pilot.1 不能读取 schema 2。需要回退时先停止插件，另存完整 sc
 rtk node hub/plugins/qcu-reading/build.mjs
 rtk node --test tests/qcu-reading-core.test.mjs
 rtk node --test tests/qcu-reading-binary.test.mjs
-rtk python3 hub/plugins/qcu-reading/pack.py .work/qcu-reading-r1b-package/candidate
+rtk node --test tests/qcu-reading-workspaces.test.mjs
+rtk python3 hub/plugins/qcu-reading/pack.py .work/qcu-reading-workspace-refresh/candidate
 ```
 
 二进制测试的自编 DOCX 夹具生成需要将 QCU_OFFICIAL_DEPENDENCIES 指向已审核 SDK（其中 JSZip 3.10.1 只用于测试）。官方运行时测试还使用已有 SDK，浏览器测试使用已有 Playwright/Chromium，无安装：
@@ -47,7 +52,8 @@ rtk python3 hub/plugins/qcu-reading/pack.py .work/qcu-reading-r1b-package/candid
 ```sh
 rtk node --experimental-transform-types --expose-internals --experimental-loader ./tests/support/feishu-official-loader.mjs --test tests/qcu-reading-official.test.mjs
 rtk node --test tests/qcu-reading-browser.test.mjs
-QCU_READING_PACKAGE_DIR=.work/qcu-reading-r1b-package/candidate rtk node --test tests/qcu-reading-package.test.mjs
+rtk node --test tests/qcu-reading-workspaces-browser.test.mjs
+QCU_READING_PACKAGE_DIR=.work/qcu-reading-workspace-refresh/candidate rtk node --test tests/qcu-reading-package.test.mjs
 rtk node hub/plugins/qcu-reading/preview.mjs
 ```
 
@@ -59,4 +65,4 @@ vendor 中固定 PDF.js 6.3.289（Apache-2.0）、saxes 6.0.0（ISC，含继承�
 
 [Mozilla 安全通告](https://github.com/mozilla/pdf.js/security/advisories/GHSA-hq66-cqwq-w95j)的修复版本为 6.2.108。本版高于该版本，另设 isEvalSupported:false，未初始化 viewer/scripting；版本号本身不作为安全充分证明。
 
-实施、验收证据和待原生/真实模型/教师核对项见 [R1b 报告](../../../docs/qcu-reading-r1b.md)。[R1a 报告](../../../docs/qcu-reading-r1a.md)及固定旧产物保持不变。
+本次刷新修复、精确候选和测试证据见 [工作区刷新报告](../../../docs/qcu-reading-workspace-refresh.md)；原生 DSH 的新候选安装/交互和真实教师使用仍由维护者验收。[R1b 报告](../../../docs/qcu-reading-r1b.md)、[R1a 报告](../../../docs/qcu-reading-r1a.md)及固定旧产物保持不变。

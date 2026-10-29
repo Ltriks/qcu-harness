@@ -10,7 +10,7 @@ import tarfile
 
 def build(root):
     manifest = json.loads((root / 'package.json').read_text())
-    assert manifest['name'] == 'qcu-reading' and manifest['version'] == '0.1.0-pilot.2'
+    assert manifest['name'] == 'qcu-reading' and manifest['version'] == '0.1.0-pilot.3'
     assert not any(manifest.get(k) for k in ['scripts', 'dependencies', 'optionalDependencies', 'bundledDependencies'])
     assert all(v == ('4.0.4' if k.endswith('/cordis') else '3.18.4' if k.endswith('/schemastery') else '0.2.0-rc.2') for k, v in manifest['peerDependencies'].items())
     assert json.loads((root / 'cordis.patch.yml').read_text()) == [{'insert':[{'id':'qcu-reading', 'name':'qcu-reading', 'disabled':True, 'config':{'enabled':True}}]}]

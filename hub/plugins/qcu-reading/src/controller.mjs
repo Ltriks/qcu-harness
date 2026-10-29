@@ -2,8 +2,8 @@ import {VERSION, PROTOCOL, LIMITS, errors, check} from './protocol.mjs'
 
 export class ReadingController {
   constructor(remote, {storage = globalThis.localStorage} = {}) {
-    this.remote = remote; this.storage = storage; this.listeners = new Set(); this.epoch = 0; this.pollEpoch = 0
-    this.state = {workspaces:[], workspaceId:'', documents:[], notes:[], runs:[], document:null, selected:'', query:'', hits:[], searched:false, question:'', prepared:null, consent:false, run:null, excerpt:'', comment:'', busy:false, parsing:null, loading:true, error:'', notice:'', pane:'original', showMaterials:false}
+    this.remote = remote; this.storage = storage; this.listeners = new Set(); this.epoch = 0; this.pollEpoch = 0; this.workspacesEpoch = 0
+    this.state = {workspaces:[], workspaceId:'', refreshingWorkspaces:false, workspacesError:'', workspacesNotice:'', workspaceMissing:false, documents:[], notes:[], runs:[], document:null, selected:'', query:'', hits:[], searched:false, question:'', prepared:null, consent:false, run:null, excerpt:'', comment:'', busy:false, parsing:null, loading:true, error:'', notice:'', pane:'original', showMaterials:false}
   }
   subscribe = fn => { this.listeners.add(fn); return () => this.listeners.delete(fn) }
   snapshot = () => this.state
@@ -17,7 +17,7 @@ export class ReadingController {
   }
   message(e) { return errors[e?.code] ?? errors['operation-failed'] }
   async action(fn) {
-    if (this.state.busy || this.closed) return false
+    if (this.state.busy || !this.state.workspaceId || this.closed) return false
     const epoch = this.epoch
     this.set({busy:true, error:'', notice:''})
     try { await fn(epoch); return epoch === this.epoch }
@@ -30,22 +30,46 @@ export class ReadingController {
     this.set({prepared:null, consent:false})
   }
   invalidate() { this.forgetConfirmation(); this.stopImport(); this.epoch++; this.set({busy:false, parsing:null, error:'', notice:''}) }
-  async boot() {
-    const epoch = ++this.epoch
-    this.set({loading:true})
+  setWorkspaces(workspaces) {
+    if (this.state.workspaceId && !workspaces.some(w => w.id === this.state.workspaceId)) {
+      // Invalidate local sends/replies and observation only. Never cancel a Host job or erase its saved data.
+      ++this.epoch; ++this.pollEpoch; clearTimeout(this.timer); clearTimeout(this.importTask?.timer)
+      this.set({workspaces, workspaceId:'', workspaceMissing:true, prepared:null, consent:false, busy:false, loading:false, parsing:null})
+    } else this.set({workspaces})
+  }
+  async refreshWorkspaces() {
+    if (this.closed) return
+    const token = ++this.workspacesEpoch
+    this.set({refreshingWorkspaces:true, workspacesError:'', workspacesNotice:''})
     try {
       const workspaces = await this.call({action:'workspaces'})
-      if (epoch !== this.epoch || this.closed) return
-      this.set({workspaces, loading:false})
+      if (token !== this.workspacesEpoch || this.closed) return
+      this.setWorkspaces(workspaces)
+      this.set({workspacesNotice:'工作区列表已刷新。'})
+    } catch (e) { if (token === this.workspacesEpoch && !this.closed) this.set({workspacesError:'刷新工作区失败：' + this.message(e)}) }
+    finally { if (token === this.workspacesEpoch && !this.closed) this.set({refreshingWorkspaces:false}) }
+  }
+  async boot() {
+    if (this.closed) return
+    const epoch = ++this.epoch, token = ++this.workspacesEpoch
+    this.set({loading:false, refreshingWorkspaces:true, workspacesError:'', workspacesNotice:''})
+    try {
+      const workspaces = await this.call({action:'workspaces'})
+      if (token !== this.workspacesEpoch || this.closed) return
+      this.setWorkspaces(workspaces)
+      if (epoch !== this.epoch) return
       let remembered
       try { remembered = this.storage?.getItem('qcu-reading.workspace') } catch {}
-      const chosen = workspaces.find(w => w.id === this.state.workspaceId || w.id === remembered) ?? (workspaces.length === 1 ? workspaces[0] : null)
+      const chosen = this.state.workspaceMissing ? null : workspaces.find(w => w.id === this.state.workspaceId) ?? workspaces.find(w => w.id === remembered) ?? (!this.state.workspaceId && !remembered && workspaces.length === 1 ? workspaces[0] : null)
       if (chosen) await this.selectWorkspace(chosen.id)
-    } catch (e) { if (epoch === this.epoch) this.set({loading:false, error:this.message(e)}) }
+      else if (remembered && !this.state.workspaceId) this.set({workspaceMissing:true})
+    } catch (e) { if (token === this.workspacesEpoch && !this.closed) this.set({workspacesError:'读取工作区失败：' + this.message(e)}) }
+    finally { if (token === this.workspacesEpoch && !this.closed) this.set({refreshingWorkspaces:false}) }
   }
   async selectWorkspace(id) {
+    if (this.closed || (id && !this.state.workspaces.some(w => w.id === id))) return
     this.invalidate(); clearTimeout(this.timer); const token = ++this.pollEpoch, epoch = this.epoch
-    this.set({workspaceId:id, documents:[], notes:[], runs:[], document:null, selected:'', question:'', query:'', hits:[], searched:false, run:null, loading:!!id, excerpt:'', comment:''})
+    this.set({workspaceId:id, workspaceMissing:false, documents:[], notes:[], runs:[], document:null, selected:'', question:'', query:'', hits:[], searched:false, run:null, loading:!!id, excerpt:'', comment:''})
     if (!id) return
     try {
       const data = await this.call({action:'catalog', workspaceId:id})
@@ -58,6 +82,7 @@ export class ReadingController {
     } catch (e) { if (epoch === this.epoch) this.set({loading:false, error:this.message(e)}) }
   }
   async openDocument(id, locator = '') {
+    if (!this.state.workspaceId || this.closed) return
     this.invalidate(); const epoch = this.epoch, workspaceId = this.state.workspaceId
     this.set({loading:true, query:'', hits:[], searched:false, excerpt:'', comment:'', selected:'', showMaterials:false})
     try {
@@ -147,7 +172,7 @@ export class ReadingController {
     await this.action(async epoch => {
       const s = this.state
       await this.call({action:'note', workspaceId:s.workspaceId, note:{documentId:s.document.id, locator:s.selected, text:s.excerpt, comment:s.comment}})
-      if (epoch === this.epoch) { await this.refresh(epoch); this.set({notice:'摘录已保存，重新打开仍会保留。'}) }
+      if (epoch === this.epoch) { await this.refresh(epoch); if (epoch === this.epoch) this.set({notice:'摘录已保存，重新打开仍会保留。'}) }
     })
   }
   async prepare() {
@@ -195,6 +220,6 @@ export class ReadingController {
       if (epoch === this.epoch) deliver(result)
     })
   }
-  async reconnect() { this.invalidate(); clearTimeout(this.timer); ++this.pollEpoch; await this.boot() }
-  dispose() { this.forgetConfirmation(); this.stopImport(); clearTimeout(this.timer); ++this.epoch; ++this.pollEpoch; this.closed = true; this.listeners.clear() }
+  async reconnect() { if (this.closed) return; this.invalidate(); clearTimeout(this.timer); ++this.pollEpoch; await this.boot() }
+  dispose() { this.forgetConfirmation(); this.stopImport(); clearTimeout(this.timer); ++this.epoch; ++this.pollEpoch; ++this.workspacesEpoch; this.closed = true; this.listeners.clear() }
 }

@@ -1,4 +1,4 @@
-export const VERSION = '0.1.0-pilot.2', PROTOCOL = 2, OUTPUT_BUDGET = 2000
+export const VERSION = '0.1.0-pilot.3', PROTOCOL = 2, OUTPUT_BUDGET = 2000
 export const LIMITS = Object.freeze({fileBytes:262144, binaryBytes:2097152, requestChars:3000000, extractedBytes:524288, pages:120, items:40000, zipEntries:256, zipEntryBytes:2097152, zipTotalBytes:8388608, zipRatio:100, parseMilliseconds:15000, documents:24, paragraphs:2000, notes:200, runs:50, storeBytes:8000000, answerChars:24000, questionChars:2000, snippetChars:1800, sources:4})
 export function check(ok, code = 'invalid-input') {
   if (!ok) throw Object.assign(Error(code), {code})

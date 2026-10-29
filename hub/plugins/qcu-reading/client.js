@@ -1,7 +1,7 @@
 // Generated official lazy-CJS Client; shared host React only.
 window.__ModuleLoader__.load({id:'qcu-reading',factory(require){
 const React=require('react');
-const VERSION = '0.1.0-pilot.2', PROTOCOL = 2, OUTPUT_BUDGET = 2000
+const VERSION = '0.1.0-pilot.3', PROTOCOL = 2, OUTPUT_BUDGET = 2000
 const LIMITS = Object.freeze({fileBytes:262144, binaryBytes:2097152, requestChars:3000000, extractedBytes:524288, pages:120, items:40000, zipEntries:256, zipEntryBytes:2097152, zipTotalBytes:8388608, zipRatio:100, parseMilliseconds:15000, documents:24, paragraphs:2000, notes:200, runs:50, storeBytes:8000000, answerChars:24000, questionChars:2000, snippetChars:1800, sources:4})
 function check(ok, code = 'invalid-input') {
   if (!ok) throw Object.assign(Error(code), {code})
@@ -215,8 +215,8 @@ function exportRun(run) {
 
 class ReadingController {
   constructor(remote, {storage = globalThis.localStorage} = {}) {
-    this.remote = remote; this.storage = storage; this.listeners = new Set(); this.epoch = 0; this.pollEpoch = 0
-    this.state = {workspaces:[], workspaceId:'', documents:[], notes:[], runs:[], document:null, selected:'', query:'', hits:[], searched:false, question:'', prepared:null, consent:false, run:null, excerpt:'', comment:'', busy:false, parsing:null, loading:true, error:'', notice:'', pane:'original', showMaterials:false}
+    this.remote = remote; this.storage = storage; this.listeners = new Set(); this.epoch = 0; this.pollEpoch = 0; this.workspacesEpoch = 0
+    this.state = {workspaces:[], workspaceId:'', refreshingWorkspaces:false, workspacesError:'', workspacesNotice:'', workspaceMissing:false, documents:[], notes:[], runs:[], document:null, selected:'', query:'', hits:[], searched:false, question:'', prepared:null, consent:false, run:null, excerpt:'', comment:'', busy:false, parsing:null, loading:true, error:'', notice:'', pane:'original', showMaterials:false}
   }
   subscribe = fn => { this.listeners.add(fn); return () => this.listeners.delete(fn) }
   snapshot = () => this.state
@@ -230,7 +230,7 @@ class ReadingController {
   }
   message(e) { return errors[e?.code] ?? errors['operation-failed'] }
   async action(fn) {
-    if (this.state.busy || this.closed) return false
+    if (this.state.busy || !this.state.workspaceId || this.closed) return false
     const epoch = this.epoch
     this.set({busy:true, error:'', notice:''})
     try { await fn(epoch); return epoch === this.epoch }
@@ -243,22 +243,46 @@ class ReadingController {
     this.set({prepared:null, consent:false})
   }
   invalidate() { this.forgetConfirmation(); this.stopImport(); this.epoch++; this.set({busy:false, parsing:null, error:'', notice:''}) }
-  async boot() {
-    const epoch = ++this.epoch
-    this.set({loading:true})
+  setWorkspaces(workspaces) {
+    if (this.state.workspaceId && !workspaces.some(w => w.id === this.state.workspaceId)) {
+      // Invalidate local sends/replies and observation only. Never cancel a Host job or erase its saved data.
+      ++this.epoch; ++this.pollEpoch; clearTimeout(this.timer); clearTimeout(this.importTask?.timer)
+      this.set({workspaces, workspaceId:'', workspaceMissing:true, prepared:null, consent:false, busy:false, loading:false, parsing:null})
+    } else this.set({workspaces})
+  }
+  async refreshWorkspaces() {
+    if (this.closed) return
+    const token = ++this.workspacesEpoch
+    this.set({refreshingWorkspaces:true, workspacesError:'', workspacesNotice:''})
     try {
       const workspaces = await this.call({action:'workspaces'})
-      if (epoch !== this.epoch || this.closed) return
-      this.set({workspaces, loading:false})
+      if (token !== this.workspacesEpoch || this.closed) return
+      this.setWorkspaces(workspaces)
+      this.set({workspacesNotice:'工作区列表已刷新。'})
+    } catch (e) { if (token === this.workspacesEpoch && !this.closed) this.set({workspacesError:'刷新工作区失败：' + this.message(e)}) }
+    finally { if (token === this.workspacesEpoch && !this.closed) this.set({refreshingWorkspaces:false}) }
+  }
+  async boot() {
+    if (this.closed) return
+    const epoch = ++this.epoch, token = ++this.workspacesEpoch
+    this.set({loading:false, refreshingWorkspaces:true, workspacesError:'', workspacesNotice:''})
+    try {
+      const workspaces = await this.call({action:'workspaces'})
+      if (token !== this.workspacesEpoch || this.closed) return
+      this.setWorkspaces(workspaces)
+      if (epoch !== this.epoch) return
       let remembered
       try { remembered = this.storage?.getItem('qcu-reading.workspace') } catch {}
-      const chosen = workspaces.find(w => w.id === this.state.workspaceId || w.id === remembered) ?? (workspaces.length === 1 ? workspaces[0] : null)
+      const chosen = this.state.workspaceMissing ? null : workspaces.find(w => w.id === this.state.workspaceId) ?? workspaces.find(w => w.id === remembered) ?? (!this.state.workspaceId && !remembered && workspaces.length === 1 ? workspaces[0] : null)
       if (chosen) await this.selectWorkspace(chosen.id)
-    } catch (e) { if (epoch === this.epoch) this.set({loading:false, error:this.message(e)}) }
+      else if (remembered && !this.state.workspaceId) this.set({workspaceMissing:true})
+    } catch (e) { if (token === this.workspacesEpoch && !this.closed) this.set({workspacesError:'读取工作区失败：' + this.message(e)}) }
+    finally { if (token === this.workspacesEpoch && !this.closed) this.set({refreshingWorkspaces:false}) }
   }
   async selectWorkspace(id) {
+    if (this.closed || (id && !this.state.workspaces.some(w => w.id === id))) return
     this.invalidate(); clearTimeout(this.timer); const token = ++this.pollEpoch, epoch = this.epoch
-    this.set({workspaceId:id, documents:[], notes:[], runs:[], document:null, selected:'', question:'', query:'', hits:[], searched:false, run:null, loading:!!id, excerpt:'', comment:''})
+    this.set({workspaceId:id, workspaceMissing:false, documents:[], notes:[], runs:[], document:null, selected:'', question:'', query:'', hits:[], searched:false, run:null, loading:!!id, excerpt:'', comment:''})
     if (!id) return
     try {
       const data = await this.call({action:'catalog', workspaceId:id})
@@ -271,6 +295,7 @@ class ReadingController {
     } catch (e) { if (epoch === this.epoch) this.set({loading:false, error:this.message(e)}) }
   }
   async openDocument(id, locator = '') {
+    if (!this.state.workspaceId || this.closed) return
     this.invalidate(); const epoch = this.epoch, workspaceId = this.state.workspaceId
     this.set({loading:true, query:'', hits:[], searched:false, excerpt:'', comment:'', selected:'', showMaterials:false})
     try {
@@ -360,7 +385,7 @@ class ReadingController {
     await this.action(async epoch => {
       const s = this.state
       await this.call({action:'note', workspaceId:s.workspaceId, note:{documentId:s.document.id, locator:s.selected, text:s.excerpt, comment:s.comment}})
-      if (epoch === this.epoch) { await this.refresh(epoch); this.set({notice:'摘录已保存，重新打开仍会保留。'}) }
+      if (epoch === this.epoch) { await this.refresh(epoch); if (epoch === this.epoch) this.set({notice:'摘录已保存，重新打开仍会保留。'}) }
     })
   }
   async prepare() {
@@ -408,8 +433,8 @@ class ReadingController {
       if (epoch === this.epoch) deliver(result)
     })
   }
-  async reconnect() { this.invalidate(); clearTimeout(this.timer); ++this.pollEpoch; await this.boot() }
-  dispose() { this.forgetConfirmation(); this.stopImport(); clearTimeout(this.timer); ++this.epoch; ++this.pollEpoch; this.closed = true; this.listeners.clear() }
+  async reconnect() { if (this.closed) return; this.invalidate(); clearTimeout(this.timer); ++this.pollEpoch; await this.boot() }
+  dispose() { this.forgetConfirmation(); this.stopImport(); clearTimeout(this.timer); ++this.epoch; ++this.pollEpoch; ++this.workspacesEpoch; this.closed = true; this.listeners.clear() }
 }
 
 
@@ -421,6 +446,7 @@ const readingCSS = `
 .qr *{box-sizing:border-box;min-width:0}.qr button,.qr input,.qr textarea,.qr select{font:inherit;color:inherit}.qr button,.qr select,.qr input,.qr textarea{border:1px solid var(--qr-line);border-radius:5px;background:var(--qr-surface);padding:.4em .65em}.qr button{cursor:pointer;white-space:normal}.qr button:hover:not(:disabled){background:var(--qr-selected)}.qr button:disabled{opacity:.55;cursor:default}.qr :focus-visible{outline:2px solid var(--qr-accent);outline-offset:2px}.qr .qr-primary{background:var(--qr-accent);color:var(--qr-surface);border-color:var(--qr-accent)}.qr .qr-primary:hover:not(:disabled){background:var(--qr-ink);color:var(--qr-surface)}.qr button[aria-pressed=true]{background:var(--qr-selected);border-color:var(--qr-accent)}
 .qr h1,.qr h2,.qr h3,.qr p{margin:0}.qr h1{font-size:1.15em}.qr h2{font-size:1.05em}.qr h3{font-size:1em}.qr small,.qr .qr-muted{color:var(--qr-muted);font-size:.88em}.qr-header{display:flex;align-items:center;gap:16px;padding:10px 14px;border-bottom:1px solid var(--qr-line);flex-wrap:wrap}.qr-header label{display:flex;align-items:center;gap:8px;margin-left:auto}.qr-header select{max-width:240px}.qr-header .qr-back{margin-right:4px}.qr-banner{padding:8px 14px;border-bottom:1px solid var(--qr-line);overflow-wrap:anywhere}.qr-error{color:var(--qr-alert)}.qr-layout{display:grid;grid-template-columns:180px minmax(0,1.15fr) minmax(285px,1fr);flex:1;min-height:0}.qr-materials,.qr-reader,.qr-qa{overflow:auto;padding:14px;overflow-wrap:anywhere}.qr-materials,.qr-reader{border-right:1px solid var(--qr-line)}.qr-materials{padding:12px 10px}.qr-toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:12px}.qr-import{display:block;width:100%;margin:10px 0 6px}.qr-file{display:none}.qr-docs{list-style:none;margin:14px 0 0;padding:0}.qr-docs li+li{margin-top:4px}.qr-docs button{display:block;width:100%;text-align:left;border-color:transparent;background:transparent}.qr-docs strong{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-weight:500}.qr-docs small{display:block}.qr-title{margin-bottom:12px}.qr-title h2{overflow-wrap:anywhere}.qr-search{display:flex;gap:6px;margin:12px 0}.qr-search input{width:100%}.qr-results{display:grid;gap:6px;margin-bottom:16px}.qr-results button{text-align:left}.qr-paragraph{padding:10px 10px 12px;margin:4px 0;border-left:3px solid transparent;scroll-margin-top:14px;white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.8}.qr-paragraph[data-selected=true]{border-left-color:var(--qr-accent);background:var(--qr-selected)}.qr-locator{display:block!important;color:var(--qr-accent)!important;font-size:.8em!important;padding:1px 6px!important;margin-bottom:5px!important;background:transparent!important}.qr-paragraph p{white-space:pre-wrap}.qr label.qr-field{display:grid;gap:6px;margin:12px 0}.qr textarea{display:block;resize:vertical;width:100%;min-height:74px;line-height:1.6}.qr-question{min-height:96px!important}.qr pre,.qr blockquote{white-space:pre-wrap;overflow-wrap:anywhere;word-break:normal;font:inherit;margin:8px 0;padding:9px 10px;border-left:2px solid var(--qr-line);background:var(--qr-bg)}.qr details{margin:14px 0}.qr summary{cursor:pointer;color:var(--qr-muted)}.qr-confirm{padding:12px 0;border-top:2px solid var(--qr-accent);margin-top:18px}.qr-confirm dl{margin:10px 0}.qr-confirm dt{color:var(--qr-muted);font-size:.88em}.qr-confirm dd{margin:0 0 8px;white-space:pre-wrap;overflow-wrap:anywhere}.qr-consent{display:flex;align-items:flex-start;gap:8px;margin:14px 0}.qr-consent input{flex:none;margin-top:5px}.qr-answer{white-space:pre-wrap;margin-top:12px;line-height:1.8}.qr-citation{display:inline;padding:0 .3em!important;color:var(--qr-accent)!important}.qr-unknown{text-decoration:underline dotted;color:var(--qr-alert)}.qr-run{margin-top:18px;padding-top:14px;border-top:1px solid var(--qr-line)}.qr-history{display:grid;gap:6px;margin-top:10px}.qr-history button{text-align:left}.qr-history small{display:block}.qr-note{border-top:1px solid var(--qr-line);padding:10px 0}.qr-empty{max-width:38em;padding:28px 14px}.qr-empty p{margin:10px 0;color:var(--qr-muted)}.qr-tabs{display:none}.qr-note-editor{border-top:1px solid var(--qr-line);margin-top:18px;padding-top:12px}.qr-identity{overflow-wrap:anywhere;user-select:all}
 .qr-search button{flex:none;white-space:nowrap}
+.qr-workspaces{display:flex;align-items:center;gap:8px;margin-left:auto;max-width:100%}.qr-header .qr-workspaces label{margin-left:0}.qr-workspaces button{flex:none}.qr-workspaces select{min-width:0}@media(max-width:600px){.qr-workspaces{width:100%;margin-left:0}.qr-header .qr-workspaces label{flex:1;width:auto}}
 .qr-extraction{margin:8px 0 12px;color:var(--qr-muted);font-size:.88em}.qr .qr-extraction details{margin:4px 0 0}.qr .qr-extraction summary{color:var(--qr-accent)}.qr-extraction ul{margin:8px 0 0;padding-left:1.3em}.qr-extraction li+li{margin-top:4px}
 @media(max-width:960px){.qr-layout{grid-template-columns:160px minmax(0,1fr)}.qr-tabs{display:flex;gap:8px;padding:8px 14px;border-bottom:1px solid var(--qr-line)}.qr-layout[data-pane=original] .qr-qa,.qr-layout[data-pane=qa] .qr-reader{display:none}.qr-reader{border-right:0}.qr-qa{border-right:0}.qr-header label{margin-left:0}.qr-header{gap:10px}}
 @media(max-width:600px){.qr-layout{grid-template-columns:minmax(0,1fr)}.qr-materials{display:none;max-height:260px;border-right:0;border-bottom:1px solid var(--qr-line)}.qr-layout[data-materials=true] .qr-materials{display:block}.qr-layout[data-materials=true]{grid-template-rows:auto minmax(0,1fr)}.qr-header{padding:10px}.qr-header label{width:100%}.qr-header select{flex:1;max-width:100%}.qr-reader,.qr-qa{padding:12px}.qr-tabs{padding:8px 10px}.qr-paragraph{padding:8px 6px}.qr-title h2{font-size:1em}}
@@ -477,7 +503,10 @@ function createReadingViews(React) {
     }
     return h('div', {className:'qr', ref:rootRef}, h('style', {}, readingCSS),
       h('header', {className:'qr-header'}, onBack && button('返回对话', onBack, {className:'qr-back'}), h('h1', {}, '材料伴读'),
-        h('label', {}, '工作区', h('select', {value:s.workspaceId, 'aria-label':'工作区', onChange:e => void c.selectWorkspace(e.target.value)}, h('option', {value:''}, '请选择工作区'), ...s.workspaces.map(w => h('option', {value:w.id, key:w.id}, w.title))))),
+        h('div', {className:'qr-workspaces'}, h('label', {}, '工作区', h('select', {value:s.workspaceId, 'aria-label':'工作区', onChange:e => void c.selectWorkspace(e.target.value)}, h('option', {value:''}, '请选择工作区'), ...s.workspaces.map(w => h('option', {value:w.id, key:w.id}, w.title)))), button(s.refreshingWorkspaces ? '刷新中…' : '刷新', () => void c.refreshWorkspaces(), {'aria-label':'刷新工作区列表', 'aria-busy':s.refreshingWorkspaces, disabled:s.refreshingWorkspaces}))),
+      s.workspaceMissing && h('div', {className:'qr-banner qr-error', role:'alert'}, '当前工作区已不可用，请重新选择工作区。已保存的材料、摘录和问答记录不会删除。'),
+      s.workspacesError && h('div', {className:'qr-banner qr-error', role:'alert'}, s.workspacesError),
+      s.workspacesNotice && h('div', {className:'qr-banner', role:'status'}, s.workspacesNotice),
       s.error && h('div', {className:'qr-banner qr-error', role:'alert'}, s.error),
       s.notice && h('div', {className:'qr-banner', role:'status'}, s.notice),
       s.loading && h('div', {className:'qr-banner', role:'status'}, '正在读取本地材料…'),
