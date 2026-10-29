@@ -1,0 +1,136 @@
+// Actual shared UI + real local disk store. Disposable headless Chromium, synthetic model only.
+import test from 'node:test'
+import assert from 'node:assert/strict'
+import {createRequire} from 'node:module'
+import {spawn} from 'node:child_process'
+import {mkdtemp, mkdir, readFile, writeFile} from 'node:fs/promises'
+import {join, resolve} from 'node:path'
+import {once} from 'node:events'
+
+const browserRoot = process.env.QCU_BROWSER_DEPENDENCIES
+assert.ok(browserRoot && process.env.QCU_OFFICIAL_DEPENDENCIES, 'Use existing QCU_BROWSER_DEPENDENCIES and QCU_OFFICIAL_DEPENDENCIES; no installs')
+const require = createRequire(join(resolve(browserRoot), 'package.json')), {chromium} = require('playwright')
+const out = resolve(process.env.QCU_READING_BROWSER_OUT ?? '.work/qcu-reading-browser')
+await mkdir(out, {recursive:true})
+test('actual reading UI: import/search/locate/confirm/cite/note/reload/download; 360px, themes, host font, cancellation and zero external requests', {timeout:90000}, async t => {
+  const runOut = await mkdtemp(join(out, 'run-')), profile = join(runOut, 'chromium-disposable')
+  const server = spawn(process.execPath, ['hub/plugins/qcu-reading/preview.mjs'], {env:{...process.env, QCU_READING_PREVIEW_OUT:join(runOut, 'preview')}, stdio:['ignore', 'pipe', 'pipe']})
+  let stderr = ''
+  server.stderr.on('data', bytes => stderr += bytes.toString())
+  t.after(async () => { if (server.exitCode === null) { const exited = once(server, 'exit'); server.kill('SIGTERM'); await exited } })
+  const info = await new Promise((resolve, reject) => {
+    let output = ''
+    const timer = setTimeout(() => reject(Error('preview startup timed out: ' + stderr)), 15000)
+    server.once('exit', code => { clearTimeout(timer); reject(Error('preview exited ' + code + ': ' + stderr)) })
+    server.stdout.on('data', chunk => {
+      output += chunk.toString()
+      if (output.includes('\n')) { clearTimeout(timer); try { resolve(JSON.parse(output.split('\n')[0])) } catch (e) { reject(e) } }
+    })
+  })
+  assert.equal(info.synthetic, true)
+  const url = info.url, stats = async () => fetch(url + '/preview/stats').then(r => r.json())
+  const executablePath = process.env.QCU_READING_CHROMIUM ?? '/Users/mcq/Library/Caches/ms-playwright/chromium_headless_shell-1234/chrome-headless-shell-mac-arm64/chrome-headless-shell'
+  const context = await chromium.launchPersistentContext(profile, {ignoreDefaultArgs:true, args:['--headless', '--user-data-dir=' + profile, '--remote-debugging-pipe', '--no-first-run', '--no-default-browser-check', '--disable-background-networking', '--disable-component-update', '--disable-sync'], executablePath, headless:true, chromiumSandbox:true, viewport:{width:1280, height:920}, acceptDownloads:true})
+  const evidence = {syntheticOnly:true, realModel:false, nativeDSH:false, nativeFileChooser:false, screenshots:[], checks:[], external:[], errors:[]}
+  t.after(async () => { await context.close(); await writeFile(join(runOut, 'EVIDENCE.json'), JSON.stringify(evidence, null, 2) + '\n') })
+  await context.route('**/*', route => {
+    if (new URL(route.request().url()).origin !== url) { evidence.external.push(route.request().url()); return route.abort() }
+    return route.continue()
+  })
+  const page = await context.newPage()
+  page.on('pageerror', e => evidence.errors.push(e.message))
+  const button = name => page.getByRole('button', {name, exact:true})
+  const original = page.getByRole('main', {name:'原文'})
+  const qa = page.getByRole('complementary', {name:'材料问答'})
+  const confirmation = page.getByRole('region', {name:'发送前确认'})
+  const material = await readFile('tests/fixtures/qcu-reading-material.md')
+  await page.goto(url)
+  await page.getByText('把材料放在手边', {exact:true}).waitFor()
+  assert.equal((await stats()).calls, 0)
+  await page.getByLabel('选择 TXT 或 Markdown 文件').setInputFiles({name:'自编课堂.md', mimeType:'text/markdown', buffer:material})
+  await original.getByRole('heading', {name:'自编课堂.md', exact:true}).waitFor()
+  assert.equal(await page.evaluate(() => window.QCU_UNTRUSTED_EXECUTED), undefined)
+  await page.getByLabel('原文关键词').fill('有效反馈')
+  await button('搜索').click()
+  await page.getByRole('button', {name:/^p0003 · /}).click()
+  assert.equal(await original.locator('[data-locator=p0003]').getAttribute('data-selected'), 'true')
+  await page.getByLabel('摘录文字（可保留段落中的一部分）').fill('反馈不能替代学生自己的练习。')
+  await page.getByLabel('我的笔记', {exact:true}).fill('下次课堂核对反馈后的练习。')
+  await button('保存摘录').click(); await page.getByText('摘录已保存，重新打开仍会保留。', {exact:true}).waitFor()
+  await page.reload(); await original.getByRole('heading', {name:'自编课堂.md', exact:true}).waitFor()
+  await original.getByText('已保存摘录（1）', {exact:true}).click()
+  await original.getByText('下次课堂核对反馈后的练习。', {exact:true}).waitFor()
+  await page.getByLabel('选择 TXT 或 Markdown 文件').setInputFiles({name:'同内容.txt', mimeType:'text/plain', buffer:material})
+  await page.getByText('相同内容已存在，已打开原快照。', {exact:true}).waitFor()
+  assert.equal(await page.locator('.qr-docs li').count(), 1)
+  const question = page.getByLabel('问题', {exact:true})
+  await question.fill('宇宙星系'); await button('准备问答').click()
+  await page.getByText(/未找到匹配原文。请改用材料中的关键词/).waitFor()
+  assert.equal((await stats()).calls, 0)
+  await question.fill('有效反馈如何提供下一步建议'); await button('准备问答').click(); await confirmation.waitFor()
+  assert.match(await confirmation.innerText(), /合成模型（无外部请求） \/ synthetic/)
+  assert.equal(await confirmation.getByRole('button', {name:'确认发送', exact:true}).isDisabled(), true)
+  await confirmation.getByRole('checkbox').check(); await question.fill('形成性评价的反馈')
+  await confirmation.waitFor({state:'hidden'}); assert.equal((await stats()).calls, 0)
+  await button('准备问答').click(); await confirmation.waitFor()
+  await confirmation.getByRole('checkbox').focus(); await page.keyboard.press('Escape'); await confirmation.waitFor({state:'hidden'})
+  assert.equal(await button('准备问答').evaluate(el => el === document.activeElement), true)
+  await button('准备问答').click(); await confirmation.waitFor()
+  const confirmDesktop = join(runOut, 'confirmation-1280.png'); await page.screenshot({path:confirmDesktop}); evidence.screenshots.push(confirmDesktop)
+  await page.setViewportSize({width:360, height:920}); await button('问答').click()
+  assert.equal(await confirmation.getByRole('checkbox').isVisible(), true)
+  assert.ok((await confirmation.locator('pre').allTextContents()).every(snippet => material.toString().includes(snippet)))
+  const confirmNarrow = join(runOut, 'confirmation-360.png'); await page.screenshot({path:confirmNarrow}); evidence.screenshots.push(confirmNarrow)
+  await confirmation.getByRole('checkbox').check(); await page.keyboard.press('Tab')
+  assert.equal(await button('确认发送').evaluate(el => el === document.activeElement), true)
+  await button('确认发送').click()
+  await qa.getByRole('heading', {name:'已生成草案', exact:true}).waitFor()
+  assert.equal((await stats()).calls, 1)
+  await page.getByRole('button', {name:'定位来源 S1', exact:true}).click()
+  const selection = original.locator('[data-selected=true]'); assert.equal(await selection.count(), 1)
+  const visible = await selection.evaluate(el => { const r = el.getBoundingClientRect(), p = el.closest('main').getBoundingClientRect(); return r.bottom > p.top && r.top < p.bottom })
+  assert.equal(visible, true)
+  await page.setViewportSize({width:1280, height:920})
+  const downloadWait = page.waitForEvent('download'); await button('导出 Markdown').click()
+  const download = await downloadWait, exportPath = join(runOut, 'answer.md'); await download.saveAs(exportPath)
+  const markdown = await readFile(exportPath, 'utf8')
+  assert.match(markdown, /教师审阅草案/); assert.match(markdown, /本次确认的完整来源片段/); assert.match(markdown, /SHA-256 [a-f0-9]{64}/)
+  assert.equal((await stats()).calls, 1)
+  evidence.checks.push('real upload bytes, deterministic search and locator scrolling, exact excerpt persisted over reload, duplicate/no-hit 0 calls, bound confirmation/Escape, actual Markdown download')
+  // Capture geometry with actual long filenames/text; no fake success page.
+  await page.getByLabel('选择 TXT 或 Markdown 文件').setInputFiles({name:'自编很长文件名'.repeat(12) + '.md', mimeType:'text/markdown', buffer:Buffer.from('自编长文本 ' + 'longword'.repeat(1100) + '\n\n有效反馈帮助教师核对。')})
+  await page.getByText('材料已保存为本地快照。', {exact:true}).waitFor()
+  for (const width of [1280, 360]) for (const theme of ['light', 'dark']) {
+    await page.setViewportSize({width, height:920})
+    await page.evaluate(theme => document.documentElement.dataset.theme = theme, theme)
+    if (width === 360) await button('原文').click()
+    const geometry = await page.evaluate(() => ({width:innerWidth, page:document.documentElement.scrollWidth, font:getComputedStyle(document.querySelector('.qr')).fontSize, background:getComputedStyle(document.querySelector('.qr')).backgroundColor, panels:[...document.querySelectorAll('.qr-materials,.qr-reader,.qr-qa')].filter(el => getComputedStyle(el).display !== 'none').map(el => ({width:el.clientWidth, scroll:el.scrollWidth}))}))
+    assert.ok(geometry.page <= width, JSON.stringify(geometry)); assert.ok(geometry.panels.every(p => p.scroll <= p.width + 1), JSON.stringify(geometry))
+    assert.equal(geometry.background, theme === 'dark' ? 'rgb(23, 33, 44)' : 'rgb(247, 250, 253)')
+    await button('切换字号').click(); assert.equal(await page.locator('.qr').evaluate(el => getComputedStyle(el).fontSize), '18px')
+    if (width === 360) { await button('问答').click(); await question.waitFor({state:'visible'}); await button('原文').click() }
+    const path = join(runOut, width + '-' + theme + '.png'); await page.screenshot({path}); evidence.screenshots.push(path)
+    await button('切换字号').click()
+  }
+  await page.setViewportSize({width:1280, height:920})
+  await page.getByRole('button', {name:'定位来源 S1', exact:true}).click()
+  await original.getByRole('heading', {name:'自编课堂.md', exact:true}).waitFor()
+  assert.equal((await stats()).calls, 1)
+  await question.fill('有效反馈 [合成等待]'); await button('准备问答').click(); await confirmation.getByRole('checkbox').check(); await button('确认发送').click()
+  await qa.getByRole('heading', {name:'生成中', exact:true}).waitFor()
+  await button('取消问答').click(); await qa.getByRole('heading', {name:'已取消 · 不完整', exact:true}).waitFor()
+  assert.equal((await stats()).calls, 2); assert.equal((await stats()).aborted, 1)
+  await question.fill('有效反馈 [合成失败]'); await button('准备问答').click(); await confirmation.getByRole('checkbox').check(); await button('确认发送').click()
+  await qa.getByRole('heading', {name:'失败 · 不完整', exact:true}).waitFor()
+  assert.match(await qa.innerText(), /模型上限/)
+  await question.fill('有效反馈 [未知引用]'); await button('准备问答').click(); await confirmation.getByRole('checkbox').check(); await button('确认发送').click()
+  await qa.getByRole('heading', {name:'已生成草案', exact:true}).waitFor()
+  assert.equal(await qa.locator('.qr-unknown').innerText(), '[S99]')
+  assert.equal(await qa.getByRole('button', {name:'定位来源 S99', exact:true}).count(), 0)
+  assert.match(await qa.innerText(), /来源待核对/)
+  const beforeReload = (await stats()).calls
+  await page.reload(); await original.getByRole('heading').first().waitFor()
+  assert.equal((await stats()).calls, beforeReload)
+  evidence.checks.push('1280/360 light/dark, long filename/text without horizontal overflow, inherited 18px font, original/QA switch, cancellation abort, incomplete max-token state, reload does not call model')
+  assert.deepEqual(evidence.errors, []); assert.deepEqual(evidence.external, []); evidence.passed = true
+})

@@ -1,5 +1,11 @@
 # QCU Harness
 
+## 单机材料伴读 R1a（本地候选，未部署）
+
+[单机教学工具演进计划](docs/qcu-standalone-learning-plan.md)按“伴读基础 → PDF/Word → 个人资料架 → 教师题库”逐步实施，课程工作台继续由同事维护。首版 `qcu-reading@0.1.0-pilot.1` 支持 UTF-8 TXT/Markdown、本机段落检索、原文定位、摘录保留、逐次确认问答及来源快照导出；尚不支持 PDF/DOCX/OCR。
+
+开发分支 `dev/qcu-teacher-reading`，worktree `$HOME/Repos/worktrees/qcu-harness/teacher-reading`。构建：`rtk node hub/plugins/qcu-reading/build.mjs`；核心测试：`rtk node --test tests/qcu-reading-core.test.mjs`。官方运行时/浏览器测试、合成预览命令及限制见 [R1a实施与验收](docs/qcu-reading-r1a.md)。安装包、截图、日志与自编材料归档在 `$HOME/Artifacts/qcu-harness/0.1.0-reading.1/`。未修改官方DSH、现有市场/主题/专家团/课程，不发布Hub、不安装到mini，也未调用真实模型；现有部署位置不变。
+
 ## 教师助手与工具市场 P16（Hub与mini已部署，基础验证通过）
 
 当前QCU包固定支持官方DSH **0.2.0-rc.2**。QCU更新请走“工具市场→版本管理”；左下“新版本／安装并重启”属于官方内核升级。mini曾升级0.2.1-rc.3导致插件被兼容检查拒绝，2026-10-27经用户确认已恢复原官方版本并验证市场和插件列表，见[异常与恢复记录](docs/qcu-p16-official-update-recovery.md)。

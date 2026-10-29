@@ -1,0 +1,23 @@
+{
+  "name":"qcu-reading",
+  "version":"0.1.0-pilot.1",
+  "private":true,
+  "type":"module",
+  "license":"MIT",
+  "description":"QCU 材料伴读：本地快照、段落检索、确认问答与教师审阅草案",
+  "exports":{".":"./index.js","./client":"./client.js","./package.json":"./package.json"},
+  "dsh":{"bundle":{"patch":"./cordis.patch.yml"},"client":{"platform":"web","immediately":true,"inject":["@deepseek-ai/dsh-client-ui-layout","@deepseek-ai/dsh-client-ui-sidebar","@deepseek-ai/dsh-api-remotes"]}},
+  "peerDependencies":{
+    "@deepseek-ai/cordis":"4.0.4",
+    "@deepseek-ai/schemastery":"3.18.4",
+    "@deepseek-ai/dsh-typert-protocol":"0.2.0-rc.2",
+    "@deepseek-ai/dsh-typert-registry":"0.2.0-rc.2",
+    "@deepseek-ai/dsh-api-remotes":"0.2.0-rc.2",
+    "@deepseek-ai/dsh-llm":"0.2.0-rc.2",
+    "@deepseek-ai/dsh-workspace":"0.2.0-rc.2",
+    "@deepseek-ai/dsh-agent-default-model":"0.2.0-rc.2",
+    "@deepseek-ai/dsh-client-ui-layout":"0.2.0-rc.2",
+    "@deepseek-ai/dsh-client-ui-sidebar":"0.2.0-rc.2"
+  },
+  "files":["build.mjs","index.js","client.js","src/protocol.mjs","src/reports.mjs","src/store.mjs","src/model.mjs","src/dispatch.mjs","src/controller.mjs","src/view.mjs","src/plugin.mjs","cordis.patch.yml","README.md","LICENSE"]
+}
