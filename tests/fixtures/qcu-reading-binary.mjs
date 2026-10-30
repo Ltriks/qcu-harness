@@ -3,13 +3,13 @@
 import {createRequire} from 'node:module'
 import {resolve, join} from 'node:path'
 import {deflateSync} from 'node:zlib'
-export function pdfFixture({scanOnly = false, encrypted = false, streamBomb = false, pages:pageCount = 5} = {}) {
+export function pdfFixture({scanOnly = false, encrypted = false, streamBomb = false, decodedBytes = 0, compressed = false, unicodeText = '第二页形成性评价反馈', incompleteForm = false, pages:pageCount = 5} = {}) {
   const objects = [], put = value => { objects.push(Buffer.isBuffer(value) ? value : Buffer.from(value)); return objects.length }
-  const stream = (content, dict = '') => { const b = Buffer.isBuffer(content) ? content : Buffer.from(content); return Buffer.concat([Buffer.from('<< /Length ' + b.length + ' ' + dict + ' >>\nstream\n'), b, Buffer.from('\nendstream')]) }
+  const stream = (content, dict = '') => { let b = Buffer.isBuffer(content) ? content : Buffer.from(content); if (compressed && !dict.includes('/Filter')) { b = deflateSync(b); dict += ' /Filter /FlateDecode' } return Buffer.concat([Buffer.from('<< /Length ' + b.length + ' ' + dict + ' >>\nstream\n'), b, Buffer.from('\nendstream')]) }
   put(''); put('')
   const latin = put('<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>')
-  const chinese = '第二页形成性评价反馈', chars = [...new Set(chinese)], code = c => (chars.indexOf(c) + 1).toString(16).padStart(4, '0')
-  const cmap = put(stream('/CIDInit /ProcSet findresource begin\n12 dict begin\nbegincmap\n/CIDSystemInfo << /Registry (QCU) /Ordering (Synthetic) /Supplement 0 >> def\n/CMapName /QCUUnicode def\n/CMapType 2 def\n1 begincodespacerange\n<0000> <ffff>\nendcodespacerange\n' + chars.length + ' beginbfchar\n' + chars.map(c => '<' + code(c) + '> <' + c.charCodeAt(0).toString(16).padStart(4, '0') + '>').join('\n') + '\nendbfchar\nendcmap\nCMapName currentdict /CMap defineresource pop\nend\nend'))
+  const chinese = unicodeText, chars = [...new Set(chinese)], code = c => (chars.indexOf(c) + 1).toString(16).padStart(4, '0')
+  const cmap = put(stream('/CIDInit /ProcSet findresource begin\n12 dict begin\nbegincmap\n/CIDSystemInfo << /Registry (QCU) /Ordering (Synthetic) /Supplement 0 >> def\n/CMapName /QCUUnicode def\n/CMapType 2 def\n1 begincodespacerange\n<0000> <ffff>\nendcodespacerange\n' + chars.length + ' beginbfchar\n' + chars.map(c => '<' + code(c) + '> <' + Buffer.from(c, 'utf16le').swap16().toString('hex') + '>').join('\n') + '\nendbfchar\nendcmap\nCMapName currentdict /CMap defineresource pop\nend\nend'))
   const descriptor = put('<< /Type /FontDescriptor /FontName /QCUSynthetic /Flags 4 /FontBBox [0 -200 1000 900] /ItalicAngle 0 /Ascent 900 /Descent -200 /CapHeight 700 /StemV 80 >>')
   const cid = put('<< /Type /Font /Subtype /CIDFontType2 /BaseFont /QCUSynthetic /CIDSystemInfo << /Registry (Adobe) /Ordering (Identity) /Supplement 0 >> /FontDescriptor ' + descriptor + ' 0 R /DW 1000 /CIDToGIDMap /Identity >>')
   const font = put('<< /Type /Font /Subtype /Type0 /BaseFont /QCUSynthetic /Encoding /Identity-H /DescendantFonts [' + cid + ' 0 R] /ToUnicode ' + cmap + ' 0 R >>')
@@ -20,8 +20,8 @@ export function pdfFixture({scanOnly = false, encrypted = false, streamBomb = fa
     if (scanOnly || n === 3) content = 'q 20 0 0 20 20 20 cm /Im1 Do Q'
     else if (n === 1) content = 'BT /F1 14 Tf 40 220 Td (Local feedback page one) Tj ET'
     else if (n === 2) content = 'BT /FC 14 Tf 40 220 Td <' + [...chinese].map(code).join('') + '> Tj ET\nBT /F1 12 Tf 40 180 Td (Table left) Tj 230 0 Td (Table right) Tj ET\nBT /F1 12 Tf 40 140 Td (x = 2) Tj ET'
-    else if (n === 5) content = 'BT /F1 14 Tf 40 220 Td (After gap final feedback) Tj ET'
-    const body = put(n === 1 && streamBomb ? stream(deflateSync(Buffer.from('%' + 'x'.repeat(9000000) + '\n')), '/Filter /FlateDecode') : stream(content))
+    else if (n === 5) content = 'BT /F1 14 Tf 40 220 Td (After gap final feedback) Tj ET' + (incompleteForm ? '\nq /UnknownForm Do Q' : '')
+    const body = put((n === 1 && streamBomb) || decodedBytes ? stream(deflateSync(Buffer.from('%' + 'x'.repeat(decodedBytes || 9000000) + '\n' + content)), '/Filter /FlateDecode') : stream(content))
     pages.push(put('<< /Type /Page /Parent 2 0 R /MediaBox [0 0 400 280] /Resources << /Font << /F1 ' + latin + ' 0 R /FC ' + font + ' 0 R >> /XObject << /Im1 ' + image + ' 0 R >> >> /Contents ' + body + ' 0 R >>'))
   }
   const action = put('<< /S /JavaScript /JS (globalThis.QCU_PDF_EXECUTED = true; fetch\(\"https://example.invalid/never\"\)) >>')

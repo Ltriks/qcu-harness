@@ -4,11 +4,24 @@ import {check, LIMITS} from './protocol.mjs'
 // Process-wide cap; each store also admits only one import. No unbounded waiting queue.
 const workers = new Set()
 export const parserActivity = () => workers.size
+function workerExecArgv() {
+  // Exclude Host loaders/preloads while preserving explicit filesystem/addon
+  // restrictions. An empty execArgv silently disables Node permissions in workers.
+  const args = process.permission ? ['--permission'] : []
+  for (let i = 0; i < process.execArgv.length; i++) {
+    const arg = process.execArgv[i]
+    if (/^--allow-fs-(?:read|write)(?:=|$)/.test(arg)) {
+      args.push(arg)
+      if (!arg.includes('=') && process.execArgv[i + 1] && !process.execArgv[i + 1].startsWith('--')) args.push(process.execArgv[++i])
+    } else if (['--no-addons', '--no-global-search-paths'].includes(arg)) args.push(arg)
+  }
+  return args
+}
 export async function parseBinary(bytes, format, {signal, progress = () => {}, milliseconds = LIMITS.parseMilliseconds, workerURL = new URL('./parser-worker.mjs', import.meta.url)} = {}) {
   check(!signal?.aborted, 'parse-cancelled'); check(workers.size < 2, 'parse-busy')
   check(bytes.length > 0 && bytes.length <= LIMITS.binaryBytes, 'binary-too-large')
   const data = Uint8Array.from(bytes)
-  const worker = new Worker(workerURL, {workerData:{data, format}, transferList:[data.buffer], resourceLimits:{maxOldGenerationSizeMb:128, maxYoungGenerationSizeMb:16, stackSizeMb:4}, execArgv:[]})
+  const worker = new Worker(workerURL, {workerData:{data, format}, transferList:[data.buffer], resourceLimits:{maxOldGenerationSizeMb:128, maxYoungGenerationSizeMb:16, stackSizeMb:4}, execArgv:workerExecArgv()})
   workers.add(worker)
   let timer, abort, onMessage, onError, onExit
   try {

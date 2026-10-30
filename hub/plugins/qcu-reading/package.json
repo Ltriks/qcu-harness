@@ -1,6 +1,6 @@
 {
   "name":"qcu-reading",
-  "version":"0.1.0-pilot.3",
+  "version":"0.1.0-pilot.4",
   "private":true,
   "type":"module",
   "license":"MIT",
@@ -19,5 +19,5 @@
     "@deepseek-ai/dsh-client-ui-layout":"0.2.0-rc.2",
     "@deepseek-ai/dsh-client-ui-sidebar":"0.2.0-rc.2"
   },
-  "files":["build.mjs","vendor.mjs","vendor-inputs/saxes-LICENSE.txt","vendor-inputs/core-js-LICENSE.txt","pack.py","index.js","client.js","src/protocol.mjs","src/reports.mjs","src/store.mjs","src/source.mjs","src/parser.mjs","src/parser-worker.mjs","src/zip.mjs","src/model.mjs","src/dispatch.mjs","src/controller.mjs","src/view.mjs","src/plugin.mjs","vendor/pdf.mjs","vendor/pdf.worker.mjs","vendor/xml.mjs","vendor/dommatrix.mjs","vendor/MANIFEST.json","vendor/THIRD-PARTY-NOTICES.txt","cordis.patch.yml","README.md","LICENSE"]
+  "files":["build.mjs","vendor.mjs","vendor-inputs/saxes-LICENSE.txt","vendor-inputs/core-js-LICENSE.txt","index.js","client.js","src/protocol.mjs","src/reports.mjs","src/store.mjs","src/source.mjs","src/parser.mjs","src/parser-worker.mjs","src/zip.mjs","src/model.mjs","src/dispatch.mjs","src/controller.mjs","src/view.mjs","src/plugin.mjs","vendor/pdf.mjs","vendor/pdf.worker.mjs","vendor/pdf.font-tables.mjs","vendor/xml.mjs","vendor/dommatrix.mjs","vendor/MANIFEST.json","vendor/THIRD-PARTY-NOTICES.txt","cordis.patch.yml","README.md","LICENSE"]
 }

@@ -15,10 +15,20 @@ const out = resolve(process.env.QCU_READING_BROWSER_OUT ?? '.work/qcu-reading-r1
 await mkdir(out, {recursive:true})
 test('actual reading UI: import/search/locate/confirm/cite/note/reload/download; 360px, themes, host font, cancellation and zero external requests', {timeout:90000}, async t => {
   const runOut = await mkdtemp(join(out, 'run-')), profile = join(runOut, 'chromium-disposable')
+  let evidence
   const server = spawn(process.execPath, ['hub/plugins/qcu-reading/preview.mjs'], {env:{...process.env, QCU_READING_PREVIEW_OUT:join(runOut, 'preview')}, stdio:['ignore', 'pipe', 'pipe']})
   let stderr = ''
   server.stderr.on('data', bytes => stderr += bytes.toString())
-  t.after(async () => { if (server.exitCode === null) { const exited = once(server, 'exit'); server.kill('SIGTERM'); await exited } })
+  t.after(async () => {
+    if (server.exitCode === null && server.signalCode === null) { const exited = once(server, 'exit'); server.kill('SIGTERM'); await exited }
+    if (evidence) {
+      evidence.serverClosed = server.exitCode !== null || server.signalCode !== null
+      evidence.serverExitCode = server.exitCode; evidence.serverSignal = server.signalCode
+      assert.equal(evidence.serverClosed, true)
+      await assert.rejects(fetch(info.url + '/preview/stats')); evidence.loopbackClosed = true
+      await writeFile(join(runOut, 'EVIDENCE.json'), JSON.stringify(evidence, null, 2) + '\n')
+    }
+  })
   const info = await new Promise((resolve, reject) => {
     let output = ''
     const timer = setTimeout(() => reject(Error('preview startup timed out: ' + stderr)), 15000)
@@ -40,8 +50,8 @@ test('actual reading UI: import/search/locate/confirm/cite/note/reload/download;
   }
   const executablePath = process.env.QCU_READING_CHROMIUM ?? '/Users/mcq/Library/Caches/ms-playwright/chromium_headless_shell-1234/chrome-headless-shell-mac-arm64/chrome-headless-shell'
   const context = await chromium.launchPersistentContext(profile, {ignoreDefaultArgs:true, args:['--headless', '--user-data-dir=' + profile, '--remote-debugging-pipe', '--no-first-run', '--no-default-browser-check', '--disable-background-networking', '--disable-component-update', '--disable-sync'], executablePath, headless:true, chromiumSandbox:true, viewport:{width:1280, height:920}, acceptDownloads:true})
-  const evidence = {syntheticOnly:true, realModel:false, nativeDSH:false, nativeFileChooser:false, packageRoot:process.env.QCU_READING_PACKAGE_ROOT ?? 'source', serverPid:server.pid, screenshots:[], checks:[], external:[], errors:[]}
-  t.after(async () => { await context.close(); await writeFile(join(runOut, 'EVIDENCE.json'), JSON.stringify(evidence, null, 2) + '\n') })
+  evidence = {syntheticOnly:true, realModel:false, nativeDSH:false, nativeFileChooser:false, packageRoot:process.env.QCU_READING_PACKAGE_ROOT ?? 'source', serverPid:server.pid, screenshots:[], checks:[], external:[], errors:[]}
+  t.after(async () => { await context.close(); evidence.browserClosed = true; await writeFile(join(runOut, 'EVIDENCE.json'), JSON.stringify(evidence, null, 2) + '\n') })
   await context.route('**/*', route => {
     if (new URL(route.request().url()).origin !== url) { evidence.external.push(route.request().url()); return route.abort() }
     return route.continue()

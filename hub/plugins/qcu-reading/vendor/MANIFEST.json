@@ -1,5 +1,5 @@
 {
-  "recipe": "node vendor.mjs --stage; esbuild 0.28.1, node22 ESM minify; PDF.js native canvas bootstrap removed, canvas rendering throws; image size gate always warns and skips decoding (text-only maxImageSize=0); DecodeStream allocator capped at 8 MiB per buffer and 64 MiB cumulative allocations; limit flag checked by parser; no other semantic patches",
+  "recipe": "node vendor.mjs --stage; esbuild 0.28.1; audited PDF.js legacy 6.3.289 Node24 ESM minify; unchanged encodings/charsets/glyphlist/metrics/*_factors/liberationsans_widths and lookup helper factored at fixed upstream boundaries into static pdf.font-tables.mjs; native canvas bootstrap removed; canvas rendering throws; image size gate always warns and skips decoding (text-only maxImageSize=0); DecodeStream allocator capped at 8 MiB per buffer and 64 MiB cumulative allocations; limit flag checked by parser; other inputs retain node22 recipe; no other semantic patches",
   "inputs": [
     {
       "package": "pdfjs-dist",
@@ -93,9 +93,14 @@
       "sha256": "d7a7d5bb8ffb4c4eec1d0e92363f854b81676d93c08f9cd77b6ba98bd6ce333f"
     },
     {
+      "file": "pdf.font-tables.mjs",
+      "bytes": 235851,
+      "sha256": "bc642bb78d79ac146f5b794b516d9b2def86f652c49b0f42b5507b29fbc05509"
+    },
+    {
       "file": "pdf.worker.mjs",
-      "bytes": 1268229,
-      "sha256": "784a51bbb6df3c7867e8017b998972f0873f9b9db5137bf509a4ce5e887928de"
+      "bytes": 1035415,
+      "sha256": "eb649b2144318f1e270d7e8e36a161b5af84378dcf8f19086a91f5d64b6a569e"
     },
     {
       "file": "xml.mjs",

@@ -1,5 +1,7 @@
 # QCU 材料伴读 R1b 实施与本机验收
 
+**2026-10-30更新：** 本机已获准升级pilot.3，原生刷新、指定一次真实问答、引用定位、系统保存导出、隔离与正常重启留存通过，见[原生验收](qcu-reading-native-acceptance.md)。当前源码pilot.4修复Hub分发类型/大小并补强worker隔离证据，尚未安装/发布，见[分发候选](qcu-reading-hub-package.md)。下面10月29日安装/未调用模型等为该阶段历史，不代表当前状态；旧离线测试未充分证明worker权限继承，network scope断言也不足，新证据明确区分Node文件/addon限制与测试专用网络拒绝。
+
 任务 `QCU-READING-R1B`，父任务 `qcu-standalone-learning-tools-20261029`。基线 `f9aebfceaf50559fc271f0d37176f9b1c31ab7d3`，分支 `dev/qcu-teacher-reading`。候选 `qcu-reading@0.1.0-pilot.2`，协议 2 / 存储 schema 2。基于首版增量实现，仍为默认停用的本地候选。
 
 开发阶段完成实际代码、合成材料测试、生成 Client、可重建自包含 TGZ 与精确解包验收。源码由开发分支交付，实际提交及远端状态见固定产物中的 `evidence/SOURCE-COMMIT.json`。该开发阶段没有部署、访问 mini、安装到真实 DSH、调用真实模型或读取真实教师材料/Key；未改其他插件、Hub/市场容量、官方源码或 pilot.1 固定证据。原生 DSH 与教师真实使用验收仍未完成，不能将此报告当作原生通过。

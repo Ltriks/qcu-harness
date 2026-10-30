@@ -40,12 +40,14 @@ if (process.argv.includes('--stage')) {
     for (const file of files) {
       let contents = await input(name, version, file, base, source)
       if (name === 'pdfjs-dist') {
+        const expected = file.endsWith('/pdf.mjs') ? '91e29f812c593904e8d48d022db5ddf93e3443575d4765ac9bfbb42494cfbd8d' : 'df3bf6bf6b8b8dac8a4042d8c4ecf1cf21e1d197e0fe231c192122409eba656b'
+        if (hash(contents) !== expected) throw Error('Audited legacy PDF.js input changed: ' + file)
         if (file.endsWith('/pdf.mjs')) {
           const noticeEnd = contents.indexOf('*/') + 2
           if (noticeEnd < 2 || !contents.slice(0, noticeEnd).includes('Copyright 2024 Mozilla')) throw Error('PDF.js notice changed')
           licenses.push('PDF.js original notice (main and worker)\n\n' + contents.slice(0, noticeEnd))
           licenses.push('core-js 3.50.0 (embedded in PDF.js legacy files)\n\n' + await input('core-js', '3.50.0', 'core-js-LICENSE.txt', join(root, 'vendor-inputs'), 'https://raw.githubusercontent.com/zloirock/core-js/v3.50.0/LICENSE'))
-          // Remove optional native canvas bootstrap. Real DOMMatrix is installed ONLY in our worker.
+          // Remove optional native bootstrap. Real DOMMatrix remains worker-local.
           const start = contents.indexOf('  let canvas;\n'), end = contents.indexOf('  if (!globalThis.navigator?.language)', start)
           if (start < 0 || end < start) throw Error('PDF.js bootstrap changed')
           contents = contents.slice(0, start) + contents.slice(end)
@@ -68,8 +70,30 @@ if (process.argv.includes('--stage')) {
           if (!contents.includes(asyncChunk)) throw Error('PDF.js streaming decoder changed')
           contents = contents.replace(asyncChunk, asyncChunk + '\n        qcuDecodeCheck(totalLength);')
           contents = contents.replace('      const data = new Uint8Array(totalLength);', '      qcuDecodeCheck(totalLength, 2 * totalLength); qcuDecodedBudget += 2 * totalLength;\n      const data = new Uint8Array(totalLength);')
+          // Fixed static ESM factoring at audited upstream module boundaries. No runtime
+          // decoding/assembly/evaluation and no omitted parser or font behavior.
+          const helperStart = contents.indexOf('function getLookupTableFactory(')
+          const helperEnd = contents.indexOf('\nclass MissingDataException', helperStart)
+          if (helperStart < 0 || helperEnd < helperStart) throw Error('Lookup helper boundary changed')
+          let tables = contents.slice(helperStart, helperEnd) + '\n'
+          contents = contents.slice(0, helperStart) + contents.slice(helperEnd)
+          const names = ['getLookupTableFactory']
+          for (const section of ['encodings', 'charsets', 'glyphlist', 'metrics', 'calibri_factors', 'helvetica_factors', 'liberationsans_widths', 'myriadpro_factors', 'segoeui_factors']) {
+            const start = contents.indexOf(';// ./src/core/' + section + '.js\n')
+            const end = contents.indexOf(';// ./', start + 1)
+            if (start < 0 || end < start) throw Error('Font table boundary changed: ' + section)
+            const body = contents.slice(start, end)
+            names.push(...[...body.matchAll(/^(?:const|function) (\w+)/gm)].map(m => m[1]))
+            tables += body
+            contents = contents.slice(0, start) + contents.slice(end)
+          }
+          tables += '\nexport {' + names.join(',') + '};\n'
+          contents = 'import {' + names.join(',') + '} from "./pdf.font-tables.mjs";\n' + contents
+          const tableResult = await esbuild.transform(tables, {minify:true, format:'esm', target:'node24', legalComments:'none'})
+          await output('pdf.font-tables.mjs', tableResult.code)
         }
-        const result = await esbuild.transform(contents, {minify:true, format:'esm', target:'node22', legalComments:'none'})
+        const result = await esbuild.transform(contents, {minify:true, format:'esm', target:'node24', legalComments:'none'})
+        if (Buffer.byteLength(result.code) > 1048576) throw Error('PDF.js member exceeds market bound')
         await output(file.endsWith('/pdf.mjs') ? 'pdf.mjs' : 'pdf.worker.mjs', result.code)
       } else if (name === '@thednp/dommatrix') await output('dommatrix.mjs', contents)
     }
@@ -79,7 +103,7 @@ if (process.argv.includes('--stage')) {
     }
   }
   await output('THIRD-PARTY-NOTICES.txt', licenses.join('\n\n' + '='.repeat(72) + '\n\n') + '\n')
-  await writeFile(join(out, 'MANIFEST.json'), JSON.stringify({recipe:'node vendor.mjs --stage; esbuild 0.28.1, node22 ESM minify; PDF.js native canvas bootstrap removed, canvas rendering throws; image size gate always warns and skips decoding (text-only maxImageSize=0); DecodeStream allocator capped at 8 MiB per buffer and 64 MiB cumulative allocations; limit flag checked by parser; no other semantic patches', inputs, outputs}, null, 2) + '\n')
+  await writeFile(join(out, 'MANIFEST.json'), JSON.stringify({recipe:'node vendor.mjs --stage; esbuild 0.28.1; audited PDF.js legacy 6.3.289 Node24 ESM minify; unchanged encodings/charsets/glyphlist/metrics/*_factors/liberationsans_widths and lookup helper factored at fixed upstream boundaries into static pdf.font-tables.mjs; native canvas bootstrap removed; canvas rendering throws; image size gate always warns and skips decoding (text-only maxImageSize=0); DecodeStream allocator capped at 8 MiB per buffer and 64 MiB cumulative allocations; limit flag checked by parser; other inputs retain node22 recipe; no other semantic patches', inputs, outputs}, null, 2) + '\n')
   const verified = await verifyVendor()
   console.log(JSON.stringify({inputs:verified.inputs.length, outputs:verified.outputs.length, bytes:verified.outputs.reduce((n, f) => n + f.bytes, 0)}))
 }

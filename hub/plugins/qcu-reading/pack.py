@@ -5,12 +5,13 @@ import gzip
 import hashlib
 import io
 import json
+import re
 import tarfile
 
 
 def build(root):
     manifest = json.loads((root / 'package.json').read_text())
-    assert manifest['name'] == 'qcu-reading' and manifest['version'] == '0.1.0-pilot.3'
+    assert manifest['name'] == 'qcu-reading' and manifest['version'] == '0.1.0-pilot.4'
     assert not any(manifest.get(k) for k in ['scripts', 'dependencies', 'optionalDependencies', 'bundledDependencies'])
     assert all(v == ('4.0.4' if k.endswith('/cordis') else '3.18.4' if k.endswith('/schemastery') else '0.2.0-rc.2') for k, v in manifest['peerDependencies'].items())
     assert json.loads((root / 'cordis.patch.yml').read_text()) == [{'insert':[{'id':'qcu-reading', 'name':'qcu-reading', 'disabled':True, 'config':{'enabled':True}}]}]
@@ -18,6 +19,7 @@ def build(root):
     for record in json.loads((root / 'vendor/MANIFEST.json').read_text())['outputs']:
         assert hashlib.sha256((root / 'vendor' / record['file']).read_bytes()).hexdigest() == record['sha256']
     assert len(files) == len(set(files))
+    assert len(files) <= 80 and 'pack.py' not in files
     for value in [*manifest['exports'].values(), manifest['dsh']['bundle']['patch']]:
         assert value.removeprefix('./') in files
     client = (root / 'client.js').read_text()
@@ -29,14 +31,19 @@ def build(root):
         for name in files:
             path = root / name
             assert not Path(name).is_absolute() and '..' not in Path(name).parts
+            assert len('package/' + name) <= 100  # no USTAR prefix/extensions
+            assert name == 'LICENSE' or re.fullmatch(r'[a-zA-Z0-9][a-zA-Z0-9_./-]*\.(?:m?js|cjs|json|md|ya?ml|txt)', name)
             assert path.is_file() and not path.is_symlink()
             assert not any(part in ['node_modules', '.env', '.work'] for part in path.parts)
             data = path.read_bytes()
             data.decode('utf-8')
+            assert b'\0' not in data and len(data) <= 1048576
             entry = tarfile.TarInfo('package/' + name)
             entry.size, entry.mode, entry.mtime = len(data), 0o644, 0
             tar.addfile(entry, io.BytesIO(data))
             records.append({'path':entry.name, 'bytes':len(data), 'sha256':hashlib.sha256(data).hexdigest()})
+    assert sum(r['bytes'] for r in records) <= 4194304
+    assert len(raw.getvalue()) <= 5 * 1048576
     out = io.BytesIO()
     with gzip.GzipFile(fileobj=out, mode='wb', filename='', mtime=0, compresslevel=9) as zipped:
         zipped.write(raw.getvalue())

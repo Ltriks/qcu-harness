@@ -1,12 +1,14 @@
 # QCU Harness
 
-## 单机材料伴读 R1b（本机已启用并验证导入与留存；Hub未发布）
+## 单机材料伴读（pilot.3原生闭环通过；pilot.4分发候选）
 
-`qcu-reading@0.1.0-pilot.2` 在首版上新增本机文字型 PDF / DOCX 解析：PDF 保留物理页，Word 按章节、段落和表格行列定位；原始字节、来源快照、逐次确认问答与 Markdown 导出均可追溯。提取遗漏可见，扫描件需先做 OCR。自包含候选不需要教师安装 Python、Docker、native canvas 或解析服务。
+`qcu-reading` 支持本机TXT/Markdown、文字型PDF和DOCX；保留原始字节版本、PDF物理页、Word章节/表格行列位置、摘录、逐次确认问答和Markdown导出。扫描件需先OCR，提取遗漏可见，教师运行不需要Python、Docker或解析服务。
 
-构建：`rtk node hub/plugins/qcu-reading/build.mjs`。支持范围、合成测试及精确 TGZ 证据见 [R1b 实施与验收](docs/qcu-reading-r1b.md)和 [插件说明](hub/plugins/qcu-reading/README.md)。[演进计划](docs/qcu-standalone-learning-plan.md)仍按伴读 → 个人资料架 → 教师题库推进；[R1a 固定记录](docs/qcu-reading-r1a.md)保持原样。开发分支 `dev/qcu-teacher-reading`，worktree `$HOME/Repos/worktrees/qcu-harness/teacher-reading`；安装包、截图和证据在 `$HOME/Artifacts/qcu-harness/0.1.0-reading.2/`。维护者本地验收 46 项通过，另独立验证实际 PDF/Word 文件与旧记录；[短验收步骤](docs/qcu-reading-r1b-checklist.md)可在合成预览中核对。源码由开发分支交付。已通过本机官方 DSH 0.2.0-rc.2 安装及随后单独授权的启用，29 个文件逐字节匹配固定包；唯一组件显示运行中。原生自编 PDF 页位、Word 表格定位、摘录保存和正常重启后保留已通过；Word 的一次系统文件选择由用户完成。真实模型、原生问答引用及导出、重复导入和教师效果待测，Hub/mini未发布，未触碰真实教师材料或Key。
+开发分支 `dev/qcu-teacher-reading`，worktree `$HOME/Repos/worktrees/qcu-harness/teacher-reading`。当前本机官方DSH仍为0.2.0-rc.2，已安装启用pilot.3：新增工作区刷新保留草稿和确认、指定的一次真实k3问答、来源定位、系统保存Markdown、工作区隔离及正常重启后保留均通过。Word首次文件选择由用户协助一次，后续重复导入已由维护者完成。实际记录见[原生验收](docs/qcu-reading-native-acceptance.md)；只用自编材料，不代表真人教师采用或一般教学质量通过。
 
-原生发现新增工作区不能立即出现在伴读列表；[工作区刷新修复](docs/qcu-reading-workspace-refresh.md)已形成独立本地候选 `0.1.0-pilot.3`，精确包59项检查、父级独立15项定向复核及可重复构建通过。产物在 `$HOME/Artifacts/qcu-harness/0.1.0-reading.3/`；已安装版本仍为pilot.2，pilot.3未安装或发布。当前源码构建生成pilot.3；重建pilot.2应使用其固定来源提交。
+准备投稿时发现旧包包含维护Python脚本及超限PDF worker；[pilot.4分发修复](docs/qcu-reading-hub-package.md)已通过现有静态检查器和市场归档检查，未放宽审核政策。精确包64项（含官方12项和浏览器2项）、源码61项，父级另独立8项通过；官方App内置Node24.18.1也完成精确包自编PDF/Word解析与重开。固定产物 `$HOME/Artifacts/qcu-harness/0.1.0-reading.4/`；pilot.4尚未安装，产品准入/更新策略及实际Hub签名发布未完成，Hub/mini未部署。源码构建生成pilot.4，旧版重建须用对应固定提交。[演进计划](docs/qcu-standalone-learning-plan.md)按伴读→个人资料架→题库推进，R2尚未进入。
+
+构建：`rtk node hub/plugins/qcu-reading/build.mjs`；定向解析回归：`rtk node --test tests/qcu-reading-hub-parser.test.mjs`。精确包、官方运行时和浏览器完整命令见[分发候选报告](docs/qcu-reading-hub-package.md)。
 
 ## 教师助手与工具市场 P16（Hub与mini已部署，基础验证通过）
 
