@@ -1,7 +1,7 @@
 // Generated official lazy-CJS Client; shared host React only.
 window.__ModuleLoader__.load({id:'qcu-reading',factory(require){
 const React=require('react');
-const VERSION = '0.1.0-pilot.4', PROTOCOL = 2, OUTPUT_BUDGET = 2000
+const VERSION = '0.2.0-pilot.1', PROTOCOL = 3, OUTPUT_BUDGET = 2000
 const LIMITS = Object.freeze({fileBytes:262144, binaryBytes:2097152, requestChars:3000000, extractedBytes:524288, pages:120, items:40000, zipEntries:256, zipEntryBytes:2097152, zipTotalBytes:8388608, zipRatio:100, parseMilliseconds:15000, documents:24, paragraphs:2000, notes:200, runs:50, storeBytes:8000000, answerChars:24000, questionChars:2000, snippetChars:1800, sources:4})
 function check(ok, code = 'invalid-input') {
   if (!ok) throw Object.assign(Error(code), {code})
@@ -132,6 +132,12 @@ function policyFor(info) {
 }
 const sameRoute = (a, b) => JSON.stringify(parseRoute(a)) === JSON.stringify(parseRoute(b))
 const errors = {
+  'state-changed':'本地记录已被其他操作修改；已拒绝写入，请重启插件后核对。',
+  'backup-changed':'备份期间记录已变化，未下载文件；请重新导出。',
+  'backup-invalid':'备份校验未通过，未下载文件；请重试或联系维护者。',
+  'delete-expired':'删除预览已失效或记录有变化，请重新预览。',
+  'delete-busy':'请先等待或取消当前导入、问答，再预览删除。',
+  'note-not-found':'摘录或其来源不存在，请刷新核对。',
   'invalid-input':'输入无效，请检查后重试。', 'invalid-fields':'请求包含不支持的字段。',
   'invalid-text':'文字为空、过长或包含无效字符。', 'invalid-name':'文件名无效，请使用不含路径的普通文件名。',
   'unsupported-format':'请选择 UTF-8 TXT、Markdown、文字型 PDF 或 DOCX；不支持 DOC、DOCM 或扫描件 OCR。',
@@ -165,6 +171,53 @@ const errors = {
 const safeCode = e => Object.hasOwn(errors, e?.code) ? e.code : 'operation-failed'
 const codec = (symbol, max) => ({mode:'strict', typeSymbol:'qcu-reading#' + symbol, create:() => ({parse(value) { check(typeof value === 'string' && value.length <= max, 'invalid-fields'); JSON.parse(value); return value }})})
 const remoteContribution = {package:'qcu-reading', descriptors:[{id:'qcu-reading#qcuReading/dispatch', service:'qcuReading', namespace:'qcuReading', method:'dispatch', invocation:{kind:'direct'}, parameters:[{name:'payload', wire:'payload', source:'json', codec:codec('request', LIMITS.requestChars)}], cancellation:{parameter:'signal'}, result:codec('reply', 10000000)}]}
+
+
+const SHELF_LIMITS = Object.freeze({title:180, course:80, tags:8, tag:24, hits:40, chunkBytes:262144, backupBytes:8001024})
+const emptyMetadata = () => ({title:'', course:'', tags:[], favorite:false})
+function shelfText(value, max) {
+  text(value, max, false)
+  check(!/[\p{Cc}\p{Cf}\p{Zl}\p{Zp}]/u.test(value), 'invalid-text')
+  return value.trim().normalize('NFC')
+}
+function parseMetadata(raw) {
+  exact(raw, ['title', 'course', 'tags', 'favorite'])
+  const title = shelfText(raw.title, SHELF_LIMITS.title), course = shelfText(raw.course, SHELF_LIMITS.course)
+  check(Array.isArray(raw.tags) && raw.tags.length <= SHELF_LIMITS.tags && typeof raw.favorite === 'boolean', 'invalid-fields')
+  const tags = [], seen = new Set()
+  for (const value of raw.tags) {
+    const tag = shelfText(value, SHELF_LIMITS.tag), key = tag.toLowerCase()
+    check(tag, 'invalid-text')
+    if (!seen.has(key)) { tags.push(tag); seen.add(key) }
+  }
+  return {title, course, tags, favorite:raw.favorite}
+}
+function metadataFor(library, id) { return Object.hasOwn(library.documents, id) ? library.documents[id] : emptyMetadata() }
+function validateLibrary(library, documents, notes) {
+  exact(library, ['documents', 'notes'])
+  for (const [kind, known, max] of [['documents', documents, 24], ['notes', notes, 200]]) {
+    const values = library[kind]
+    check(values && typeof values === 'object' && !Array.isArray(values) && Object.keys(values).length <= max, 'invalid-store')
+    for (const id of Object.keys(values)) {
+      check(known.has(id) && !['__proto__', 'constructor', 'prototype'].includes(id), 'invalid-store')
+      if (kind === 'documents') check(JSON.stringify(parseMetadata(values[id])) === JSON.stringify(values[id]), 'invalid-store')
+      else check(typeof values[id] === 'boolean', 'invalid-store')
+    }
+  }
+}
+function parseShelf(raw) {
+  exact(raw, ['query', 'course', 'tag', 'favorites'])
+  const query = shelfText(raw.query, 2000), course = shelfText(raw.course, 80), tag = shelfText(raw.tag, 24)
+  check(typeof raw.favorites === 'boolean', 'invalid-fields')
+  return {query, course, tag, favorites:raw.favorites}
+}
+function matchesFilters(meta, filters) {
+  return (!filters.course || meta.course === filters.course) && (!filters.tag || meta.tags.includes(filters.tag)) && (!filters.favorites || meta.favorite)
+}
+function matchesMetadata(document, meta, query) {
+  const terms = searchTerms(query), value = [document.name, meta.title, meta.course, ...meta.tags].join(' ').toLowerCase()
+  return terms.some(term => value.includes(term))
+}
 
 const statusLabel = status => ({running:'生成中', completed:'已生成草案', failed:'失败 · 不完整', cancelled:'已取消 · 不完整', interrupted:'已中断 · 不完整'}[status] ?? '不完整')
 function citationParts(answer, sources) {
@@ -216,7 +269,7 @@ function exportRun(run) {
 class ReadingController {
   constructor(remote, {storage = globalThis.localStorage} = {}) {
     this.remote = remote; this.storage = storage; this.listeners = new Set(); this.epoch = 0; this.pollEpoch = 0; this.workspacesEpoch = 0
-    this.state = {workspaces:[], workspaceId:'', refreshingWorkspaces:false, workspacesError:'', workspacesNotice:'', workspaceMissing:false, documents:[], notes:[], runs:[], document:null, selected:'', query:'', hits:[], searched:false, question:'', prepared:null, consent:false, run:null, excerpt:'', comment:'', busy:false, parsing:null, loading:true, error:'', notice:'', pane:'original', showMaterials:false}
+    this.state = {workspaces:[], workspaceId:'', refreshingWorkspaces:false, workspacesError:'', workspacesNotice:'', workspaceMissing:false, documents:[], notes:[], runs:[], library:{documents:{}, notes:{}}, shelfQuery:'', course:'', tag:'', favorites:false, shelfIds:null, shelfHits:[], deletePreview:null, backing:null, document:null, selected:'', query:'', hits:[], searched:false, question:'', prepared:null, consent:false, run:null, excerpt:'', comment:'', busy:false, parsing:null, loading:true, error:'', notice:'', pane:'original', showMaterials:false}
   }
   subscribe = fn => { this.listeners.add(fn); return () => this.listeners.delete(fn) }
   snapshot = () => this.state
@@ -242,11 +295,12 @@ class ReadingController {
     if (s.prepared) void this.call({action:'dismiss', workspaceId:s.workspaceId, intentId:s.prepared.id}).catch(() => {})
     this.set({prepared:null, consent:false})
   }
-  invalidate() { this.forgetConfirmation(); this.stopImport(); this.epoch++; this.set({busy:false, parsing:null, error:'', notice:''}) }
+  invalidate() { this.forgetConfirmation(); this.dismissDelete(); this.cancelBackup(); this.stopImport(); this.epoch++; this.set({busy:false, parsing:null, error:'', notice:''}) }
   setWorkspaces(workspaces) {
     if (this.state.workspaceId && !workspaces.some(w => w.id === this.state.workspaceId)) {
       // Invalidate local sends/replies and observation only. Never cancel a Host job or erase its saved data.
       ++this.epoch; ++this.pollEpoch; clearTimeout(this.timer); clearTimeout(this.importTask?.timer)
+      this.dismissDelete(); this.cancelBackup()
       this.set({workspaces, workspaceId:'', workspaceMissing:true, prepared:null, consent:false, busy:false, loading:false, parsing:null})
     } else this.set({workspaces})
   }
@@ -282,7 +336,7 @@ class ReadingController {
   async selectWorkspace(id) {
     if (this.closed || (id && !this.state.workspaces.some(w => w.id === id))) return
     this.invalidate(); clearTimeout(this.timer); const token = ++this.pollEpoch, epoch = this.epoch
-    this.set({workspaceId:id, workspaceMissing:false, documents:[], notes:[], runs:[], document:null, selected:'', question:'', query:'', hits:[], searched:false, run:null, loading:!!id, excerpt:'', comment:''})
+    this.set({workspaceId:id, workspaceMissing:false, documents:[], notes:[], runs:[], library:{documents:{}, notes:{}}, shelfQuery:'', course:'', tag:'', favorites:false, shelfIds:null, shelfHits:[], document:null, selected:'', question:'', query:'', hits:[], searched:false, run:null, loading:!!id, excerpt:'', comment:''})
     if (!id) return
     try {
       const data = await this.call({action:'catalog', workspaceId:id})
@@ -313,6 +367,94 @@ class ReadingController {
   async refresh(epoch = this.epoch) {
     const data = await this.call({action:'catalog', workspaceId:this.state.workspaceId})
     if (epoch === this.epoch) this.set(data)
+  }
+  metadata(id = this.state.document?.id) { return id ? metadataFor(this.state.library, id) : emptyMetadata() }
+  async filterShelf(patch = {}) {
+    this.set({...patch, shelfIds:null, shelfHits:[]})
+    await this.action(async epoch => { await this.loadShelf(epoch) })
+  }
+  async loadShelf(epoch) {
+    const s = this.state
+    const binding = state => JSON.stringify([state.shelfQuery, state.course, state.tag, state.favorites])
+    const result = await this.call({action:'shelf', workspaceId:s.workspaceId, query:s.shelfQuery, course:s.course, tag:s.tag, favorites:s.favorites})
+    if (epoch === this.epoch && binding(s) === binding(this.state)) this.set({shelfIds:result.documentIds, shelfHits:result.hits})
+  }
+  clearFilters() { void this.filterShelf({shelfQuery:'', course:'', tag:'', favorites:false}) }
+  async saveMetadata(metadata) {
+    await this.action(async epoch => {
+      const s = this.state
+      await this.call({action:'metadata', workspaceId:s.workspaceId, documentId:s.document.id, metadata})
+      if (epoch !== this.epoch) return
+      await this.refresh(epoch); if (epoch !== this.epoch) return
+      await this.loadShelf(epoch); if (epoch === this.epoch) this.set({notice:'资料信息已保存；原文和历史来源保持原版本。'})
+    })
+  }
+  async favoriteNote(noteId, favorite) {
+    await this.action(async epoch => {
+      await this.call({action:'favoriteNote', workspaceId:this.state.workspaceId, noteId, favorite})
+      if (epoch === this.epoch) await this.refresh(epoch)
+    })
+  }
+  async openNote(noteId) {
+    const note = this.state.notes.find(n => n.id === noteId)
+    if (!note || !this.state.documents.some(d => d.id === note.documentId)) { this.set({error:errors['note-not-found']}); return }
+    await this.openDocument(note.documentId, note.locator)
+  }
+  async previewDelete() {
+    this.dismissDelete()
+    await this.action(async epoch => {
+      const s = this.state, preview = await this.call({action:'deletePreview', workspaceId:s.workspaceId, documentId:s.document.id})
+      if (epoch === this.epoch) this.set({deletePreview:preview})
+      else void this.call({action:'deleteDismiss', workspaceId:s.workspaceId, receiptId:preview.id}).catch(() => {})
+    })
+  }
+  dismissDelete() {
+    const s = this.state
+    if (s.deletePreview) void this.call({action:'deleteDismiss', workspaceId:s.workspaceId, receiptId:s.deletePreview.id}).catch(() => {})
+    this.set({deletePreview:null})
+  }
+  async confirmDelete() {
+    const s = this.state, p = s.deletePreview
+    if (!p) return
+    await this.action(async epoch => {
+      await this.call({action:'deleteConfirm', workspaceId:s.workspaceId, receiptId:p.id, digest:p.digest, documentId:p.document.id, consent:true})
+      if (epoch !== this.epoch) return
+      this.forgetConfirmation(); this.set({deletePreview:null, document:null, selected:'', excerpt:'', comment:'', run:s.run?.document.id === p.document.id ? null : s.run})
+      await this.refresh(epoch); if (epoch !== this.epoch) return
+      await this.loadShelf(epoch); if (epoch === this.epoch) this.set({notice:'已删除该版本及其摘录、问答；其他材料记录保留。'})
+    })
+  }
+  cancelBackup() { if (this.backupTask) this.backupTask.cancelled = true; this.set({backing:null}) }
+  async exportBackup(deliver) {
+    await this.action(async epoch => {
+      const workspaceId = this.state.workspaceId, task = {cancelled:false}; this.backupTask = task
+      const current = () => !task.cancelled && !this.closed && epoch === this.epoch && workspaceId === this.state.workspaceId
+      const sha = async bytes => [...new Uint8Array(await crypto.subtle.digest('SHA-256', bytes))].map(n => n.toString(16).padStart(2, '0')).join('')
+      this.set({backing:{done:0, total:0}})
+      try {
+        const p = await this.call({action:'backupPrepare', workspaceId})
+        if (!current()) return
+        check(p.format === 'qcu-reading-backup' && p.version === 1 && p.stateSchema === 3 && Number.isInteger(p.bytes) && p.bytes > 0 && p.bytes <= SHELF_LIMITS.backupBytes && p.chunkBytes === SHELF_LIMITS.chunkBytes && p.chunks === Math.ceil(p.bytes / p.chunkBytes) && /^[a-f0-9]{64}$/.test(p.digest) && /^[a-f0-9]{64}$/.test(p.checksum), 'backup-invalid')
+        const bytes = new Uint8Array(p.bytes); let offset = 0
+        for (let index = 0; index < p.chunks; index++) {
+          if (!current()) return
+          const chunk = await this.call({action:'backupChunk', workspaceId, digest:p.digest, index})
+          if (!current()) return
+          check(chunk.digest === p.digest && chunk.index === index && typeof chunk.base64 === 'string' && chunk.base64.length <= 4 * Math.ceil(p.chunkBytes / 3) && /^[A-Za-z0-9+/]*={0,2}$/.test(chunk.base64), 'backup-invalid')
+          const ascii = atob(chunk.base64), expected = Math.min(p.chunkBytes, p.bytes - offset)
+          check(ascii.length === expected, 'backup-invalid')
+          for (let i = 0; i < ascii.length; i++) bytes[offset + i] = ascii.charCodeAt(i)
+          offset += ascii.length; this.set({backing:{done:index + 1, total:p.chunks}})
+        }
+        check(offset === p.bytes && await sha(bytes) === p.digest, 'backup-invalid')
+        const backup = JSON.parse(new TextDecoder('utf-8', {fatal:true}).decode(bytes))
+        check(backup.format === p.format && backup.version === 1 && backup.stateSchema === 3 && backup.checksum?.algorithm === 'SHA-256' && backup.checksum.state === p.checksum && await sha(new TextEncoder().encode(JSON.stringify(backup.state))) === p.checksum, 'backup-invalid')
+        if (!current()) return
+        const final = await this.call({action:'backupPrepare', workspaceId})
+        check(final.digest === p.digest && final.bytes === p.bytes, 'backup-changed')
+        if (current()) { deliver({filename:'qcu-reading-backup-' + p.digest.slice(0, 16) + '.json', bytes}); this.set({notice:'完整本地备份已准备，请在系统保存窗口或下载列表中确认保存；含原材料、摘录及问答。本版尚无导入恢复界面。'}) }
+      } finally { if (this.backupTask === task) { this.backupTask = null; if (epoch === this.epoch) this.set({backing:null}) } }
+    })
   }
   async importFile(file) {
     const workspaceId = this.state.workspaceId
@@ -434,7 +576,7 @@ class ReadingController {
     })
   }
   async reconnect() { if (this.closed) return; this.invalidate(); clearTimeout(this.timer); ++this.pollEpoch; await this.boot() }
-  dispose() { this.forgetConfirmation(); this.stopImport(); clearTimeout(this.timer); ++this.epoch; ++this.pollEpoch; ++this.workspacesEpoch; this.closed = true; this.listeners.clear() }
+  dispose() { this.forgetConfirmation(); this.dismissDelete(); this.cancelBackup(); this.stopImport(); clearTimeout(this.timer); ++this.epoch; ++this.pollEpoch; ++this.workspacesEpoch; this.closed = true; this.listeners.clear() }
 }
 
 
@@ -448,6 +590,8 @@ const readingCSS = `
 .qr-search button{flex:none;white-space:nowrap}
 .qr-workspaces{display:flex;align-items:center;gap:8px;margin-left:auto;max-width:100%}.qr-header .qr-workspaces label{margin-left:0}.qr-workspaces button{flex:none}.qr-workspaces select{min-width:0}@media(max-width:600px){.qr-workspaces{width:100%;margin-left:0}.qr-header .qr-workspaces label{flex:1;width:auto}}
 .qr-extraction{margin:8px 0 12px;color:var(--qr-muted);font-size:.88em}.qr .qr-extraction details{margin:4px 0 0}.qr .qr-extraction summary{color:var(--qr-accent)}.qr-extraction ul{margin:8px 0 0;padding-left:1.3em}.qr-extraction li+li{margin-top:4px}
+.qr-title h2{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}.qr-docs small{overflow:hidden;white-space:nowrap;text-overflow:ellipsis}.qr-favorites button span,.qr-favorites small{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.qr-shelf-field{display:grid;gap:3px;margin:8px 0;font-size:.88em}.qr-shelf-field input,.qr-shelf-field select{width:100%}.qr-check{display:flex;align-items:center;gap:6px;margin:8px 0}.qr-shelf-search{display:grid;gap:6px;margin:12px 0}.qr-shelf-search input{width:100%}.qr-shelf-hits{display:grid;gap:5px;margin:10px 0}.qr-shelf-hits button{text-align:left;font-size:.88em}.qr-favorites button{display:block;text-align:left;width:100%;margin:6px 0}.qr-favorites small{display:block}.qr-management{border-top:1px solid var(--qr-line);padding-top:8px}.qr-metadata{max-width:38em}.qr-delete{border:1px solid var(--qr-alert);padding:12px;margin:12px 0;overflow-wrap:anywhere}.qr-delete p{margin:8px 0}.qr-delete .qr-toolbar{margin:12px 0 0}.qr-note .qr-toolbar{margin-bottom:4px}.qr ::selection{background:var(--qr-selected);color:var(--qr-ink)}.qr input,.qr textarea{caret-color:var(--qr-accent)}
 @media(max-width:960px){.qr-layout{grid-template-columns:160px minmax(0,1fr)}.qr-tabs{display:flex;gap:8px;padding:8px 14px;border-bottom:1px solid var(--qr-line)}.qr-layout[data-pane=original] .qr-qa,.qr-layout[data-pane=qa] .qr-reader{display:none}.qr-reader{border-right:0}.qr-qa{border-right:0}.qr-header label{margin-left:0}.qr-header{gap:10px}}
 @media(max-width:600px){.qr-layout{grid-template-columns:minmax(0,1fr)}.qr-materials{display:none;max-height:260px;border-right:0;border-bottom:1px solid var(--qr-line)}.qr-layout[data-materials=true] .qr-materials{display:block}.qr-layout[data-materials=true]{grid-template-rows:auto minmax(0,1fr)}.qr-header{padding:10px}.qr-header label{width:100%}.qr-header select{flex:1;max-width:100%}.qr-reader,.qr-qa{padding:12px}.qr-tabs{padding:8px 10px}.qr-paragraph{padding:8px 6px}.qr-title h2{font-size:1em}}
 `
@@ -469,18 +613,35 @@ function createReadingViews(React) {
       h('p', {className:omitted.length || emptyPages || missingText ? 'qr-error' : undefined}, summary),
       h('details', {}, h('summary', {}, '完整提取说明（' + notices.length + ' 项）'), h('ul', {}, ...notices.map((notice, i) => h('li', {key:i}, notice)))))
   }
-  function download({filename, markdown}) {
-    const url = URL.createObjectURL(new Blob([markdown], {type:'text/markdown;charset=utf-8'})), a = document.createElement('a')
+  function download({filename, markdown, bytes}) {
+    const url = URL.createObjectURL(new Blob([bytes ?? markdown], {type:bytes ? 'application/json;charset=utf-8' : 'text/markdown;charset=utf-8'})), a = document.createElement('a')
     a.href = url; a.download = filename; a.click(); setTimeout(() => URL.revokeObjectURL(url), 1000)
+  }
+  function MetadataEditor({controller:c, documentId, metadata, disabled}) {
+    const editable = {title:metadata.title, course:metadata.course, tags:metadata.tags.join('，')}
+    const [draft, setDraft] = React.useState(editable)
+    React.useEffect(() => setDraft(editable), [documentId, JSON.stringify(editable)])
+    const field = (key, label, maxLength) => h('label', {className:'qr-field'}, label, h('input', {value:draft[key], maxLength, onChange:e => setDraft({...draft, [key]:e.target.value})}))
+    return h('form', {className:'qr-metadata', 'aria-label':'资料信息', onSubmit:e => { e.preventDefault(); void c.saveMetadata({...metadata, ...draft, tags:draft.tags.split(/[,，]/u).map(t => t.trim()).filter(Boolean)}) }},
+      field('title', '显示标题（可选）', 180), field('course', '课程 / 分类（可选）', 80), field('tags', '标签（最多 8 个，用逗号分隔；每个 24 字符）', 207),
+      h('p', {className:'qr-muted'}, '仅整理资料架；原文件名、快照及旧回答来源保持原版本。'), h('button', {type:'submit', disabled}, '保存资料信息'))
   }
   function Page({controller:c, onBack}) {
     const s = React.useSyncExternalStore(c.subscribe, c.snapshot, c.snapshot)
     const fileRef = React.useRef(null), rootRef = React.useRef(null), confirmRef = React.useRef(null), prepareRef = React.useRef(null)
+    const deleteCancelRef = React.useRef(null), deleteButtonRef = React.useRef(null)
     React.useEffect(() => {
       if (s.selected && s.pane === 'original') rootRef.current?.querySelector('[data-locator="' + s.selected + '"]')?.scrollIntoView({block:'nearest'})
     }, [s.selected, s.document?.id, s.pane])
     React.useEffect(() => { if (s.prepared) confirmRef.current?.focus() }, [s.prepared?.id])
+    React.useEffect(() => { if (s.deletePreview) deleteCancelRef.current?.focus() }, [s.deletePreview?.id])
     const doc = s.document, disabled = s.busy || !s.workspaceId || s.loading
+    const meta = doc ? metadataFor(s.library, doc.id) : null
+    const visible = s.documents.filter(d => matchesFilters(metadataFor(s.library, d.id), s) && (!s.shelfIds || s.shelfIds.includes(d.id)))
+    const courses = [...new Set(s.documents.map(d => metadataFor(s.library, d.id).course).filter(Boolean))].sort()
+    const tags = [...new Set(s.documents.flatMap(d => metadataFor(s.library, d.id).tags))].sort()
+    const favoriteNotes = s.notes.filter(n => s.library.notes[n.id] === true)
+    const dismissDelete = () => { c.dismissDelete(); deleteButtonRef.current?.focus() }
     const dismiss = () => { c.forgetConfirmation(); prepareRef.current?.focus() }
     const active = s.runs.find(r => r.status === 'running')
     const paragraphView = p => h('section', {className:'qr-paragraph', key:p.locator, 'data-locator':p.locator, 'data-selected':s.selected === p.locator}, button(sourceLabel(p), () => c.selectParagraph(p.locator), {className:'qr-locator', 'aria-pressed':s.selected === p.locator, 'aria-label':'选择段落 ' + p.locator}), h('p', {}, p.text))
@@ -518,18 +679,35 @@ function createReadingViews(React) {
             button('导入材料', () => fileRef.current?.click(), {className:'qr-import qr-primary', disabled}),
             h('input', {ref:fileRef, className:'qr-file', type:'file', accept:'.txt,.md,.pdf,.docx', 'aria-label':'选择 TXT、Markdown、PDF 或 DOCX 文件', onChange:e => { const file = e.target.files[0]; e.target.value = ''; if (file) void c.importFile(file) }}),
             h('small', {}, 'TXT / MD ≤ 256 KiB；PDF / DOCX ≤ 2 MiB'), h('details', {}, h('summary', {}, '格式说明'), h('small', {}, '仅本机解析；PDF 为提取文本，扫描件需先 OCR。Word 按章节、段落及表格行列定位。Markdown 以纯文本显示。')),
-            h('ul', {className:'qr-docs'}, ...s.documents.map(d => h('li', {key:d.id}, button(h(React.Fragment, {}, h('strong', {}, d.name), h('small', {}, formatOf(d).toUpperCase() + ' · ' + d.paragraphs + ' 段')), () => void c.openDocument(d.id), {'aria-pressed':doc?.id === d.id})))),
+            !!s.documents.length && h('section', {'aria-label':'资料架筛选'},
+              h('form', {className:'qr-shelf-search', onSubmit:e => { e.preventDefault(); void c.filterShelf() }}, h('label', {className:'qr-shelf-field'}, '资料架关键词', h('input', {value:s.shelfQuery, maxLength:2000, placeholder:'文件名、标题、标签或原文', onChange:e => c.set({shelfQuery:e.target.value, shelfIds:null, shelfHits:[]})})), h('button', {type:'submit', disabled}, '检索资料架')),
+              h('label', {className:'qr-shelf-field'}, '课程 / 分类', h('select', {'aria-label':'课程 / 分类', value:s.course, disabled:s.busy, onChange:e => void c.filterShelf({course:e.target.value})}, h('option', {value:''}, '全部课程'), ...[...new Set([...courses, ...(s.course ? [s.course] : [])])].map(value => h('option', {key:value, value}, value)))),
+              h('label', {className:'qr-shelf-field'}, '标签', h('select', {'aria-label':'标签', value:s.tag, disabled:s.busy, onChange:e => void c.filterShelf({tag:e.target.value})}, h('option', {value:''}, '全部标签'), ...[...new Set([...tags, ...(s.tag ? [s.tag] : [])])].map(value => h('option', {key:value, value}, value)))),
+              h('label', {className:'qr-check'}, h('input', {type:'checkbox', checked:s.favorites, disabled:s.busy, onChange:e => void c.filterShelf({favorites:e.target.checked})}), '只看收藏材料'),
+              (s.shelfQuery || s.course || s.tag || s.favorites) && button('清除筛选', () => c.clearFilters(), {disabled:s.busy})),
+            h('ul', {className:'qr-docs'}, ...visible.map(d => { const m = metadataFor(s.library, d.id); return h('li', {key:d.id}, button(h(React.Fragment, {}, h('strong', {}, m.title || d.name), h('small', {}, (m.course ? m.course + ' · ' : '') + formatOf(d).toUpperCase() + ' · ' + d.paragraphs + ' 段' + (m.favorite ? ' · 已收藏' : ''))), () => void c.openDocument(d.id), {'aria-pressed':doc?.id === d.id})) })),
+            !!s.documents.length && !visible.length && h('p', {role:'status', className:'qr-muted'}, '没有符合筛选的材料。可清除筛选后查看全部。'),
+            !!s.shelfHits.length && h('section', {className:'qr-shelf-hits', 'aria-label':'跨材料关键词结果'}, h('small', {}, '原文字词匹配，最多 40 处；不理解语义。'), ...s.shelfHits.map(hit => button((metadataFor(s.library, hit.documentId).title || s.documents.find(d => d.id === hit.documentId)?.name || '') + ' · ' + sourceLabel(hit) + ' · ' + hit.text, () => void c.openDocument(hit.documentId, hit.locator), {key:hit.documentId + ':' + hit.locator}))),
+            h('details', {className:'qr-favorites'}, h('summary', {}, '收藏摘录（' + favoriteNotes.length + '）'), favoriteNotes.length ? favoriteNotes.map(n => { const d = s.documents.find(d => d.id === n.documentId); return button(h(React.Fragment, {}, h('span', {}, (d && (metadataFor(s.library, d.id).title || d.name)) || '来源不可用'), h('small', {}, n.locator + ' · ' + n.text.slice(0, 90))), () => void c.openNote(n.id), {key:n.id}) }) : h('p', {className:'qr-muted'}, '在已保存摘录中点击“收藏摘录”，便可从这里打开原文。')),
+            h('details', {className:'qr-management'}, h('summary', {}, '本地备份'), h('p', {className:'qr-muted'}, '备份包含该工作区全部原材料、摘录及保存的问题和回答，下载到本机。请妥善保存。本版仅导出，尚无导入恢复界面。'),
+              button(s.backing ? '正在校验备份…' : '下载完整备份 JSON', () => void c.exportBackup(download), {disabled}),
+              s.backing && h('div', {role:'status'}, '备份进度 ' + s.backing.done + ' / ' + s.backing.total, button('取消备份', () => c.cancelBackup()))),
             !s.documents.length && h('p', {className:'qr-muted'}, '导入一份材料开始阅读。')),
           h('main', {className:'qr-reader', 'aria-label':'原文'}, !doc ? h('section', {className:'qr-empty'}, h('h2', {}, '把材料放在手边'), h('p', {}, '导入 TXT、Markdown、PDF 或 DOCX 后，可搜索材料、保存摘录，再选择片段提问。'), button('导入材料', () => fileRef.current?.click(), {disabled})) : h(React.Fragment, {},
-            h('div', {className:'qr-title'}, h('h2', {}, doc.name), h('small', {}, doc.paragraphs.length + ' 个段落 · 已保存快照')),
+            h('div', {className:'qr-title'}, h('h2', {title:meta.title || doc.name}, meta.title || doc.name), h('small', {}, doc.paragraphs.length + ' 个段落 · 已保存快照'), h('p', {className:'qr-muted'}, '原文件：' + doc.name + ' · 版本 ' + doc.id.slice(0, 12))),
+            h('div', {className:'qr-toolbar'}, button(meta.favorite ? '取消收藏材料' : '收藏材料', () => void c.saveMetadata({...meta, favorite:!meta.favorite}), {'aria-pressed':meta.favorite, disabled})),
+            h('details', {}, h('summary', {}, '整理与管理此版本'), h(MetadataEditor, {controller:c, documentId:doc.id, metadata:meta, disabled}), button('预览删除此版本', () => void c.previewDelete(), {ref:deleteButtonRef, disabled:disabled || !!s.parsing || !!active})),
+            s.deletePreview && h('section', {className:'qr-delete', role:'region', 'aria-label':'删除预览', onKeyDown:e => { if (e.key === 'Escape') { e.preventDefault(); dismissDelete() } }},
+              h('h3', {}, '删除这个资料版本？'), h('p', {}, '原文件：' + s.deletePreview.document.name), h('p', {className:'qr-identity'}, 'SHA-256：' + s.deletePreview.document.id), h('p', {}, '将连同 ' + s.deletePreview.notes + ' 条摘录、' + s.deletePreview.runs + ' 条问答及此版本的分类、标签和收藏一起删除。其他版本和记录保留；原文件不受影响。'), h('p', {}, '此操作不能在界面撤销。需要留存时，请先取消并下载完整备份。'),
+              h('div', {className:'qr-toolbar'}, button('取消删除', dismissDelete, {ref:deleteCancelRef}), button('确认删除此版本及记录', () => void c.confirmDelete(), {disabled:s.busy}))),
             doc.extraction && h(ExtractionNotice, {key:doc.id, extraction:doc.extraction}),
             h('form', {className:'qr-search', onSubmit:e => { e.preventDefault(); void c.search() }}, h('input', {'aria-label':'原文关键词', placeholder:'搜索材料中的关键词', maxLength:LIMITS.questionChars, value:s.query, onChange:e => c.input('query', e.target.value)}), h('button', {type:'submit', disabled:disabled || !s.query.trim()}, '搜索')),
             h('small', {}, '按字词匹配：中文用相邻双字，英文用单词；不理解语义，最多显示 20 处。'),
             s.searched && h('div', {className:'qr-results', 'aria-label':'搜索结果'}, s.hits.length ? s.hits.map(hit => button(sourceLabel(hit) + ' · ' + hit.text.slice(0, 90), () => c.selectParagraph(hit.locator), {key:hit.locator})) : h('p', {role:'status'}, '未找到匹配原文。请尝试材料中的其他关键词。')),
             h('article', {'aria-label':'材料段落'}, ...(doc.format === 'pdf' ? doc.extraction.pages.map(page => h('section', {key:page.number, 'data-page':page.number}, h('h3', {}, 'PDF 第 ' + page.number + ' 页'), ...doc.paragraphs.filter(p => p.location.page === page.number).map(paragraphView), !page.units && h('p', {className:'qr-error'}, '本页未提取到文字；如有内容请先做 OCR。'))) : doc.paragraphs.map(paragraphView))),
             s.selected && h('section', {className:'qr-note-editor', 'aria-label':'保存摘录'}, h('h3', {}, '摘录 · ' + sourceLabel(doc.paragraphs.find(p => p.locator === s.selected))), h('label', {className:'qr-field'}, '摘录文字（可保留段落中的一部分）', h('textarea', {'aria-label':'摘录文字（可保留段落中的一部分）', value:s.excerpt, maxLength:4000, onChange:e => c.input('excerpt', e.target.value)})), h('label', {className:'qr-field'}, '我的笔记', h('textarea', {'aria-label':'我的笔记', value:s.comment, maxLength:2000, onChange:e => c.input('comment', e.target.value)})), button('保存摘录', () => void c.saveNote(), {disabled:disabled || !s.excerpt.trim()})),
-            h('details', {}, h('summary', {}, '已保存摘录（' + s.notes.filter(n => n.documentId === doc.id).length + '）'), ...s.notes.filter(n => n.documentId === doc.id).map(n => h('section', {className:'qr-note', key:n.id}, button(sourceLabel(doc.paragraphs.find(p => p.locator === n.locator)), () => c.selectParagraph(n.locator)), h('blockquote', {}, n.text), h('p', {}, n.comment)))),
-            h('details', {}, h('summary', {}, '文档与容量信息'), h('p', {className:'qr-identity'}, 'SHA-256：' + doc.id), h('p', {}, doc.format ? '身份基于原始文件字节，原始字节保存在本地快照；提取文本另有校验。' : '身份基于规范化文本；同内容不重复导入，同名不同内容保留独立版本。'), doc.contentHash && h('p', {className:'qr-identity'}, '提取文本 SHA-256：' + doc.contentHash), h('p', {}, '记录仅保存在工作区 .qcu-reading；不改动原文件。'), h('p', {}, '最多 24 份材料、200 条摘录、50 次问答，共 8 MB（含原始字节）；本版不自动清理。')))),
+            h('details', {}, h('summary', {}, '已保存摘录（' + s.notes.filter(n => n.documentId === doc.id).length + '）'), ...s.notes.filter(n => n.documentId === doc.id).map(n => h('section', {className:'qr-note', key:n.id}, h('div', {className:'qr-toolbar'}, button(sourceLabel(doc.paragraphs.find(p => p.locator === n.locator)), () => c.selectParagraph(n.locator)), button(s.library.notes[n.id] ? '取消收藏摘录' : '收藏摘录', () => void c.favoriteNote(n.id, !s.library.notes[n.id]), {'aria-pressed':!!s.library.notes[n.id], disabled})), h('blockquote', {}, n.text), h('p', {}, n.comment)))),
+            h('details', {}, h('summary', {}, '文档与容量信息'), h('p', {}, '原文件：' + doc.name), h('p', {className:'qr-identity'}, 'SHA-256：' + doc.id), h('p', {}, doc.format ? '身份基于原始文件字节，原始字节保存在本地快照；提取文本另有校验。' : '身份基于规范化文本；同内容不重复导入，同名不同内容保留独立版本。'), doc.contentHash && h('p', {className:'qr-identity'}, '提取文本 SHA-256：' + doc.contentHash), h('p', {}, '记录仅保存在工作区 .qcu-reading；不改动原文件。'), h('p', {}, '最多 24 份材料、200 条摘录、50 次问答，共 8 MB（含原始字节）；本版不自动清理。')))),
           h('aside', {className:'qr-qa', 'aria-label':'材料问答'}, h('h2', {}, '带着原文提问'), h('p', {className:'qr-muted'}, '先找片段，确认本次发送内容后再调用默认模型。'),
             h('label', {className:'qr-field'}, '问题', h('textarea', {'aria-label':'问题', className:'qr-question', value:s.question, maxLength:LIMITS.questionChars, disabled:!doc, placeholder:'例如：形成性评价如何提供学习反馈？', onChange:e => c.input('question', e.target.value)})),
             button('准备问答', () => void c.prepare(), {ref:prepareRef, disabled:disabled || !doc || !s.question.trim() || !!active}),

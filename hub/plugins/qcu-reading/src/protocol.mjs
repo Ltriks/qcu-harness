@@ -1,4 +1,4 @@
-export const VERSION = '0.1.0-pilot.4', PROTOCOL = 2, OUTPUT_BUDGET = 2000
+export const VERSION = '0.2.0-pilot.1', PROTOCOL = 3, OUTPUT_BUDGET = 2000
 export const LIMITS = Object.freeze({fileBytes:262144, binaryBytes:2097152, requestChars:3000000, extractedBytes:524288, pages:120, items:40000, zipEntries:256, zipEntryBytes:2097152, zipTotalBytes:8388608, zipRatio:100, parseMilliseconds:15000, documents:24, paragraphs:2000, notes:200, runs:50, storeBytes:8000000, answerChars:24000, questionChars:2000, snippetChars:1800, sources:4})
 export function check(ok, code = 'invalid-input') {
   if (!ok) throw Object.assign(Error(code), {code})
@@ -129,6 +129,12 @@ export function policyFor(info) {
 }
 export const sameRoute = (a, b) => JSON.stringify(parseRoute(a)) === JSON.stringify(parseRoute(b))
 export const errors = {
+  'state-changed':'本地记录已被其他操作修改；已拒绝写入，请重启插件后核对。',
+  'backup-changed':'备份期间记录已变化，未下载文件；请重新导出。',
+  'backup-invalid':'备份校验未通过，未下载文件；请重试或联系维护者。',
+  'delete-expired':'删除预览已失效或记录有变化，请重新预览。',
+  'delete-busy':'请先等待或取消当前导入、问答，再预览删除。',
+  'note-not-found':'摘录或其来源不存在，请刷新核对。',
   'invalid-input':'输入无效，请检查后重试。', 'invalid-fields':'请求包含不支持的字段。',
   'invalid-text':'文字为空、过长或包含无效字符。', 'invalid-name':'文件名无效，请使用不含路径的普通文件名。',
   'unsupported-format':'请选择 UTF-8 TXT、Markdown、文字型 PDF 或 DOCX；不支持 DOC、DOCM 或扫描件 OCR。',

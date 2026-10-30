@@ -5,7 +5,9 @@ export async function dispatchStore(store, request, signal) {
     catalog:[], document:['documentId'], import:['file', 'importId'], importStatus:['importId'], cancelImport:['importId'], search:['documentId', 'query'], note:['note'],
     prepare:['documentId', 'question'], dismiss:['intentId'],
     start:['intentId', 'requestId', 'consent', 'documentId', 'question', 'digest'],
-    run:['runId'], cancel:['runId'], export:['runId']
+    run:['runId'], cancel:['runId'], export:['runId'],
+    shelf:['query', 'course', 'tag', 'favorites'], metadata:['documentId', 'metadata'], favoriteNote:['noteId', 'favorite'],
+    backupPrepare:[], backupChunk:['digest', 'index'], deletePreview:['documentId'], deleteDismiss:['receiptId'], deleteConfirm:['receiptId', 'digest', 'documentId', 'consent']
   }
   check(Object.hasOwn(fields, request.action), 'invalid-fields')
   exact(request, ['action', 'workspaceId', ...fields[request.action]])
@@ -16,6 +18,14 @@ export async function dispatchStore(store, request, signal) {
   if (action === 'importStatus') return store.importStatus(data.importId)
   if (action === 'cancelImport') return store.cancelImport(data.importId)
   if (action === 'search') return store.search(data.documentId, data.query)
+  if (action === 'shelf') return store.shelf(data)
+  if (action === 'metadata') return store.updateMetadata(data.documentId, data.metadata)
+  if (action === 'favoriteNote') return store.favoriteNote(data.noteId, data.favorite)
+  if (action === 'backupPrepare') return store.backupPrepare()
+  if (action === 'backupChunk') return store.backupChunk(data)
+  if (action === 'deletePreview') return store.deletePreview(data.documentId)
+  if (action === 'deleteDismiss') return store.dismissDelete(data.receiptId)
+  if (action === 'deleteConfirm') return store.deleteConfirm(data)
   if (action === 'note') return store.saveNote(data.note)
   if (action === 'prepare') return store.prepare(data, signal)
   if (action === 'dismiss') return store.dismiss(data.intentId)

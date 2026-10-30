@@ -1,5 +1,6 @@
 import {LIMITS, errors, sourceLabel, formatOf, extractionNotices} from './protocol.mjs'
 import {citationParts, sourceReview, statusLabel} from './reports.mjs'
+import {metadataFor, matchesFilters} from './shelf.mjs'
 
 export const readingCSS = `
 .qr{--qr-bg:#f7fafd;--qr-surface:#fff;--qr-ink:#17324d;--qr-muted:#48617a;--qr-accent:#174f91;--qr-line:#d9e5ee;--qr-selected:#e5effa;--qr-alert:#8a3a16;color-scheme:light;background:var(--qr-bg);color:var(--qr-ink);font-family:inherit;font-size:var(--dsh-content-font-size,14px);height:100%;min-height:300px;display:flex;flex-direction:column;text-align:left;line-height:1.55}
@@ -11,6 +12,8 @@ export const readingCSS = `
 .qr-search button{flex:none;white-space:nowrap}
 .qr-workspaces{display:flex;align-items:center;gap:8px;margin-left:auto;max-width:100%}.qr-header .qr-workspaces label{margin-left:0}.qr-workspaces button{flex:none}.qr-workspaces select{min-width:0}@media(max-width:600px){.qr-workspaces{width:100%;margin-left:0}.qr-header .qr-workspaces label{flex:1;width:auto}}
 .qr-extraction{margin:8px 0 12px;color:var(--qr-muted);font-size:.88em}.qr .qr-extraction details{margin:4px 0 0}.qr .qr-extraction summary{color:var(--qr-accent)}.qr-extraction ul{margin:8px 0 0;padding-left:1.3em}.qr-extraction li+li{margin-top:4px}
+.qr-title h2{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}.qr-docs small{overflow:hidden;white-space:nowrap;text-overflow:ellipsis}.qr-favorites button span,.qr-favorites small{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.qr-shelf-field{display:grid;gap:3px;margin:8px 0;font-size:.88em}.qr-shelf-field input,.qr-shelf-field select{width:100%}.qr-check{display:flex;align-items:center;gap:6px;margin:8px 0}.qr-shelf-search{display:grid;gap:6px;margin:12px 0}.qr-shelf-search input{width:100%}.qr-shelf-hits{display:grid;gap:5px;margin:10px 0}.qr-shelf-hits button{text-align:left;font-size:.88em}.qr-favorites button{display:block;text-align:left;width:100%;margin:6px 0}.qr-favorites small{display:block}.qr-management{border-top:1px solid var(--qr-line);padding-top:8px}.qr-metadata{max-width:38em}.qr-delete{border:1px solid var(--qr-alert);padding:12px;margin:12px 0;overflow-wrap:anywhere}.qr-delete p{margin:8px 0}.qr-delete .qr-toolbar{margin:12px 0 0}.qr-note .qr-toolbar{margin-bottom:4px}.qr ::selection{background:var(--qr-selected);color:var(--qr-ink)}.qr input,.qr textarea{caret-color:var(--qr-accent)}
 @media(max-width:960px){.qr-layout{grid-template-columns:160px minmax(0,1fr)}.qr-tabs{display:flex;gap:8px;padding:8px 14px;border-bottom:1px solid var(--qr-line)}.qr-layout[data-pane=original] .qr-qa,.qr-layout[data-pane=qa] .qr-reader{display:none}.qr-reader{border-right:0}.qr-qa{border-right:0}.qr-header label{margin-left:0}.qr-header{gap:10px}}
 @media(max-width:600px){.qr-layout{grid-template-columns:minmax(0,1fr)}.qr-materials{display:none;max-height:260px;border-right:0;border-bottom:1px solid var(--qr-line)}.qr-layout[data-materials=true] .qr-materials{display:block}.qr-layout[data-materials=true]{grid-template-rows:auto minmax(0,1fr)}.qr-header{padding:10px}.qr-header label{width:100%}.qr-header select{flex:1;max-width:100%}.qr-reader,.qr-qa{padding:12px}.qr-tabs{padding:8px 10px}.qr-paragraph{padding:8px 6px}.qr-title h2{font-size:1em}}
 `
@@ -32,18 +35,35 @@ export function createReadingViews(React) {
       h('p', {className:omitted.length || emptyPages || missingText ? 'qr-error' : undefined}, summary),
       h('details', {}, h('summary', {}, '完整提取说明（' + notices.length + ' 项）'), h('ul', {}, ...notices.map((notice, i) => h('li', {key:i}, notice)))))
   }
-  function download({filename, markdown}) {
-    const url = URL.createObjectURL(new Blob([markdown], {type:'text/markdown;charset=utf-8'})), a = document.createElement('a')
+  function download({filename, markdown, bytes}) {
+    const url = URL.createObjectURL(new Blob([bytes ?? markdown], {type:bytes ? 'application/json;charset=utf-8' : 'text/markdown;charset=utf-8'})), a = document.createElement('a')
     a.href = url; a.download = filename; a.click(); setTimeout(() => URL.revokeObjectURL(url), 1000)
+  }
+  function MetadataEditor({controller:c, documentId, metadata, disabled}) {
+    const editable = {title:metadata.title, course:metadata.course, tags:metadata.tags.join('，')}
+    const [draft, setDraft] = React.useState(editable)
+    React.useEffect(() => setDraft(editable), [documentId, JSON.stringify(editable)])
+    const field = (key, label, maxLength) => h('label', {className:'qr-field'}, label, h('input', {value:draft[key], maxLength, onChange:e => setDraft({...draft, [key]:e.target.value})}))
+    return h('form', {className:'qr-metadata', 'aria-label':'资料信息', onSubmit:e => { e.preventDefault(); void c.saveMetadata({...metadata, ...draft, tags:draft.tags.split(/[,，]/u).map(t => t.trim()).filter(Boolean)}) }},
+      field('title', '显示标题（可选）', 180), field('course', '课程 / 分类（可选）', 80), field('tags', '标签（最多 8 个，用逗号分隔；每个 24 字符）', 207),
+      h('p', {className:'qr-muted'}, '仅整理资料架；原文件名、快照及旧回答来源保持原版本。'), h('button', {type:'submit', disabled}, '保存资料信息'))
   }
   function Page({controller:c, onBack}) {
     const s = React.useSyncExternalStore(c.subscribe, c.snapshot, c.snapshot)
     const fileRef = React.useRef(null), rootRef = React.useRef(null), confirmRef = React.useRef(null), prepareRef = React.useRef(null)
+    const deleteCancelRef = React.useRef(null), deleteButtonRef = React.useRef(null)
     React.useEffect(() => {
       if (s.selected && s.pane === 'original') rootRef.current?.querySelector('[data-locator="' + s.selected + '"]')?.scrollIntoView({block:'nearest'})
     }, [s.selected, s.document?.id, s.pane])
     React.useEffect(() => { if (s.prepared) confirmRef.current?.focus() }, [s.prepared?.id])
+    React.useEffect(() => { if (s.deletePreview) deleteCancelRef.current?.focus() }, [s.deletePreview?.id])
     const doc = s.document, disabled = s.busy || !s.workspaceId || s.loading
+    const meta = doc ? metadataFor(s.library, doc.id) : null
+    const visible = s.documents.filter(d => matchesFilters(metadataFor(s.library, d.id), s) && (!s.shelfIds || s.shelfIds.includes(d.id)))
+    const courses = [...new Set(s.documents.map(d => metadataFor(s.library, d.id).course).filter(Boolean))].sort()
+    const tags = [...new Set(s.documents.flatMap(d => metadataFor(s.library, d.id).tags))].sort()
+    const favoriteNotes = s.notes.filter(n => s.library.notes[n.id] === true)
+    const dismissDelete = () => { c.dismissDelete(); deleteButtonRef.current?.focus() }
     const dismiss = () => { c.forgetConfirmation(); prepareRef.current?.focus() }
     const active = s.runs.find(r => r.status === 'running')
     const paragraphView = p => h('section', {className:'qr-paragraph', key:p.locator, 'data-locator':p.locator, 'data-selected':s.selected === p.locator}, button(sourceLabel(p), () => c.selectParagraph(p.locator), {className:'qr-locator', 'aria-pressed':s.selected === p.locator, 'aria-label':'选择段落 ' + p.locator}), h('p', {}, p.text))
@@ -81,18 +101,35 @@ export function createReadingViews(React) {
             button('导入材料', () => fileRef.current?.click(), {className:'qr-import qr-primary', disabled}),
             h('input', {ref:fileRef, className:'qr-file', type:'file', accept:'.txt,.md,.pdf,.docx', 'aria-label':'选择 TXT、Markdown、PDF 或 DOCX 文件', onChange:e => { const file = e.target.files[0]; e.target.value = ''; if (file) void c.importFile(file) }}),
             h('small', {}, 'TXT / MD ≤ 256 KiB；PDF / DOCX ≤ 2 MiB'), h('details', {}, h('summary', {}, '格式说明'), h('small', {}, '仅本机解析；PDF 为提取文本，扫描件需先 OCR。Word 按章节、段落及表格行列定位。Markdown 以纯文本显示。')),
-            h('ul', {className:'qr-docs'}, ...s.documents.map(d => h('li', {key:d.id}, button(h(React.Fragment, {}, h('strong', {}, d.name), h('small', {}, formatOf(d).toUpperCase() + ' · ' + d.paragraphs + ' 段')), () => void c.openDocument(d.id), {'aria-pressed':doc?.id === d.id})))),
+            !!s.documents.length && h('section', {'aria-label':'资料架筛选'},
+              h('form', {className:'qr-shelf-search', onSubmit:e => { e.preventDefault(); void c.filterShelf() }}, h('label', {className:'qr-shelf-field'}, '资料架关键词', h('input', {value:s.shelfQuery, maxLength:2000, placeholder:'文件名、标题、标签或原文', onChange:e => c.set({shelfQuery:e.target.value, shelfIds:null, shelfHits:[]})})), h('button', {type:'submit', disabled}, '检索资料架')),
+              h('label', {className:'qr-shelf-field'}, '课程 / 分类', h('select', {'aria-label':'课程 / 分类', value:s.course, disabled:s.busy, onChange:e => void c.filterShelf({course:e.target.value})}, h('option', {value:''}, '全部课程'), ...[...new Set([...courses, ...(s.course ? [s.course] : [])])].map(value => h('option', {key:value, value}, value)))),
+              h('label', {className:'qr-shelf-field'}, '标签', h('select', {'aria-label':'标签', value:s.tag, disabled:s.busy, onChange:e => void c.filterShelf({tag:e.target.value})}, h('option', {value:''}, '全部标签'), ...[...new Set([...tags, ...(s.tag ? [s.tag] : [])])].map(value => h('option', {key:value, value}, value)))),
+              h('label', {className:'qr-check'}, h('input', {type:'checkbox', checked:s.favorites, disabled:s.busy, onChange:e => void c.filterShelf({favorites:e.target.checked})}), '只看收藏材料'),
+              (s.shelfQuery || s.course || s.tag || s.favorites) && button('清除筛选', () => c.clearFilters(), {disabled:s.busy})),
+            h('ul', {className:'qr-docs'}, ...visible.map(d => { const m = metadataFor(s.library, d.id); return h('li', {key:d.id}, button(h(React.Fragment, {}, h('strong', {}, m.title || d.name), h('small', {}, (m.course ? m.course + ' · ' : '') + formatOf(d).toUpperCase() + ' · ' + d.paragraphs + ' 段' + (m.favorite ? ' · 已收藏' : ''))), () => void c.openDocument(d.id), {'aria-pressed':doc?.id === d.id})) })),
+            !!s.documents.length && !visible.length && h('p', {role:'status', className:'qr-muted'}, '没有符合筛选的材料。可清除筛选后查看全部。'),
+            !!s.shelfHits.length && h('section', {className:'qr-shelf-hits', 'aria-label':'跨材料关键词结果'}, h('small', {}, '原文字词匹配，最多 40 处；不理解语义。'), ...s.shelfHits.map(hit => button((metadataFor(s.library, hit.documentId).title || s.documents.find(d => d.id === hit.documentId)?.name || '') + ' · ' + sourceLabel(hit) + ' · ' + hit.text, () => void c.openDocument(hit.documentId, hit.locator), {key:hit.documentId + ':' + hit.locator}))),
+            h('details', {className:'qr-favorites'}, h('summary', {}, '收藏摘录（' + favoriteNotes.length + '）'), favoriteNotes.length ? favoriteNotes.map(n => { const d = s.documents.find(d => d.id === n.documentId); return button(h(React.Fragment, {}, h('span', {}, (d && (metadataFor(s.library, d.id).title || d.name)) || '来源不可用'), h('small', {}, n.locator + ' · ' + n.text.slice(0, 90))), () => void c.openNote(n.id), {key:n.id}) }) : h('p', {className:'qr-muted'}, '在已保存摘录中点击“收藏摘录”，便可从这里打开原文。')),
+            h('details', {className:'qr-management'}, h('summary', {}, '本地备份'), h('p', {className:'qr-muted'}, '备份包含该工作区全部原材料、摘录及保存的问题和回答，下载到本机。请妥善保存。本版仅导出，尚无导入恢复界面。'),
+              button(s.backing ? '正在校验备份…' : '下载完整备份 JSON', () => void c.exportBackup(download), {disabled}),
+              s.backing && h('div', {role:'status'}, '备份进度 ' + s.backing.done + ' / ' + s.backing.total, button('取消备份', () => c.cancelBackup()))),
             !s.documents.length && h('p', {className:'qr-muted'}, '导入一份材料开始阅读。')),
           h('main', {className:'qr-reader', 'aria-label':'原文'}, !doc ? h('section', {className:'qr-empty'}, h('h2', {}, '把材料放在手边'), h('p', {}, '导入 TXT、Markdown、PDF 或 DOCX 后，可搜索材料、保存摘录，再选择片段提问。'), button('导入材料', () => fileRef.current?.click(), {disabled})) : h(React.Fragment, {},
-            h('div', {className:'qr-title'}, h('h2', {}, doc.name), h('small', {}, doc.paragraphs.length + ' 个段落 · 已保存快照')),
+            h('div', {className:'qr-title'}, h('h2', {title:meta.title || doc.name}, meta.title || doc.name), h('small', {}, doc.paragraphs.length + ' 个段落 · 已保存快照'), h('p', {className:'qr-muted'}, '原文件：' + doc.name + ' · 版本 ' + doc.id.slice(0, 12))),
+            h('div', {className:'qr-toolbar'}, button(meta.favorite ? '取消收藏材料' : '收藏材料', () => void c.saveMetadata({...meta, favorite:!meta.favorite}), {'aria-pressed':meta.favorite, disabled})),
+            h('details', {}, h('summary', {}, '整理与管理此版本'), h(MetadataEditor, {controller:c, documentId:doc.id, metadata:meta, disabled}), button('预览删除此版本', () => void c.previewDelete(), {ref:deleteButtonRef, disabled:disabled || !!s.parsing || !!active})),
+            s.deletePreview && h('section', {className:'qr-delete', role:'region', 'aria-label':'删除预览', onKeyDown:e => { if (e.key === 'Escape') { e.preventDefault(); dismissDelete() } }},
+              h('h3', {}, '删除这个资料版本？'), h('p', {}, '原文件：' + s.deletePreview.document.name), h('p', {className:'qr-identity'}, 'SHA-256：' + s.deletePreview.document.id), h('p', {}, '将连同 ' + s.deletePreview.notes + ' 条摘录、' + s.deletePreview.runs + ' 条问答及此版本的分类、标签和收藏一起删除。其他版本和记录保留；原文件不受影响。'), h('p', {}, '此操作不能在界面撤销。需要留存时，请先取消并下载完整备份。'),
+              h('div', {className:'qr-toolbar'}, button('取消删除', dismissDelete, {ref:deleteCancelRef}), button('确认删除此版本及记录', () => void c.confirmDelete(), {disabled:s.busy}))),
             doc.extraction && h(ExtractionNotice, {key:doc.id, extraction:doc.extraction}),
             h('form', {className:'qr-search', onSubmit:e => { e.preventDefault(); void c.search() }}, h('input', {'aria-label':'原文关键词', placeholder:'搜索材料中的关键词', maxLength:LIMITS.questionChars, value:s.query, onChange:e => c.input('query', e.target.value)}), h('button', {type:'submit', disabled:disabled || !s.query.trim()}, '搜索')),
             h('small', {}, '按字词匹配：中文用相邻双字，英文用单词；不理解语义，最多显示 20 处。'),
             s.searched && h('div', {className:'qr-results', 'aria-label':'搜索结果'}, s.hits.length ? s.hits.map(hit => button(sourceLabel(hit) + ' · ' + hit.text.slice(0, 90), () => c.selectParagraph(hit.locator), {key:hit.locator})) : h('p', {role:'status'}, '未找到匹配原文。请尝试材料中的其他关键词。')),
             h('article', {'aria-label':'材料段落'}, ...(doc.format === 'pdf' ? doc.extraction.pages.map(page => h('section', {key:page.number, 'data-page':page.number}, h('h3', {}, 'PDF 第 ' + page.number + ' 页'), ...doc.paragraphs.filter(p => p.location.page === page.number).map(paragraphView), !page.units && h('p', {className:'qr-error'}, '本页未提取到文字；如有内容请先做 OCR。'))) : doc.paragraphs.map(paragraphView))),
             s.selected && h('section', {className:'qr-note-editor', 'aria-label':'保存摘录'}, h('h3', {}, '摘录 · ' + sourceLabel(doc.paragraphs.find(p => p.locator === s.selected))), h('label', {className:'qr-field'}, '摘录文字（可保留段落中的一部分）', h('textarea', {'aria-label':'摘录文字（可保留段落中的一部分）', value:s.excerpt, maxLength:4000, onChange:e => c.input('excerpt', e.target.value)})), h('label', {className:'qr-field'}, '我的笔记', h('textarea', {'aria-label':'我的笔记', value:s.comment, maxLength:2000, onChange:e => c.input('comment', e.target.value)})), button('保存摘录', () => void c.saveNote(), {disabled:disabled || !s.excerpt.trim()})),
-            h('details', {}, h('summary', {}, '已保存摘录（' + s.notes.filter(n => n.documentId === doc.id).length + '）'), ...s.notes.filter(n => n.documentId === doc.id).map(n => h('section', {className:'qr-note', key:n.id}, button(sourceLabel(doc.paragraphs.find(p => p.locator === n.locator)), () => c.selectParagraph(n.locator)), h('blockquote', {}, n.text), h('p', {}, n.comment)))),
-            h('details', {}, h('summary', {}, '文档与容量信息'), h('p', {className:'qr-identity'}, 'SHA-256：' + doc.id), h('p', {}, doc.format ? '身份基于原始文件字节，原始字节保存在本地快照；提取文本另有校验。' : '身份基于规范化文本；同内容不重复导入，同名不同内容保留独立版本。'), doc.contentHash && h('p', {className:'qr-identity'}, '提取文本 SHA-256：' + doc.contentHash), h('p', {}, '记录仅保存在工作区 .qcu-reading；不改动原文件。'), h('p', {}, '最多 24 份材料、200 条摘录、50 次问答，共 8 MB（含原始字节）；本版不自动清理。')))),
+            h('details', {}, h('summary', {}, '已保存摘录（' + s.notes.filter(n => n.documentId === doc.id).length + '）'), ...s.notes.filter(n => n.documentId === doc.id).map(n => h('section', {className:'qr-note', key:n.id}, h('div', {className:'qr-toolbar'}, button(sourceLabel(doc.paragraphs.find(p => p.locator === n.locator)), () => c.selectParagraph(n.locator)), button(s.library.notes[n.id] ? '取消收藏摘录' : '收藏摘录', () => void c.favoriteNote(n.id, !s.library.notes[n.id]), {'aria-pressed':!!s.library.notes[n.id], disabled})), h('blockquote', {}, n.text), h('p', {}, n.comment)))),
+            h('details', {}, h('summary', {}, '文档与容量信息'), h('p', {}, '原文件：' + doc.name), h('p', {className:'qr-identity'}, 'SHA-256：' + doc.id), h('p', {}, doc.format ? '身份基于原始文件字节，原始字节保存在本地快照；提取文本另有校验。' : '身份基于规范化文本；同内容不重复导入，同名不同内容保留独立版本。'), doc.contentHash && h('p', {className:'qr-identity'}, '提取文本 SHA-256：' + doc.contentHash), h('p', {}, '记录仅保存在工作区 .qcu-reading；不改动原文件。'), h('p', {}, '最多 24 份材料、200 条摘录、50 次问答，共 8 MB（含原始字节）；本版不自动清理。')))),
           h('aside', {className:'qr-qa', 'aria-label':'材料问答'}, h('h2', {}, '带着原文提问'), h('p', {className:'qr-muted'}, '先找片段，确认本次发送内容后再调用默认模型。'),
             h('label', {className:'qr-field'}, '问题', h('textarea', {'aria-label':'问题', className:'qr-question', value:s.question, maxLength:LIMITS.questionChars, disabled:!doc, placeholder:'例如：形成性评价如何提供学习反馈？', onChange:e => c.input('question', e.target.value)})),
             button('准备问答', () => void c.prepare(), {ref:prepareRef, disabled:disabled || !doc || !s.question.trim() || !!active}),

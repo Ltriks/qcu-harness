@@ -18,6 +18,7 @@ const packageRoot = process.env.QCU_READING_PACKAGE_ROOT ? pathToFileURL(process
 const plugin = await import(new URL('index.js', packageRoot))
 const {remoteContribution, OUTPUT_BUDGET} = await import(new URL('src/protocol.mjs', packageRoot))
 const {ReadingController} = await import(new URL('src/controller.mjs', packageRoot))
+const {createHash} = await import('node:crypto')
 class SyntheticAdapter extends LlmAdapter {
   calls = []; mode = 'ok'; aborted = false
   async resolveModel(provider, model) { return {provider, id:model, name:model, reasoning:{efforts:[{id:'low', name:'low'}, {id:'high', name:'high'}], defaultEffort:'high'}} }
@@ -47,6 +48,35 @@ async function setup(t) {
 const prepare = f => f.call({action:'prepare', documentId:f.document.id, question:'反馈如何帮助学习'})
 const request = p => ({action:'start', intentId:p.id, requestId:crypto.randomUUID(), consent:true, documentId:p.document.id, question:p.question, digest:p.digest})
 async function settle(f, r) { const store = await f.ctx.get('qcuReading').store(f.workspace.id); await store.jobs.get(r.id)?.promise; return f.call({action:'run', runId:r.id}) }
+
+test('R2 official gateway shelf/favorites/full chunks/delete lifecycle, canonical aliases and workspace-bound receipts cause zero adapter calls', async t => {
+  const f = await setup(t), service = f.ctx.get('qcuReading'), sha = bytes => createHash('sha256').update(bytes).digest('hex')
+  const alias = {...f.workspace, id:'alias'}; f.workspaces.push(alias)
+  assert.equal(await service.store(alias.id), await service.store(f.workspace.id))
+  const meta = {title:'资料架标题', course:'会计', tags:['例题'], favorite:true}
+  await f.call({action:'metadata', documentId:f.document.id, metadata:meta})
+  const note = await f.call({action:'note', note:{documentId:f.document.id, locator:f.document.paragraphs[0].locator, text:'反馈帮助学生', comment:'官方合成摘录'}})
+  await f.call({action:'favoriteNote', noteId:note.id, favorite:true})
+  const shelf = await f.call({action:'shelf', query:'反馈', course:'会计', tag:'例题', favorites:true})
+  assert.deepEqual(shelf.documentIds, [f.document.id]); assert.equal(shelf.hits[0].documentId, f.document.id)
+  const binary = await docxFixture(), docx = (await f.call({action:'import', file:{name:'完整原件.docx', base64:binary.toString('base64')}, importId:'official-r2'})).document
+  const p = await f.call({action:'backupPrepare'}), parts = []
+  for (let index = 0; index < p.chunks; index++) parts.push(Buffer.from((await f.call({action:'backupChunk', digest:p.digest, index})).base64, 'base64'))
+  const bytes = Buffer.concat(parts), backup = JSON.parse(bytes)
+  assert.equal(bytes.length, p.bytes); assert.equal(sha(bytes), p.digest); assert.equal(sha(JSON.stringify(backup.state)), p.checksum)
+  assert.equal(backup.state.documents.find(d => d.id === docx.id).base64, binary.toString('base64'))
+  assert.equal(backup.state.library.notes[note.id], true)
+  const preview = await f.call({action:'deletePreview', documentId:f.document.id})
+  assert.equal((await f.invoke({action:'deleteConfirm', workspaceId:f.second.id, receiptId:preview.id, digest:preview.digest, documentId:f.document.id, consent:true})).error, 'delete-expired')
+  await f.call({action:'deleteDismiss', receiptId:preview.id})
+  assert.equal((await f.invoke({action:'deleteConfirm', workspaceId:f.workspace.id, receiptId:preview.id, digest:preview.digest, documentId:f.document.id, consent:true})).error, 'delete-expired')
+  const next = await f.call({action:'deletePreview', documentId:f.document.id})
+  await f.call({action:'deleteConfirm', receiptId:next.id, digest:next.digest, documentId:f.document.id, consent:true})
+  const catalog = await f.call({action:'catalog'}); assert.deepEqual(catalog.documents.map(d => d.id), [docx.id]); assert.equal(catalog.notes.length, 0)
+  assert.equal((await f.invoke({action:'favoriteNote', workspaceId:f.workspace.id, noteId:note.id, favorite:true})).error, 'note-not-found')
+  assert.equal(f.adapter.calls.length, 0)
+  const handshake = await f.invoke({action:'workspaces'}); assert.equal(handshake.version, '0.2.0-pilot.1'); assert.equal(handshake.protocol, 3)
+})
 
 test('official mutable registry is rediscovered through the controller without remount, draft loss, implicit store access or model calls', async t => {
   const f = await setup(t); f.workspaces.pop()

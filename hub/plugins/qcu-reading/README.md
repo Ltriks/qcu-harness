@@ -1,6 +1,22 @@
-# QCU 材料伴读 · Hub 归档候选
+# QCU 材料伴读 · 本地资料架 R2
 
-`qcu-reading@0.1.0-pilot.4`，协议 2、存储 schema 2，独立 DSH Host / Client 本地候选，默认停用。复用官方 Cordis 4.0.4 / DSH 0.2.0-rc.2；不读取或保存 Key，未加入 Hub、部署或安装到真实 DSH。目标为教师 Mac，本轮验证使用 Apple Silicon / Node 24.19.0，未宣称 Windows 或原生多平台验收。
+`qcu-reading@0.2.0-pilot.1`，协议 3、存储 schema 3，独立 DSH Host / Client 本地候选，默认停用。复用官方 Cordis 4.0.4 / DSH 0.2.0-rc.2 和原有精确十项 peers，无新运行依赖。该升级必须 **manual-review**：R1 不能读取 schema 3。尚未安装、部署或发布 R2，原生 R2、教师业务和 Windows 均未测。源码基线为 `6ee4127d5f44e5d82defc86afed5c67cac529e0e`，它不是本候选的最终提交；父任务审阅并提交后需重新绑定。
+
+## 资料架
+
+每份材料可另设显示标题（180 字符）、一项课程 / 分类（80 字符）、最多 8 个去重标签（每项 24 字符）及收藏状态。仅接受无控制 / 双向覆盖字符的普通文字。原文件名、ID、原始字节、正文、创建时间、段落和位置保持原样；历史问题、回答及其来源快照不随别名改写。原文件名和版本在阅读区可见，完整 SHA-256 在详情中。
+
+侧栏按课程、标签和收藏筛选；“资料架关键词”检索文件名、标题、课程、标签及已导入的快照原文。原文沿用确定性 searchDocument，每份最多 5 处、工作区最多 40 处；可直接打开对应的文档 ID + locator。它不是语义 / 向量搜索。空筛选可清除，空资料库仍提供导入。已保存摘录的收藏单独按原 note ID 保存，侧栏“收藏摘录”打开其原版本；不复制或改写摘录。
+
+“整理与管理此版本”可编辑资料信息并预览删除。预览显示原文件、版本 SHA-256、连带删除的摘录 / 问答数量。取消或 Escape 不写盘，并返回删除入口焦点。确认只删除该版本及其依赖记录 / 元数据，其他版本保留。预览与工作区、当前内存及磁盘状态绑定，2 分钟过期，失配、重复、其他写入或活动导入 / 问答均拒绝。每次写入和删除确认前复核文件摘要、inode、owner、链接数和目录身份；这不是与任意外部编辑器之间的跨进程原子锁，维护时须停止插件并避免并发改盘。
+
+## 完整本地备份（仅导出）
+
+“本地备份 → 下载完整备份 JSON”是一次显式操作，包含该工作区全部文档快照（含原始 PDF / DOCX base64）、摘录、问答与资料架元数据，不读取原始外部路径、Home、设置或 Key。备份格式 `qcu-reading-backup` / version 1 / stateSchema 3，`checksum.algorithm=SHA-256`，`checksum.state` 校验 `JSON.stringify(state)` 的 UTF-8 字节。外层整个文件的摘要和长度在导出协议中独立验证。
+
+原 RPC 上限保持请求 3M 字符、回复 10M 字符；完整备份以 256 KiB 字节块 base64 传输，每次重算最多 8 MB 状态并绑定稳定摘要，最多 31 块，无导出会话缓存。Client 检查块序号、长度、完整长度、外层 SHA-256 与 state 校验，下载前再次确认摘要；取消、停用、切换工作区或记录变化均不产生部分下载。备份只作为数据，不执行其内容。本版 **没有导入 / 恢复 UI**，Markdown 问答导出也不是完整备份。
+
+维护者验证备份时，先在隔离副本核对格式 / 版本、文件摘要、state 校验和 schema 3 的记录 / 引用边界；不要直接把未知 JSON 写回真实工作区。需要实际恢复时，停止插件、保留当前 state 和所有历史备份，由维护者另行审阅恢复流程，并在一次性副本验证重开。该流程未实现为产品恢复功能，也未授权对真实资料操作。
 
 在 DSH 添加工作区后，点击工作区选择框旁的“刷新”，即可更新列表，无需重启或重新连接。按钮支持键盘操作，刷新期间显示忙碌状态；失败后可重试。仍有效的当前工作区、打开材料、摘录、问题草稿、发送确认及勾选状态和运行状态均保留；新工作区出现时不会自动选择或读取其材料。只有显式切换工作区才沿用原有的隔离和确认失效规则。
 
@@ -29,38 +45,29 @@ PDF 最多 120 页、40000 个文本项/单页绘图操作、2000 个来源单�
 
 DOCX ZIP 在解压前校验所有目录/本地头、路径、重复/重叠成员与大小：最多 256 项、单项 2 MiB、合计 8 MiB、压缩率 ≤100。只支持普通单卷 ZIP 的 stored/deflate；实际解压另用 maxOutputLength、实际长度、消耗的压缩字节和 CRC 校验，不解压到路径。XML 用 saxes 按命名空间解析，拒绝 DTD/处理指令，限制深度 64、每 XML 80000 节点和文本长度；不支持嵌套表格、ZIP64 等结构，需另存/拆分。表格合并和修订标记需要复核；修订保留插入/移入、略去删除/移出。
 
-工作区 `.qcu-reading/state.json` 最多 24 份材料、200 条摘录、50 次问答、共 8 MB（包括 base64 原始字节）；任一先到即停止新增，本版无删除/自动清理。沿用链接/硬链接拒绝与独占临时文件、同步、原子替换。取消若与已经完成的落盘交错，以实际完成结果为准；未完成解析不保存材料。
+工作区 `.qcu-reading/state.json` 最多 24 份材料、200 条摘录、50 次问答、共 8 MB（包括 base64 原始字节及资料架元数据）；任一先到即停止新增，无自动清理。仅支持显式预览确认后的单版本删除。沿用链接/硬链接拒绝与独占临时文件、同步、原子替换；所有变更使用原串行队列。取消若与已经完成的落盘交错，以实际完成结果为准；未完成解析不保存材料。
 
 ## 首版兼容和回退
 
-schema 1 读取后保留原有 TXT/MD 文档、ID、正文、摘录及问答，不重写旧位置。在第一次 schema 2 写入之前，将原文件逐字节同步保存为 `.qcu-reading/state.schema1.<原状态SHA256>.json`。损坏、链接、超限或不一致的状态/备份会拒绝写入，不重置记录；重复打开不重复迁移。遗留生成状态仍标为中断，不恢复模型请求。
+schema 1 / 2 读取后在内存添加 schema 3 空资料架，不改写原文档、ID、正文、摘录及问答。空闲读取 / 浏览 / 导出不写盘。第一次新写入前，将原文件逐字节同步保存为 `.qcu-reading/state.schema<旧版本>.<原状态SHA256>.json`。损坏、链接、超限、不一致或失败的备份 / 写入拒绝继续变更，不重置记录；重复打开不重复迁移。遗留 running 仍按既有规则持久化为 interrupted，此次写入同样先保留旧字节，绝不恢复模型请求。
 
-pilot.1 不能读取 schema 2。需要回退时先停止插件，另存完整 schema 2 状态，再由维护者将对应的 schema 1 备份复制回 state.json；回退后的首版看不到升级后新增的材料和记录。勿直接启用首版覆盖新状态。本轮只用自编迁移夹具验证，未触碰真实教师记录。
+旧 R1 不能读取 schema 3。需要回退时先停止插件，另存完整当前状态，再由维护者核对对应的 schema 1 / 2 备份；回退会丢失备份之后新增的记录 / 元数据，不自动降级或覆盖真实工作区。本轮只用自编一次性迁移 / 删除夹具验证。
 
 ## 构建、测试和打包
 
-默认构建只用 Node 内置模块和已随源码保存的 vendor 文件，不下载依赖：
+仅使用已审核本地 Node 24、SDK、Playwright / Chromium，无下载、安装或新运行依赖。先设置 QCU_OFFICIAL_DEPENDENCIES、QCU_BROWSER_DEPENDENCIES、QCU_READING_CHROMIUM 为任务稿中已有位置，并把 TMPDIR、QCU_READING_BROWSER_OUT、QCU_READING_WORKSPACES_BROWSER_OUT、QCU_READING_SHELF_BROWSER_OUT、QCU_READING_PREVIEW_OUT 设在本次新建的 `.work/qcu-reading-r2-shelf/` 子目录。
 
 ```sh
 rtk node hub/plugins/qcu-reading/build.mjs
-rtk node --test tests/qcu-reading-core.test.mjs
-rtk node --test tests/qcu-reading-binary.test.mjs
-rtk node --test tests/qcu-reading-workspaces.test.mjs tests/qcu-reading-hub-parser.test.mjs
-rtk python3 hub/plugins/qcu-reading/pack.py .work/qcu-reading-hub-package/candidate
-```
-
-二进制测试的自编 DOCX 夹具生成需要将 QCU_OFFICIAL_DEPENDENCIES 指向已审核 SDK（其中 JSZip 3.10.1 只用于测试）。官方运行时测试还使用已有 SDK，浏览器测试使用已有 Playwright/Chromium，无安装：
-
-```sh
+rtk node --test tests/qcu-reading-shelf.test.mjs tests/qcu-reading-core.test.mjs tests/qcu-reading-binary.test.mjs tests/qcu-reading-workspaces.test.mjs tests/qcu-reading-hub-parser.test.mjs
 rtk node --experimental-transform-types --expose-internals --experimental-loader ./tests/support/feishu-official-loader.mjs --test tests/qcu-reading-official.test.mjs
-rtk node --test tests/qcu-reading-browser.test.mjs
-rtk node --test tests/qcu-reading-workspaces-browser.test.mjs
-QCU_READING_PACKAGE_DIR=.work/qcu-reading-hub-package/candidate rtk node --test tests/qcu-reading-package.test.mjs
-QCU_READING_PACKAGE_DIR=.work/qcu-reading-hub-package/candidate rtk node --test tests/qcu-reading-hub-package.test.mjs
-rtk node hub/plugins/qcu-reading/preview.mjs
+rtk node --test tests/qcu-reading-shelf-browser.test.mjs tests/qcu-reading-browser.test.mjs tests/qcu-reading-workspaces-browser.test.mjs
+rtk python3 -B hub/plugins/qcu-reading/pack.py .work/qcu-reading-r2-shelf/candidate
 ```
 
-先设置 QCU_OFFICIAL_DEPENDENCIES；浏览器另设 QCU_BROWSER_DEPENDENCIES 为已有测试运行库。本任务设置 QCU_READING_BROWSER_OUT、QCU_READING_WORKSPACES_BROWSER_OUT、QCU_READING_PREVIEW_OUT 到 `.work/qcu-reading-hub-package/` 下的新目录；归档测试需先按报告准备冻结 pilot.3 handoff。预览只监听 127.0.0.1，共用真实组件、controller、dispatch 和磁盘 store，模型明确为合成模型；Ctrl-C 关闭。测试自行关闭所建服务器/浏览器，不停止父任务预览。QCU_READING_PACKAGE_ROOT 可让核心、解析、官方和浏览器测试读取精确解包代码。
+精确包复跑时，QCU_READING_PACKAGE_ROOT 指向验证过成员清单的解包 package 目录，QCU_READING_PACKAGE_DIR 指向本次候选目录。`qcu-reading-package.test.mjs` 验证精确 TGZ 和离线 parser / worker；`qcu-reading-shelf-package.test.mjs` 验证 R2 同源成员、原 parser/vendor、unchanged market archive inspection 与真实 checker。后者还需 QCU_READING_R2_HANDOFF 和 QCU_READING_R2_CHECKER_OUT 指向本次实际交接与新报告。历史 `qcu-reading-hub-package.test.mjs` 必须使用固定 pilot.3 / pilot.4 原输入，不能将其旧版断言改成 R2。
+
+浏览器只使用共用真实组件 / controller / dispatch / 临时磁盘 Store，模型为合成适配器，禁止外部请求；只关闭自身所建服务器与 profile。独立视觉 reviewer / detector、Git、原生和真实业务由父任务处理。
 
 源码中的 pack.py 不随包分发，仅供维护者使用。它使用白名单、固定元数据并双次比对，生成 TGZ、逐成员 MANIFEST.json 和 SHA256SUMS。约束为 TGZ 和每成员各 ≤1 MiB、最多 80 成员、payload ≤5 MiB、文件内容合计 ≤4 MiB；不会覆盖内容不同的旧清单。包内含已生成 lazy-CJS Client，仅共享宿主 React，解析器留在 Host。Python 只用于维护者打包，教师运行不需要 Python、Docker、native canvas、解析服务、npm 下载、网络字体或模型权重。
 
@@ -68,4 +75,6 @@ vendor 中固定 PDF.js 6.3.289（Apache-2.0）、saxes 6.0.0（ISC，含继承�
 
 [Mozilla 安全通告](https://github.com/mozilla/pdf.js/security/advisories/GHSA-hq66-cqwq-w95j)的修复版本为 6.2.108。本版高于该版本，另设 isEvalSupported:false，未初始化 viewer/scripting；版本号本身不作为安全充分证明。
 
-本次归档修复、精确候选、失败记录及测试证据见 [Hub 归档候选报告](../../../docs/qcu-reading-hub-package.md)。协议 2 / schema 2 / 官方 DSH 0.2.0-rc.2 不变；Node24.18.1 是目标，实际本地测试为 24.19.0。通过静态 checker 和 market archive-shape 检查仍需人工批准、产品准入及实际签名目录；没有安装、发布或借用 pilot.3 原生验收。sourceRevision 暂绑定实际基线，并明确等待父任务候选精确 commit 重绑；[工作区刷新报告](../../../docs/qcu-reading-workspace-refresh.md) 保留；原生 DSH 的新候选安装/交互和真实教师使用仍由维护者验收。[R1b 报告](../../../docs/qcu-reading-r1b.md)、[R1a 报告](../../../docs/qcu-reading-r1a.md)及固定旧产物保持不变。
+R1 归档修复历史见 [Hub 归档候选报告](../../../docs/qcu-reading-hub-package.md)。本 R2 为协议 3 / schema 3；官方 DSH 0.2.0-rc.2 不变。Node24.18.1 是目标，实际本地测试为 24.19.0。同一 tools 产品已获现有精确十 peers 准入，无须新增产品；静态 checker 和 archive inspection 通过仍需人工批准及后续单独授权的发布；没有安装、发布或借用 pilot.3 原生验收。sourceRevision 暂绑定实际基线，并明确等待父任务候选精确 commit 重绑；[工作区刷新报告](../../../docs/qcu-reading-workspace-refresh.md) 保留；原生 DSH 的新候选安装/交互和真实教师使用仍由维护者验收。[R1b 报告](../../../docs/qcu-reading-r1b.md)、[R1a 报告](../../../docs/qcu-reading-r1a.md)及固定旧产物保持不变。
+
+R2 精确候选、分层验证、保留的失败与未测边界见 [R2 资料架报告](../../../docs/qcu-reading-r2-shelf.md) 和 [教师短清单](../../../docs/qcu-reading-r2-shelf-checklist.md)。R2 输出只在 `.work/qcu-reading-r2-shelf/`，不复用旧归档输出目录。旧历史包拒绝测试应固定原 pilot.3 / pilot.4 输入；R2 使用 `tests/qcu-reading-shelf-package.test.mjs`。

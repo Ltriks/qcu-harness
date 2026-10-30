@@ -1,9 +1,10 @@
 import {VERSION, PROTOCOL, LIMITS, errors, check} from './protocol.mjs'
+import {SHELF_LIMITS, emptyMetadata, metadataFor} from './shelf.mjs'
 
 export class ReadingController {
   constructor(remote, {storage = globalThis.localStorage} = {}) {
     this.remote = remote; this.storage = storage; this.listeners = new Set(); this.epoch = 0; this.pollEpoch = 0; this.workspacesEpoch = 0
-    this.state = {workspaces:[], workspaceId:'', refreshingWorkspaces:false, workspacesError:'', workspacesNotice:'', workspaceMissing:false, documents:[], notes:[], runs:[], document:null, selected:'', query:'', hits:[], searched:false, question:'', prepared:null, consent:false, run:null, excerpt:'', comment:'', busy:false, parsing:null, loading:true, error:'', notice:'', pane:'original', showMaterials:false}
+    this.state = {workspaces:[], workspaceId:'', refreshingWorkspaces:false, workspacesError:'', workspacesNotice:'', workspaceMissing:false, documents:[], notes:[], runs:[], library:{documents:{}, notes:{}}, shelfQuery:'', course:'', tag:'', favorites:false, shelfIds:null, shelfHits:[], deletePreview:null, backing:null, document:null, selected:'', query:'', hits:[], searched:false, question:'', prepared:null, consent:false, run:null, excerpt:'', comment:'', busy:false, parsing:null, loading:true, error:'', notice:'', pane:'original', showMaterials:false}
   }
   subscribe = fn => { this.listeners.add(fn); return () => this.listeners.delete(fn) }
   snapshot = () => this.state
@@ -29,11 +30,12 @@ export class ReadingController {
     if (s.prepared) void this.call({action:'dismiss', workspaceId:s.workspaceId, intentId:s.prepared.id}).catch(() => {})
     this.set({prepared:null, consent:false})
   }
-  invalidate() { this.forgetConfirmation(); this.stopImport(); this.epoch++; this.set({busy:false, parsing:null, error:'', notice:''}) }
+  invalidate() { this.forgetConfirmation(); this.dismissDelete(); this.cancelBackup(); this.stopImport(); this.epoch++; this.set({busy:false, parsing:null, error:'', notice:''}) }
   setWorkspaces(workspaces) {
     if (this.state.workspaceId && !workspaces.some(w => w.id === this.state.workspaceId)) {
       // Invalidate local sends/replies and observation only. Never cancel a Host job or erase its saved data.
       ++this.epoch; ++this.pollEpoch; clearTimeout(this.timer); clearTimeout(this.importTask?.timer)
+      this.dismissDelete(); this.cancelBackup()
       this.set({workspaces, workspaceId:'', workspaceMissing:true, prepared:null, consent:false, busy:false, loading:false, parsing:null})
     } else this.set({workspaces})
   }
@@ -69,7 +71,7 @@ export class ReadingController {
   async selectWorkspace(id) {
     if (this.closed || (id && !this.state.workspaces.some(w => w.id === id))) return
     this.invalidate(); clearTimeout(this.timer); const token = ++this.pollEpoch, epoch = this.epoch
-    this.set({workspaceId:id, workspaceMissing:false, documents:[], notes:[], runs:[], document:null, selected:'', question:'', query:'', hits:[], searched:false, run:null, loading:!!id, excerpt:'', comment:''})
+    this.set({workspaceId:id, workspaceMissing:false, documents:[], notes:[], runs:[], library:{documents:{}, notes:{}}, shelfQuery:'', course:'', tag:'', favorites:false, shelfIds:null, shelfHits:[], document:null, selected:'', question:'', query:'', hits:[], searched:false, run:null, loading:!!id, excerpt:'', comment:''})
     if (!id) return
     try {
       const data = await this.call({action:'catalog', workspaceId:id})
@@ -100,6 +102,94 @@ export class ReadingController {
   async refresh(epoch = this.epoch) {
     const data = await this.call({action:'catalog', workspaceId:this.state.workspaceId})
     if (epoch === this.epoch) this.set(data)
+  }
+  metadata(id = this.state.document?.id) { return id ? metadataFor(this.state.library, id) : emptyMetadata() }
+  async filterShelf(patch = {}) {
+    this.set({...patch, shelfIds:null, shelfHits:[]})
+    await this.action(async epoch => { await this.loadShelf(epoch) })
+  }
+  async loadShelf(epoch) {
+    const s = this.state
+    const binding = state => JSON.stringify([state.shelfQuery, state.course, state.tag, state.favorites])
+    const result = await this.call({action:'shelf', workspaceId:s.workspaceId, query:s.shelfQuery, course:s.course, tag:s.tag, favorites:s.favorites})
+    if (epoch === this.epoch && binding(s) === binding(this.state)) this.set({shelfIds:result.documentIds, shelfHits:result.hits})
+  }
+  clearFilters() { void this.filterShelf({shelfQuery:'', course:'', tag:'', favorites:false}) }
+  async saveMetadata(metadata) {
+    await this.action(async epoch => {
+      const s = this.state
+      await this.call({action:'metadata', workspaceId:s.workspaceId, documentId:s.document.id, metadata})
+      if (epoch !== this.epoch) return
+      await this.refresh(epoch); if (epoch !== this.epoch) return
+      await this.loadShelf(epoch); if (epoch === this.epoch) this.set({notice:'资料信息已保存；原文和历史来源保持原版本。'})
+    })
+  }
+  async favoriteNote(noteId, favorite) {
+    await this.action(async epoch => {
+      await this.call({action:'favoriteNote', workspaceId:this.state.workspaceId, noteId, favorite})
+      if (epoch === this.epoch) await this.refresh(epoch)
+    })
+  }
+  async openNote(noteId) {
+    const note = this.state.notes.find(n => n.id === noteId)
+    if (!note || !this.state.documents.some(d => d.id === note.documentId)) { this.set({error:errors['note-not-found']}); return }
+    await this.openDocument(note.documentId, note.locator)
+  }
+  async previewDelete() {
+    this.dismissDelete()
+    await this.action(async epoch => {
+      const s = this.state, preview = await this.call({action:'deletePreview', workspaceId:s.workspaceId, documentId:s.document.id})
+      if (epoch === this.epoch) this.set({deletePreview:preview})
+      else void this.call({action:'deleteDismiss', workspaceId:s.workspaceId, receiptId:preview.id}).catch(() => {})
+    })
+  }
+  dismissDelete() {
+    const s = this.state
+    if (s.deletePreview) void this.call({action:'deleteDismiss', workspaceId:s.workspaceId, receiptId:s.deletePreview.id}).catch(() => {})
+    this.set({deletePreview:null})
+  }
+  async confirmDelete() {
+    const s = this.state, p = s.deletePreview
+    if (!p) return
+    await this.action(async epoch => {
+      await this.call({action:'deleteConfirm', workspaceId:s.workspaceId, receiptId:p.id, digest:p.digest, documentId:p.document.id, consent:true})
+      if (epoch !== this.epoch) return
+      this.forgetConfirmation(); this.set({deletePreview:null, document:null, selected:'', excerpt:'', comment:'', run:s.run?.document.id === p.document.id ? null : s.run})
+      await this.refresh(epoch); if (epoch !== this.epoch) return
+      await this.loadShelf(epoch); if (epoch === this.epoch) this.set({notice:'已删除该版本及其摘录、问答；其他材料记录保留。'})
+    })
+  }
+  cancelBackup() { if (this.backupTask) this.backupTask.cancelled = true; this.set({backing:null}) }
+  async exportBackup(deliver) {
+    await this.action(async epoch => {
+      const workspaceId = this.state.workspaceId, task = {cancelled:false}; this.backupTask = task
+      const current = () => !task.cancelled && !this.closed && epoch === this.epoch && workspaceId === this.state.workspaceId
+      const sha = async bytes => [...new Uint8Array(await crypto.subtle.digest('SHA-256', bytes))].map(n => n.toString(16).padStart(2, '0')).join('')
+      this.set({backing:{done:0, total:0}})
+      try {
+        const p = await this.call({action:'backupPrepare', workspaceId})
+        if (!current()) return
+        check(p.format === 'qcu-reading-backup' && p.version === 1 && p.stateSchema === 3 && Number.isInteger(p.bytes) && p.bytes > 0 && p.bytes <= SHELF_LIMITS.backupBytes && p.chunkBytes === SHELF_LIMITS.chunkBytes && p.chunks === Math.ceil(p.bytes / p.chunkBytes) && /^[a-f0-9]{64}$/.test(p.digest) && /^[a-f0-9]{64}$/.test(p.checksum), 'backup-invalid')
+        const bytes = new Uint8Array(p.bytes); let offset = 0
+        for (let index = 0; index < p.chunks; index++) {
+          if (!current()) return
+          const chunk = await this.call({action:'backupChunk', workspaceId, digest:p.digest, index})
+          if (!current()) return
+          check(chunk.digest === p.digest && chunk.index === index && typeof chunk.base64 === 'string' && chunk.base64.length <= 4 * Math.ceil(p.chunkBytes / 3) && /^[A-Za-z0-9+/]*={0,2}$/.test(chunk.base64), 'backup-invalid')
+          const ascii = atob(chunk.base64), expected = Math.min(p.chunkBytes, p.bytes - offset)
+          check(ascii.length === expected, 'backup-invalid')
+          for (let i = 0; i < ascii.length; i++) bytes[offset + i] = ascii.charCodeAt(i)
+          offset += ascii.length; this.set({backing:{done:index + 1, total:p.chunks}})
+        }
+        check(offset === p.bytes && await sha(bytes) === p.digest, 'backup-invalid')
+        const backup = JSON.parse(new TextDecoder('utf-8', {fatal:true}).decode(bytes))
+        check(backup.format === p.format && backup.version === 1 && backup.stateSchema === 3 && backup.checksum?.algorithm === 'SHA-256' && backup.checksum.state === p.checksum && await sha(new TextEncoder().encode(JSON.stringify(backup.state))) === p.checksum, 'backup-invalid')
+        if (!current()) return
+        const final = await this.call({action:'backupPrepare', workspaceId})
+        check(final.digest === p.digest && final.bytes === p.bytes, 'backup-changed')
+        if (current()) { deliver({filename:'qcu-reading-backup-' + p.digest.slice(0, 16) + '.json', bytes}); this.set({notice:'完整本地备份已准备，请在系统保存窗口或下载列表中确认保存；含原材料、摘录及问答。本版尚无导入恢复界面。'}) }
+      } finally { if (this.backupTask === task) { this.backupTask = null; if (epoch === this.epoch) this.set({backing:null}) } }
+    })
   }
   async importFile(file) {
     const workspaceId = this.state.workspaceId
@@ -221,5 +311,5 @@ export class ReadingController {
     })
   }
   async reconnect() { if (this.closed) return; this.invalidate(); clearTimeout(this.timer); ++this.pollEpoch; await this.boot() }
-  dispose() { this.forgetConfirmation(); this.stopImport(); clearTimeout(this.timer); ++this.epoch; ++this.pollEpoch; ++this.workspacesEpoch; this.closed = true; this.listeners.clear() }
+  dispose() { this.forgetConfirmation(); this.dismissDelete(); this.cancelBackup(); this.stopImport(); clearTimeout(this.timer); ++this.epoch; ++this.pollEpoch; ++this.workspacesEpoch; this.closed = true; this.listeners.clear() }
 }

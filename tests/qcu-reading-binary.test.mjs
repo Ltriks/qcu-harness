@@ -152,14 +152,15 @@ test('schema1 byte-exact safe backup before first write; notes/runs/IDs remain i
   await f.store.saveNote({documentId:d.id, locator:'p0001', text:'首版证据', comment:'保留'})
   const p = await f.store.prepare({documentId:d.id, question:'反馈'})
   const run = await f.store.start({intentId:p.id, requestId:'v1-run', consent:true, documentId:d.id, question:p.question, digest:p.digest}); await f.store.jobs.get(run.id)?.promise
-  const old = {...f.store.state, schemaVersion:1}, bytes = Buffer.from(JSON.stringify(old, null, 2) + '\n'), state = join(f.directory, '.qcu-reading/state.json')
+  const {library, ...legacy} = f.store.state
+  const old = {...legacy, schemaVersion:1}, bytes = Buffer.from(JSON.stringify(old, null, 2) + '\n'), state = join(f.directory, '.qcu-reading/state.json')
   await f.store.dispose(); await writeFile(state, bytes)
   const reopen = await new ReadingStore(f.directory, {}).init(); t.after(() => reopen.dispose())
   assert.deepEqual(reopen.state.notes, old.notes); assert.deepEqual(reopen.state.runs, old.runs); assert.deepEqual(reopen.document(d.id), d)
   assert.deepEqual(await readFile(state), bytes, 'no write during idle reopen')
   await reopen.importDocument(file('结构.docx', await docxFixture()))
   const backup = join(f.directory, '.qcu-reading/state.schema1.' + hash(bytes) + '.json')
-  assert.deepEqual(await readFile(backup), bytes); assert.equal(JSON.parse(await readFile(state)).schemaVersion, 2)
+  assert.deepEqual(await readFile(backup), bytes); assert.equal(JSON.parse(await readFile(state)).schemaVersion, 3)
   await reopen.saveNote({documentId:d.id, locator:'p0001', text:'首版证据', comment:'再写'})
   const again = await new ReadingStore(f.directory, {}).init(); t.after(() => again.dispose())
   assert.deepEqual(again.state.runs, old.runs); assert.equal((await readdir(join(f.directory, '.qcu-reading'))).filter(f => f.startsWith('state.schema1.')).length, 1)

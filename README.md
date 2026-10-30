@@ -6,11 +6,19 @@
 
 开发分支 `dev/qcu-teacher-reading`，worktree `$HOME/Repos/worktrees/qcu-harness/teacher-reading`。当前本机官方DSH仍为0.2.0-rc.2。pilot.3已完成：新增工作区刷新保留草稿和确认、指定的一次真实k3问答、来源定位、系统保存Markdown、工作区隔离及正常重启后保留均通过。Word首次文件选择由用户协助一次，后续重复导入已由维护者完成。实际记录见[原生验收](docs/qcu-reading-native-acceptance.md)；只用自编材料，不代表真人教师采用或一般教学质量通过。
 
-准备投稿时发现旧包包含维护Python脚本及超限PDF worker；[pilot.4分发修复](docs/qcu-reading-hub-package.md)已通过现有静态检查器和市场归档检查，未放宽审核政策。精确包64项（含官方12项和浏览器2项）、源码61项，父级另独立8项通过；官方App内置Node24.18.1也完成精确包自编PDF/Word解析与重开。固定产物 `$HOME/Artifacts/qcu-harness/0.1.0-reading.4/`；后续已确认安装伴读pilot.4和市场17.1，53个成员与固定包一致，其他11个依赖及配置保留；同Home正常重开后旧笔记/问答和新PDF/Word解析通过，本轮无模型调用，见[pilot.4原生验收](docs/qcu-reading-pilot4-native-acceptance.md)。Hub/mini未部署。伴读产品准入与独立签名更新通道已在市场17.1实现；实际Hub生产签名发布仍待安排。源码构建生成pilot.4，旧版重建须用对应固定提交。[演进计划](docs/qcu-standalone-learning-plan.md)按伴读→个人资料架→题库推进，R2尚未进入。
+准备投稿时发现旧包包含维护Python脚本及超限PDF worker；[pilot.4分发修复](docs/qcu-reading-hub-package.md)已通过现有静态检查器和市场归档检查，未放宽审核政策。精确包64项（含官方12项和浏览器2项）、源码61项，父级另独立8项通过；官方App内置Node24.18.1也完成精确包自编PDF/Word解析与重开。固定产物 `$HOME/Artifacts/qcu-harness/0.1.0-reading.4/`；后续已确认安装伴读pilot.4和市场17.1，53个成员与固定包一致，其他11个依赖及配置保留；同Home正常重开后旧笔记/问答和新PDF/Word解析通过，本轮无模型调用，见[pilot.4原生验收](docs/qcu-reading-pilot4-native-acceptance.md)。Hub/mini未部署。伴读产品准入与独立签名更新通道已在市场17.1实现；实际Hub生产签名发布仍待安排。`dev/qcu-teacher-reading`冻结源码构建生成pilot.4；本资料架分支构建生成R2，旧版重建须用对应固定提交。[演进计划](docs/qcu-standalone-learning-plan.md)按伴读→个人资料架→题库推进；R2个人资料架已完成本地候选，见下节，尚未安装。
 
 市场准入分支 `dev/qcu-reading-market-admission`，worktree `$HOME/Repos/worktrees/qcu-harness/reading-market-admission`。旧版、专家版和伴读版分别使用冻结产品清单；新版优先读取 `updates-v3.json`，仅404时回退，保留现有安装/启用/升级确认。实现和本地验证见[市场准入报告](docs/qcu-reading-market-admission.md)，教师使用与短验收步骤见[伴读试用说明](docs/qcu-reading-teacher-guide.md)。市场17.1已安装并通过基础原生检查，Hub尚未发布伴读；未上架产品按钮缺名已以[17.2本地候选](docs/qcu-market-missing-name.md)修复并通过实际React渲染及精确包回归；17.2尚未安装或部署。
 
 构建：`rtk node hub/plugins/qcu-reading/build.mjs`；定向解析回归：`rtk node --test tests/qcu-reading-hub-parser.test.mjs`。精确包、官方运行时和浏览器完整命令见[分发候选报告](docs/qcu-reading-hub-package.md)。
+
+## R2 个人资料架（本地候选，未安装或部署）
+
+`qcu-reading@0.2.0-pilot.1` 在伴读中增加显示标题、课程分类、标签、材料/摘录收藏、跨材料关键词搜索、完整JSON备份导出和带预览确认的单版本删除。原材料快照与历史引用保持原版本；管理功能不调用模型。备份仅导出，暂不提供导入恢复界面。
+
+开发分支 `dev/qcu-reading-shelf`；worktree `$HOME/Repos/worktrees/qcu-harness/reading-shelf`。固定候选位于 `$HOME/Artifacts/qcu-harness/0.2.0-reading.1/`：641,636字节、30个成员，SHA256 `56f846b9…fa40901`。源码99项、精确包102项通过；父级另用官方内置Node24.18.1复核旧schema1/2迁移、完整备份和删除边界，并验证近8MB备份及市场阻止schema升级直接安装。真实浏览器覆盖明暗、14/18px字号和360/1280宽度，独立视觉复核的两项文档问题已修正。
+
+首次写入schema3前保留旧状态原始字节备份；旧R1不能读取schema3，回退需维护者核对且会失去备份后的记录，更新标为manual-review。当前真实DSH仍是伴读pilot.4和市场17.1；R2原生升级、真实教师使用和Windows未测，Hub/mini未部署，R3题库未开始。实现与分层结果见[R2报告](docs/qcu-reading-r2-shelf.md)，步骤见[教师短清单](docs/qcu-reading-r2-shelf-checklist.md)，视觉边界见[UI复核](docs/qcu-reading-r2-ui-review.md)。
 
 ## 教师助手与工具市场 P16（Hub与mini已部署，基础验证通过）
 
