@@ -3,7 +3,7 @@ import {join,dirname} from 'node:path'
 import {homedir} from 'node:os'
 import {realpath,lstat,open,link,unlink} from 'node:fs/promises'
 import {updatePolicy} from './update-policy.mjs'
-import {updateAssert,updateExact,parseUpdatePayload,updateCandidate,updateReleaseKey,updateOrigin,expertProjectionCapable} from './update-model.mjs'
+import {updateAssert,updateExact,parseUpdatePayload,updateCandidate,updateReleaseKey,updateOrigin,expertProjectionCapable,readingProjectionCapable,updateProjections} from './update-model.mjs'
 import {inspectUpdateArchive} from './update-archive.mjs'
 import {UpdateStorage,ownedUpdateDir,regularUpdateBytes} from './update-storage.mjs'
 const digest=b=>createHash('sha256').update(b).digest('hex')
@@ -65,14 +65,18 @@ export class MarketUpdates{
   updateAssert(!this.pending&&!this.disposed,'已有更新操作进行中')
   const abort=new AbortController();this.pending=abort;this.feed=null;this.receipts.clear()
   try{
-   const combined=AbortSignal.any([abort.signal,...(signal?[signal]:[])]),expertCapable=expertProjectionCapable(this.policy)
-   let path=expertCapable?'/updates-v2.json':'/updates.json'
-   let raw=await boundedUpdateFetch(updateOrigin+path,524288,this.fetcher,combined,{allowMissing:expertCapable})
-   if(raw===null){combined.throwIfAborted();path='/updates.json';raw=await boundedUpdateFetch(updateOrigin+path,524288,this.fetcher,combined)}
-   const envelope=JSON.parse(raw.toString('utf8')),feed=verifyUpdateEnvelope(envelope,this.policy,this.now()),fingerprint=digest(Buffer.from(envelope.payload)),stateFile=path==='/updates-v2.json'?'state-v2.json':'state.json'
-   updateAssert(feed.channel===(path==='/updates-v2.json'?'pilot-experts':'pilot'),'更新清单签名通道与请求地址不符')
-   // Each projection pins its own bytes; both share the publisher sequence floor.
-   for(const file of ['state.json','state-v2.json']){
+   const combined=AbortSignal.any([abort.signal,...(signal?[signal]:[])])
+   const projections=readingProjectionCapable(this.policy)?['v3','v2','legacy']:expertProjectionCapable(this.policy)?['v2','legacy']:['legacy']
+   let projection,raw
+   for(let i=0;i<projections.length;i++){
+    projection=updateProjections[projections[i]]
+    raw=await boundedUpdateFetch(updateOrigin+'/'+projection.file,524288,this.fetcher,combined,{allowMissing:i<projections.length-1})
+    combined.throwIfAborted();if(raw!==null)break
+   }
+   const envelope=JSON.parse(raw.toString('utf8')),feed=verifyUpdateEnvelope(envelope,this.policy,this.now()),fingerprint=digest(Buffer.from(envelope.payload)),stateFile=projection.state
+   updateAssert(feed.channel===projection.channel,'更新清单签名通道与请求地址不符')
+   // Each projection pins its own bytes; all share the publisher sequence floor.
+   for(const file of ['state.json','state-v2.json','state-v3.json']){
     const saved=await this.storage.read(file)
     if(saved){updateExact(saved,['revision','fingerprint','envelope']);updateAssert(Number.isSafeInteger(saved.revision)&&saved.revision>0&&/^[a-f0-9]{64}$/.test(saved.fingerprint),'本地更新状态损坏');updateAssert(feed.revision>=saved.revision&&(file!==stateFile||feed.revision>saved.revision||fingerprint===saved.fingerprint),'更新清单发生回退或同修订内容变化')}
    }

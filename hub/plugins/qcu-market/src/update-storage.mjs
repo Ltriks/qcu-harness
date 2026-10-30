@@ -15,11 +15,11 @@ export async function regularUpdateBytes(path,cap){
 export class UpdateStorage{
  constructor(root){this.root=root}
  async read(name){
-  updateAssert(['state.json','state-v2.json','journal.json'].includes(name),'未知缓存名');await ownedUpdateDir(this.root)
+  updateAssert(['state.json','state-v2.json','state-v3.json','journal.json'].includes(name),'未知缓存名');await ownedUpdateDir(this.root)
   try{return JSON.parse((await regularUpdateBytes(join(this.root,name),1048576)).toString('utf8'))}catch(e){if(e.code==='ENOENT')return null;throw e}
  }
  async write(name,value){
-  updateAssert(['state.json','state-v2.json','journal.json'].includes(name),'未知缓存名');await ownedUpdateDir(this.root)
+  updateAssert(['state.json','state-v2.json','state-v3.json','journal.json'].includes(name),'未知缓存名');await ownedUpdateDir(this.root)
   const path=join(this.root,name),temp=join(this.root,'.partial-'+randomUUID()),bytes=Buffer.from(JSON.stringify(value))
   updateAssert(bytes.length<=1048576,'缓存数据过大')
   try{await regularUpdateBytes(path,1048576)}catch(e){if(e.code!=='ENOENT')throw e}

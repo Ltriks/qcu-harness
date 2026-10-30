@@ -12,7 +12,7 @@ MAX_FILE = 32 * 1024 * 1024
 MAX_TOTAL = 64 * 1024 * 1024
 HASH = re.compile(r'^[a-f0-9]{64}$')
 PACKAGE = re.compile(r'^(plugins/[a-z][a-z0-9-]*-[0-9][a-zA-Z0-9.-]*-[a-f0-9]{64}\.tgz|skills/[a-z][a-z0-9-]*-[0-9][a-zA-Z0-9.-]*-[a-f0-9]{64}\.zip)$')
-ROOT_NAMES = {'catalog.json', 'updates.json', 'updates-v2.json', 'index.html', 'themes.html', 'serve-hub.py', 'README.txt'}
+ROOT_NAMES = {'catalog.json', 'updates.json', 'updates-v2.json', 'updates-v3.json', 'index.html', 'themes.html', 'serve-hub.py', 'README.txt'}
 
 
 def check(condition, code):
@@ -56,7 +56,7 @@ def load_snapshot(root, manifest_pin):
         check(len(data) == expected['bytes'] and hashlib.sha256(data).hexdigest() == expected['sha256'], 'file-integrity-mismatch')
         # Helper and operator README never become HTTP routes.
         if name not in {'serve-hub.py', 'README.txt'}:
-            if name in {'updates.json', 'updates-v2.json'}:
+            if name in {'updates.json', 'updates-v2.json', 'updates-v3.json'}:
                 check(len(data) <= 512 * 1024, 'updates-too-large')
                 envelope = json.loads(data)
                 check(isinstance(envelope, dict) and set(envelope) == {'payload', 'signature'} and isinstance(envelope['payload'], str) and isinstance(envelope['signature'], str), 'invalid-update-envelope')
@@ -127,7 +127,7 @@ def make_server(resources, host='127.0.0.1', port=8080, lan_approved=False, publ
                 self.send_error(404)
                 return
             data = dynamic if dynamic is not None else resources[self.path]
-            content_type = 'text/html; charset=utf-8' if self.path in {'/', '/index.html', '/themes.html'} else 'application/json; charset=utf-8' if self.path in {'/catalog.json','/updates.json','/updates-v2.json','/market/catalog.signed.json'} else 'application/octet-stream'
+            content_type = 'text/html; charset=utf-8' if self.path in {'/', '/index.html', '/themes.html'} else 'application/json; charset=utf-8' if self.path in {'/catalog.json','/updates.json','/updates-v2.json','/updates-v3.json','/market/catalog.signed.json'} else 'application/octet-stream'
             self.send_response(200)
             self.send_header('Content-Type', content_type)
             self.send_header('Content-Length', str(len(data)))

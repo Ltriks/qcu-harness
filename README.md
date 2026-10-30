@@ -6,7 +6,9 @@
 
 开发分支 `dev/qcu-teacher-reading`，worktree `$HOME/Repos/worktrees/qcu-harness/teacher-reading`。当前本机官方DSH仍为0.2.0-rc.2，已安装启用pilot.3：新增工作区刷新保留草稿和确认、指定的一次真实k3问答、来源定位、系统保存Markdown、工作区隔离及正常重启后保留均通过。Word首次文件选择由用户协助一次，后续重复导入已由维护者完成。实际记录见[原生验收](docs/qcu-reading-native-acceptance.md)；只用自编材料，不代表真人教师采用或一般教学质量通过。
 
-准备投稿时发现旧包包含维护Python脚本及超限PDF worker；[pilot.4分发修复](docs/qcu-reading-hub-package.md)已通过现有静态检查器和市场归档检查，未放宽审核政策。精确包64项（含官方12项和浏览器2项）、源码61项，父级另独立8项通过；官方App内置Node24.18.1也完成精确包自编PDF/Word解析与重开。固定产物 `$HOME/Artifacts/qcu-harness/0.1.0-reading.4/`；pilot.4尚未安装，产品准入/更新策略及实际Hub签名发布未完成，Hub/mini未部署。源码构建生成pilot.4，旧版重建须用对应固定提交。[演进计划](docs/qcu-standalone-learning-plan.md)按伴读→个人资料架→题库推进，R2尚未进入。
+准备投稿时发现旧包包含维护Python脚本及超限PDF worker；[pilot.4分发修复](docs/qcu-reading-hub-package.md)已通过现有静态检查器和市场归档检查，未放宽审核政策。精确包64项（含官方12项和浏览器2项）、源码61项，父级另独立8项通过；官方App内置Node24.18.1也完成精确包自编PDF/Word解析与重开。固定产物 `$HOME/Artifacts/qcu-harness/0.1.0-reading.4/`；pilot.4尚未安装，Hub/mini未部署。伴读产品准入与独立签名更新通道已在市场17.1本地候选中实现；实际Hub生产签名发布仍待安排。源码构建生成pilot.4，旧版重建须用对应固定提交。[演进计划](docs/qcu-standalone-learning-plan.md)按伴读→个人资料架→题库推进，R2尚未进入。
+
+市场准入分支 `dev/qcu-reading-market-admission`，worktree `$HOME/Repos/worktrees/qcu-harness/reading-market-admission`。旧版、专家版和伴读版分别使用冻结产品清单；新版优先读取 `updates-v3.json`，仅404时回退，保留现有安装/启用/升级确认。实现和本地验证见[市场准入报告](docs/qcu-reading-market-admission.md)，教师使用与短验收步骤见[伴读试用说明](docs/qcu-reading-teacher-guide.md)。市场17.1尚未安装或部署。
 
 构建：`rtk node hub/plugins/qcu-reading/build.mjs`；定向解析回归：`rtk node --test tests/qcu-reading-hub-parser.test.mjs`。精确包、官方运行时和浏览器完整命令见[分发候选报告](docs/qcu-reading-hub-package.md)。
 
