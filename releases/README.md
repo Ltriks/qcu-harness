@@ -1,10 +1,11 @@
 # QCU 助手下载与源码索引
 
-本索引在 `dev/qcu-release-archive-20261028` 维护。两个平台独立预发布，版本和功能不同；二进制放 GitHub Release 附件，不提交到 Git。`main` 暂未集成这些开发分支。
+本索引在 `dev/qcu-release-archive-20261028` 建立，Mac rc4.4.2 起在 `dev/qcu-release-mac-rc442` 续写。两个平台独立预发布，版本和功能不同；二进制放 GitHub Release 附件，不提交到 Git。`main` 暂未集成这些开发分支。
 
 | 平台 | 当前固定预发布 | 包含内容与边界 |
 | --- | --- | --- |
-| Apple Silicon Mac / macOS 13+ | [rc4.3](https://github.com/Ltriks/qcu-harness/releases/tag/qcu-teacher-v0.1.0-rc.4.3-mac-arm64) | 市场16.1、清蓝0.2.6-pilot.2、专家团3.font.1、课程1.3.font.1、七项技能及飞书只读；完整新机 GUI、系统信任及教学效果待验收 |
+| Apple Silicon Mac / macOS 13+ | [rc4.4.2](https://github.com/Ltriks/qcu-harness/releases/tag/qcu-teacher-v0.1.0-rc.4.4.2-mac-arm64) | 市场16.4（错误分级诊断、应用内局域网受限时改走系统通道）、清蓝0.2.7-pilot.2、专家团3.font.1、七项技能及飞书只读；不预装课程；同版本 rc44.1 覆盖安装保留数据；试用机 GUI 复核、新机系统信任及教学效果待验收 |
+| Apple Silicon Mac（前一版） | [rc4.3](https://github.com/Ltriks/qcu-harness/releases/tag/qcu-teacher-v0.1.0-rc.4.3-mac-arm64) | 市场16.1、清蓝0.2.6-pilot.2、专家团3.font.1、课程1.3.font.1、七项技能及飞书只读；完整新机 GUI、系统信任及教学效果待验收 |
 | Windows x64 | [rc3-r4](https://github.com/Ltriks/qcu-harness/releases/tag/qcu-teacher-v0.1.0-rc.3-win-x64-r4) | 早期主题、七项技能、课程1.2、飞书只读；不含新版市场或专家团；Windows 本地磁盘启动获用户确认 |
 
 下载 Release 附件中 `QCU-Teacher-…zip`，不要下载自动生成的 Source code 充当安装包。每个预发布附中文说明、离线 HTML 指南、`PROVENANCE.json`、`ARCHIVE-CHECK.json`、`LICENSES.zip` 和 `SHA256SUMS`。先核对 SHA256，再完整解压。GitHub 附件和原固定包字节一致；ZIP 内历史构建状态标签不因本次发布改写。
@@ -15,6 +16,7 @@ Windows 必须解压到本地磁盘后运行 `QCU助手/QCU助手.exe`，不能�
 
 ## 源码和构建
 
+- Mac rc4.4.2 以 rc4.3 包为基础（供应商运行时不变），`release/snapshots/mac-rc4.4.2/` 保存实际随包组件源码及 rc44 构建脚本、启动器、支持脚本与测试，见[rc4.4.2 发布记录](../docs/qcu-github-release-mac-rc442-20261111.md)。
 - Mac 源码基于已推送 P16 `ef88ee71552ed84dc7b9d116de8374ee5afdd881`；发布标签在独立归档分支，`release/snapshots/mac-rc4.3/` 保存实际随包组件源码与逐文件摘要。构建命令和输入 pin 见 [Mac准备与构建](../docs/qcu-p16-mac-preparation.md)、[P16交付](../docs/qcu-p16-delivery.md)及 `release/integrated-teacher-macos-rc43.json`。
 - Windows 标签位于独立 `dev/qcu-windows-r4-source-archive`，基于历史 `1012167`。已归档57项原打包脚本、测试、模板及实际随包组件、Launcher快照。见[Windows源码归档说明](https://github.com/Ltriks/qcu-harness/blob/qcu-teacher-v0.1.0-rc.3-win-x64-r4/docs/qcu-windows-r4-source-archive.md)。不要用Mac当前源码冒充r4原构建来源。
 - 原构建需要配置中固定的官方客户端、旧基础ZIP、审核TGZ、工具链及其精确摘要；Git源码下载并不包含所有二进制输入，也不承诺仅凭clone即可逐字节重建原ZIP。本次只归档，未重建既有安装包。

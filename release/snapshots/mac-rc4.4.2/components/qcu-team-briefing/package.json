@@ -1,0 +1,39 @@
+{
+  "name": "qcu-team-briefing",
+  "version": "0.1.0-pilot.1",
+  "type": "module",
+  "private": true,
+  "license": "Apache-2.0",
+  "description": "根据教师提供的匿名工作要点起草教研简报、3P工作总结、FAQ或一般内部沟通，供教师审核；适用于已有资料的整理与表达。",
+  "exports": {
+    ".": "./index.js",
+    "./package.json": "./package.json"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  },
+  "peerDependencies": {
+    "@deepseek-ai/cordis": "4.0.4",
+    "@deepseek-ai/dsh-skill": "0.2.0-rc.2",
+    "@deepseek-ai/dsh-scope": "0.2.0-rc.2"
+  },
+  "files": [
+    "LICENSE",
+    "NOTICE",
+    "README.md",
+    "SKILL.md",
+    "SOURCE.json",
+    "WRAPPER-LICENSE",
+    "cordis.patch.yml",
+    "index.js",
+    "skill-content.js",
+    "third_party/anthropic-internal-comms/LICENSE.txt",
+    "third_party/anthropic-internal-comms/SKILL.md",
+    "third_party/anthropic-internal-comms/examples/3p-updates.md",
+    "third_party/anthropic-internal-comms/examples/company-newsletter.md",
+    "third_party/anthropic-internal-comms/examples/faq-answers.md",
+    "third_party/anthropic-internal-comms/examples/general-comms.md"
+  ]
+}

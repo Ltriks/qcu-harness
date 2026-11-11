@@ -1,9 +1,27 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-10-28",
+  "updatedAt": "2026-11-11",
   "repository": "https://github.com/Ltriks/qcu-harness",
-  "scope": "Fixed two-platform pre-release archives; not a live Hub catalog.",
+  "scope": "Fixed pre-release archives; not a live Hub catalog.",
   "releases": [
+    {
+      "id": "qcu-teacher-v0.1.0-rc.4.4.2-mac-arm64",
+      "version": "0.1.0-rc.4.4",
+      "packagingRevision": "rc44.2",
+      "target": "mac-arm64",
+      "status": "prerelease",
+      "tag": "qcu-teacher-v0.1.0-rc.4.4.2-mac-arm64",
+      "sourceBranch": "dev/qcu-release-mac-rc442",
+      "releaseUrl": "https://github.com/Ltriks/qcu-harness/releases/tag/qcu-teacher-v0.1.0-rc.4.4.2-mac-arm64",
+      "downloadUrl": "https://github.com/Ltriks/qcu-harness/releases/download/qcu-teacher-v0.1.0-rc.4.4.2-mac-arm64/QCU-Teacher-0.1.0-rc.4.4.2-mac-arm64.zip",
+      "file": "QCU-Teacher-0.1.0-rc.4.4.2-mac-arm64.zip",
+      "bytes": 395927817,
+      "sha256": "7fb571edbb1067553160e1e649741f61ea6a2f45156fd67ba890ae4e81cf966b",
+      "coreVersion": "0.2.0-rc.2",
+      "marketIncluded": true,
+      "newNativeGUIAccepted": false,
+      "notarized": false
+    },
     {
       "id": "qcu-teacher-v0.1.0-rc.4.3-mac-arm64",
       "version": "0.1.0-rc.4.3",
