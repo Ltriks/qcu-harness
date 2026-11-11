@@ -1,0 +1,76 @@
+{
+  "schemaVersion": 1,
+  "observedAt": "2026-11-11T08:34:10+08:00",
+  "target": "mac-arm64",
+  "releaseId": 441092070,
+  "tag": "qcu-teacher-v0.1.0-rc.4.4.2-mac-arm64",
+  "sourceCommit": "0775acb46699666e3c187c14ddcb12c98769996e",
+  "draft": false,
+  "prerelease": true,
+  "markedLatest": false,
+  "releaseUrl": "https://github.com/Ltriks/qcu-harness/releases/tag/qcu-teacher-v0.1.0-rc.4.4.2-mac-arm64",
+  "assets": [
+    {
+      "name": "ARCHIVE-CHECK.json",
+      "size": 4137,
+      "digest": "sha256:012b2e5544581dd71df481ec28398b92aaeb50d4c1b4eae4435d127dcdf77126",
+      "browser_download_url": "https://github.com/Ltriks/qcu-harness/releases/download/qcu-teacher-v0.1.0-rc.4.4.2-mac-arm64/ARCHIVE-CHECK.json"
+    },
+    {
+      "name": "composition.json",
+      "size": 3815,
+      "digest": "sha256:bccfa0af77151924318d23c419a2c3596c6b8601ea44c9d766f096af65dcab8b",
+      "browser_download_url": "https://github.com/Ltriks/qcu-harness/releases/download/qcu-teacher-v0.1.0-rc.4.4.2-mac-arm64/composition.json"
+    },
+    {
+      "name": "LICENSE-INDEX.json",
+      "size": 44655,
+      "digest": "sha256:c57fbb4f611a40a54fc2381d185f0ae78f3ae5b8caacc0930ced9eea869716ee",
+      "browser_download_url": "https://github.com/Ltriks/qcu-harness/releases/download/qcu-teacher-v0.1.0-rc.4.4.2-mac-arm64/LICENSE-INDEX.json"
+    },
+    {
+      "name": "LICENSES.zip",
+      "size": 358641,
+      "digest": "sha256:d6abbd3535cb3dc8ba78f0417ef993c0d108ab95e77218aef2bb43252e134919",
+      "browser_download_url": "https://github.com/Ltriks/qcu-harness/releases/download/qcu-teacher-v0.1.0-rc.4.4.2-mac-arm64/LICENSES.zip"
+    },
+    {
+      "name": "PROVENANCE.json",
+      "size": 4729,
+      "digest": "sha256:585297ee1c1ad750d8137f52e1ad71d59d73883d0695c191d99f59e52fbf182c",
+      "browser_download_url": "https://github.com/Ltriks/qcu-harness/releases/download/qcu-teacher-v0.1.0-rc.4.4.2-mac-arm64/PROVENANCE.json"
+    },
+    {
+      "name": "QCU-Teacher-0.1.0-rc.4.4.2-mac-arm64.zip",
+      "size": 395927817,
+      "digest": "sha256:7fb571edbb1067553160e1e649741f61ea6a2f45156fd67ba890ae4e81cf966b",
+      "browser_download_url": "https://github.com/Ltriks/qcu-harness/releases/download/qcu-teacher-v0.1.0-rc.4.4.2-mac-arm64/QCU-Teacher-0.1.0-rc.4.4.2-mac-arm64.zip"
+    },
+    {
+      "name": "QCU-Teacher-Guide.html",
+      "size": 4381,
+      "digest": "sha256:2ec74b6cb36ea12e19e7fbf7741ca6f3db8f7a5825b80ec004d383cb2fefe778",
+      "browser_download_url": "https://github.com/Ltriks/qcu-harness/releases/download/qcu-teacher-v0.1.0-rc.4.4.2-mac-arm64/QCU-Teacher-Guide.html"
+    },
+    {
+      "name": "README-zh-CN.md",
+      "size": 3950,
+      "digest": "sha256:84789cfbb40425f1db35c1cdd07f48d665a1fd67c6a8577f3ad1585d97b25009",
+      "browser_download_url": "https://github.com/Ltriks/qcu-harness/releases/download/qcu-teacher-v0.1.0-rc.4.4.2-mac-arm64/README-zh-CN.md"
+    },
+    {
+      "name": "SHA256SUMS",
+      "size": 692,
+      "digest": "sha256:6c72b6fd3710798157ce32af97668277e9e5130511b49f53ed77489702634b6c",
+      "browser_download_url": "https://github.com/Ltriks/qcu-harness/releases/download/qcu-teacher-v0.1.0-rc.4.4.2-mac-arm64/SHA256SUMS"
+    }
+  ],
+  "serverDigestsMatchLocal": true,
+  "publicDownloadCheck": {
+    "file": "QCU-Teacher-0.1.0-rc.4.4.2-mac-arm64.zip",
+    "authenticated": false,
+    "bytes": 395927817,
+    "sha256": "7fb571edbb1067553160e1e649741f61ea6a2f45156fd67ba890ae4e81cf966b",
+    "match": true
+  }
+}

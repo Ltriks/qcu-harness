@@ -40,3 +40,7 @@ ELECTRON_RUN_AS_NODE=1 "$ELECTRON" market-tests/test-authority-scenarios.mjs # �
 ## 未完成
 
 两台试用 Mac 安装 rc44.2 后的图形界面复核、新机原生 GUI 首次启动、互联网下载后的系统信任、真实模型与教师效果。包仅 ad-hoc 签名，未经 Apple 公证。发布为 prerelease，不标记 latest。
+
+## 发布完成核验
+
+2026-11-11 Release 已公开，`draft=false / prerelease=true`，未设为 latest。9 项附件服务器文件名、大小和 SHA256 逐项匹配；未认证经公开地址完整下载 ZIP，395,927,817 字节且 SHA256 一致。[机器可读结果](../releases/publication-20261111-mac-rc442.json)；[Mac rc4.4.2 预发布](https://github.com/Ltriks/qcu-harness/releases/tag/qcu-teacher-v0.1.0-rc.4.4.2-mac-arm64)。源码标签指向 `0775acb46699666e3c187c14ddcb12c98769996e`，本回执提交不移动标签。
