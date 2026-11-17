@@ -1,3 +1,4 @@
+import {currentUserOwns,assertPlatformPrivate} from './platform-private.mjs'
 import {mkdir,lstat,open,rename,unlink} from 'node:fs/promises'
 import {constants} from 'node:fs'
 import {join} from 'node:path'
@@ -5,10 +6,11 @@ import {randomUUID} from 'node:crypto'
 import {updateAssert} from './update-model.mjs'
 export async function ownedUpdateDir(path){
  await mkdir(path,{recursive:true,mode:0o700})
- const s=await lstat(path);updateAssert(s.isDirectory()&&!s.isSymbolicLink()&&s.uid===process.getuid(),'缓存目录不安全');return path
+ const s=await lstat(path);updateAssert(s.isDirectory()&&!s.isSymbolicLink()&&currentUserOwns(s),'缓存目录不安全');await assertPlatformPrivate(path);return path
 }
 export async function regularUpdateBytes(path,cap){
- const s=await lstat(path);updateAssert(s.isFile()&&!s.isSymbolicLink()&&s.uid===process.getuid()&&s.size<=cap,'文件不安全或过大')
+ const s=await lstat(path);updateAssert(s.isFile()&&!s.isSymbolicLink()&&currentUserOwns(s)&&s.size<=cap,'文件不安全或过大')
+ await assertPlatformPrivate(path)
  const file=await open(path,constants.O_RDONLY|constants.O_NOFOLLOW)
  try{const actual=await file.stat();updateAssert(actual.ino===s.ino&&actual.dev===s.dev&&actual.size===s.size,'文件已变化');const bytes=await file.readFile();updateAssert(bytes.length===s.size,'文件已变化');return bytes}finally{await file.close()}
 }

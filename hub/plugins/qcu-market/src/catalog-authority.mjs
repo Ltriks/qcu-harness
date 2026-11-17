@@ -1,3 +1,4 @@
+import {currentUserOwns,privateMode,assertPlatformPrivate,syncPrivateDirectory} from './platform-private.mjs'
 import {createHash,createPublicKey,verify,randomUUID} from 'node:crypto'
 import {constants} from 'node:fs'
 import {lstat,mkdir,open,link,unlink,readdir} from 'node:fs/promises'
@@ -24,7 +25,7 @@ function macSystemProxyUsed(){
  }catch{}
  return false
 }
-export const productionOrigin='http://192.168.1.68:8080'
+export const productionOrigin='https://111.229.103.201'
 export const authorityLimit=524288
 export const authorityDigest=raw=>createHash('sha256').update(raw).digest('hex')
 const need=(v,m,code)=>{if(!v){const error=Error('Catalog authority: '+m);if(code)error.code=code;throw error}}
@@ -69,16 +70,16 @@ export async function privateDirectory(root,{create=false}={}){
  need(resolve(root)===root,'absolute state path')
  const parts=[];for(let p=root;;p=dirname(p)){parts.unshift(p);if(p===dirname(p))break}
  let parent
- for(const p of parts){try{const s=await lstat(p);need(s.isDirectory()&&!s.isSymbolicLink(),'unsafe ancestor');parent=s}catch(e){if(e.code!=='ENOENT'||!create)throw e;need(parent?.uid===process.getuid(),'unowned parent for private state');await mkdir(p,{mode:0o700});parent=await lstat(p)}}
- const s=await lstat(root);need(s.uid===process.getuid()&&(s.mode&0o777)===0o700,'private state permissions');return root
+ for(const p of parts){try{const s=await lstat(p);need(s.isDirectory()&&!s.isSymbolicLink(),'unsafe ancestor');parent=s}catch(e){if(e.code!=='ENOENT'||!create)throw e;need(parent&&currentUserOwns(parent),'unowned parent for private state');await assertPlatformPrivate(dirname(p));await mkdir(p,{mode:0o700});parent=await lstat(p)}}
+ const s=await lstat(root);need(currentUserOwns(s)&&privateMode(s,0o700),'private state permissions');await assertPlatformPrivate(root);return root
 }
 export async function privateRead(path,limit=authorityLimit){
  const f=await open(path,constants.O_RDONLY|constants.O_NOFOLLOW|constants.O_NONBLOCK)
- try{const s=await f.stat();need(s.isFile()&&s.nlink===1&&s.uid===process.getuid()&&s.size<=limit,'unsafe state file');const raw=await f.readFile();need(raw.length<=limit,'state size');return raw}finally{await f.close()}
+ try{const s=await f.stat();need(s.isFile()&&s.nlink===1&&currentUserOwns(s)&&s.size<=limit,'unsafe state file');await assertPlatformPrivate(path);const raw=await f.readFile();need(raw.length<=limit,'state size');return raw}finally{await f.close()}
 }
 export async function immutableWrite(root,name,bytes){
  const tmp='.pending-'+randomUUID();let f
- try{f=await open(join(root,tmp),'wx',0o600);await f.writeFile(bytes);await f.sync();await f.close();f=null;await link(join(root,tmp),join(root,name));const d=await open(root,constants.O_RDONLY);try{await d.sync()}finally{await d.close()}}
+ try{f=await open(join(root,tmp),'wx',0o600);await f.writeFile(bytes);await f.sync();await f.close();f=null;await link(join(root,tmp),join(root,name));await syncPrivateDirectory(root)}
  finally{await f?.close();await unlink(join(root,tmp)).catch(e=>{if(e.code!=='ENOENT')throw e})}
 }
 export class CatalogAuthority{

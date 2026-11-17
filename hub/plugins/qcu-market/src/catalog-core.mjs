@@ -1,5 +1,5 @@
 // Strict local data model. This parser does not confer trust on remote JSON.
-const catalogOrigin='http://192.168.1.68:8080'
+const catalogOrigin='https://111.229.103.201'
 const catalogAssert=(ok,message)=>{if(!ok)throw Error('Catalog: '+message)}
 const exact=(value,keys)=>catalogAssert(value&&Object.getPrototypeOf(value)===Object.prototype&&Object.keys(value).sort().join()===keys.slice().sort().join(),'unknown or missing fields')
 const plain=(s,max=2000)=>typeof s==='string'&&s.length>0&&s.length<=max&&!/[\u0000-\u0008\u000b\u000c\u000e-\u001f]/.test(s)

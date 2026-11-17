@@ -1,0 +1,32 @@
+import base64,subprocess,sys,shutil
+from pathlib import Path
+phase=sys.argv[1]
+
+common=r"$ErrorActionPreference='Stop';$ProgressPreference='SilentlyContinue';[Console]::OutputEncoding=[Text.Encoding]::UTF8;$root=Join-Path $env:LOCALAPPDATA 'QCUWindowsRc44Tests\20261117-rc451';$source='\\Mac\Home\Repos\cowork\qcu-harness\.work\release-rc45\.work\rc451-win';$kit=Join-Path $root '中文 空格\QCU助手';"
+if phase=='compile':
+ script=common+r"New-Item -ItemType Directory -Force $root | Out-Null;& C:\Windows\Microsoft.NET\Framework64\v4.0.30319\csc.exe /nologo /target:winexe /platform:x64 /codepage:65001 /reference:System.Windows.Forms.dll ('/win32icon:'+(Join-Path $source 'QCU助手\program\resources\tray.ico')) ('/out:'+(Join-Path $root 'QCU助手.exe')) (Join-Path $source 'Launcher.cs');if($LASTEXITCODE -ne 0){throw 'Compile failed'};Copy-Item (Join-Path $root 'QCU助手.exe') (Join-Path $source 'QCU助手\QCU助手.exe');Write-Output 'QCU_WINDOWS_COMPILED:x64-GUI'"
+elif phase=='stage':
+ script=common+r"New-Item -ItemType Directory -Force $kit | Out-Null;robocopy (Join-Path $source 'QCU助手') $kit /E /NFL /NDL /NJH /NJS /NP;if($LASTEXITCODE -gt 7){throw 'Copy failed'};Write-Output 'QCU_WINDOWS_STAGED:local-Chinese-space-path'"
+elif phase=='prepare':
+ script=common+r"$env:QCU_TEACHER_TEST_HOME=Join-Path $root 'fresh user data';1..2|ForEach-Object{$p=Start-Process (Join-Path $kit 'QCU助手.exe') -ArgumentList '--prepare-only' -Wait -PassThru -RedirectStandardOutput (Join-Path $root 'prepare.out') -RedirectStandardError (Join-Path $root 'prepare.err');Get-Content (Join-Path $root 'prepare.out');Get-Content (Join-Path $root 'prepare.err');if($p.ExitCode -ne 0){throw 'Native prepare failed'}};Write-Output ('VENDOR_SIGNATURE:'+(Get-AuthenticodeSignature (Join-Path $kit 'program\DeepSeek Harness.exe')).Status)"
+elif phase in ['acceptance','smoke','debug','cloud','cloud-debug']:
+ script=common+r"""$env:ELECTRON_RUN_AS_NODE='1';$env:NODE_OPTIONS='';$env:DSH_HOME=Join-Path $root 'fresh user data';function RunNode($nodeArgs){$p=Start-Process (Join-Path $kit 'program\DeepSeek Harness.exe') -ArgumentList (($nodeArgs|ForEach-Object{'"'+$_+'"'}) -join ' ') -Wait -PassThru -RedirectStandardOutput (Join-Path $root 'node.out') -RedirectStandardError (Join-Path $root 'node.err');Get-Content (Join-Path $root 'node.out');Get-Content (Join-Path $root 'node.err');if($p.ExitCode -ne 0){throw 'Node check failed'}};"""
+ if phase=='cloud-debug':script+=r"RunNode @((Join-Path $source 'reporting-debug.cjs'),(Join-Path $kit 'support'))"
+ elif phase=='cloud':script+=r"RunNode @((Join-Path $source 'reporting-live-check.cjs'),(Join-Path $kit 'support'),(Join-Path $source 'cloud-live-result.json'))"
+ elif phase=='debug':script+=r"RunNode @('--expose-internals',(Join-Path $source 'debug.cjs'),$kit,(Join-Path $root 'debug data'))"
+ elif phase=='acceptance':script+=r"RunNode @('--expose-internals',(Join-Path $source 'acceptance.cjs'),$kit,$root);Copy-Item (Join-Path $root 'acceptance.json') (Join-Path $source 'acceptance-result.json')"
+ else:script+=r"RunNode @('--expose-internals','--require',(Join-Path $kit 'support\deny-network.cjs'),(Join-Path $kit 'support\smoke.cjs'),(Join-Path $kit 'program\resources'),(Join-Path $root 'fresh user data'),(Join-Path $kit 'support'))"
+elif phase=='zip-copy':
+ script=common+r"$release='\\Mac\Home\Repos\cowork\qcu-harness\.work\release-rc45\releases\0.1.0-rc.4.5.1\win-x64';$m=Get-Content -LiteralPath (Join-Path $release 'delivery.json') -Raw|ConvertFrom-Json;$zip=Join-Path $root 'final-delivery-v2.zip';Copy-Item -LiteralPath (Join-Path $release $m.file) -Destination $zip;if((Get-FileHash -LiteralPath $zip).Hash.ToLower() -ne $m.sha256){throw 'Hash mismatch'};Write-Output 'FINAL_ZIP:hash-matched'"
+elif phase=='zip-extract':
+ script=common+r"$zip=Join-Path $root 'final-delivery-v2.zip';$dest=Join-Path $root '最终 ZIP 解压 final';if(Test-Path $dest){throw 'Fresh directory required'};Expand-Archive -LiteralPath $zip -DestinationPath $dest;Write-Output ('EXTRACTED_FILES:'+@(Get-ChildItem $dest -File -Recurse).Count)"
+elif phase=='zip-prepare':
+ script=common+r"$dest=Join-Path $root '最终 ZIP 解压 final';$env:QCU_TEACHER_TEST_HOME=Join-Path $root 'final ZIP fresh data final';1..2|ForEach-Object{$p=Start-Process (Join-Path $dest 'QCU助手\QCU助手.exe') -ArgumentList '--prepare-only' -Wait -PassThru -RedirectStandardOutput (Join-Path $root 'zip.out') -RedirectStandardError (Join-Path $root 'zip.err');if($p.ExitCode -ne 0){Get-Content (Join-Path $root 'zip.err');throw 'ZIP prepare failed'}};Write-Output 'FINAL_ZIP_NATIVE:prepare-repeat-passed'"
+elif phase=='archive':
+ script=common+r"$release='\\Mac\Home\Repos\cowork\qcu-harness\.work\release-rc45\releases\0.1.0-rc.4.5.1\win-x64';$m=Get-Content -LiteralPath (Join-Path $release 'delivery.json') -Raw | ConvertFrom-Json;$zip=Join-Path $root 'final-delivery-v2.zip';Copy-Item -LiteralPath (Join-Path $release $m.file) -Destination $zip;if((Get-FileHash -LiteralPath $zip).Hash.ToLower() -ne $m.sha256){throw 'Final ZIP hash mismatch'};$dest=Join-Path $root '最终 ZIP 解压 final';if(Test-Path $dest){throw 'Fresh extraction required'};Expand-Archive -LiteralPath $zip -DestinationPath $dest;$entry=Join-Path $dest 'QCU助手\QCU助手.exe';$env:QCU_TEACHER_TEST_HOME=Join-Path $root 'final ZIP fresh data final';1..2|ForEach-Object{$p=Start-Process $entry -ArgumentList '--prepare-only' -Wait -PassThru -RedirectStandardOutput (Join-Path $root 'zip-prepare.out') -RedirectStandardError (Join-Path $root 'zip-prepare.err');if($p.ExitCode -ne 0){Get-Content (Join-Path $root 'zip-prepare.err');throw 'Final ZIP native preparation failed'}};$result=@{passed=$true;zipSha256=$m.sha256;extractedFiles=@(Get-ChildItem $dest -File -Recurse).Count;nativePrepareRepeat=$true;vendorSignature=(Get-AuthenticodeSignature (Join-Path $dest 'QCU助手\program\DeepSeek Harness.exe')).Status.ToString();guiTested=$false;modelCalls=0};$result|ConvertTo-Json|Set-Content -Encoding UTF8 (Join-Path $source 'zip-acceptance.json');Write-Output ('QCU_FINAL_ZIP:'+($result|ConvertTo-Json -Compress))"
+else:raise SystemExit('Unknown phase')
+encoded=base64.b64encode(script.encode('utf-16le')).decode()
+result=subprocess.run(['/usr/local/bin/prlctl','exec','{2ea2c08f-dcbd-4f23-8b6a-3f4e155cf15e}','--current-user','powershell.exe','-NoProfile','-NonInteractive','-EncodedCommand',encoded],stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
+text=result.stdout.decode('utf-8',errors='replace');print(text)
+Path(__file__).with_name('vm-'+phase+'.log').write_text(text)
+raise SystemExit(result.returncode)

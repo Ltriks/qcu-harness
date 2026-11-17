@@ -1,0 +1,35 @@
+{
+  "suiteVersion": "0.1.0-rc.4.5",
+  "build": "rc45.2",
+  "packageRevision": "0.1.0-rc.4.5.1",
+  "previousSeedId": "2d401583c171fae2233548d1646a050d7e199152d94f5e03b913777a1502e632",
+  "seedId": "bc3b5fb1c9a3690d142554865abd48353b19b41a3bbfd42f051c25b9f325c630",
+  "market": {
+    "id": "qcu-market",
+    "version": "0.1.0-pilot.16.15",
+    "file": "qcu-market-0.1.0-pilot.16.15-2df24f5ac60c1c8711e6171aed77c56475f492cec0481e645e037a95442148b6.tgz",
+    "bytes": 109015,
+    "sha256": "2df24f5ac60c1c8711e6171aed77c56475f492cec0481e645e037a95442148b6",
+    "source": "file:./.qcu-bundles/qcu-market-0.1.0-pilot.16.15-2df24f5ac60c1c8711e6171aed77c56475f492cec0481e645e037a95442148b6.tgz",
+    "status": "frozen-rc45-offline-input"
+  },
+  "updater": {
+    "managedUpdates": true,
+    "originalAsarSha256": "65708db9d86edc45be1611b0ea5ede8771e02ab144e6032330edaf07b2848383",
+    "customAsarSha256": "55485edd3c4f316d04e02a49e0941e4f3f39375df84b5de9bf0270dd8ccc37b9",
+    "modifiedAsarMembers": [
+      "lib/main.js",
+      "dsh/node_modules/@deepseek-ai/dsh-client-ui-settings-general/lib/client.js"
+    ],
+    "otherPackedMembersUnchanged": 11468,
+    "securityFusesChanged": false,
+    "vendorExecutableCodePatched": false,
+    "minimumVersionPolicyUnchanged": true
+  },
+  "existingConfigAutoReset": false,
+  "target": "win-x64",
+  "file": "QCU-Teacher-0.1.0-rc.4.5.1-win-x64.zip",
+  "bytes": 403853508,
+  "sha256": "1a21ec877b74bdc7081bb2bdc12298ebe61b0d48596074f804c35e3bc686ea60",
+  "modelCalls": 0
+}

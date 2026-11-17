@@ -128,7 +128,7 @@ def validate(value):
     stamp = datetime.fromisoformat(value['createdAt'].replace('Z', '+00:00')).timestamp()
     need(time.time()-30*86400 <= stamp <= time.time()+300)
     need(value['errorCode'] in CODES and value['stage'] in STAGES)
-    need(value['buildId'] in ('rc43-maintenance.2','rc44.1','rc44.2','rc45.1'))
+    need(value['buildId'] in ('rc43-maintenance.2','rc44.1','rc44.2','rc45.1','rc45.2'))
     need(value['suiteVersion'] in ('0.1.0-rc.4.1', '0.1.0-rc.4.2', '0.1.0-rc.4.3', '0.1.0-rc.4.4', '0.1.0-rc.4.5', 'unobserved'))
     need(type(value['runtimeVersion']) is str and bool(re.fullmatch(r'v\d{1,3}\.\d{1,3}\.\d{1,3}', value['runtimeVersion'])))
     need(value['platform'] in ('darwin','win32','linux','other') and value['arch'] in ('arm64','x64','other'))

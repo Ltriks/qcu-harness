@@ -1,3 +1,4 @@
+import {currentUserOwns,assertPlatformPrivate} from './platform-private.mjs'
 import {bundledCatalog,catalogSha256} from './bundled-catalog.mjs'
 import {findMarketRelease,releaseKeyOf,validateMarketRelease} from './catalog-core.mjs'
 import { createHash, randomUUID } from 'node:crypto'
@@ -21,13 +22,15 @@ export function validateRelease(entry = release) {
 async function safeDir(path) {
   try { await mkdir(path, { mode: 0o700 }) } catch (e) { if (e.code !== 'EEXIST') throw e }
   const info = await lstat(path)
-  check(info.isDirectory() && !info.isSymbolicLink() && info.uid === process.getuid(), 'Unsafe cache directory')
+  check(info.isDirectory() && !info.isSymbolicLink() && currentUserOwns(info), 'Unsafe cache directory')
+  await assertPlatformPrivate(path)
   return path
 }
 export async function verifyFile(path, entry = release, validate=validateRelease) {
   validate(entry)
   const info = await lstat(path)
-  check(info.isFile() && !info.isSymbolicLink() && info.nlink===1 && info.uid === process.getuid() && info.size === entry.bytes, 'Unsafe cached package')
+  check(info.isFile() && !info.isSymbolicLink() && info.nlink===1 && currentUserOwns(info) && info.size === entry.bytes, 'Unsafe cached package')
+  await assertPlatformPrivate(path)
   const file = await open(path, constants.O_RDONLY | constants.O_NOFOLLOW)
   try {
     const actual = await file.stat()

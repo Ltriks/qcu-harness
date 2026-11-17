@@ -1,0 +1,35 @@
+# Windows rc.4.5.1 热修验收（2026-11-17）
+
+目标：解决 Windows 原生 Harness 升级入口未受管、市场 getuid 平台异常；将目录与归档迁到既有腾讯云 IP HTTPS。基线为已发布 rc.4.5，不改旧 ZIP/tag。
+
+## 已实现、已部署
+
+- qcu-market 16.15：Windows 校验实际 SID/ACL、拒绝其他用户访问/重解析点，POSIX UID 与目录同步保留。真实 Windows 正反权限用例通过。
+- 云端 https://111.229.103.201/market/catalog.signed.json：17 项，Ed25519 验签及固定归档摘要；Windows Hallmark 487212 字节真实下载、回执复验、官方 PluginManager 安装且默认禁用通过，未调用模型。
+- /updates.json 沿用原发布者已签名 revision4、23 项历史组件发行记录，有效至 2026-12-10。所有引用包再次验签/摘要/成员核对后同步；不伪造新组件发行记录。新近组件不在此历史来源记录中时保守显示来源待核对，不自动降级。
+- Windows 冻结 ASAR 原生升级保护：仅改 main.js 和官方通用设置客户端；其余 11468 个打包成员相同。check/download/install 均后端拒绝，连已准备目标也拒绝；普通升级定时器为零。最低版本政策未取消、EXE 与安全 fuse 未改。设置里的升级组件提前返回 null；登录后 GUI 仍待真实验收。
+- 诊断接收白名单新增 rc45.2；云 /health=200、维护页匿名=401；原诊断服务8测试通过。
+
+## 数据保留验证
+
+新包标记 rc.4.5.1 / rc45.2，数据目录仍为 teacher/0.1.0-rc.4.5。仅识别正式 rc45 旧 seed，冻结受管组件清单匹配才替换 qcu-market。Windows 隔离验证：首次/重复准备；旧配置字节、额外插件和工作文件保留；手改模块拒绝覆盖；注入替换失败回滚。保留旧模块及清单备份；不承诺断电事务恢复。
+
+自动审批拒绝直接升级用户真实 Windows profile，原因是缺少明确授权。未执行该操作，也未绕过审批。实际用户配置升级及登录后的 GUI 保留待用户授权/自行试用。
+
+## ZIP与环境边界
+
+Windows11 ARM Parallels 上执行的是随包 x64 Electron，供应商签名 Valid。隔离 GUI 已启动到初次模型配置页；没有输入真实凭据，不能据此声称教学业务通过。用户真实配置未动。
+
+Windows 深层路径的 Expand-Archive 与 .NET 解压失败已复现，原因为官方 LibreOffice 依赖路径超过传统260限制；短路径 C:\QCU451-test 完整解压10178文件通过。使用说明指定短路径本地磁盘，UNC 入口直接提示复制到本地。不得在长路径解压失败后继续运行残缺目录。
+
+本地自动加载/已装技能/下载传输回归12项通过。旧 authority/updates 测试依赖已不存在的 direct-flow.mjs、update-flow.mjs，未将其计入通过；用真实 Windows 验签/安装、云更新验签和权限反例覆盖本次核心变更。临时数据在 Electron 进程退出前删除遇 EPERM，断言成功且日志标明延迟清理，不影响真实数据；没有掩盖业务断言失败。
+
+## 维护
+
+云端只提供公开静态目录、归档和已签名更新数据，没有发布私钥、后台上传/管理写路由。签名仍在 .68。project-cloud-market.mjs 对同源且大于7天有效期不重复发布；新发布递增云端修订，避免同修订不同内容。当前云目录13有效至2026-12-17，需在到期前从受控发布机重签并同步；未新增无人监督定时任务。
+
+市场内“建议/投稿”回执仍依赖原校内服务；不等同于已迁移的应用错误诊断。旧 Mac 安装包保持原样，此次交付为 Windows 热修。
+
+证据：release/rc451/ 复现脚本；.work/rc451-win/hotfix-build.json、updater-guard.json；releases/0.1.0-rc.4.5.1/win-x64/delivery.json；本机 release/rc451/*.log（私有、不提交）。最终 ZIP 的摘要、实机解压和重复启动以 final-validation.json 为准。
+
+最终交付 ZIP SHA256 `1a21ec877b74bdc7081bb2bdc12298ebe61b0d48596074f804c35e3bc686ea60`，403853508字节；Windows本地副本摘要匹配，C:\QCU451-final完整解压10178文件，原生首次与重复准备通过。该最终包已复制到主工作区 releases/0.1.0-rc.4.5.1/win-x64，尚未推送或新建GitHub发布/tag。

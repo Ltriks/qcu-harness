@@ -1,3 +1,4 @@
+import {currentUserOwns,assertPlatformPrivate} from './platform-private.mjs'
 import {createHash,verify as verifySignature} from 'node:crypto'
 import {join,dirname} from 'node:path'
 import {homedir} from 'node:os'
@@ -43,7 +44,7 @@ export class MarketUpdates{
   const configurationDigest=digest(patch),inventoryFingerprint=digest(Buffer.concat([manifestBytes,patch]))
   if(!Object.hasOwn(manifest.dependencies??{},id))return {version:null,verified:false,notInstalled:true,reason:'未在当前profile安装'}
   const root=await realpath(join(this.profileDir,'node_modules',id)),stat=await lstat(root)
-  updateAssert(stat.isDirectory()&&!stat.isSymbolicLink()&&stat.uid===process.getuid(),'安装目录无效')
+  updateAssert(stat.isDirectory()&&!stat.isSymbolicLink()&&currentUserOwns(stat),'安装目录无效');await assertPlatformPrivate(root)
   const pkg=JSON.parse((await regularUpdateBytes(join(root,'package.json'),1048576)).toString('utf8'))
   const release=this.feed.entries.find(e=>e.id===id&&e.version===pkg.version)
   if(pkg.name!==id||!release)return {version:typeof pkg.version==='string'?pkg.version:null,verified:false,reason:'版本来源不在已审核记录中'}

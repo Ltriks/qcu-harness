@@ -5,7 +5,7 @@ export function expertProjectionCapable(policy){
  const actual=policy?.products,expected=updatePolicy.products
  return actual&&Object.keys(actual).sort().join()===Object.keys(expected).sort().join()&&Object.entries(expected).every(([id,p])=>actual[id]?.capability===p.capability&&Object.keys(actual[id].peers??{}).sort().join()===Object.keys(p.peers).sort().join()&&Object.entries(p.peers).every(([k,v])=>actual[id].peers[k]===v))
 }
-export const updateOrigin='http://192.168.1.68:8080'
+export const updateOrigin='https://111.229.103.201'
 export const updateAssert=(ok,message,code)=>{if(!ok){const error=Error('更新检查：'+(code?'['+code+'] ':'')+message);if(code)error.code=code;throw error}}
 export const updateExact=(obj,keys)=>updateAssert(obj&&typeof obj==='object'&&!Array.isArray(obj)&&Object.keys(obj).sort().join()===keys.slice().sort().join(),'字段不符')
 const versionPattern=/^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?$/
