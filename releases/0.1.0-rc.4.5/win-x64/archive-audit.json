@@ -1,0 +1,12 @@
+{
+  "passed": true,
+  "target": "win-x64",
+  "vendorFilesUnchanged": 9769,
+  "seedHashesVerified": 381,
+  "components": 18,
+  "reportOrigin": "https://111.229.103.201",
+  "zipSha256": "7f65d36bcc2d9cbf608c5604ee8bef6c2d7bb9f20cdaa5e546fdfed57e15c37f",
+  "guiTested": false,
+  "supportNetworkBudgetFixIncluded": true,
+  "finalArchiveAndSupportSourceReverified": true
+}

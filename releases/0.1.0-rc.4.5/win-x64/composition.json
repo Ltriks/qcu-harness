@@ -1,0 +1,102 @@
+{
+  "version": "0.1.0-rc.4.5",
+  "build": "rc45.1",
+  "target": "win-x64",
+  "baseSha256": "6303006068d3e3803b302df4acf5afa107736535850d9f63293d98b7918c1dee",
+  "seedId": "2d401583c171fae2233548d1646a050d7e199152d94f5e03b913777a1502e632",
+  "components": [
+    {
+      "id": "qcu-study-coach",
+      "version": "0.1.0-pilot.2",
+      "sha256": "4ac9b2489ece90098faea5f5d0cf79c6efb2989214eaf74f4e38c4841c2eb060"
+    },
+    {
+      "id": "qcu-lesson-planning",
+      "version": "0.1.0-pilot.1.1",
+      "sha256": "6f8930d4f12f8f52c93422b41cadd050db374c0fe4ce5c06e8b824e69d672bd4"
+    },
+    {
+      "id": "qcu-tiered-practice",
+      "version": "0.1.0-pilot.1.1",
+      "sha256": "183e63eab27bb13dc98f4bec437028126284459c0eeef294e1ee87e819711052"
+    },
+    {
+      "id": "qcu-note-organizer",
+      "version": "0.1.0-pilot.1.1",
+      "sha256": "9c8f1e50ac4f3aff613678c8c094b4e8f53c0393ca011e7a41ceaa5ab96f67e7"
+    },
+    {
+      "id": "qcu-reading-outline",
+      "version": "0.1.0-pilot.1.1",
+      "sha256": "a0ab4dd00ce1a2b259126a1b11fb1c7f4e7599e13a2318ae3009e03b2cab7a79"
+    },
+    {
+      "id": "qcu-integrity-guard",
+      "version": "0.1.0-pilot.1.1",
+      "sha256": "3136b795de94ffd38d522c3ba5e8ac630fca4759386288aad09dfa15baea62bf"
+    },
+    {
+      "id": "qcu-team-briefing",
+      "version": "0.1.0-pilot.1",
+      "sha256": "11a6a616c488afbebc0b1781f3e40039c2e49c697cadee0fc095f2e151d6c2bf"
+    },
+    {
+      "id": "qcu-feishu-readonly",
+      "version": "0.1.0-pilot.1.1",
+      "sha256": "37376ce5f03d4f0fb459dcf6f888b25f5f78df1f7734cd780c7cfd6d01e91b17"
+    },
+    {
+      "id": "qcu-market",
+      "version": "0.1.0-pilot.16.14",
+      "sha256": "afd3cf6ad9e03b7856893ddf7053ef6b0446149b27d6c13b5a71461519baa6e9"
+    },
+    {
+      "id": "qcu-expert-teams",
+      "version": "0.3.0-pilot.8",
+      "sha256": "6ae48bc7d1757e34a672d7ba94fc2973aa1f47546a1bbefc426b82325fac4fee"
+    },
+    {
+      "id": "qcu-branding",
+      "version": "0.3.0-pilot.6",
+      "sha256": "3672414eab52f45ca3088bd622540f456eb74906ef3e347363efe6d5057418a3"
+    },
+    {
+      "id": "qcu-hallmark-design",
+      "version": "0.1.0-pilot.1",
+      "sha256": "edbcd3c30b74ec21986a84eea3aedb9904e39e2757df14d4cb24e47e2855cfe9"
+    },
+    {
+      "id": "qcu-accounting-suite",
+      "version": "0.1.0-pilot.1",
+      "sha256": "c8b9c2bcd28a874124f5dd36e04eba51181083bd9ec9969f862b63225f610d52"
+    },
+    {
+      "id": "qcu-deep-research",
+      "version": "0.1.0-pilot.1",
+      "sha256": "83bf2ecc0f6cec6d8311a9464ff8717960efc6f95dec5f55af3a8cd88a0f4733"
+    },
+    {
+      "id": "qcu-document-team",
+      "version": "0.1.0-pilot.1",
+      "sha256": "49ef06a88ad32bfc4643fffdf16f6711e34084df90cf6f494eb776881ab3a063"
+    },
+    {
+      "id": "qcu-data-copilot",
+      "version": "0.1.0-pilot.1",
+      "sha256": "7202f78d68a2e1f0d9317dca8206a111d80d228efa0c8eb0d7adf25678222cc5"
+    },
+    {
+      "id": "qcu-ket-prep",
+      "version": "0.1.0-pilot.1",
+      "sha256": "ff63176123c995f26805f2535c1792977dcbb3436d385669a93fd52617dc3837"
+    },
+    {
+      "id": "qcu-ncre-prep",
+      "version": "0.1.0-pilot.1",
+      "sha256": "0bd3d9da7fafe7a08717e533f13c92dd8508bb012888f11a5cfc201e78f9c0f9"
+    }
+  ],
+  "modelConfigured": false,
+  "coursePreinstalled": false,
+  "guiAccepted": false
+}

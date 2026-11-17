@@ -1,0 +1,46 @@
+{
+  "id": "qcu-ket-prep",
+  "title": "KET备考团队（社区改编）",
+  "lead": "ket-prep-team-lead",
+  "members": [
+    "ket-strategist",
+    "ket-foundation-builder",
+    "ket-input-master",
+    "ket-output-coach",
+    "ket-tactician"
+  ],
+  "execution": "native-dsh-agent",
+  "status": "pilot-not-model-accepted",
+  "capabilitiesRequired": [
+    "independent-agent",
+    "web-search",
+    "file-read-write"
+  ],
+  "sourceKind": "community-reconstruction",
+  "roles": [
+    {
+      "id": "ket-prep-team-lead",
+      "path": "references/agents/ket-prep-team-lead.md"
+    },
+    {
+      "id": "ket-strategist",
+      "path": "references/agents/ket-strategist.md"
+    },
+    {
+      "id": "ket-foundation-builder",
+      "path": "references/agents/ket-foundation-builder.md"
+    },
+    {
+      "id": "ket-input-master",
+      "path": "references/agents/ket-input-master.md"
+    },
+    {
+      "id": "ket-output-coach",
+      "path": "references/agents/ket-output-coach.md"
+    },
+    {
+      "id": "ket-tactician",
+      "path": "references/agents/ket-tactician.md"
+    }
+  ]
+}

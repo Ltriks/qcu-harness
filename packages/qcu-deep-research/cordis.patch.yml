@@ -1,0 +1,14 @@
+[
+  {
+    "insert": [
+      {
+        "id": "qcu-deep-research",
+        "name": "qcu-deep-research",
+        "disabled": true,
+        "config": {
+          "enabled": true
+        }
+      }
+    ]
+  }
+]

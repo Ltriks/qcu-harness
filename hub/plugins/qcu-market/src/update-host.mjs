@@ -6,6 +6,7 @@ import {updatePolicy} from './update-policy.mjs'
 import {updateAssert,updateExact,parseUpdatePayload,updateCandidate,updateReleaseKey,updateOrigin,expertProjectionCapable} from './update-model.mjs'
 import {inspectUpdateArchive} from './update-archive.mjs'
 import {UpdateStorage,ownedUpdateDir,regularUpdateBytes} from './update-storage.mjs'
+import {marketFailureMessage} from './market-errors.mjs'
 const digest=b=>createHash('sha256').update(b).digest('hex')
 export function verifyUpdateEnvelope(envelope,policy=updatePolicy,now=Date.now()){
  updateExact(envelope,['payload','signature'])
@@ -13,8 +14,10 @@ export function verifyUpdateEnvelope(envelope,policy=updatePolicy,now=Date.now()
  updateAssert(verifySignature(null,Buffer.from(envelope.payload),policy.publicKey,Buffer.from(envelope.signature,'base64')),'发布者签名校验失败')
  return parseUpdatePayload(envelope.payload,policy,now)
 }
-async function boundedUpdateFetch(url,cap,fetcher,signal,{allowMissing=false}={}){
- const response=await fetcher(url,{redirect:'manual',credentials:'omit',headers:{'Accept-Encoding':'identity'},signal:AbortSignal.any([AbortSignal.timeout(30000),...(signal?[signal]:[])])})
+async function boundedUpdateFetch(url,cap,fetcher,signal,{allowMissing=false,timeoutMs=30000}={}){
+ let response
+ try{response=await fetcher(url,{redirect:'manual',credentials:'omit',headers:{'Accept-Encoding':'identity'},signal:AbortSignal.any([AbortSignal.timeout(timeoutMs),...(signal?[signal]:[])])})}
+ catch(error){signal?.throwIfAborted();throw Error(marketFailureMessage(error))}
  try{
   signal?.throwIfAborted()
   if(allowMissing&&response.status===404&&!response.redirected&&(!response.url||response.url===url))return null
@@ -24,7 +27,8 @@ async function boundedUpdateFetch(url,cap,fetcher,signal,{allowMissing=false}={}
   const chunks=[];let count=0
   for await(const chunk of response.body){signal?.throwIfAborted();count+=chunk.length;updateAssert(count<=Number(length)&&count<=cap,'网络内容过大');chunks.push(chunk)}
   updateAssert(count===Number(length),'网络内容不完整');return Buffer.concat(chunks)
- }finally{if(response.body&&!response.body.locked)await response.body.cancel().catch(()=>{})}
+ }catch(error){signal?.throwIfAborted();if(['TimeoutError','AbortError'].includes(error?.name))throw Error(marketFailureMessage(error));throw error}
+ finally{if(response.body&&!response.body.locked)await response.body.cancel().catch(()=>{})}
 }
 export class MarketUpdates{
  constructor({profileDir,runtime,marketVersion,inventory,bootId=`${process.pid}:${performance.timeOrigin}`,root,policy=updatePolicy,fetcher=fetch,now=()=>Date.now()}={}){
@@ -67,8 +71,8 @@ export class MarketUpdates{
   try{
    const combined=AbortSignal.any([abort.signal,...(signal?[signal]:[])]),expertCapable=expertProjectionCapable(this.policy)
    let path=expertCapable?'/updates-v2.json':'/updates.json'
-   let raw=await boundedUpdateFetch(updateOrigin+path,524288,this.fetcher,combined,{allowMissing:expertCapable})
-   if(raw===null){combined.throwIfAborted();path='/updates.json';raw=await boundedUpdateFetch(updateOrigin+path,524288,this.fetcher,combined)}
+   let raw=await boundedUpdateFetch(updateOrigin+path,524288,this.fetcher,combined,{allowMissing:expertCapable,timeoutMs:10000})
+   if(raw===null){combined.throwIfAborted();path='/updates.json';raw=await boundedUpdateFetch(updateOrigin+path,524288,this.fetcher,combined,{timeoutMs:10000})}
    const envelope=JSON.parse(raw.toString('utf8')),feed=verifyUpdateEnvelope(envelope,this.policy,this.now()),fingerprint=digest(Buffer.from(envelope.payload)),stateFile=path==='/updates-v2.json'?'state-v2.json':'state.json'
    updateAssert(feed.channel===(path==='/updates-v2.json'?'pilot-experts':'pilot'),'更新清单签名通道与请求地址不符')
    // Each projection pins its own bytes; both share the publisher sequence floor.

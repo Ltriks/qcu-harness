@@ -1,0 +1,8 @@
+[Unit]
+Description=Renew QCU diagnostics IP certificate
+After=network-online.target qcu-diagnostics-proxy.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/opt/qcu-certbot/bin/certbot renew --quiet --cert-name 111.229.103.201 --deploy-hook "/usr/bin/systemctl reload qcu-diagnostics-proxy.service"

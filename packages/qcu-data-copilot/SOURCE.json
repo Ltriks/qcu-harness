@@ -1,0 +1,52 @@
+{
+  "repository": "https://github.com/darker2016/workbuddy-skill-groups",
+  "revision": "22a71e0f677f636da15129ab70012bd1286f8ba6",
+  "upstreamPackage": "ai-data-copilot-skills",
+  "upstreamVersion": "snapshot-22a71e0f677f",
+  "author": {
+    "name": "darker2016; community reconstruction, not official export"
+  },
+  "sourceKind": "community-reconstruction",
+  "licenseDeclaration": "MIT",
+  "licenseEvidence": "LICENSE",
+  "metadataSha256": "de4ae4b3f9878c802a0df782685a06393d217004b21a1b5edc6fc5218323b3de",
+  "upstreamFiles": [
+    {
+      "path": "ai-data-copilot-skills/copilot-team-lead/SKILL.md",
+      "localPath": "references/agents/copilot-team-lead.md",
+      "sha256": "61bd947bb76b844f36b777270c6978b73cbe6e069c3708706fb8777174e00d9e",
+      "bytes": 10376
+    },
+    {
+      "path": "ai-data-copilot-skills/sql-analyst/SKILL.md",
+      "localPath": "references/agents/sql-analyst.md",
+      "sha256": "743cb746c4c436bf5c91179c12efba0bd3fd805664b01b3ef174629e9ade543e",
+      "bytes": 5174
+    },
+    {
+      "path": "ai-data-copilot-skills/data-scientist/SKILL.md",
+      "localPath": "references/agents/data-scientist.md",
+      "sha256": "31cdb309daaffa288f91811856252822225d2290f8c91c92723ba50cf3590767",
+      "bytes": 6489
+    },
+    {
+      "path": "ai-data-copilot-skills/knowledge-researcher/SKILL.md",
+      "localPath": "references/agents/knowledge-researcher.md",
+      "sha256": "292d0eecec43099c4c066c4e2cee81954613fe2f573469dc180516ff411ea631",
+      "bytes": 5796
+    },
+    {
+      "path": "ai-data-copilot-skills/dashboard-designer/SKILL.md",
+      "localPath": "references/agents/dashboard-designer.md",
+      "sha256": "4c88c9ee6f35bd6101ba67361c0dec6ba7b741e8d2fd8bffa34eb805c358c284",
+      "bytes": 7048
+    },
+    {
+      "path": "ai-data-copilot-skills/report-composer/SKILL.md",
+      "localPath": "references/agents/report-composer.md",
+      "sha256": "2dfbe5f141b635d44bf5925c1222140710b7fba6c3e9b0919cf28764a99c4161",
+      "bytes": 6036
+    }
+  ],
+  "adaptation": "Original roles unchanged; DSH adapter overrides platform operations and forced approval."
+}

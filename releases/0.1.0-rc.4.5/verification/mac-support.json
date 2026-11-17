@@ -1,0 +1,19 @@
+{
+  "passed": true,
+  "suite": "0.1.0-rc.4.5",
+  "components": 18,
+  "checks": [
+    "frozen-composition",
+    "seed-hashes",
+    "fresh-prepare",
+    "repeat-prepare",
+    "config-preserved",
+    "occupied-target-preserved",
+    "altered-composition-refused",
+    "diagnostics-default-off",
+    "no-course-preinstall"
+  ],
+  "modelCalls": 0,
+  "newLauncherTested": false,
+  "commitHelper": "existing rc44 native launcher with isolated test home"
+}

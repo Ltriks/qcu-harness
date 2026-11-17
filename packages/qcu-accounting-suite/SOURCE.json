@@ -1,0 +1,67 @@
+{
+  "ownership": "qcu",
+  "author": "QCU teaching prototype contributors",
+  "license": "MIT",
+  "revision": "3aa5b917c435dd6d9cac1946eda075867cc67141",
+  "revisionKind": "sha1-content-snapshot-not-git-commit",
+  "builderSha256": "b232961340c6cfbd7df975d5f8b6a572ab90300b0c7f11ac5c1f2b89808ba10e",
+  "authoredFiles": [
+    {
+      "path": "LICENSE",
+      "bytes": 1093,
+      "sha256": "79832ece489707e2f1c9d5ddeaa9c38958a3bbce2a0d5b67645af5a4039ad787"
+    },
+    {
+      "path": "README.md",
+      "bytes": 1264,
+      "sha256": "cde25f9747a15949804c33ebc8c05a27cdb03b6dc563c3d1dfa908cde1e364da"
+    },
+    {
+      "path": "SKILL.md",
+      "bytes": 1718,
+      "sha256": "a0ff4f834df6976441fd717cc04d62e62fd9d5fb4d6a4425b033bd197d2a6e04"
+    },
+    {
+      "path": "cordis.patch.yml",
+      "bytes": 210,
+      "sha256": "1e466e34e3f8ff9f56f3a49e4e1b8e15adda2ea14ecce5f2fb6ad63400ee4540"
+    },
+    {
+      "path": "index.js",
+      "bytes": 1693,
+      "sha256": "a6aaedd36cfa57293caa657ae008d93936118f3cf86cf1dbb7f87524ba7ddf10"
+    },
+    {
+      "path": "references/case.json",
+      "bytes": 4842,
+      "sha256": "3ce0c9f84e96ccc8c072377e885991cb735c44a701996f43af0eacae5167a3f9"
+    },
+    {
+      "path": "scripts/check-case.mjs",
+      "bytes": 1873,
+      "sha256": "f7867c0d3f4dc9090faa28f8d7aa8655a16649b3ba4e76966f482bbb7286d8c1"
+    },
+    {
+      "path": "skills/qcu-accounting-journals/SKILL.md",
+      "bytes": 1452,
+      "sha256": "d3f1b06ee44790fb4719dff308e19ea98da1dac1285c947a39754137da7da054"
+    },
+    {
+      "path": "skills/qcu-accounting-lessons/SKILL.md",
+      "bytes": 1391,
+      "sha256": "0c6f3627515849188d2c43b351453642d3469a162e21e15c5d414a56bc4aac66"
+    },
+    {
+      "path": "skills/qcu-accounting-statements/SKILL.md",
+      "bytes": 1593,
+      "sha256": "a822d5fceb1ecb9796c2c45c9d4de262c4e898c3dc9eabe417fdd00047393206"
+    },
+    {
+      "path": "skills/qcu-accounting-vouchers/SKILL.md",
+      "bytes": 1368,
+      "sha256": "40caaf5c3db39793ff5fd97a425327fb7cb2fe7668d6280ca104ca6671f7dc24"
+    }
+  ],
+  "syntheticData": true,
+  "teacherApproved": false
+}

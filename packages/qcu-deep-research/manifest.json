@@ -1,0 +1,51 @@
+{
+  "id": "qcu-deep-research",
+  "title": "深度研究团队",
+  "lead": "research-chief-editor",
+  "members": [
+    "research-planner",
+    "topic-researcher",
+    "draft-reviewer",
+    "draft-reviser",
+    "report-writer",
+    "report-publisher"
+  ],
+  "execution": "native-dsh-agent",
+  "status": "pilot-not-model-accepted",
+  "capabilitiesRequired": [
+    "independent-agent",
+    "web-search",
+    "file-read-write"
+  ],
+  "sourceKind": "archived-market-package",
+  "roles": [
+    {
+      "id": "research-chief-editor",
+      "path": "references/agents/research-chief-editor.md"
+    },
+    {
+      "id": "research-planner",
+      "path": "references/agents/research-planner.md"
+    },
+    {
+      "id": "topic-researcher",
+      "path": "references/agents/topic-researcher.md"
+    },
+    {
+      "id": "draft-reviewer",
+      "path": "references/agents/draft-reviewer.md"
+    },
+    {
+      "id": "draft-reviser",
+      "path": "references/agents/draft-reviser.md"
+    },
+    {
+      "id": "report-writer",
+      "path": "references/agents/report-writer.md"
+    },
+    {
+      "id": "report-publisher",
+      "path": "references/agents/report-publisher.md"
+    }
+  ]
+}

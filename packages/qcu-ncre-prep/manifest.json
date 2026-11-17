@@ -1,0 +1,41 @@
+{
+  "id": "qcu-ncre-prep",
+  "title": "NCRE备考团队（社区改编）",
+  "lead": "ncre-expert-team-lead",
+  "members": [
+    "ncre-level1",
+    "ncre-level2",
+    "ncre-level3",
+    "ncre-level4"
+  ],
+  "execution": "native-dsh-agent",
+  "status": "pilot-not-model-accepted",
+  "capabilitiesRequired": [
+    "independent-agent",
+    "web-search",
+    "file-read-write"
+  ],
+  "sourceKind": "community-reconstruction",
+  "roles": [
+    {
+      "id": "ncre-expert-team-lead",
+      "path": "references/agents/ncre-expert-team-lead.md"
+    },
+    {
+      "id": "ncre-level1",
+      "path": "references/agents/ncre-level1.md"
+    },
+    {
+      "id": "ncre-level2",
+      "path": "references/agents/ncre-level2.md"
+    },
+    {
+      "id": "ncre-level3",
+      "path": "references/agents/ncre-level3.md"
+    },
+    {
+      "id": "ncre-level4",
+      "path": "references/agents/ncre-level4.md"
+    }
+  ]
+}

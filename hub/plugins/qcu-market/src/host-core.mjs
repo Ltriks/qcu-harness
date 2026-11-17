@@ -8,6 +8,8 @@ import { homedir } from 'node:os'
 import { release } from './trusted-release.mjs'
 import {CatalogAuthority,privateDirectory} from './catalog-authority.mjs'
 import {publicTrust} from './public-trust.mjs'
+import {createResilientFetcher} from './system-fetcher.mjs'
+const packageFetcher=createResilientFetcher()
 export const digest = bytes => createHash('sha256').update(bytes).digest('hex')
 const check = (ok, message) => { if (!ok) throw new Error(message) }
 export function validateRelease(entry = release) {
@@ -35,7 +37,7 @@ export async function verifyFile(path, entry = release, validate=validateRelease
     return path
   } finally { await file.close() }
 }
-export async function fetchPinned({ entry = release, fetcher = fetch, signal, root = join(homedir(), '.cache', 'qcu-market'),validate=validateRelease } = {}) {
+export async function fetchPinned({ entry = release, fetcher = packageFetcher, signal, root = join(homedir(), '.cache', 'qcu-market'),validate=validateRelease } = {}) {
   const url = validate(entry)
   // Production root is plugin-owned and fixed; no RPC/tool accepts root, URL or path.
   await safeDir(join(root, '..'))
@@ -44,7 +46,9 @@ export async function fetchPinned({ entry = release, fetcher = fetch, signal, ro
   const path = join(root, entry.file)
   try { await verifyFile(path, entry,validate); signal?.throwIfAborted(); return path } catch (e) { if (e.code !== 'ENOENT') throw e }
   const bounded = AbortSignal.any([...(signal ? [signal] : []), AbortSignal.timeout(30000)])
-  const response = await fetcher(url, { redirect: 'manual', credentials: 'omit', headers: { 'Accept-Encoding': 'identity' }, signal: bounded })
+  let response
+  try{response=await fetcher(url, { redirect: 'manual', credentials: 'omit', headers: { 'Accept-Encoding': 'identity' }, signal: bounded })}
+  catch(error){bounded.throwIfAborted();throw Object.assign(new Error('[QCU-MKT-DOWNLOAD] 安装包下载失败，请检查校内市场连接后重新准备；尚未进入安装阶段。',{cause:error}),{code:'QCU-MKT-DOWNLOAD'})}
   try {
     check(response.status === 200 && !response.redirected && (!response.url || response.url === url), 'Download refused: status or redirect')
     check(!response.headers.get('content-encoding') || response.headers.get('content-encoding') === 'identity', 'Encoded package refused')

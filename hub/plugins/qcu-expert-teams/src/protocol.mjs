@@ -1,4 +1,4 @@
-export const VERSION='0.2.0-pilot.3.font.1', PROTOCOL=3, OUTPUT_BUDGET=6000
+export const VERSION='0.3.0-pilot.8', PROTOCOL=3, OUTPUT_BUDGET=6000
 export const REVIEW_CHAR_LIMIT=180, FINAL_CHAR_LIMIT=600
 export function check(ok,code='invalid-input'){if(!ok)throw Object.assign(Error(code),{code})}
 export function exact(v,keys){check(v&&typeof v==='object'&&!Array.isArray(v)&&Object.keys(v).every(k=>keys.includes(k)),'invalid-fields');return v}

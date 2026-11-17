@@ -1,5 +1,9 @@
 # QCU Harness
 
+## 最新跨平台候选：rc.4.5（2026-11-17）
+
+Mac Apple Silicon 与 Windows x64 统一为 rc.4.5，源码标签 `qcu-teacher-v0.1.0-rc.4.5`。本轮集成工作助手、统一首页快捷入口、市场自动加载、专家团和技能包，启动诊断及受登录保护的查询页迁到腾讯云固定IP HTTPS。请以 [rc.4.5发布说明](releases/0.1.0-rc.4.5/README.md) 和 [重建记录](docs/release-rc45.md) 为最新入口，下方旧版本段落保留历史语境。本分支不合并或推送main。
+
 ## 固定安装包与 GitHub 预发布
 
 Mac **rc4.3**、Windows **rc3-r4** 分平台归档为预发布；下载、SHA256、指南、源码标签、构建测试、产物及部署位置见[发布索引](releases/README.md)和[本次发布记录](docs/qcu-github-release-publication-20261028.md)。当前归档分支 `dev/qcu-release-archive-20261028`，不合并或推送main。Windows不含当前市场／专家团，不继承Mac P16验收。新机GUI、系统信任与教师真实任务保持待验收。

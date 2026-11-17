@@ -1,0 +1,549 @@
+{
+  "upstream": "https://github.com/Nutlope/hallmark",
+  "revision": "04977e15f3dfd6ee4b74c887dac3eb52665d6c92",
+  "version": "2.0.0",
+  "license": "MIT",
+  "upstreamFiles": [
+    {
+      "path": "skills/hallmark/references/anatomy.md",
+      "bytes": 7037,
+      "sha256": "70f570279d42ac0bef4af809c80b522e550c6dacaaa0a93349a0fff0d5b93500"
+    },
+    {
+      "path": "skills/hallmark/references/brand-truth.md",
+      "bytes": 3685,
+      "sha256": "01c17c45d3b213f80ef28c93548d1b99aa2afad75ed8b236811ba56169c3f068"
+    },
+    {
+      "path": "skills/hallmark/references/comp.md",
+      "bytes": 7669,
+      "sha256": "597f16de607e136f93ea5829c9d82663223a1c1c0423d581b55fa0b51c08f37f"
+    },
+    {
+      "path": "skills/hallmark/references/craft.md",
+      "bytes": 19279,
+      "sha256": "1b7b40f81f0fe1c04dce133696182ca1229d16162f8f3203603f24a0f585c41c"
+    },
+    {
+      "path": "skills/hallmark/references/dark-mode.md",
+      "bytes": 3919,
+      "sha256": "99e86439eed1caa9e898a31baa05e65c856c53918faf6fdcb5d71a8e0f1ef131"
+    },
+    {
+      "path": "skills/hallmark/references/data-viz.md",
+      "bytes": 3398,
+      "sha256": "1a26f9e8e16ca065d7412d2db57200698459cdbda498e08e8eaf0ea7a82097dc"
+    },
+    {
+      "path": "skills/hallmark/references/design-md.md",
+      "bytes": 3061,
+      "sha256": "839d4cd8d5b07007854e9c6de95491691725f2968a0922f9b8fcfdbe42e2784c"
+    },
+    {
+      "path": "skills/hallmark/references/direction.md",
+      "bytes": 7525,
+      "sha256": "19e00099e95be52df2ae893881e29a23cd7a5ee5dc8434a87588376818851642"
+    },
+    {
+      "path": "skills/hallmark/references/export-formats.md",
+      "bytes": 6294,
+      "sha256": "3078bcb08e6324904ee156b6871dc0f47aa170e5d4baf09d43a5c48c46ca7c6b"
+    },
+    {
+      "path": "skills/hallmark/references/flow.md",
+      "bytes": 16750,
+      "sha256": "d24fa0bbfd8ea6f8add579029598e09815a697fc99a4abdb8c17f67155e368e5"
+    },
+    {
+      "path": "skills/hallmark/references/fonts.md",
+      "bytes": 5302,
+      "sha256": "87d50b1b32b9c901d9df5376870cf6d8e39334f468fe9a582a2720d9da5586ec"
+    },
+    {
+      "path": "skills/hallmark/references/gates.md",
+      "bytes": 39061,
+      "sha256": "63ad234a1acab5e081dfe8ecf2331518a43cbf42760dc5c6ababfb24d7b3e50c"
+    },
+    {
+      "path": "skills/hallmark/references/genres/atmospheric.md",
+      "bytes": 1664,
+      "sha256": "39c2ba5b282fcc934742aeb410d1bb4d6c65f1da1514b0f18a9600aa8f13f289"
+    },
+    {
+      "path": "skills/hallmark/references/genres/editorial.md",
+      "bytes": 1372,
+      "sha256": "1d47311bfd4d3e4c02f88f25e4852d920d168eb838370fee77b917bcc6e3592c"
+    },
+    {
+      "path": "skills/hallmark/references/genres/modern-minimal.md",
+      "bytes": 1551,
+      "sha256": "5f84b3c056be101707c6f2d7ac929e879f5ab7b009ac8426156c11054193cd9b"
+    },
+    {
+      "path": "skills/hallmark/references/genres/playful.md",
+      "bytes": 1610,
+      "sha256": "974e13a9ada8b49e2cfcc05efb8235be60103acef02e390d8f819cd8e2abd3a9"
+    },
+    {
+      "path": "skills/hallmark/references/imagery.md",
+      "bytes": 14343,
+      "sha256": "b5a4abaa3fd949ac2e2890c9aa37b2953587ed419fdd1b4ff343a4fc04838e7e"
+    },
+    {
+      "path": "skills/hallmark/references/interaction-and-states.md",
+      "bytes": 6034,
+      "sha256": "08e232008734fce86b1ec6085db72342e90d2f855351eb84f20ea3799fe0808a"
+    },
+    {
+      "path": "skills/hallmark/references/layout.md",
+      "bytes": 16258,
+      "sha256": "fa904b5b46f19ca08ee325c99deb1cf30c67acb00106e7b74945c30e428c7eab"
+    },
+    {
+      "path": "skills/hallmark/references/macrostructures/01-bento-grid.md",
+      "bytes": 1554,
+      "sha256": "1efd7da3e1857d22da50307af0effa92200198b59c26f0e429b8ffcaa9cd96ae"
+    },
+    {
+      "path": "skills/hallmark/references/macrostructures/02-long-document.md",
+      "bytes": 1833,
+      "sha256": "4d7524c16b764daef6fd8bc5e6757dcc4d886addf33f324b32f024c64bcbc573"
+    },
+    {
+      "path": "skills/hallmark/references/macrostructures/03-marquee-hero.md",
+      "bytes": 1649,
+      "sha256": "cb379a2eb56d8503265ab541ef9711e59bb2d51dadedfe3e47ccb697b3948e79"
+    },
+    {
+      "path": "skills/hallmark/references/macrostructures/04-stat-led.md",
+      "bytes": 1923,
+      "sha256": "2a065807340244d188de455fdb21c7ff8906bb95240873d0993f734c85c8f4a1"
+    },
+    {
+      "path": "skills/hallmark/references/macrostructures/05-workbench.md",
+      "bytes": 1671,
+      "sha256": "6bc0ccd0604afef8c749706189cf91b35078bcc52738eb29603840db0db151c6"
+    },
+    {
+      "path": "skills/hallmark/references/macrostructures/06-conversational-faq.md",
+      "bytes": 1530,
+      "sha256": "000a182731d543eaa9e2fda2be50fd4032ff25ed83a6befbbb0cd03567dbe15b"
+    },
+    {
+      "path": "skills/hallmark/references/macrostructures/07-manifesto.md",
+      "bytes": 1931,
+      "sha256": "3ac47d67fa8e0ee8db2fba2fd329c5ffcbf981a0b760e482748935f6e3411c46"
+    },
+    {
+      "path": "skills/hallmark/references/macrostructures/08-photographic.md",
+      "bytes": 1554,
+      "sha256": "d07d2508845277b68cb8cacc8f82d8fac84b69063277ec277d19a7f59fe43992"
+    },
+    {
+      "path": "skills/hallmark/references/macrostructures/09-quote-led.md",
+      "bytes": 1666,
+      "sha256": "1609ddc34d842c730e4d18bacc010b1b43cfa59892043c523b51bdffead0fb56"
+    },
+    {
+      "path": "skills/hallmark/references/macrostructures/10-specimen.md",
+      "bytes": 1527,
+      "sha256": "18313a17c6512afda417c8c19f4e0bea1549ecd5fc43e87ba89fb4e526b56eea"
+    },
+    {
+      "path": "skills/hallmark/references/macrostructures/11-catalogue.md",
+      "bytes": 1495,
+      "sha256": "20708e7e61ed610506971f48d36eec88512423b77855f78cc8c65b75ba90e0ae"
+    },
+    {
+      "path": "skills/hallmark/references/macrostructures/12-letter.md",
+      "bytes": 1282,
+      "sha256": "0d6779b5da3e3a44b573b3665daefe489fbd4857c1124ca4b8ff0fe6fc17a34f"
+    },
+    {
+      "path": "skills/hallmark/references/macrostructures/13-index-first.md",
+      "bytes": 1237,
+      "sha256": "ba7b085f91a8c2eb0baf376b88e4307b38250a2d4dd707fb22f2e5faeb32a7e2"
+    },
+    {
+      "path": "skills/hallmark/references/macrostructures/14-narrative-workflow.md",
+      "bytes": 2096,
+      "sha256": "4e120a5cb04a54aa172a5d2b5e727c27603ccddf37a2f8c9a15756993a9337fc"
+    },
+    {
+      "path": "skills/hallmark/references/macrostructures/15-split-studio.md",
+      "bytes": 1426,
+      "sha256": "49c758082ce6d4a6e541bb8706412fe4eb92ffd9dd772208b6a21142aa4bf3c6"
+    },
+    {
+      "path": "skills/hallmark/references/macrostructures/16-feature-stack.md",
+      "bytes": 1753,
+      "sha256": "df26d2d4094b3059c0a35db94389524b0ba76f8fe64e89d4e6ba3def7eed1ece"
+    },
+    {
+      "path": "skills/hallmark/references/macrostructures/17-type-specimen.md",
+      "bytes": 1211,
+      "sha256": "4ff06c001a10f973b9c70b1a0fa21ea1ce54ac0e3727cf8b5ec2e0a1b6bf568d"
+    },
+    {
+      "path": "skills/hallmark/references/macrostructures/18-portfolio-grid.md",
+      "bytes": 1177,
+      "sha256": "d035dee299e329efeea7dd3b4b897b11f0547f03ac4c2f0c62a3fd422d30f618"
+    },
+    {
+      "path": "skills/hallmark/references/macrostructures/19-map-diagram.md",
+      "bytes": 1497,
+      "sha256": "b8c0021c01fb8a970907caefa74a8c462cb573a2666fc4b223082812f9b19399"
+    },
+    {
+      "path": "skills/hallmark/references/macrostructures/20-ecosystem-index.md",
+      "bytes": 1315,
+      "sha256": "27b1909d028f553efbc112ecd5a8c843e191e97a286bf2bd258daad86bfa64c4"
+    },
+    {
+      "path": "skills/hallmark/references/macrostructures/21-component-playground.md",
+      "bytes": 1315,
+      "sha256": "830b52f62bdb722f3bd954f4f9ce60fc8c6e521ba2cc1f173e6c0fc3b5611413"
+    },
+    {
+      "path": "skills/hallmark/references/macrostructures.md",
+      "bytes": 14614,
+      "sha256": "3389dbc0434bd9a6161896a19b4ec6664859d49f1b0329cd0e8fae6f045e1c43"
+    },
+    {
+      "path": "skills/hallmark/references/microinteractions.md",
+      "bytes": 6484,
+      "sha256": "e7ec31f08e58edcdb8986fc57d276466c1f7b08445756f3a7cf6f46e8b5a8c8e"
+    },
+    {
+      "path": "skills/hallmark/references/patterns.md",
+      "bytes": 10928,
+      "sha256": "bb15954cb04083c9a3b796dda5df5c33c9c05dddf2341d7befe2571e715f613b"
+    },
+    {
+      "path": "skills/hallmark/references/redesign.md",
+      "bytes": 12231,
+      "sha256": "cd3fc1dd10af22bb0374b41340fbab8f2b3be997ea5b63716da3d44ba0bb0552"
+    },
+    {
+      "path": "skills/hallmark/references/responsive.md",
+      "bytes": 3504,
+      "sha256": "7ed0cd54fda3351be9e7b5514ebf4a5306a837cf3d893b31e96c7fd490b348ea"
+    },
+    {
+      "path": "skills/hallmark/references/review-finish.md",
+      "bytes": 3865,
+      "sha256": "9d00de59e71ee2516212140b0512d6d2e90a120d4a328eeba9cb12396ff38d64"
+    },
+    {
+      "path": "skills/hallmark/references/review-hero.md",
+      "bytes": 2548,
+      "sha256": "e84702982bcad34fc8ef4aaf032a5482356912992ce72d84b12e05cd4a519fb2"
+    },
+    {
+      "path": "skills/hallmark/references/scroll-choreography.md",
+      "bytes": 6099,
+      "sha256": "809c0fc84011412766db10e3e14def2b3ce02f0452d7fb2e60adecfa85991393"
+    },
+    {
+      "path": "skills/hallmark/references/texture.md",
+      "bytes": 6082,
+      "sha256": "b5749c008fef0511188d491aec0c5556b19f6731b13539934ecc1cb584a2e756"
+    },
+    {
+      "path": "skills/hallmark/references/themes/README.md",
+      "bytes": 7649,
+      "sha256": "aece9d5f273ef6a4eb3e59833bc428c17232ad4ade1247637355636087d5264d"
+    },
+    {
+      "path": "skills/hallmark/references/themes/almanac.md",
+      "bytes": 7491,
+      "sha256": "b5c85e7c96cda4f13af81dd42c020c7eae7c4f63b4530b7e9fcef09340d96efc"
+    },
+    {
+      "path": "skills/hallmark/references/themes/arcade.md",
+      "bytes": 7504,
+      "sha256": "a6e6d644412e9cbe0172fa784bc05a69767c792a642ab860e6da1af33ef861f9"
+    },
+    {
+      "path": "skills/hallmark/references/themes/atelier.md",
+      "bytes": 7851,
+      "sha256": "8cffffd26a857adab803fd0e1c5eb49ade86cd486a8dc3c576728032a84a5ccf"
+    },
+    {
+      "path": "skills/hallmark/references/themes/bloom.md",
+      "bytes": 7995,
+      "sha256": "2965adfc995a5605078f45b4ca09a549f1587e6b960fa1986890850668543660"
+    },
+    {
+      "path": "skills/hallmark/references/themes/blueprint.md",
+      "bytes": 7561,
+      "sha256": "9de09c493df045f8b3f720638248d21f857b076be264e7ee0262e9877a5040d6"
+    },
+    {
+      "path": "skills/hallmark/references/themes/broadside.md",
+      "bytes": 7360,
+      "sha256": "9a4ebceef5ca462a0b7ade98250a07ad33cfa40f97f6e78434e638fa9e626222"
+    },
+    {
+      "path": "skills/hallmark/references/themes/brutal.md",
+      "bytes": 7065,
+      "sha256": "4e087f62f815635cbf9c1a7f2a58db77c610ae97f31bef70acd777871859aa97"
+    },
+    {
+      "path": "skills/hallmark/references/themes/carnival.md",
+      "bytes": 7588,
+      "sha256": "fc8e876e5a1c23bda103719b61a7440e203ff91ff050ebded53f732108c43b82"
+    },
+    {
+      "path": "skills/hallmark/references/themes/cobalt.md",
+      "bytes": 7990,
+      "sha256": "d24a5609f0c42e6ff6a1976d5f7f0651ec40eed69db5d6c4680c1385a65f2007"
+    },
+    {
+      "path": "skills/hallmark/references/themes/console.md",
+      "bytes": 7598,
+      "sha256": "d52eda46d5480ab0123f78ab83ea1187813f4b26ddb02d0f4e61e2b511ae6309"
+    },
+    {
+      "path": "skills/hallmark/references/themes/coral.md",
+      "bytes": 7966,
+      "sha256": "f8444921b5e751b3b9be94d448aaee502e509729aa89411ff887087777bb1c28"
+    },
+    {
+      "path": "skills/hallmark/references/themes/darkroom.md",
+      "bytes": 7591,
+      "sha256": "946e2233f310dde0304f970070408a7ff6581e3b442faaa14da80f39e31e9499"
+    },
+    {
+      "path": "skills/hallmark/references/themes/dose.md",
+      "bytes": 7912,
+      "sha256": "780a5e57a813b3008ac6a8c7287affc5516a68e51310d77df890286f6d6369f5"
+    },
+    {
+      "path": "skills/hallmark/references/themes/dusk.md",
+      "bytes": 7955,
+      "sha256": "47cf0ede99ba90b88cec14eb2ec80d5fd9e003e9ed3878708275553e2c52d4bf"
+    },
+    {
+      "path": "skills/hallmark/references/themes/editorial.md",
+      "bytes": 7551,
+      "sha256": "cafd967f2ac736c9927a749de1b8f4216183e3fa3adce95e638d124b2de5876f"
+    },
+    {
+      "path": "skills/hallmark/references/themes/formwork.md",
+      "bytes": 7444,
+      "sha256": "e2c0f88b2a83eec6ac076be536cd71cfd883bb21a234c268bba0ccd12e773416"
+    },
+    {
+      "path": "skills/hallmark/references/themes/furrow.md",
+      "bytes": 7914,
+      "sha256": "16f9ffc0fe9588754d25a96a32d6ca25e4b5a918623e90a1ee0dc5006953fc89"
+    },
+    {
+      "path": "skills/hallmark/references/themes/garden.md",
+      "bytes": 7041,
+      "sha256": "2f2197da95ef795a10eeef1c60f9ae98e62ca110c34260035b9789c1f3486185"
+    },
+    {
+      "path": "skills/hallmark/references/themes/grid.md",
+      "bytes": 7803,
+      "sha256": "0f81c1efa45ec32ae3bd24b15eb96144edff8e018eec7a3d6a6a8bb25e42f520"
+    },
+    {
+      "path": "skills/hallmark/references/themes/halftone.md",
+      "bytes": 7498,
+      "sha256": "a19da44930e5c475cf9c285f939d959ab590da17faea21426387332a5d8ca682"
+    },
+    {
+      "path": "skills/hallmark/references/themes/hedgerow.md",
+      "bytes": 7181,
+      "sha256": "23371c7894032ccc4f51236539d535d9c47b201b3007a40949db234c19b84ddd"
+    },
+    {
+      "path": "skills/hallmark/references/themes/hum.md",
+      "bytes": 7485,
+      "sha256": "180ef874894a544230f4e3a867a7120da3a79d5994d15737e806e0373e4cc5c7"
+    },
+    {
+      "path": "skills/hallmark/references/themes/index.json",
+      "bytes": 51051,
+      "sha256": "df8299332a805b9c8504c10574258a98057fb9e63e87e85a7e8bbb76333fb403"
+    },
+    {
+      "path": "skills/hallmark/references/themes/ink.md",
+      "bytes": 7347,
+      "sha256": "7dd419ccec59a33461c86d894856085edaeddd6139f8eb9eff22f22e45fbdf9f"
+    },
+    {
+      "path": "skills/hallmark/references/themes/kiln.md",
+      "bytes": 7467,
+      "sha256": "94909cf878a89b88ba96d3a69dfccb64ce32968a3a4544a920a9c927d5a56fd4"
+    },
+    {
+      "path": "skills/hallmark/references/themes/loom.md",
+      "bytes": 7578,
+      "sha256": "835789caae2ef444b1db967411856f79ddcf844c8a988f75a62f3f5d4b53d819"
+    },
+    {
+      "path": "skills/hallmark/references/themes/lumen.md",
+      "bytes": 7604,
+      "sha256": "8a202bde1d9eb9b4615b0f0e2279adeb5c95a82dedd003fdba1613c70b715450"
+    },
+    {
+      "path": "skills/hallmark/references/themes/manifesto.md",
+      "bytes": 7212,
+      "sha256": "326c63f732128ed5cda8ff3187793ffe9bcb56936387367cc932b5a3e216b862"
+    },
+    {
+      "path": "skills/hallmark/references/themes/midnight.md",
+      "bytes": 6998,
+      "sha256": "cb29035685b63a56762c291dc4246c6a66c6ec6d8bc4559d6823ee2d2a80e40d"
+    },
+    {
+      "path": "skills/hallmark/references/themes/newsprint.md",
+      "bytes": 7373,
+      "sha256": "2fd477d10f9dde600993486a7dab5ff5f643c8821833cb3837f176005eafb5e0"
+    },
+    {
+      "path": "skills/hallmark/references/themes/overprint.md",
+      "bytes": 7597,
+      "sha256": "79010c27e619fad842da18559658c83cec86172266b00bb5933871b3f7bf852b"
+    },
+    {
+      "path": "skills/hallmark/references/themes/pasteup.md",
+      "bytes": 7568,
+      "sha256": "7e8d5013bda81e945f27b401f967f08e41bbc7d10ddc14d1ef7dd91c25f95c3d"
+    },
+    {
+      "path": "skills/hallmark/references/themes/piste.md",
+      "bytes": 7082,
+      "sha256": "79c1b4b7297467d9a0d057ad790d475f4b88a41af1867172dfd77b951cda803a"
+    },
+    {
+      "path": "skills/hallmark/references/themes/refract.md",
+      "bytes": 7953,
+      "sha256": "74970c11c5759685610608fc569e18eb409f12ac479c3409c9156a8a352c5fdc"
+    },
+    {
+      "path": "skills/hallmark/references/themes/ribbon.md",
+      "bytes": 7906,
+      "sha256": "0bcc8708d3ceec0cb246fa134a4fcf8e019fa8012af1f87646737cc1c8b324a1"
+    },
+    {
+      "path": "skills/hallmark/references/themes/rim.md",
+      "bytes": 7018,
+      "sha256": "ac134e8ccbda501b660f4cd83ace56059f2b254b187f574a612460c7c796e49f"
+    },
+    {
+      "path": "skills/hallmark/references/themes/riso.md",
+      "bytes": 7585,
+      "sha256": "333577e736f793c94161994dd8087c583ab53dd5af50a5dc63c3bfc5f4bf28ad"
+    },
+    {
+      "path": "skills/hallmark/references/themes/solstice.md",
+      "bytes": 7346,
+      "sha256": "6813e8556faa9e34637ce52a2cefadbf74795e7956503f14cf1c672c3f92c5d1"
+    },
+    {
+      "path": "skills/hallmark/references/themes/specimen.md",
+      "bytes": 6880,
+      "sha256": "f9ed583e2adfe885eced94374fed3f697ff932705eee029a9c226d4db39667ed"
+    },
+    {
+      "path": "skills/hallmark/references/themes/spore.md",
+      "bytes": 7312,
+      "sha256": "2b4f30287f6779404104a98bddd2f2876f000abad2533228c9aa105b3c30ca7d"
+    },
+    {
+      "path": "skills/hallmark/references/themes/sport.md",
+      "bytes": 7425,
+      "sha256": "5714651df7c46925357d33876e498ac4ecaa3c8b3d50bee5ead3bf7ce54d863a"
+    },
+    {
+      "path": "skills/hallmark/references/themes/squeeze.md",
+      "bytes": 7579,
+      "sha256": "d007f2f09a6d8da5cf53a9fe98bc9cb3ead7f013d71569b605e65e7f295b2cb5"
+    },
+    {
+      "path": "skills/hallmark/references/themes/sticker.md",
+      "bytes": 7554,
+      "sha256": "5c266f131f506d7ba2e51e12015141e8d1ac394523ce537504a6b21336f0f953"
+    },
+    {
+      "path": "skills/hallmark/references/themes/studio.md",
+      "bytes": 7629,
+      "sha256": "7e0352a5de3485bbc61043c412258490aa7750eab03a5534a422a717f44db194"
+    },
+    {
+      "path": "skills/hallmark/references/themes/terminal.md",
+      "bytes": 7564,
+      "sha256": "cb5104b31d31e2ece13cc736a2ee5819d9b80a3272ff5a905e0f772c2865f19e"
+    },
+    {
+      "path": "skills/hallmark/references/themes/terrazzo.md",
+      "bytes": 7034,
+      "sha256": "9f2a03aa0670fe7caef3789e077eb917483034a38c756b45977ea9f27ee1dc02"
+    },
+    {
+      "path": "skills/hallmark/references/themes/ultraviolet.md",
+      "bytes": 7359,
+      "sha256": "b706384370d51ad849faaa87f80c2beeff9d14ca2f253385d20e28ac09bc9569"
+    },
+    {
+      "path": "skills/hallmark/references/themes/vantage.md",
+      "bytes": 7295,
+      "sha256": "08405ead89e69270c2fa5946c6d3f7905168d10eb06a34502c5c129d262f96db"
+    },
+    {
+      "path": "skills/hallmark/references/themes/vellum.md",
+      "bytes": 7606,
+      "sha256": "4914d9e6ca704d55b57fe6630ca2edc1ed49dea0fdd0912c97d437939fd3e893"
+    },
+    {
+      "path": "skills/hallmark/references/themes/wayfind.md",
+      "bytes": 7351,
+      "sha256": "7849521b843f82a3956727e0d06a595d6ecec5f501f4c31f577bf4bd1bae9e2c"
+    },
+    {
+      "path": "skills/hallmark/references/themes/werkstatt.md",
+      "bytes": 7441,
+      "sha256": "b3a31e2acb8a15ca46bbb194f23b9555ef19d9c70ceb1cf67d9fde3b55b7e08a"
+    },
+    {
+      "path": "skills/hallmark/scripts/capture.mjs",
+      "bytes": 9659,
+      "sha256": "0364ca6591a722d14b935f201956c300d688b8f9f73879b00df92242dc26610b"
+    },
+    {
+      "path": "skills/hallmark/scripts/photos.json",
+      "bytes": 452868,
+      "sha256": "1ee6836583e8048400876351c0605bc3f08515fecfe68aca3712b9e75498bc65"
+    },
+    {
+      "path": "skills/hallmark/scripts/sloplint-render.mjs",
+      "bytes": 99965,
+      "sha256": "228f14808cbf872ab6dcc5f4f9e8d58a5a9060028f1530bec80e24dbd12737f3"
+    },
+    {
+      "path": "skills/hallmark/scripts/sloplint.mjs",
+      "bytes": 231740,
+      "sha256": "23fb94903ae0e3b709019380443163bdc50390a246911e3423b83695e4bc8037"
+    },
+    {
+      "path": "skills/hallmark/scripts/theme.mjs",
+      "bytes": 59476,
+      "sha256": "7c5cd6ea080e47b663967f2cce5c806e38acbc33eb77b6dce7585a9f2ea1a1a6"
+    },
+    {
+      "path": "skills/hallmark/SKILL.md",
+      "bytes": 18239,
+      "sha256": "25a1ff92d925b2389e8409f42fb8ad7e033fceca8b5d1f07ed4ca4c28da53dc3"
+    }
+  ],
+  "modifications": [
+    "DSH entry and namespaced invocation",
+    "Official resourceBase in provider",
+    "Pinned opt-in previews",
+    "No hooks or generation integration"
+  ]
+}

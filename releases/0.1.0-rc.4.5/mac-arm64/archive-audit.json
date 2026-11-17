@@ -1,0 +1,12 @@
+{
+  "passed": true,
+  "target": "mac-arm64",
+  "vendorFilesUnchanged": 8241,
+  "seedHashesVerified": 381,
+  "components": 18,
+  "reportOrigin": "https://111.229.103.201",
+  "zipSha256": "8d7112cd3f65a20b239d0ab1d4daef46e116cb7170bbf1f0fe7235c7934c0612",
+  "guiTested": false,
+  "supportNetworkBudgetFixIncluded": true,
+  "finalArchiveAndSupportSourceReverified": true
+}

@@ -1,0 +1,46 @@
+{
+  "name": "qcu-branding",
+  "version": "0.3.0-pilot.6",
+  "type": "module",
+  "license": "MIT",
+  "description": "QCU首页、个人常用能力与清蓝主题",
+  "exports": {
+    ".": "./index.js",
+    "./client": "./client.js",
+    "./package.json": "./package.json"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "inject": [
+        "@deepseek-ai/dsh-client-ui-renderer",
+        "@deepseek-ai/dsh-client-ui-sidebar",
+        "@deepseek-ai/dsh-client-ui-conversation",
+        "@deepseek-ai/dsh-client-ui-theme",
+        "@deepseek-ai/dsh-client-ui-layout",
+        "@deepseek-ai/dsh-client-ui-workspace",
+        "@deepseek-ai/dsh-api-remotes"
+      ]
+    }
+  },
+  "peerDependencies": {
+    "@deepseek-ai/cordis": "4.0.4",
+    "@deepseek-ai/dsh-typert-protocol": "0.2.0-rc.2"
+  },
+  "files": [
+    "index.js",
+    "client.js",
+    "cordis.patch.yml",
+    "build.mjs",
+    "icon-data.txt",
+    "client.template.js",
+    "src/theme.mjs",
+    "src/tasks.mjs",
+    "src/personalization.mjs",
+    "src/view.mjs",
+    "src/plugin.mjs"
+  ]
+}

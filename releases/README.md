@@ -1,3 +1,7 @@
+# 最新版本：rc.4.5（2026-11-17）
+
+Mac和Windows统一版本、下载、完整性与验收边界见 [rc.4.5](0.1.0-rc.4.5/README.md)。本轮新增固定IP腾讯云HTTPS启动诊断与受登录保护的查询页。以下为历史发行记录。
+
 # QCU 助手下载与源码索引
 
 本索引在 `dev/qcu-release-archive-20261028` 建立，Mac rc4.4.2 起在 `dev/qcu-release-mac-rc442` 续写。两个平台独立预发布，版本和功能不同；二进制放 GitHub Release 附件，不提交到 Git。`main` 暂未集成这些开发分支。

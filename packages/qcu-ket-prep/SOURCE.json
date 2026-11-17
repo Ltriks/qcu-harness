@@ -1,0 +1,52 @@
+{
+  "repository": "https://github.com/darker2016/workbuddy-skill-groups",
+  "revision": "22a71e0f677f636da15129ab70012bd1286f8ba6",
+  "upstreamPackage": "ket-prep-skills",
+  "upstreamVersion": "snapshot-22a71e0f677f",
+  "author": {
+    "name": "darker2016; community reconstruction, not official export"
+  },
+  "sourceKind": "community-reconstruction",
+  "licenseDeclaration": "MIT",
+  "licenseEvidence": "LICENSE",
+  "metadataSha256": "65b33d95cae79a891b777a948fc3c3bbcdbd03712c0928f13c46653290dd1a6e",
+  "upstreamFiles": [
+    {
+      "path": "ket-prep-skills/ket-prep-team-lead.md",
+      "localPath": "references/agents/ket-prep-team-lead.md",
+      "sha256": "d0ec8097dd244b645cf2ef6f075b4aa12455d620c2b79a565dab73a6b72916a7",
+      "bytes": 6115
+    },
+    {
+      "path": "ket-prep-skills/ket-strategist.md",
+      "localPath": "references/agents/ket-strategist.md",
+      "sha256": "ad0d25bb3228e61a692b02d6d8c22d60f25cf274a4f3475e65fc2fa3da5b636b",
+      "bytes": 4495
+    },
+    {
+      "path": "ket-prep-skills/ket-foundation-builder.md",
+      "localPath": "references/agents/ket-foundation-builder.md",
+      "sha256": "fe8eb5828d32204bfe453261504b06d613009a971c20137e92d5510fc4f4a71e",
+      "bytes": 5848
+    },
+    {
+      "path": "ket-prep-skills/ket-input-master.md",
+      "localPath": "references/agents/ket-input-master.md",
+      "sha256": "a364ea332806ea237be5b368f1c028659cd0bbabb344ac976157b41fc1d84e8b",
+      "bytes": 5503
+    },
+    {
+      "path": "ket-prep-skills/ket-output-coach.md",
+      "localPath": "references/agents/ket-output-coach.md",
+      "sha256": "355197a56da855c87391ba8bfc8ce1c7cd0ee095978a7d8b180db2d097c3f01c",
+      "bytes": 6589
+    },
+    {
+      "path": "ket-prep-skills/ket-tactician.md",
+      "localPath": "references/agents/ket-tactician.md",
+      "sha256": "c77bda2cb1d606d6d7186d94cad7f12d9156a9d25ddaa20ba094d47c927532ab",
+      "bytes": 6734
+    }
+  ],
+  "adaptation": "Original roles unchanged; DSH adapter overrides platform operations and forced approval."
+}

@@ -1,0 +1,36 @@
+{
+  "id": "qcu-document-team",
+  "title": "专业文档团队",
+  "lead": "doc-team-lead",
+  "members": [
+    "doc-researcher",
+    "doc-generator",
+    "doc-auditor"
+  ],
+  "execution": "native-dsh-agent",
+  "status": "pilot-not-model-accepted",
+  "capabilitiesRequired": [
+    "independent-agent",
+    "web-search",
+    "file-read-write"
+  ],
+  "sourceKind": "archived-market-package",
+  "roles": [
+    {
+      "id": "doc-team-lead",
+      "path": "references/agents/doc-team-lead.md"
+    },
+    {
+      "id": "doc-researcher",
+      "path": "references/agents/doc-researcher.md"
+    },
+    {
+      "id": "doc-generator",
+      "path": "references/agents/doc-generator.md"
+    },
+    {
+      "id": "doc-auditor",
+      "path": "references/agents/doc-auditor.md"
+    }
+  ]
+}

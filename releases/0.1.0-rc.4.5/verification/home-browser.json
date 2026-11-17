@@ -1,0 +1,102 @@
+{
+  "passed": true,
+  "realReact": true,
+  "syntheticServices": true,
+  "nativeFrameGeometry": "official macOS zero-width sidebar and absolute leading seat; semantic main slot",
+  "modelCalls": 0,
+  "checks": [
+    "work-scenario-groups",
+    "office-plain-draft",
+    "per-task-input-preserved",
+    "office-pin-home",
+    "office-home-empty-opens-draft",
+    "office-home-with-input",
+    "suite-five-members-from-one-package",
+    "suite-member-draft",
+    "suite-manage-parent",
+    "suite-home-shortcut",
+    "installed-only-list",
+    "disabled-skills-cannot-launch",
+    "direct-skill-draft-no-market",
+    "favorites-filter",
+    "top-brand-toggle",
+    "footer-more-only",
+    "mac-collapsed-no-overlap",
+    "mac-fullscreen-no-overlap",
+    "mac-narrow-no-overlap",
+    "expand-recovery",
+    "escape-close",
+    "web-icon-rail-menu",
+    "settings-access",
+    "tutorial-and-version",
+    "walkthrough-hidden",
+    "skill-pin-home-shared-state",
+    "reload-persists",
+    "correct-skill-draft-no-send",
+    "unpin",
+    "no-horizontal-overflow"
+  ],
+  "geometries": [
+    {
+      "label": "mac-collapsed",
+      "heading": {
+        "x": 108,
+        "y": 82,
+        "width": 48.96875,
+        "height": 33.59375
+      },
+      "leading": {
+        "x": 88,
+        "y": 8,
+        "width": 40,
+        "height": 40
+      }
+    },
+    {
+      "label": "mac-fullscreen",
+      "heading": {
+        "x": 108,
+        "y": 82,
+        "width": 48.96875,
+        "height": 33.59375
+      },
+      "leading": {
+        "x": 12,
+        "y": 8,
+        "width": 40,
+        "height": 40
+      }
+    },
+    {
+      "label": "mac-narrow",
+      "heading": {
+        "x": 16,
+        "y": 82,
+        "width": 48.96875,
+        "height": 33.59375
+      },
+      "leading": {
+        "x": 88,
+        "y": 8,
+        "width": 40,
+        "height": 40
+      }
+    }
+  ],
+  "calls": [
+    [
+      "create"
+    ],
+    [
+      "draft",
+      "/qcu-hallmark-design\n设计教学网站"
+    ],
+    [
+      "open",
+      "new-session"
+    ],
+    [
+      "release"
+    ]
+  ]
+}

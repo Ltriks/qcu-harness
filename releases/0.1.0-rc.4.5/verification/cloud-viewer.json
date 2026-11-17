@@ -1,0 +1,8 @@
+{
+  "passed": true,
+  "anonymousViewer": 401,
+  "anonymousAPI": 401,
+  "authenticatedViewer": 200,
+  "authenticatedAPI": 200,
+  "secretStoredOutsideRepository": true
+}

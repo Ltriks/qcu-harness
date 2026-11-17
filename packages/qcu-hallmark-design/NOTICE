@@ -1,0 +1,1 @@
+Hallmark contributors, MIT. Upstream 04977e15f3dfd6ee4b74c887dac3eb52665d6c92. QCU adapted the entry and provider resource base; added pinned on-demand preview helper. Bundled reference text and core scripts unchanged. Binary previews, installer hooks and generation integrations omitted. No upstream endorsement.

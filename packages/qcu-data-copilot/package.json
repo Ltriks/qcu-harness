@@ -1,0 +1,43 @@
+{
+  "name": "qcu-data-copilot",
+  "version": "0.1.0-pilot.1",
+  "type": "module",
+  "private": true,
+  "license": "MIT",
+  "description": "智数分析团队（社区改编） · DSH 原生工具适配试用版",
+  "exports": {
+    ".": "./index.js",
+    "./package.json": "./package.json"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  },
+  "peerDependencies": {
+    "@deepseek-ai/cordis": "4.0.4",
+    "@deepseek-ai/dsh-skill": "0.2.0-rc.2",
+    "@deepseek-ai/dsh-scope": "0.2.0-rc.2"
+  },
+  "files": [
+    "LICENSE",
+    "NOTICE",
+    "README.md",
+    "SKILL.md",
+    "SOURCE.json",
+    "cordis.patch.yml",
+    "index.js",
+    "manifest.json",
+    "references/COMMUNITY-LICENSE.txt",
+    "references/COMMUNITY-SOURCE.md",
+    "references/adapted-roster.json",
+    "references/agents/copilot-team-lead.md",
+    "references/agents/dashboard-designer.md",
+    "references/agents/data-scientist.md",
+    "references/agents/knowledge-researcher.md",
+    "references/agents/report-composer.md",
+    "references/agents/sql-analyst.md",
+    "references/dsh-adapter.md",
+    "skill-content.js"
+  ]
+}

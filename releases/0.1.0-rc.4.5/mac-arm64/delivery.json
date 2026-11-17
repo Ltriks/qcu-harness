@@ -1,0 +1,12 @@
+{
+  "version": "0.1.0-rc.4.5",
+  "build": "rc45.1",
+  "target": "mac-arm64",
+  "file": "QCU-Teacher-0.1.0-rc.4.5-mac-arm64.zip",
+  "bytes": 398150328,
+  "sha256": "8d7112cd3f65a20b239d0ab1d4daef46e116cb7170bbf1f0fe7235c7934c0612",
+  "seedId": "b69fcd0a75b0addaac4858162024165e3643b97b71d6da8e54c2f179ec70fb37",
+  "modelCalls": 0,
+  "guiAcceptance": "pending",
+  "legacyDataMigration": "not-automatic"
+}

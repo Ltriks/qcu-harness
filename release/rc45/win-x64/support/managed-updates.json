@@ -1,0 +1,8 @@
+{
+  "managedUpdates": false,
+  "target": "win-x64",
+  "policy": "manual-whole-suite-replacement",
+  "vendorBaseline": "Windows rc.3 r4",
+  "macManagedUpdatePatchPorted": false,
+  "note": "Mac ASAR hashes and update patch do not apply to this Windows runtime."
+}

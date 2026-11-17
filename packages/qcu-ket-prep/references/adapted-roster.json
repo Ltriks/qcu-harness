@@ -1,0 +1,26 @@
+{
+  "name": "ket-prep-skills",
+  "version": "snapshot-22a71e0f677f",
+  "license": "MIT",
+  "author": {
+    "name": "darker2016; community reconstruction, not official export"
+  },
+  "agents": [
+    "./agents/ket-prep-team-lead.md",
+    "./agents/ket-strategist.md",
+    "./agents/ket-foundation-builder.md",
+    "./agents/ket-input-master.md",
+    "./agents/ket-output-coach.md",
+    "./agents/ket-tactician.md"
+  ],
+  "teamInfo": {
+    "leadAgent": "ket-prep-team-lead",
+    "memberAgents": [
+      "ket-strategist",
+      "ket-foundation-builder",
+      "ket-input-master",
+      "ket-output-coach",
+      "ket-tactician"
+    ]
+  }
+}

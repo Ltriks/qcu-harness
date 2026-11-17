@@ -1,0 +1,14 @@
+[
+  {
+    "insert": [
+      {
+        "id": "qcu-accounting-suite",
+        "name": "qcu-accounting-suite",
+        "disabled": true,
+        "config": {
+          "enabled": true
+        }
+      }
+    ]
+  }
+]

@@ -1,0 +1,203 @@
+{
+  "caseId": "fictional-accounting-classroom-v1",
+  "synthetic": true,
+  "currency": "CNY",
+  "period": "虚构单一教学期间",
+  "assumptions": [
+    "期初余额为零，采用本案例自定教学科目表",
+    "所有金额为整数元；不涉及税费、折旧、利润分配、坏账与期末调整",
+    "设备计入固定资产、当期场地租金计入管理费用，均为本案例设定",
+    "采用权责发生制与借贷记账；展示结转前试算与结转后的权益关系",
+    "现金流仅按此案例声明分类，不替代正式报表编制规范"
+  ],
+  "accountTypes": {
+    "银行存款": "asset",
+    "固定资产": "asset",
+    "存货": "asset",
+    "应付账款": "liability",
+    "实收资本": "equity",
+    "主营业务收入": "revenue",
+    "主营业务成本": "expense",
+    "管理费用": "expense"
+  },
+  "transactions": [
+    {
+      "id": "T1",
+      "description": "投资者投入银行存款10000",
+      "entries": [
+        {
+          "account": "银行存款",
+          "debit": 10000,
+          "credit": 0
+        },
+        {
+          "account": "实收资本",
+          "debit": 0,
+          "credit": 10000
+        }
+      ],
+      "cashCategory": "financing",
+      "cashAmount": 10000
+    },
+    {
+      "id": "T2",
+      "description": "银行存款购入设备3000，教学约定计入固定资产",
+      "entries": [
+        {
+          "account": "固定资产",
+          "debit": 3000,
+          "credit": 0
+        },
+        {
+          "account": "银行存款",
+          "debit": 0,
+          "credit": 3000
+        }
+      ],
+      "cashCategory": "investing",
+      "cashAmount": -3000
+    },
+    {
+      "id": "T3",
+      "description": "赊购存货2000",
+      "entries": [
+        {
+          "account": "存货",
+          "debit": 2000,
+          "credit": 0
+        },
+        {
+          "account": "应付账款",
+          "debit": 0,
+          "credit": 2000
+        }
+      ],
+      "cashCategory": null,
+      "cashAmount": 0
+    },
+    {
+      "id": "T4",
+      "description": "销售存货收银行存款3200，同时结转成本1200",
+      "entries": [
+        {
+          "account": "银行存款",
+          "debit": 3200,
+          "credit": 0
+        },
+        {
+          "account": "主营业务收入",
+          "debit": 0,
+          "credit": 3200
+        },
+        {
+          "account": "主营业务成本",
+          "debit": 1200,
+          "credit": 0
+        },
+        {
+          "account": "存货",
+          "debit": 0,
+          "credit": 1200
+        }
+      ],
+      "cashCategory": "operating",
+      "cashAmount": 3200
+    },
+    {
+      "id": "T5",
+      "description": "用银行存款支付当期场地租金500，教学约定计入管理费用",
+      "entries": [
+        {
+          "account": "管理费用",
+          "debit": 500,
+          "credit": 0
+        },
+        {
+          "account": "银行存款",
+          "debit": 0,
+          "credit": 500
+        }
+      ],
+      "cashCategory": "operating",
+      "cashAmount": -500
+    },
+    {
+      "id": "T6",
+      "description": "用银行存款偿还应付账款1000",
+      "entries": [
+        {
+          "account": "应付账款",
+          "debit": 1000,
+          "credit": 0
+        },
+        {
+          "account": "银行存款",
+          "debit": 0,
+          "credit": 1000
+        }
+      ],
+      "cashCategory": "operating",
+      "cashAmount": -1000
+    }
+  ],
+  "voucherExercises": [
+    {
+      "id": "V1",
+      "transactionId": "T2",
+      "entries": [
+        {
+          "account": "固定资产",
+          "debit": 3000,
+          "credit": 0
+        },
+        {
+          "account": "银行存款",
+          "debit": 0,
+          "credit": 300
+        }
+      ],
+      "expectedIssue": "贷方抄录金额300与原业务3000不符，借贷差额2700"
+    },
+    {
+      "id": "V2",
+      "transactionId": "T6",
+      "entries": [
+        {
+          "account": "管理费用",
+          "debit": 1000,
+          "credit": 0
+        },
+        {
+          "account": "银行存款",
+          "debit": 0,
+          "credit": 1000
+        }
+      ],
+      "expectedIssue": "借贷虽平衡，但原业务为偿还应付账款，不是当期管理费用"
+    }
+  ],
+  "expected": {
+    "balances": {
+      "银行存款": 8700,
+      "固定资产": 3000,
+      "存货": 800,
+      "应付账款": -1000,
+      "实收资本": -10000,
+      "主营业务收入": -3200,
+      "主营业务成本": 1200,
+      "管理费用": 500
+    },
+    "trialDebit": 14200,
+    "trialCredit": 14200,
+    "profit": 1500,
+    "assets": 12500,
+    "liabilities": 1000,
+    "closingEquity": 11500,
+    "cashFlows": {
+      "operating": 1700,
+      "investing": -3000,
+      "financing": 10000
+    },
+    "netCash": 8700
+  }
+}

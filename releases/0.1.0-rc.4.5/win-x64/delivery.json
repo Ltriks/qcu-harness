@@ -1,0 +1,12 @@
+{
+  "version": "0.1.0-rc.4.5",
+  "build": "rc45.1",
+  "target": "win-x64",
+  "file": "QCU-Teacher-0.1.0-rc.4.5-win-x64.zip",
+  "bytes": 403845089,
+  "sha256": "7f65d36bcc2d9cbf608c5604ee8bef6c2d7bb9f20cdaa5e546fdfed57e15c37f",
+  "seedId": "2d401583c171fae2233548d1646a050d7e199152d94f5e03b913777a1502e632",
+  "modelCalls": 0,
+  "guiAcceptance": "pending",
+  "legacyDataMigration": "not-automatic"
+}

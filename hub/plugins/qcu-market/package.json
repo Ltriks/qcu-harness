@@ -1,6 +1,6 @@
 {
   "name": "qcu-market",
-  "version": "0.1.0-pilot.16.1",
+  "version": "0.1.0-pilot.16.14",
   "private": true,
   "type": "module",
   "license": "MIT",
@@ -21,7 +21,9 @@
         "@deepseek-ai/dsh-client-ui-layout",
         "@deepseek-ai/dsh-client-ui-sidebar",
         "@deepseek-ai/dsh-api-remotes",
-        "@deepseek-ai/dsh-client-ui-plugin-manager"
+        "@deepseek-ai/dsh-client-ui-plugin-manager",
+        "@deepseek-ai/dsh-client-ui-conversation",
+        "@deepseek-ai/dsh-client-ui-workspace"
       ]
     }
   },
@@ -34,7 +36,9 @@
     "@deepseek-ai/dsh-client-ui-plugin-manager": "0.2.0-rc.2",
     "@deepseek-ai/dsh-typert-registry": "0.2.0-rc.2",
     "@deepseek-ai/dsh-typert-protocol": "0.2.0-rc.2",
-    "@deepseek-ai/dsh-app-boot": "0.2.0-rc.2"
+    "@deepseek-ai/dsh-app-boot": "0.2.0-rc.2",
+    "@deepseek-ai/dsh-client-ui-conversation": "0.2.0-rc.2",
+    "@deepseek-ai/dsh-client-ui-workspace": "0.2.0-rc.2"
   },
   "files": [
     "index.js",
@@ -59,7 +63,11 @@
     "src/update-model.mjs",
     "src/feedback-host.mjs",
     "src/feedback-schema.mjs",
-    "src/feedback-storage.mjs"
+    "src/feedback-storage.mjs",
+    "src/market-errors.mjs",
+    "src/system-fetcher.mjs",
+    "src/capability-library.mjs",
+    "src/department-suites.mjs"
   ],
   "description": "QCU 签名动态市场；独立发布、安装与启用确认",
   "icon": "./icon.svg"

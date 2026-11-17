@@ -1,0 +1,5 @@
+export const content="---\nname: qcu-deep-research\ndescription: 多源检索、章节研究、独立审稿、定点修订与报告交付。用于用户要求的研究或文档团队任务，按 DSH 实际工具执行，不是旧版纯文字专家评审。\n---\n\n# 深度研究团队 · DSH 迁移试用版\n\n来源类型：公开市场包归档适配，非官方背书。\n\n先读取 [DSH 适配契约](references/dsh-adapter.md)，再读取 [团队清单](manifest.json) 和\n[主理人职责](references/agents/research-chief-editor.md)。派发成员前按清单读取其角色文件。\n当前技能目录由 DSH resourceBase 提供，不假设用户工作区包含本包。\n\n支持原始团队的完整角色分工，以当前 DSH 工具替换 WorkBuddy 平台操作。\n研究任务需要真实搜索与来源；文档任务优先使用用户提供资料。工具缺失时标明限制。\n默认输出 Markdown；其他格式按用户需要和已具备的实际工具生成。\n试用版尚未经真实模型端到端验收，不能宣称与 WorkBuddy 原版等效。\n"
+export const contentSha256="9c7f53e56970cf17820fdad1f28c01a5f3ba8d328e0cef9b9c4e4cf93382e95c"
+export const skillName="qcu-deep-research"
+export const description="深度研究团队：多源检索、章节研究、独立审稿、定点修订与报告交付"
+export const provider="qcu-deep-research"

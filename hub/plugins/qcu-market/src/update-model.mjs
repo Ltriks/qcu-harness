@@ -6,7 +6,7 @@ export function expertProjectionCapable(policy){
  return actual&&Object.keys(actual).sort().join()===Object.keys(expected).sort().join()&&Object.entries(expected).every(([id,p])=>actual[id]?.capability===p.capability&&Object.keys(actual[id].peers??{}).sort().join()===Object.keys(p.peers).sort().join()&&Object.entries(p.peers).every(([k,v])=>actual[id].peers[k]===v))
 }
 export const updateOrigin='http://192.168.1.68:8080'
-export const updateAssert=(ok,message)=>{if(!ok)throw Error('更新检查：'+message)}
+export const updateAssert=(ok,message,code)=>{if(!ok){const error=Error('更新检查：'+(code?'['+code+'] ':'')+message);if(code)error.code=code;throw error}}
 export const updateExact=(obj,keys)=>updateAssert(obj&&typeof obj==='object'&&!Array.isArray(obj)&&Object.keys(obj).sort().join()===keys.slice().sort().join(),'字段不符')
 const versionPattern=/^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?$/
 export function compareUpdateVersions(a,b){
@@ -27,7 +27,9 @@ export function parseUpdatePayload(payload,policy,now=Date.now()){
  const feed=JSON.parse(payload);updateExact(feed,['schemaVersion','channel','revision','issuedAt','expiresAt','entries'])
  updateAssert(feed.schemaVersion===1&&(feed.channel==='pilot'||(feed.channel==='pilot-experts'&&expertProjectionCapable(policy)))&&Number.isSafeInteger(feed.revision)&&feed.revision>0,'更新清单版本或通道不符')
  const issued=Date.parse(feed.issuedAt),expires=Date.parse(feed.expiresAt)
- updateAssert(typeof feed.issuedAt==='string'&&typeof feed.expiresAt==='string'&&Number.isFinite(issued)&&Number.isFinite(expires)&&issued<=now+300000&&expires>now&&expires>issued&&expires-issued<=30*86400000,'更新清单未生效或已过期，请联系发布者更新清单')
+ updateAssert(typeof feed.issuedAt==='string'&&typeof feed.expiresAt==='string'&&Number.isFinite(issued)&&Number.isFinite(expires)&&expires>issued&&expires-issued<=30*86400000,'更新清单有效期格式无效')
+ updateAssert(issued<=now+300000,'更新清单尚未生效，请核对设备时间或联系维护人员','QCU-MKT-CLOCK')
+ updateAssert(expires>now,'更新清单已过期，请维护人员重新签发；已安装工具可继续使用','QCU-MKT-UPDATES-EXPIRED')
  updateAssert(Array.isArray(feed.entries)&&feed.entries.length>0&&feed.entries.length<=60,'更新清单数量无效')
  const seen=new Set()
  for(const e of feed.entries){

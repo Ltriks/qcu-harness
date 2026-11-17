@@ -1,0 +1,5 @@
+export const content="---\nname: qcu-data-copilot\ndescription: 用实际代码分析用户数据、生成图表和分析报告。用于用户要求的研究或文档团队任务，按 DSH 实际工具执行，不是旧版纯文字专家评审。\n---\n\n# 智数分析团队（社区改编） · DSH 迁移试用版\n\n来源类型：MIT 社区对话重建版，不是 WorkBuddy 官方原版，角色与功能可能不同。\n\n先读取 [DSH 适配契约](references/dsh-adapter.md)，再读取 [团队清单](manifest.json) 和\n[主理人职责](references/agents/copilot-team-lead.md)。派发成员前按清单读取其角色文件。\n当前技能目录由 DSH resourceBase 提供，不假设用户工作区包含本包。\n\n支持原始团队的完整角色分工，以当前 DSH 工具替换 WorkBuddy 平台操作。\n研究任务需要真实搜索与来源；文档任务优先使用用户提供资料。工具缺失时标明限制。\n默认输出 Markdown；其他格式按用户需要和已具备的实际工具生成。\n试用版尚未经真实模型端到端验收，不能宣称与 WorkBuddy 原版等效。\n"
+export const contentSha256="ce50aa835a8157bb1edbe6bd5ea1ff6a63cc5296bc623af0c93e20ae2b9ea01b"
+export const skillName="qcu-data-copilot"
+export const description="智数分析团队（社区改编）：用实际代码分析用户数据、生成图表和分析报告"
+export const provider="qcu-data-copilot"

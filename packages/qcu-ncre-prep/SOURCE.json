@@ -1,0 +1,46 @@
+{
+  "repository": "https://github.com/darker2016/workbuddy-skill-groups",
+  "revision": "22a71e0f677f636da15129ab70012bd1286f8ba6",
+  "upstreamPackage": "ncre-exam-skills",
+  "upstreamVersion": "snapshot-22a71e0f677f",
+  "author": {
+    "name": "darker2016; community reconstruction, not official export"
+  },
+  "sourceKind": "community-reconstruction",
+  "licenseDeclaration": "MIT",
+  "licenseEvidence": "LICENSE",
+  "metadataSha256": "6f5f773c71692902bc588706d652be57491d4940ae94303d657c3542310b1c40",
+  "upstreamFiles": [
+    {
+      "path": "ncre-exam-skills/ncre-expert-team-lead.md",
+      "localPath": "references/agents/ncre-expert-team-lead.md",
+      "sha256": "da731f009b5dce98859bdab7a1c7008149626cc278e51c1b80cd7537b5200eaf",
+      "bytes": 9981
+    },
+    {
+      "path": "ncre-exam-skills/ncre-level1.md",
+      "localPath": "references/agents/ncre-level1.md",
+      "sha256": "f63e5442f1e6d75a47670d8af866b60a9ac95703f5bd27890fc205a701c0d2fb",
+      "bytes": 8855
+    },
+    {
+      "path": "ncre-exam-skills/ncre-level2.md",
+      "localPath": "references/agents/ncre-level2.md",
+      "sha256": "1c555c08866a46903ac47fec1ce60a8e7c9058bed35233b91c5115f74b15a776",
+      "bytes": 12950
+    },
+    {
+      "path": "ncre-exam-skills/ncre-level3.md",
+      "localPath": "references/agents/ncre-level3.md",
+      "sha256": "b8150e37c271ffb0b5716f43ccb9c71040bdfcbfc8a255e5beea9230143473e6",
+      "bytes": 15433
+    },
+    {
+      "path": "ncre-exam-skills/ncre-level4.md",
+      "localPath": "references/agents/ncre-level4.md",
+      "sha256": "bfe27096c4e71b1bd0a491f5e18b36fc719a74cc3b2509984951791ad0cc92a4",
+      "bytes": 19562
+    }
+  ],
+  "adaptation": "Original roles unchanged; DSH adapter overrides platform operations and forced approval."
+}

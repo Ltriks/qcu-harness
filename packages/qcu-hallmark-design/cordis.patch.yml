@@ -1,0 +1,14 @@
+[
+  {
+    "insert": [
+      {
+        "id": "qcu-hallmark-design",
+        "name": "qcu-hallmark-design",
+        "disabled": true,
+        "config": {
+          "enabled": true
+        }
+      }
+    ]
+  }
+]

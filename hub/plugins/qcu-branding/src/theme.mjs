@@ -1,0 +1,165 @@
+export const themeTokens = {
+ '--dsw-alias-bg-base':['#FFFFFF','#17212E'],
+ '--dsw-alias-bg-layer-1':['#FFFFFF','#1D2A3A'],
+ '--dsw-alias-bg-layer-2':['#FFFFFF','#233247'],
+ '--dsw-alias-bg-layer-3':['#F7FAFD','#293B50'],
+ '--dsw-alias-bg-module-platform':['#F7FAFD','#1D2A3A'],
+ '--dsw-specific-sidebar-fill':['#F0F5FA','#14202D'],
+ '--dsw-specific-input-major':['#FFFFFF','#1D2A3A'],
+ '--dsw-alias-label-primary':['#17324D','#E5EFF9'],
+ '--dsw-alias-label-primary-dimmed':['#304E6A','#D0DFED'],
+ '--dsw-alias-label-secondary':['#48617A','#B8CBDE'],
+ '--dsw-alias-label-tertiary':['#566C82','#A8BED2'],
+ '--dsw-alias-label-caption':['#617589','#9FB5CA'],
+ '--dsw-alias-border-l1':['#E5EDF5','#2B4055'],
+ '--dsw-alias-border-l2':['#D9E5EE','#354C63'],
+ '--dsw-alias-border-l3':['#CBDCE9','#405A73'],
+ '--dsw-alias-border-l4':['#A6BED3','#68839D'],
+ '--dsw-alias-state-business-primary':['#174F91','#93C4FF'],
+ '--dsw-alias-brand-primary':['#174F91','#93C4FF'],
+ '--dsw-alias-brand-text':['#174F91','#B6D8FF'],
+ '--dsw-alias-button-primary-fill':['#174F91','#285E9C'],
+ '--dsw-alias-button-primary-hover':['#103F78','#3473B8'],
+ '--dsw-alias-button-info-fill':['#174F91','#285E9C'],
+ '--dsw-alias-button-info-hover':['#103F78','#3473B8'],
+ '--dsw-alias-interactive-bg-hover':['#E9F2F9','#293F57'],
+ '--dsw-alias-interactive-bg-hover-solid':['#E1ECF6','#314D68'],
+ '--qcu-canvas':['#F7FAFD','#111B27'],
+ '--qcu-paper':['#FFFFFF','#1D2A3A'],
+ '--qcu-selected':['#E9F2F9','#263F5B'],
+ '--qcu-blue':['#174F91','#ABD1FF'],
+ '--qcu-button':['#174F91','#285E9C'],
+ '--qcu-line':['#D9E5EE','#354C63'],
+ '--qcu-ink':['#17324D','#E5EFF9'],
+ '--qcu-muted':['#48617A','#B8CBDE'],
+ '--qcu-error-bg':['#FFF0EE','#462B2D'],
+ '--qcu-error-ink':['#962E24','#FFC0B8']
+};
+export const pairedTokens=Object.fromEntries(Object.entries(themeTokens).map(([name,[light,dark]])=>[name,{light,dark}]));
+
+export const teacherStyles = `
+body[data-qcu-teacher]{--qcu-font:var(--dsh-content-font-size,14px);--qcu-small:calc(var(--qcu-font) * 13 / 14)}
+.qcu-teacher{box-sizing:border-box;color:var(--qcu-ink);font:var(--qcu-font)/1.7 var(--dsw-font-family,system-ui,sans-serif)}
+.qcu-teacher *{box-sizing:border-box}.qcu-teacher button,.qcu-teacher select,.qcu-teacher textarea{font:inherit}
+.qcu-teacher button{cursor:pointer}.qcu-teacher button:disabled{cursor:default;opacity:.55}
+.qcu-teacher :focus-visible{outline:3px solid var(--qcu-blue);outline-offset:3px}
+.qcu-home{height:100%;width:100%;min-height:0;min-width:0;flex:1;overflow:auto;background:var(--qcu-canvas);container-type:inline-size}
+.qcu-home-inner{max-width:1060px;margin:auto;padding:46px 52px 48px}
+html[data-platform=darwin] .qcu-home-inner{padding-top:58px}
+.qcu-home-top{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-bottom:28px}
+.qcu-home h1{font-size:calc(var(--qcu-font) * 24 / 14);line-height:1.4;letter-spacing:.02em;margin:0;font-weight:650}
+.qcu-home h2{font-size:calc(var(--qcu-font) * 21 / 14);line-height:1.5;margin:0 0 12px;font-weight:600}
+.qcu-home :is(h1,h2,p){overflow-wrap:anywhere}.qcu-home section,.qcu-home header,.qcu-home aside{min-width:0}
+.qcu-home p{margin:8px 0 16px;max-width:42em}.qcu-muted{color:var(--qcu-muted);font-size:var(--qcu-small)}
+.qcu-toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.qcu-button{min-height:44px;border:1px solid var(--qcu-line);border-radius:8px;padding:8px 16px;background:var(--qcu-paper);color:var(--qcu-ink)}
+.qcu-button:hover:not(:disabled){background:var(--qcu-selected);border-color:var(--qcu-blue)}
+.qcu-button.primary{background:var(--qcu-button);border-color:var(--qcu-button);color:white}
+.qcu-button.primary:is(:hover,:active):not(:disabled){background:var(--qcu-button);border-color:var(--qcu-button)}
+body[data-qcu-teacher] .qcu-market{--qcu-market-primary-ink:#fff}
+.qcu-button.quiet{border-color:transparent;background:transparent;color:var(--qcu-blue)}
+.qcu-task-sheet{background:var(--qcu-paper);border:1px solid var(--qcu-line);border-radius:4px 4px 12px 12px;padding:28px 30px}
+.qcu-task-tabs{display:flex;flex-wrap:wrap;gap:6px;margin:18px 0 24px}
+.qcu-task-tabs button{min-height:48px;padding:8px 17px;border:1px solid transparent;border-radius:6px;background:transparent;color:var(--qcu-muted)}
+.qcu-task-tabs button[aria-pressed=true]{background:var(--qcu-selected);color:var(--qcu-blue);border-color:var(--qcu-line);font-weight:600}
+.qcu-task-tabs button:hover{background:var(--qcu-selected)}
+.qcu-field{display:flex;flex-direction:column;gap:8px;margin:20px 0}.qcu-field>span{font-size:var(--qcu-small);font-weight:600}
+.qcu-field textarea,.qcu-field select{width:100%;border:1px solid var(--qcu-line);border-radius:7px;background:var(--qcu-canvas);color:var(--qcu-ink);padding:12px 14px;min-height:48px}
+.qcu-field textarea{resize:vertical;min-height:220px;line-height:1.7}.qcu-field select{max-width:100%}
+.qcu-task-bottom{display:flex;justify-content:space-between;gap:14px;align-items:center;flex-wrap:wrap}.qcu-task-bottom p{margin:0;flex:1;min-width:200px}
+.qcu-lower{display:grid;grid-template-columns:minmax(0,1fr) 265px;gap:34px;margin-top:32px}.qcu-recent{padding:0;list-style:none;margin:0}
+.qcu-recent li{border-bottom:1px solid var(--qcu-line)}.qcu-recent button{display:block;text-align:left;width:100%;padding:12px 0;min-height:54px;background:transparent;border:0;color:var(--qcu-ink);overflow-wrap:anywhere}
+.qcu-recent button:hover{color:var(--qcu-blue)}.qcu-empty{border:1px dashed var(--qcu-line);padding:20px;border-radius:8px}
+.qcu-course-link{padding:0 0 22px;border-bottom:1px solid var(--qcu-line);margin-bottom:22px}.qcu-home details{margin-top:22px}.qcu-home summary{cursor:pointer;color:var(--qcu-blue);min-height:44px}
+.qcu-tool-list{list-style:none;padding:0;margin:0}.qcu-tool-list li{padding:18px 0;border-bottom:1px solid var(--qcu-line)}.qcu-tool-list strong{font-size:calc(var(--qcu-font) * 20 / 14)}.qcu-tool-list p{margin:4px 0 12px}
+.qcu-notice{padding:12px 16px;background:var(--qcu-selected);margin:16px 0;border-radius:0 7px 7px 0}
+.qcu-notice[role=alert]{color:var(--qcu-error-ink);background:var(--qcu-error-bg);border-color:currentColor}
+.qcu-side{height:100%;min-width:0;display:flex;flex-direction:column;overflow-x:hidden;overflow-y:auto;background:var(--dsw-specific-sidebar-fill);border-right:1px solid var(--qcu-line);padding:46px 16px 14px;font-size:var(--qcu-font)}
+html:not([data-platform=darwin]) .qcu-side{padding-top:16px}.qcu-side-brand{display:flex;gap:10px;align-items:center;padding:4px 0 20px;flex-wrap:nowrap}.qcu-brand-name{min-width:0;flex:1}.qcu-brand-name small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.qcu-side-brand strong{font-size:calc(var(--qcu-font) * 18 / 14);font-weight:650;letter-spacing:.03em}.qcu-side-brand small{display:block;color:var(--qcu-muted);font-size:calc(var(--qcu-font) * 12 / 14);letter-spacing:.12em}
+html[data-windows-titlebar] .qcu-side{padding-top:calc(var(--dsh-windows-titlebar-height,40px) + 12px)}
+.qcu-side-nav svg{flex:none}.qcu-side-nav{display:flex;flex-direction:column;flex:none;gap:7px}.qcu-side-nav button{display:flex;align-items:center;gap:12px;text-align:left;min-height:48px;border:0;border-radius:7px;padding:10px 12px;color:var(--qcu-ink);background:transparent;white-space:normal;overflow-wrap:anywhere}.qcu-side-nav button[aria-current=page]{background:var(--qcu-paper);box-shadow:inset 3px 0 var(--qcu-blue);color:var(--qcu-blue);font-weight:600}.qcu-side-nav button:hover{background:var(--qcu-selected)}
+/* Short windows scroll the sidebar; native workspace controls keep a usable viewport. */
+.qcu-side-work{flex:1 1 auto;min-height:80px;overflow:auto;margin-top:24px}.qcu-side-work h2{font-size:calc(var(--qcu-font) * 13 / 14);color:var(--qcu-muted);font-weight:500;padding:0 10px;margin:0 0 8px}.qcu-side-foot{padding-top:12px;border-top:1px solid var(--qcu-line)}.qcu-side-foot details>summary{min-height:44px;cursor:pointer;color:var(--qcu-muted);font-size:var(--qcu-font)}.qcu-side-foot .qcu-button{font-size:var(--qcu-font);width:100%;text-align:left}
+.qcu-side-foot,.qcu-side-brand,.qcu-side>.qcu-button{flex:none}.qcu-side-foot details .qcu-button{white-space:normal}
+.qcu-footer-row{box-sizing:border-box;display:flex;align-items:center;gap:12px;width:100%;min-height:44px;margin:0;padding:8px 12px;border:0;border-radius:6px;background:transparent;color:var(--qcu-ink);font:var(--qcu-font)/1.6 var(--dsw-font-family);text-align:left;cursor:pointer}
+.qcu-footer-row>svg{flex:none}.qcu-footer-row:hover{background:var(--qcu-selected)}
+.qcu-side-foot .qcu-maintenance>summary{font:var(--qcu-font)/1.6 var(--dsw-font-family);color:var(--qcu-ink);list-style:none}
+.qcu-maintenance>summary::-webkit-details-marker{display:none}.qcu-maintenance>summary>svg{transform:rotate(180deg)}.qcu-maintenance[open]>summary>svg{transform:rotate(-90deg)}
+.qcu-maintenance-items .qcu-footer-row{padding-left:44px;font-size:var(--qcu-small)}
+.qcu-footer-settings [data-slot="sidebar.settings"]>div:first-child{display:flex;flex-direction:column;align-items:stretch;gap:4px;width:100%;margin:0}
+.qcu-footer-settings [data-slot="sidebar.settings"]>div:first-child>button:not(.qcu-footer-row){align-self:flex-start;margin:0 12px 4px;min-height:32px;font-size:var(--qcu-font)}
+/* Keep native workspace actions, picker, search and menus; only label and reflow
+   their semantic controls in the frozen UI. No generated class names. */
+.qcu-native-workspaces{--dsh-sidebar-inline-padding:0px}
+.qcu-native-workspaces [data-slot="sidebar.workspaces"]>div>div:first-child{display:flex;flex-wrap:wrap;height:auto;min-height:44px;padding:0;margin:0 0 10px;overflow:visible;gap:6px;justify-content:flex-start}
+.qcu-native-workspaces [data-slot="sidebar.workspaces"]>div>div:first-child>span{flex-basis:100%;max-width:100%;font-size:var(--qcu-font);padding:4px 12px}
+.qcu-native-workspaces [data-slot="sidebar.workspaces"]>div>div:first-child>div{max-width:100%;min-width:0;margin:0;padding:0}
+.qcu-native-workspaces [data-slot="sidebar.workspaces"]>div>div:first-child>div:has(button[aria-expanded]){flex-basis:100%;width:100%}
+.qcu-native-workspaces [data-slot="sidebar.workspaces"]>div>div:first-child>div:has(button[aria-expanded])>div{min-height:44px;height:auto;width:100%;margin:0}
+.qcu-native-workspaces button:is([aria-label="搜索会话"],[aria-label="Search sessions"]):not([aria-expanded=true]){width:100%;min-height:44px;height:auto;justify-content:flex-start;gap:12px;padding:8px 12px;font:var(--qcu-font)/1.6 var(--dsw-font-family)}
+.qcu-native-workspaces button:is([aria-label="搜索会话"],[aria-label="Search sessions"]):not([aria-expanded=true])::after{content:attr(aria-label)}
+.qcu-native-workspaces [data-slot="sidebar.workspaces"]>div>div:first-child>div:has(>button[aria-label="添加工作区"]),.qcu-native-workspaces [data-slot="sidebar.workspaces"]>div>div:first-child>div:has(>button[aria-label="Add workspace"]){flex-basis:100%;max-width:100%;width:100%;min-height:44px;height:auto}
+.qcu-native-workspaces button:is([aria-label="添加工作区"],[aria-label="Add workspace"]){order:-1;flex:1;width:auto;min-height:44px;height:auto;justify-content:flex-start;gap:12px;padding:8px 12px;font:var(--qcu-font)/1.6 var(--dsw-font-family)}
+.qcu-native-workspaces button:is([aria-label="添加工作区"],[aria-label="Add workspace"])::after{content:attr(aria-label)}
+.qcu-native-workspaces button:is([aria-label="视图选项"],[aria-label="View options"]){width:36px;height:44px}
+.qcu-native-workspaces [data-slot="sidebar.workspaces"]>div>div:first-child:has(button:is([aria-label="搜索会话"],[aria-label="Search sessions"])[aria-expanded=true])>div:has(>button[aria-label="添加工作区"]),.qcu-native-workspaces [data-slot="sidebar.workspaces"]>div>div:first-child:has(button:is([aria-label="搜索会话"],[aria-label="Search sessions"])[aria-expanded=true])>div:has(>button[aria-label="Add workspace"]){display:none}
+.qcu-native-workspaces [data-slot="sidebar.workspaces"]>div>div:first-child:has(button:is([aria-label="搜索会话"],[aria-label="Search sessions"])[aria-expanded=true])>span{display:none}
+.qcu-sidebar-toggle{display:inline-flex;align-items:center;justify-content:center;flex:none;width:40px;height:40px;padding:0;border:0;border-radius:8px;background:transparent;color:var(--qcu-muted);cursor:pointer;-webkit-app-region:no-drag}
+.qcu-sidebar-toggle:hover{background:var(--qcu-selected);color:var(--qcu-blue)}.qcu-sidebar-toggle:active{background:var(--qcu-line)}
+.qcu-header-nav{display:flex;align-items:center;-webkit-app-region:no-drag}.qcu-windows-recovery{display:none}
+/* The official macOS frame collapses the sidebar to zero, not an icon rail.
+   Its leading seat is absolute. Reserve real space in the center column via
+   the public main-slot anchor, without targeting generated vendor classes. */
+html[data-platform=darwin] body[data-qcu-teacher] [data-sidebar-collapsed]:has(>[data-shell-leading])>:has(>[data-slot="main"]){padding-block-start:56px;box-sizing:border-box}
+html[data-platform=darwin] body[data-qcu-teacher] [data-shell-leading]{top:8px;left:88px;height:40px}
+html[data-platform=darwin][data-fullscreen] body[data-qcu-teacher] [data-shell-leading]{left:12px}
+html[data-platform=darwin] body[data-qcu-teacher] [data-sidebar-collapsed]{--dsh-frame-leading-clearance:140px}
+html[data-platform=darwin][data-fullscreen] body[data-qcu-teacher] [data-sidebar-collapsed]{--dsh-frame-leading-clearance:64px}
+html[data-windows-titlebar] .qcu-windows-recovery{display:flex;position:fixed;top:0;left:8px;height:var(--dsh-windows-titlebar-height,40px);align-items:center;z-index:30;-webkit-app-region:no-drag}
+html[data-windows-titlebar]:has(body[data-qcu-teacher] [data-sidebar-collapsed]){--dsh-windows-menu-start:64px}
+.qcu-side.collapsed{padding:16px 8px 12px;align-items:center}.qcu-side.collapsed .qcu-side-brand{padding:0 0 20px}.qcu-side.collapsed .qcu-side-nav{align-self:stretch;min-width:0}.qcu-side.collapsed .qcu-side-nav button{padding:10px 0;justify-content:center}.qcu-side.collapsed .qcu-side-work{display:none}.qcu-side.collapsed .qcu-side-foot{margin-top:auto;width:100%}
+.qcu-side.collapsed .qcu-footer-row{padding:8px 0;justify-content:center;gap:0}
+/* Keep the settings name accessible in the icon rail, including with a scrollbar. */
+.qcu-side.collapsed .qcu-footer-row>span{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+/* Semantic host anchors only; never target generated/minified class names. */
+body[data-qcu-teacher] [data-composer-card]{border:1px solid var(--qcu-line);box-shadow:none;border-radius:12px}
+body[data-qcu-teacher] [data-composer-input]{min-height:70px;padding:12px 18px}
+body[data-qcu-teacher] [data-composer-card] button{min-width:44px;min-height:44px}
+html body[data-qcu-teacher] .qcu-course{--bg:var(--qcu-canvas);--card:var(--qcu-paper);--soft:var(--qcu-canvas);--line:var(--qcu-line);--ink:var(--qcu-ink);--body:var(--qcu-muted);--accent:var(--qcu-blue);--mint:var(--qcu-selected)}
+body[data-qcu-teacher] .qcu-course .logo{background:var(--qcu-button)}
+body[data-qcu-teacher] .qcu-course .primary{background:var(--qcu-button);border-color:var(--qcu-button)}
+body[data-qcu-teacher] .qcu-course .btn{min-height:44px}
+body[data-qcu-teacher] .qcu-course input[type=checkbox]{accent-color:var(--qcu-blue);width:20px;height:20px}
+body[data-qcu-teacher] .qcu-course :focus-visible{outline-color:var(--qcu-blue)}
+body[data-qcu-teacher] .qcu-course .card{box-shadow:none}
+
+/* P16 compact teacher workspace; host font size and paired palette stay authoritative. */
+.qcu-home-inner{padding:24px 28px 28px;max-width:1120px}
+html[data-platform=darwin] .qcu-home-inner{padding-top:26px}
+.qcu-home-top{padding-bottom:16px}.qcu-home h2{font-size:calc(var(--qcu-font) * 18 / 14);margin-bottom:8px}
+.qcu-first-task{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:16px;font-size:var(--qcu-small)}
+.qcu-compose-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(180px,230px);gap:20px;align-items:start}
+.qcu-task-sheet{padding:16px 20px}.qcu-task-tabs{margin:8px 0 12px}.qcu-task-tabs button{min-height:40px;padding:6px 10px}
+.qcu-field{margin:12px 0;gap:6px}.qcu-field textarea{min-height:170px;padding:10px 12px}.qcu-field select{padding:8px 10px;min-height:40px}
+.qcu-button{min-height:40px;padding:6px 12px}.qcu-lower{display:block;margin-top:18px}.qcu-lower>aside{display:flex;gap:20px;flex-wrap:wrap}.qcu-lower>aside>section{flex:1;min-width:180px}
+.qcu-recent-section{padding-top:4px}.qcu-recent button{min-height:44px;padding:8px 0}.qcu-empty{padding:12px}
+.qcu-tool-list li{display:grid;grid-template-columns:minmax(0,1fr) auto;column-gap:16px;padding:12px 0}.qcu-tool-list strong{font-size:calc(var(--qcu-font) * 16 / 14)}.qcu-tool-list p{grid-column:1;margin:2px 0 4px}.qcu-tool-list button{grid-column:2;grid-row:1 / 4;align-self:center}
+.qcu-first-guide{border:1px solid var(--qcu-line);padding:16px;border-radius:6px}.qcu-first-guide .qcu-home-inner{padding:8px 0}.qcu-first-guide .qcu-compose-grid{grid-template-columns:minmax(0,1fr)}.qcu-first-guide .qcu-recent-section,.qcu-first-guide .qcu-lower{display:none}.qcu-first-guide .qcu-home{height:auto;overflow:visible}.qcu-first-guide>.qcu-toolbar{margin-top:16px}
+@container(max-width:800px){.qcu-compose-grid{grid-template-columns:1fr}.qcu-home-inner{padding:20px}.qcu-home-top{align-items:flex-start;flex-wrap:wrap}}
+@container(max-width:480px){.qcu-home-inner{padding:16px}.qcu-task-sheet{padding:12px}.qcu-task-bottom>.qcu-button{width:100%}.qcu-tool-list li{display:block}.qcu-tool-list button{margin-top:6px}.qcu-first-guide{padding:12px}}
+@media(prefers-reduced-motion:reduce){.qcu-teacher *,.qcu-market *{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
+
+/* Personal workspace: conversation first, compact shortcuts and a single secondary menu. */
+.qcu-more>summary{display:flex;min-height:44px;align-items:center;gap:12px;padding:8px 12px;list-style:none;border-radius:6px;color:var(--qcu-ink)}
+.qcu-side.collapsed .qcu-more>summary{justify-content:center;padding:8px 0}.qcu-more>summary::-webkit-details-marker{display:none}.qcu-more>summary:hover{background:var(--qcu-selected)}
+.qcu-more-indicator{display:flex;margin-left:auto;transform:rotate(-90deg)}.qcu-more[open]>summary .qcu-more-indicator{transform:rotate(90deg)}.qcu-more-items{padding:8px 0}.qcu-more-items .qcu-footer-row{white-space:normal}
+.qcu-side.collapsed .qcu-more-items{position:fixed;bottom:12px;left:64px;width:min(280px,calc(100vw - 76px));max-height:70vh;overflow:auto;z-index:50;padding:12px;background:var(--qcu-paper);border:1px solid var(--qcu-line);border-radius:12px}
+.qcu-side.collapsed .qcu-more-items .qcu-footer-row{justify-content:flex-start;gap:12px;padding:8px 12px}
+.qcu-side.collapsed .qcu-more-items .qcu-footer-row>span{position:static;width:auto;height:auto;clip-path:none;overflow:visible;white-space:normal}
+.qcu-home-compose{padding:20px;background:var(--qcu-paper);border:1px solid var(--qcu-line);border-radius:12px}
+.qcu-home-favorites,.qcu-home-recents{margin-top:32px}.qcu-section-heading{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:12px}.qcu-section-heading h2{margin:0}
+.qcu-shortcuts{padding:0;margin:0;list-style:none}.qcu-shortcuts li{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 0;border-bottom:1px solid var(--qcu-line)}
+.qcu-shortcuts p{margin:0}.qcu-shortcut-launch{font:inherit;font-weight:600;color:var(--qcu-blue);border:0;background:transparent;min-height:44px;padding:4px 0;text-align:left}.qcu-shortcut-launch:hover:not(:disabled){text-decoration:underline;text-underline-offset:4px}
+.qcu-teacher textarea{caret-color:var(--qcu-blue)}.qcu-teacher ::selection{color:var(--qcu-ink);background:var(--qcu-selected)}
+@container(max-width:480px){.qcu-shortcuts li{align-items:flex-start;flex-direction:column}.qcu-home-compose{padding:12px}}
+`;

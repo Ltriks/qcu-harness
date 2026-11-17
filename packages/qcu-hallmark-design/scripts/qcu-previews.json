@@ -1,0 +1,252 @@
+{
+  "almanac": {
+    "url": "https://raw.githubusercontent.com/Nutlope/hallmark/04977e15f3dfd6ee4b74c887dac3eb52665d6c92/skills/hallmark/references/themes/almanac.jpg",
+    "bytes": 99885,
+    "sha256": "a78b5a78a662ebd6a54be31b581bfd7447d391cff549c503025f0f762f4bddb5"
+  },
+  "arcade": {
+    "url": "https://raw.githubusercontent.com/Nutlope/hallmark/04977e15f3dfd6ee4b74c887dac3eb52665d6c92/skills/hallmark/references/themes/arcade.jpg",
+    "bytes": 101185,
+    "sha256": "dad3bbcf4cc25bf8e97e03d034ceed2f2bf0f8a9ea308afe60b559f04bb40f04"
+  },
+  "atelier": {
+    "url": "https://raw.githubusercontent.com/Nutlope/hallmark/04977e15f3dfd6ee4b74c887dac3eb52665d6c92/skills/hallmark/references/themes/atelier.jpg",
+    "bytes": 91926,
+    "sha256": "1f7d16373c8ab9d949084599c87777060c24b298fec9fd382fe7cc0066d6ec03"
+  },
+  "bloom": {
+    "url": "https://raw.githubusercontent.com/Nutlope/hallmark/04977e15f3dfd6ee4b74c887dac3eb52665d6c92/skills/hallmark/references/themes/bloom.jpg",
+    "bytes": 82847,
+    "sha256": "6dcda211f142627c455ec800442038475341cfcbdae83c529753283427066081"
+  },
+  "blueprint": {
+    "url": "https://raw.githubusercontent.com/Nutlope/hallmark/04977e15f3dfd6ee4b74c887dac3eb52665d6c92/skills/hallmark/references/themes/blueprint.jpg",
+    "bytes": 101363,
+    "sha256": "dec761657594b854635572f498e6d7428068b132e314df782b07d31e7e06d777"
+  },
+  "broadside": {
+    "url": "https://raw.githubusercontent.com/Nutlope/hallmark/04977e15f3dfd6ee4b74c887dac3eb52665d6c92/skills/hallmark/references/themes/broadside.jpg",
+    "bytes": 131008,
+    "sha256": "86e56076fb37223a448c354ea1148890167e85036b3189c51296a176c97bc978"
+  },
+  "brutal": {
+    "url": "https://raw.githubusercontent.com/Nutlope/hallmark/04977e15f3dfd6ee4b74c887dac3eb52665d6c92/skills/hallmark/references/themes/brutal.jpg",
+    "bytes": 114728,
+    "sha256": "cafd8a53eb83fe09efb0250f2006fd517c3218959afc337024bfe775e4bc7bbf"
+  },
+  "carnival": {
+    "url": "https://raw.githubusercontent.com/Nutlope/hallmark/04977e15f3dfd6ee4b74c887dac3eb52665d6c92/skills/hallmark/references/themes/carnival.jpg",
+    "bytes": 132812,
+    "sha256": "9a0a139afb7f1ca0ac65d55157432c5ed91e23371b7b6116e3e6937b675712a5"
+  },
+  "cobalt": {
+    "url": "https://raw.githubusercontent.com/Nutlope/hallmark/04977e15f3dfd6ee4b74c887dac3eb52665d6c92/skills/hallmark/references/themes/cobalt.jpg",
+    "bytes": 103331,
+    "sha256": "695cf419c3cc734c8fa9e6d23e0692385990bcd55349bb689300431392d0e3cd"
+  },
+  "console": {
+    "url": "https://raw.githubusercontent.com/Nutlope/hallmark/04977e15f3dfd6ee4b74c887dac3eb52665d6c92/skills/hallmark/references/themes/console.jpg",
+    "bytes": 70036,
+    "sha256": "665f07532303613d55c3832ac7141c2b007cb3a34bb245882bef3ab74e6e1cf1"
+  },
+  "coral": {
+    "url": "https://raw.githubusercontent.com/Nutlope/hallmark/04977e15f3dfd6ee4b74c887dac3eb52665d6c92/skills/hallmark/references/themes/coral.jpg",
+    "bytes": 81948,
+    "sha256": "dbb7596586c0563122935ab602e627cc621fe6939013619b6a1c552d5f25a03e"
+  },
+  "darkroom": {
+    "url": "https://raw.githubusercontent.com/Nutlope/hallmark/04977e15f3dfd6ee4b74c887dac3eb52665d6c92/skills/hallmark/references/themes/darkroom.jpg",
+    "bytes": 154305,
+    "sha256": "d8a7136d01223a7b6d2193d30c0c2e549e2967da65fb69fd33eee55df9f149c1"
+  },
+  "dose": {
+    "url": "https://raw.githubusercontent.com/Nutlope/hallmark/04977e15f3dfd6ee4b74c887dac3eb52665d6c92/skills/hallmark/references/themes/dose.jpg",
+    "bytes": 79672,
+    "sha256": "7bdf523555d21e8c89b04ab77af15a816a3c7bf84055c7c780b77d891cd4c735"
+  },
+  "dusk": {
+    "url": "https://raw.githubusercontent.com/Nutlope/hallmark/04977e15f3dfd6ee4b74c887dac3eb52665d6c92/skills/hallmark/references/themes/dusk.jpg",
+    "bytes": 93157,
+    "sha256": "f38be2c20d3d2183dfdb127fc2a9df71e3f16e413b8fda56146567a05e5a9514"
+  },
+  "editorial": {
+    "url": "https://raw.githubusercontent.com/Nutlope/hallmark/04977e15f3dfd6ee4b74c887dac3eb52665d6c92/skills/hallmark/references/themes/editorial.jpg",
+    "bytes": 111404,
+    "sha256": "a5f3ecdbe561cfbe06374706beac154bc47a77b12ac964c742b412eec6a3e0df"
+  },
+  "formwork": {
+    "url": "https://raw.githubusercontent.com/Nutlope/hallmark/04977e15f3dfd6ee4b74c887dac3eb52665d6c92/skills/hallmark/references/themes/formwork.jpg",
+    "bytes": 116193,
+    "sha256": "dc52b44d0dd300d54d0fad5f18b032e7b29f0288da546fbfa4dd73baa0d4e255"
+  },
+  "furrow": {
+    "url": "https://raw.githubusercontent.com/Nutlope/hallmark/04977e15f3dfd6ee4b74c887dac3eb52665d6c92/skills/hallmark/references/themes/furrow.jpg",
+    "bytes": 148449,
+    "sha256": "2f6decb95504070eaf484c051da77a4ec0713d2b2cc55eabdc7d99ce740acc99"
+  },
+  "garden": {
+    "url": "https://raw.githubusercontent.com/Nutlope/hallmark/04977e15f3dfd6ee4b74c887dac3eb52665d6c92/skills/hallmark/references/themes/garden.jpg",
+    "bytes": 149502,
+    "sha256": "a0d649ed96f7462dbef00047685151a3ca3e8a72e9672f240b21a82d798a9740"
+  },
+  "grid": {
+    "url": "https://raw.githubusercontent.com/Nutlope/hallmark/04977e15f3dfd6ee4b74c887dac3eb52665d6c92/skills/hallmark/references/themes/grid.jpg",
+    "bytes": 73542,
+    "sha256": "511ed8d58f8abb1fe86d53166c3966c4046c1000ccc7075d6c312ba3efc67f70"
+  },
+  "halftone": {
+    "url": "https://raw.githubusercontent.com/Nutlope/hallmark/04977e15f3dfd6ee4b74c887dac3eb52665d6c92/skills/hallmark/references/themes/halftone.jpg",
+    "bytes": 104490,
+    "sha256": "a84cb1876366b5e1070ce1a70b22f263a7a963372587ff92076c0492c7f2d9db"
+  },
+  "hedgerow": {
+    "url": "https://raw.githubusercontent.com/Nutlope/hallmark/04977e15f3dfd6ee4b74c887dac3eb52665d6c92/skills/hallmark/references/themes/hedgerow.jpg",
+    "bytes": 123319,
+    "sha256": "ac564eb0f3c8553cd5a077b8f5da38a1bb1d2c7a78e4e8ebb8aafe91ee448f95"
+  },
+  "hum": {
+    "url": "https://raw.githubusercontent.com/Nutlope/hallmark/04977e15f3dfd6ee4b74c887dac3eb52665d6c92/skills/hallmark/references/themes/hum.jpg",
+    "bytes": 130495,
+    "sha256": "22c73e8bdb16fd96165cc4d003a82cf321e1d274f6c3c538015e0d3ae823802e"
+  },
+  "ink": {
+    "url": "https://raw.githubusercontent.com/Nutlope/hallmark/04977e15f3dfd6ee4b74c887dac3eb52665d6c92/skills/hallmark/references/themes/ink.jpg",
+    "bytes": 75097,
+    "sha256": "18802cca6d7428c50a0e9d3051f7aa321f0f4749e14dd941107b30266346c62e"
+  },
+  "kiln": {
+    "url": "https://raw.githubusercontent.com/Nutlope/hallmark/04977e15f3dfd6ee4b74c887dac3eb52665d6c92/skills/hallmark/references/themes/kiln.jpg",
+    "bytes": 91613,
+    "sha256": "2ef6da1860464f7d189d6e0e371b97b1e17b4ee107e1e68b7555aafc96685123"
+  },
+  "loom": {
+    "url": "https://raw.githubusercontent.com/Nutlope/hallmark/04977e15f3dfd6ee4b74c887dac3eb52665d6c92/skills/hallmark/references/themes/loom.jpg",
+    "bytes": 132303,
+    "sha256": "a71f16f59ec0c9710d5f6cd4f3eec0fbe3536e31b194b1e25dbb924618765f64"
+  },
+  "lumen": {
+    "url": "https://raw.githubusercontent.com/Nutlope/hallmark/04977e15f3dfd6ee4b74c887dac3eb52665d6c92/skills/hallmark/references/themes/lumen.jpg",
+    "bytes": 106712,
+    "sha256": "d7f66625e11d7d495c89748c6f43db49b5542040d1c091a109802a7098d1cc84"
+  },
+  "manifesto": {
+    "url": "https://raw.githubusercontent.com/Nutlope/hallmark/04977e15f3dfd6ee4b74c887dac3eb52665d6c92/skills/hallmark/references/themes/manifesto.jpg",
+    "bytes": 85855,
+    "sha256": "c900e70ac48d01d133acdcbda0310d9c0fd53a0474d7a1b1344291a70b3c89bd"
+  },
+  "midnight": {
+    "url": "https://raw.githubusercontent.com/Nutlope/hallmark/04977e15f3dfd6ee4b74c887dac3eb52665d6c92/skills/hallmark/references/themes/midnight.jpg",
+    "bytes": 86091,
+    "sha256": "6f49568b885ba74035faa5a2608c51a079cd7a2eebe7e1967fa0225958b0c82e"
+  },
+  "newsprint": {
+    "url": "https://raw.githubusercontent.com/Nutlope/hallmark/04977e15f3dfd6ee4b74c887dac3eb52665d6c92/skills/hallmark/references/themes/newsprint.jpg",
+    "bytes": 154148,
+    "sha256": "fdac566be09a8ea6891f79ccb70f1f2c47abe12a3fb476c3874031eece6e0fe6"
+  },
+  "overprint": {
+    "url": "https://raw.githubusercontent.com/Nutlope/hallmark/04977e15f3dfd6ee4b74c887dac3eb52665d6c92/skills/hallmark/references/themes/overprint.jpg",
+    "bytes": 84649,
+    "sha256": "415342811cfecc22d267d93afb07c12dfa12d8823a2e2c5852c9a587d9f462de"
+  },
+  "pasteup": {
+    "url": "https://raw.githubusercontent.com/Nutlope/hallmark/04977e15f3dfd6ee4b74c887dac3eb52665d6c92/skills/hallmark/references/themes/pasteup.jpg",
+    "bytes": 111056,
+    "sha256": "664423a43e4906e63ab9610b8c327af1baddb611a14109b453a7ed04505ba0c2"
+  },
+  "piste": {
+    "url": "https://raw.githubusercontent.com/Nutlope/hallmark/04977e15f3dfd6ee4b74c887dac3eb52665d6c92/skills/hallmark/references/themes/piste.jpg",
+    "bytes": 118882,
+    "sha256": "39c73cb56040dc5ab13b6bb7927d0dfdacfc7802ef1d22d9c1c13f39faf1500b"
+  },
+  "refract": {
+    "url": "https://raw.githubusercontent.com/Nutlope/hallmark/04977e15f3dfd6ee4b74c887dac3eb52665d6c92/skills/hallmark/references/themes/refract.jpg",
+    "bytes": 84000,
+    "sha256": "43b0c7245536dc7f83608b3881221a90e68f78a6c7223006b75e47cc86b1a719"
+  },
+  "ribbon": {
+    "url": "https://raw.githubusercontent.com/Nutlope/hallmark/04977e15f3dfd6ee4b74c887dac3eb52665d6c92/skills/hallmark/references/themes/ribbon.jpg",
+    "bytes": 67143,
+    "sha256": "a5848452f358eb7e8f7fae3b1592fe04b9f1fb09c92551c372def878529512d0"
+  },
+  "rim": {
+    "url": "https://raw.githubusercontent.com/Nutlope/hallmark/04977e15f3dfd6ee4b74c887dac3eb52665d6c92/skills/hallmark/references/themes/rim.jpg",
+    "bytes": 115325,
+    "sha256": "bbc6f916316da6f6d03b01dfc798efd0c8f8b94d80155049f0a1a497a3560811"
+  },
+  "riso": {
+    "url": "https://raw.githubusercontent.com/Nutlope/hallmark/04977e15f3dfd6ee4b74c887dac3eb52665d6c92/skills/hallmark/references/themes/riso.jpg",
+    "bytes": 113102,
+    "sha256": "b02f0c68760cab70cf971cacc2669fe32472f1f3eb2998f8c7706c4fafb678ca"
+  },
+  "solstice": {
+    "url": "https://raw.githubusercontent.com/Nutlope/hallmark/04977e15f3dfd6ee4b74c887dac3eb52665d6c92/skills/hallmark/references/themes/solstice.jpg",
+    "bytes": 100411,
+    "sha256": "5d6bcf025a79c4b117ccc2ede5cc69f5334bfc65ed8107b1068a9689cfff7abf"
+  },
+  "specimen": {
+    "url": "https://raw.githubusercontent.com/Nutlope/hallmark/04977e15f3dfd6ee4b74c887dac3eb52665d6c92/skills/hallmark/references/themes/specimen.jpg",
+    "bytes": 64586,
+    "sha256": "9735716ddda7bba0f62d1d35743256ad1b718038fbd6924e341bceb3dfa62150"
+  },
+  "spore": {
+    "url": "https://raw.githubusercontent.com/Nutlope/hallmark/04977e15f3dfd6ee4b74c887dac3eb52665d6c92/skills/hallmark/references/themes/spore.jpg",
+    "bytes": 70176,
+    "sha256": "b2493347715fb49d6d30040ae3ea85885571709bd588f2222722a1af317a704a"
+  },
+  "sport": {
+    "url": "https://raw.githubusercontent.com/Nutlope/hallmark/04977e15f3dfd6ee4b74c887dac3eb52665d6c92/skills/hallmark/references/themes/sport.jpg",
+    "bytes": 109685,
+    "sha256": "51a51694055ef122de7e6be01f5d881fec696d86df5192557aefd90d12bb1b84"
+  },
+  "squeeze": {
+    "url": "https://raw.githubusercontent.com/Nutlope/hallmark/04977e15f3dfd6ee4b74c887dac3eb52665d6c92/skills/hallmark/references/themes/squeeze.jpg",
+    "bytes": 105257,
+    "sha256": "570529d5d842ca14a60d9689d3c4997eac31e463c5a9df3d386d39f36091224b"
+  },
+  "sticker": {
+    "url": "https://raw.githubusercontent.com/Nutlope/hallmark/04977e15f3dfd6ee4b74c887dac3eb52665d6c92/skills/hallmark/references/themes/sticker.jpg",
+    "bytes": 90110,
+    "sha256": "ccbf946b230eae35f8ba35b7ceb362bd082b0c6240e1ff3695a07f9e948d6320"
+  },
+  "studio": {
+    "url": "https://raw.githubusercontent.com/Nutlope/hallmark/04977e15f3dfd6ee4b74c887dac3eb52665d6c92/skills/hallmark/references/themes/studio.jpg",
+    "bytes": 113815,
+    "sha256": "d4b8670539d50ebc17c64ad5f13fbd01dbf6bf47cc3421baf688a496112d6daf"
+  },
+  "terminal": {
+    "url": "https://raw.githubusercontent.com/Nutlope/hallmark/04977e15f3dfd6ee4b74c887dac3eb52665d6c92/skills/hallmark/references/themes/terminal.jpg",
+    "bytes": 89868,
+    "sha256": "0843a7120876a7e4f89acbd122fe7f6d4dab72caad99746c5a574eb8f5a8552e"
+  },
+  "terrazzo": {
+    "url": "https://raw.githubusercontent.com/Nutlope/hallmark/04977e15f3dfd6ee4b74c887dac3eb52665d6c92/skills/hallmark/references/themes/terrazzo.jpg",
+    "bytes": 146188,
+    "sha256": "8f22ce7fac3fed6479bac56a0061477491c9055398b5bc7d7d856d66188f357d"
+  },
+  "ultraviolet": {
+    "url": "https://raw.githubusercontent.com/Nutlope/hallmark/04977e15f3dfd6ee4b74c887dac3eb52665d6c92/skills/hallmark/references/themes/ultraviolet.jpg",
+    "bytes": 72491,
+    "sha256": "66cb4ad24a61fb16f5cf0e97f4d81be67993e3d237d4af0b67e71e4f0e6961db"
+  },
+  "vantage": {
+    "url": "https://raw.githubusercontent.com/Nutlope/hallmark/04977e15f3dfd6ee4b74c887dac3eb52665d6c92/skills/hallmark/references/themes/vantage.jpg",
+    "bytes": 112234,
+    "sha256": "d64768e186ad62d32f1546c5c97ce55f4e97d1879686a0bbfdf394de353916a4"
+  },
+  "vellum": {
+    "url": "https://raw.githubusercontent.com/Nutlope/hallmark/04977e15f3dfd6ee4b74c887dac3eb52665d6c92/skills/hallmark/references/themes/vellum.jpg",
+    "bytes": 175505,
+    "sha256": "4b4116033ad5ea3a65e0ec720f43e0e9cd1c7494e4ae95c09610782240b9a48d"
+  },
+  "wayfind": {
+    "url": "https://raw.githubusercontent.com/Nutlope/hallmark/04977e15f3dfd6ee4b74c887dac3eb52665d6c92/skills/hallmark/references/themes/wayfind.jpg",
+    "bytes": 101995,
+    "sha256": "3fc6e32cd77b7455a10237ba7424048bd2fb94bdc955bdd5395da173d9b3b574"
+  },
+  "werkstatt": {
+    "url": "https://raw.githubusercontent.com/Nutlope/hallmark/04977e15f3dfd6ee4b74c887dac3eb52665d6c92/skills/hallmark/references/themes/werkstatt.jpg",
+    "bytes": 114968,
+    "sha256": "5cd183720988973306ff568fa7f21a7c7cb345621dfa1d288a33d22f785aac20"
+  }
+}

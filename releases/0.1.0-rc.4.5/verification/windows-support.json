@@ -1,0 +1,16 @@
+{
+  "passed": true,
+  "platform": "win32",
+  "arch": "x64",
+  "checks": [
+    "config-preserved",
+    "occupied-home-preserved",
+    "damaged-seed-refused",
+    "native-exclusive-commit",
+    "private-windows-acl",
+    "traceable-sanitized-diagnostic",
+    "diagnostic-export",
+    "reporting-default-off"
+  ],
+  "modelCalls": 0
+}

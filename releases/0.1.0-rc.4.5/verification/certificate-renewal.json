@@ -1,0 +1,11 @@
+{
+  "passed": true,
+  "host": "111.229.103.201",
+  "httpsCertificateIPMatched": true,
+  "productionCertificateExpires": "2026-11-23",
+  "renewalTimerEnabled": true,
+  "renewalDryRunWithDeployHooksPassed": true,
+  "existingServicesPreserved": true,
+  "historicalRecordsCopied": 5,
+  "historicalIdsAndTimesPreserved": true
+}

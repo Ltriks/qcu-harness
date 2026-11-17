@@ -1,3 +1,6 @@
 # Unified-diff blank context lines require their single space prefix.
 # Preserve the pinned cumulative patch bytes; ordinary source keeps normal checks.
 upstream/qcu-office.patch whitespace=-blank-at-eol
+
+# Preserve verbatim, hash-pinned upstream resource whitespace.
+packages/qcu-data-copilot/references/agents/dashboard-designer.md -whitespace

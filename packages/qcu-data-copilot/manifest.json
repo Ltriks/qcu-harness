@@ -1,0 +1,47 @@
+{
+  "id": "qcu-data-copilot",
+  "title": "智数分析团队（社区改编）",
+  "lead": "copilot-team-lead",
+  "members": [
+    "sql-analyst",
+    "data-scientist",
+    "knowledge-researcher",
+    "dashboard-designer",
+    "report-composer"
+  ],
+  "execution": "native-dsh-agent",
+  "status": "pilot-not-model-accepted",
+  "capabilitiesRequired": [
+    "independent-agent",
+    "web-search",
+    "file-read-write",
+    "code-execution"
+  ],
+  "sourceKind": "community-reconstruction",
+  "roles": [
+    {
+      "id": "copilot-team-lead",
+      "path": "references/agents/copilot-team-lead.md"
+    },
+    {
+      "id": "sql-analyst",
+      "path": "references/agents/sql-analyst.md"
+    },
+    {
+      "id": "data-scientist",
+      "path": "references/agents/data-scientist.md"
+    },
+    {
+      "id": "knowledge-researcher",
+      "path": "references/agents/knowledge-researcher.md"
+    },
+    {
+      "id": "dashboard-designer",
+      "path": "references/agents/dashboard-designer.md"
+    },
+    {
+      "id": "report-composer",
+      "path": "references/agents/report-composer.md"
+    }
+  ]
+}

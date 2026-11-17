@@ -1,0 +1,22 @@
+[Unit]
+Description=QCU sanitized incident receiver
+After=network.target
+
+[Service]
+User=qcu-diagnostics
+Group=qcu-diagnostics
+WorkingDirectory=/opt/qcu-diagnostics
+ExecStart=/usr/bin/python3 /opt/qcu-diagnostics/server.py --host 127.0.0.1 --port 18768 --network 127.0.0.0/8 --root /var/lib/qcu-diagnostics/data
+Restart=on-failure
+RestartSec=3
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/qcu-diagnostics/data
+MemoryMax=128M
+TasksMax=32
+
+[Install]
+WantedBy=multi-user.target

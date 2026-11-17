@@ -1,0 +1,24 @@
+{
+  "name": "ncre-exam-skills",
+  "version": "snapshot-22a71e0f677f",
+  "license": "MIT",
+  "author": {
+    "name": "darker2016; community reconstruction, not official export"
+  },
+  "agents": [
+    "./agents/ncre-expert-team-lead.md",
+    "./agents/ncre-level1.md",
+    "./agents/ncre-level2.md",
+    "./agents/ncre-level3.md",
+    "./agents/ncre-level4.md"
+  ],
+  "teamInfo": {
+    "leadAgent": "ncre-expert-team-lead",
+    "memberAgents": [
+      "ncre-level1",
+      "ncre-level2",
+      "ncre-level3",
+      "ncre-level4"
+    ]
+  }
+}

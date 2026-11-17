@@ -1,0 +1,14 @@
+[
+  {
+    "insert": [
+      {
+        "id": "qcu-data-copilot",
+        "name": "qcu-data-copilot",
+        "disabled": true,
+        "config": {
+          "enabled": true
+        }
+      }
+    ]
+  }
+]

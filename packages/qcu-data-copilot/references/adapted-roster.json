@@ -1,0 +1,26 @@
+{
+  "name": "ai-data-copilot-skills",
+  "version": "snapshot-22a71e0f677f",
+  "license": "MIT",
+  "author": {
+    "name": "darker2016; community reconstruction, not official export"
+  },
+  "agents": [
+    "./agents/copilot-team-lead.md",
+    "./agents/sql-analyst.md",
+    "./agents/data-scientist.md",
+    "./agents/knowledge-researcher.md",
+    "./agents/dashboard-designer.md",
+    "./agents/report-composer.md"
+  ],
+  "teamInfo": {
+    "leadAgent": "copilot-team-lead",
+    "memberAgents": [
+      "sql-analyst",
+      "data-scientist",
+      "knowledge-researcher",
+      "dashboard-designer",
+      "report-composer"
+    ]
+  }
+}

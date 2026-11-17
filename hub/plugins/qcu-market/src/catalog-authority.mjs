@@ -3,11 +3,31 @@ import {constants} from 'node:fs'
 import {lstat,mkdir,open,link,unlink,readdir} from 'node:fs/promises'
 import {resolve,dirname,join} from 'node:path'
 import {homedir} from 'node:os'
+import {execFileSync} from 'node:child_process'
 import {parseMarketCatalog} from './catalog-core.mjs'
+import {marketFailureMessage} from './market-errors.mjs'
+import {createResilientFetcher} from './system-fetcher.mjs'
+
+function envProxyUsed(){
+ return Boolean(process.env.HTTP_PROXY||process.env.HTTPS_PROXY||process.env.ALL_PROXY||process.env.http_proxy||process.env.https_proxy||process.env.all_proxy)
+}
+
+function macSystemProxyUsed(){
+ if(process.platform!=='darwin')return false
+ try{
+  for(const service of ['Wi-Fi','Ethernet','Thunderbolt Bridge']){
+   for(const kind of ['-getwebproxy','-getsecurewebproxy']){
+    const out=execFileSync('/usr/sbin/networksetup',[kind,service],{encoding:'utf8',timeout:800})
+    if(/^Enabled:\s*Yes/m.test(out))return true
+   }
+  }
+ }catch{}
+ return false
+}
 export const productionOrigin='http://192.168.1.68:8080'
 export const authorityLimit=524288
 export const authorityDigest=raw=>createHash('sha256').update(raw).digest('hex')
-const need=(v,m)=>{if(!v)throw Error('Catalog authority: '+m)}
+const need=(v,m,code)=>{if(!v){const error=Error('Catalog authority: '+m);if(code)error.code=code;throw error}}
 export function canonical(value,depth=0){
  need(depth<=20,'nesting')
  if(Array.isArray(value))return '['+value.map(v=>canonical(v,depth+1)).join(',')+']'
@@ -38,7 +58,7 @@ export function verifyCatalog(raw,trust,{now=Date.now(),test=false,allowExpired=
  need(payload.domain==='QCU-MARKET-CATALOG/ED25519/V1'&&payload.schema===1&&payload.origin===trust.origin,'protocol or source')
  need(Number.isSafeInteger(payload.revision)&&payload.revision>0,'revision')
  need(Number.isSafeInteger(payload.issuedAt)&&Number.isSafeInteger(payload.expiresAt)&&payload.issuedAt>0&&payload.expiresAt>payload.issuedAt&&payload.expiresAt-payload.issuedAt<=30*86400000,'time bounds')
- need(allowExpired||(payload.issuedAt<=now+120000&&payload.expiresAt>now),'expired or future')
+ if(!allowExpired){need(payload.issuedAt<=now+120000,'expired or future','QCU-MKT-CLOCK');need(payload.expiresAt>now,'expired or future','QCU-MKT-CATALOG-EXPIRED')}
  const catalog=parseMarketCatalog(JSON.stringify(payload.catalog),{dynamic:true,origin:trust.origin})
  need(catalog.revision===payload.revision,'revision mismatch')
  need(Array.isArray(payload.withdrawn)&&payload.withdrawn.length<=100&&new Set(payload.withdrawn).size===payload.withdrawn.length&&payload.withdrawn.every(id=>/^qcu-[a-z0-9]+(?:-[a-z0-9]+)*$/.test(id)&&!catalog.entries.some(e=>e.id===id)),'withdrawals')
@@ -62,7 +82,7 @@ export async function immutableWrite(root,name,bytes){
  finally{await f?.close();await unlink(join(root,tmp)).catch(e=>{if(e.code!=='ENOENT')throw e})}
 }
 export class CatalogAuthority{
- constructor(trust,{root=join(homedir(),'.cache','qcu-market-authority'),fetcher=fetch,now=()=>Date.now(),test=false}={}){
+ constructor(trust,{root=join(homedir(),'.cache','qcu-market-authority'),fetcher=createResilientFetcher(fetch),now=()=>Date.now(),test=false}={}){
   validateTrust(trust,{test});this.trust=trust;this.root=root;this.fetcher=fetcher;this.now=now;this.test=test;this.accepted=null;this.state='unavailable';this.message='尚未验证签名目录';this.running=null
  }
  snapshot(){return {mode:'dynamic',state:this.state,message:this.message,catalog:this.accepted?.catalog||{schemaVersion:4,protocol:4,revision:1,entries:[]},fingerprint:this.accepted?.fingerprint||null,lastRefresh:this.lastRefresh||null}}
@@ -74,16 +94,50 @@ export class CatalogAuthority{
  }
  async refresh(){if(this.running)return this.running;this.running=this.load();try{return await this.running}finally{this.running=null}}
  async load(){
+  const started=this.now()
+  const proxyUsed=envProxyUsed()||macSystemProxyUsed()
+  let phase='prepare',httpStatus=null
+  const attach=(error)=>{
+   if(error&&typeof error==='object'&&!error.marketDiagnostic){
+    error.marketDiagnostic={phase,httpStatus,proxyUsed,durationMs:this.now()-started}
+   }
+   if(error&&typeof error==='object'&&!error.code){
+    const message=String(error.message||'')
+    if(message.includes('Catalog authority: HTTP'))error.code='QCU-MKT-HTTP'
+    else if(/noncanonical|duplicate JSON|base64|fields|size|UTF|encoded data/i.test(message))error.code='QCU-MKT-FORMAT'
+    else if(/signature|pinned key|envelope identity|protocol or source/i.test(message))error.code='QCU-MKT-SIGNATURE'
+    else if(/unsafe|private state|unowned parent|absolute state/i.test(message))error.code='QCU-MKT-STATE'
+   }
+   return error
+  }
   try{
-   await privateDirectory(this.root,{create:true})
-   const url=this.trust.origin+'/market/catalog.signed.json',signal=AbortSignal.timeout(10000),r=await this.fetcher(url,{redirect:'manual',credentials:'omit',headers:{'Accept-Encoding':'identity'},signal})
-   let raw;try{need(r.status===200&&!r.redirected&&(!r.url||r.url===url)&&(!r.headers.get('content-encoding')||r.headers.get('content-encoding')==='identity'),'HTTP');const length=r.headers.get('content-length');need(length&&/^[0-9]+$/.test(length)&&Number(length)<=authorityLimit,'HTTP size');const chunks=[];let size=0;for await(const b of r.body){size+=b.length;need(size<=authorityLimit,'HTTP size');chunks.push(b)}raw=Buffer.concat(chunks);need(raw.length===Number(length),'HTTP length')}finally{if(r.body&&!r.body.locked)await r.body.cancel().catch(()=>{})}
+   phase='state';await privateDirectory(this.root,{create:true})
+   phase='request'
+   const url=this.trust.origin+'/market/catalog.signed.json',signal=AbortSignal.timeout(10000)
+   const r=await this.fetcher(url,{redirect:'manual',credentials:'omit',headers:{'Accept-Encoding':'identity'},signal})
+   httpStatus=r.status
+   phase='response'
+   let raw
+   try{
+    if(r.status!==200||r.redirected||(r.url&&r.url!==url)||(r.headers.get('content-encoding')&&r.headers.get('content-encoding')!=='identity')){
+     need(false,'HTTP','QCU-MKT-HTTP')
+    }
+    const length=r.headers.get('content-length')
+    need(length&&/^[0-9]+$/.test(length)&&Number(length)<=authorityLimit,'HTTP size','QCU-MKT-HTTP')
+    need(r.body,'HTTP body','QCU-MKT-FORMAT')
+    const chunks=[];let size=0
+    for await(const b of r.body){size+=b.length;need(size<=authorityLimit,'HTTP size','QCU-MKT-HTTP');chunks.push(b)}
+    raw=Buffer.concat(chunks)
+    need(raw.length===Number(length),'HTTP length','QCU-MKT-HTTP')
+   }finally{if(r.body&&!r.body.locked&&typeof r.body.cancel==='function')await r.body.cancel().catch(()=>{})}
+   phase='verify'
    const accepted=verifyCatalog(raw,this.trust,{now:this.now(),test:this.test}),v={revision:accepted.payload.revision,fingerprint:accepted.fingerprint}
+   phase='commit'
    const high=await this.highWater();need(v.revision>=high.revision&&(v.revision!==high.revision||v.fingerprint===high.fingerprint),'replay or equivocation')
-   try{await immutableWrite(this.root,`revision-${v.revision}.json`,Buffer.from(canonical(v)))}catch(e){if(e.code!=='EEXIST')throw e}
+   try{await immutableWrite(this.root,`revision-${v.revision}.json`,Buffer.from(canonical(v)))}catch(e){if(e.code!=='EEXIST'){e.code=e.code||'QCU-MKT-STATE';throw e}}
    const actual=await this.highWater();need(actual.revision===v.revision&&actual.fingerprint===v.fingerprint,'concurrent replay or equivocation')
-   this.accepted=accepted;this.state='fresh';this.message='签名目录已验证';this.lastRefresh=this.now()
-  }catch(e){this.state=this.accepted?'stale':'unavailable';this.message='签名目录不可用；安装与启用已停止：'+e.message;this.lastRefresh=this.now()}
+   this.accepted=accepted;this.state='fresh';this.message=accepted.payload.expiresAt-this.now()<=7*86400000?'[QCU-MKT-EXPIRING] 目录将在'+Math.ceil((accepted.payload.expiresAt-this.now())/86400000)+'天内到期，维护端需续期；已安装工具可继续使用。':'签名目录已验证';this.lastRefresh=this.now()
+  }catch(e){attach(e);this.state=this.accepted?'stale':'unavailable';this.message=marketFailureMessage(e);this.lastRefresh=this.now()}
   return this.snapshot()
  }
  async require(fingerprint,key){const s=await this.refresh();need(s.state==='fresh'&&s.fingerprint===fingerprint&&s.catalog.entries.some(e=>`${e.release.id}@${e.release.version}+${e.release.sha256}`===key),'authority changed; review again');return s}

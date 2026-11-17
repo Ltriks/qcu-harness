@@ -1,0 +1,5 @@
+export const content="---\nname: qcu-document-team\ndescription: 根据资料编写技术方案、说明文档与长文档，并独立核对来源和结构。用于用户要求的研究或文档团队任务，按 DSH 实际工具执行，不是旧版纯文字专家评审。\n---\n\n# 专业文档团队 · DSH 迁移试用版\n\n来源类型：公开市场包归档适配，非官方背书。\n\n先读取 [DSH 适配契约](references/dsh-adapter.md)，再读取 [团队清单](manifest.json) 和\n[主理人职责](references/agents/doc-team-lead.md)。派发成员前按清单读取其角色文件。\n当前技能目录由 DSH resourceBase 提供，不假设用户工作区包含本包。\n\n支持原始团队的完整角色分工，以当前 DSH 工具替换 WorkBuddy 平台操作。\n研究任务需要真实搜索与来源；文档任务优先使用用户提供资料。工具缺失时标明限制。\n默认输出 Markdown；其他格式按用户需要和已具备的实际工具生成。\n试用版尚未经真实模型端到端验收，不能宣称与 WorkBuddy 原版等效。\n"
+export const contentSha256="b80589c055c9c4ad544d858a2e0173920256db9afd3ca1e1205790f9455f93da"
+export const skillName="qcu-document-team"
+export const description="专业文档团队：根据资料编写技术方案、说明文档与长文档，并独立核对来源和结构"
+export const provider="qcu-document-team"

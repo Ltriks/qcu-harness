@@ -1,0 +1,40 @@
+{
+  "repository": "https://github.com/infometa/workbuddyskills",
+  "revision": "33b6151ccee9aa0816c6f32d021be77d82772755",
+  "upstreamPackage": "openspec-doc-team",
+  "upstreamVersion": "1.1.0",
+  "author": {
+    "name": "Expert Marketplace"
+  },
+  "sourceKind": "archived-market-package",
+  "licenseDeclaration": "MIT",
+  "licenseEvidence": "experts/openspec-doc-team/.codebuddy-plugin/plugin.json",
+  "metadataSha256": "873cde8a81180de59db8201827d96e52ee87a2afbdd93b21f6fa5b6dece264ce",
+  "upstreamFiles": [
+    {
+      "path": "experts/openspec-doc-team/agents/doc-team-lead.md",
+      "localPath": "references/agents/doc-team-lead.md",
+      "sha256": "4f057377c8832ea0e161be65ad7d1c67443c475b759f527fde24f37ed706e0ba",
+      "bytes": 14968
+    },
+    {
+      "path": "experts/openspec-doc-team/agents/doc-researcher.md",
+      "localPath": "references/agents/doc-researcher.md",
+      "sha256": "a49900c19a4f2e1b12186f23d31aa2c0e60797025bd132231e524befe64ab869",
+      "bytes": 7298
+    },
+    {
+      "path": "experts/openspec-doc-team/agents/doc-generator.md",
+      "localPath": "references/agents/doc-generator.md",
+      "sha256": "c59d6bf50ada9942ace2279ad2b4b8bf07e455487c3fdee0ba8e1c71fc43e62c",
+      "bytes": 7007
+    },
+    {
+      "path": "experts/openspec-doc-team/agents/doc-auditor.md",
+      "localPath": "references/agents/doc-auditor.md",
+      "sha256": "c729d6e57258afcf9f6fdbfb08e9e8f7de75b3b333b0a831f9c6775993c560fd",
+      "bytes": 9049
+    }
+  ],
+  "adaptation": "Original roles unchanged; DSH adapter overrides platform operations and forced approval."
+}

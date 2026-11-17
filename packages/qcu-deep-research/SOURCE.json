@@ -1,0 +1,58 @@
+{
+  "repository": "https://github.com/infometa/workbuddyskills",
+  "revision": "33b6151ccee9aa0816c6f32d021be77d82772755",
+  "upstreamPackage": "gpt-researcher-team",
+  "upstreamVersion": "2.0.0",
+  "author": {
+    "name": "Expert Marketplace"
+  },
+  "sourceKind": "archived-market-package",
+  "licenseDeclaration": "MIT",
+  "licenseEvidence": "experts/gpt-researcher-team/.codebuddy-plugin/plugin.json",
+  "metadataSha256": "bd4260827075409c388168c80e9a6fe1896010c033316b1f939723bec716753e",
+  "upstreamFiles": [
+    {
+      "path": "experts/gpt-researcher-team/agents/research-chief-editor.md",
+      "localPath": "references/agents/research-chief-editor.md",
+      "sha256": "b44dea95ea149db6e01662cd13afc7a60a01bc296d93113e315e174278f6560c",
+      "bytes": 23826
+    },
+    {
+      "path": "experts/gpt-researcher-team/agents/research-planner.md",
+      "localPath": "references/agents/research-planner.md",
+      "sha256": "260648b87ea8dc784ceeb2146fe212ce32709fca912896585870d82a5332a34a",
+      "bytes": 5099
+    },
+    {
+      "path": "experts/gpt-researcher-team/agents/topic-researcher.md",
+      "localPath": "references/agents/topic-researcher.md",
+      "sha256": "1c0d5aeb4a5170453233e36b065154db12c2ca20d5396478317bc72e06754130",
+      "bytes": 9377
+    },
+    {
+      "path": "experts/gpt-researcher-team/agents/draft-reviewer.md",
+      "localPath": "references/agents/draft-reviewer.md",
+      "sha256": "e0f98558c03066e1a761b0523e123391e8b85ddf232b42abcd201f47cdaa0849",
+      "bytes": 6406
+    },
+    {
+      "path": "experts/gpt-researcher-team/agents/draft-reviser.md",
+      "localPath": "references/agents/draft-reviser.md",
+      "sha256": "ad4ff5c240f7b829ea80ed4b18dab4620292303c7d9e43869f30bfbb0bb13fd7",
+      "bytes": 5728
+    },
+    {
+      "path": "experts/gpt-researcher-team/agents/report-writer.md",
+      "localPath": "references/agents/report-writer.md",
+      "sha256": "ba4cfabe1708fed8978275cd2912abc2e97218eab9cb0ecea28c25dfac48a082",
+      "bytes": 5639
+    },
+    {
+      "path": "experts/gpt-researcher-team/agents/report-publisher.md",
+      "localPath": "references/agents/report-publisher.md",
+      "sha256": "5aa534762679ee20c15bf35064fb9f1746423fd6ff1504bdca3ad93fb3403c01",
+      "bytes": 10261
+    }
+  ],
+  "adaptation": "Original roles unchanged; DSH adapter overrides platform operations and forced approval."
+}
