@@ -24,5 +24,20 @@
     "diagnostics": 8
   },
   "dataDirectory": "teacher/0.1.0-rc.4.5",
-  "userAcceptance": "pending-authorization; authenticated-GUI-and-existing-real-profile-not-verified"
+  "userAcceptance": "existing-profile-refresh-and-live-catalog-passed; visual-settings-and-market-page-pending-during-user-active-VM-use",
+  "existingUserProfile": {
+    "authorizedByUser": true,
+    "managedRefresh": "passed",
+    "settingsByteIdentical": true,
+    "build": "rc45.2",
+    "marketVersion": "0.1.0-pilot.16.15",
+    "realCacheCloudCatalog": "fresh",
+    "catalogEntries": 17,
+    "refreshMs": 5460,
+    "modelCalls": 0,
+    "launchedProcesses": 5,
+    "programPath": "C:\\QCU451\\QCU助手\\QCU助手.exe",
+    "startMenu": "QCU Teacher rc4.5.1",
+    "shortcut": "passed: new link target and ASCII argument read back; executable exists; not clicked during active desktop use"
+  }
 }

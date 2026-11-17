@@ -2,7 +2,7 @@ $ErrorActionPreference='Stop'
 $ProgressPreference='SilentlyContinue'
 [Console]::OutputEncoding=[Text.Encoding]::UTF8
 $testRoot=Join-Path $env:LOCALAPPDATA 'QCUWindowsRc44Tests\20261117-rc451'
-$kit=Join-Path $testRoot '中文 空格\QCU助手'
+$kit='C:\QCU451-final\QCU助手'
 $teacherDataHome=Join-Path $env:LOCALAPPDATA 'QCU-DSH\teacher\0.1.0-rc.4.5'
 Remove-Item Env:QCU_TEACHER_TEST_HOME -ErrorAction SilentlyContinue
 Remove-Item Env:ELECTRON_RUN_AS_NODE -ErrorAction SilentlyContinue

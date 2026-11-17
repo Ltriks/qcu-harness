@@ -33,3 +33,7 @@ Windows 深层路径的 Expand-Archive 与 .NET 解压失败已复现，原因�
 证据：release/rc451/ 复现脚本；.work/rc451-win/hotfix-build.json、updater-guard.json；releases/0.1.0-rc.4.5.1/win-x64/delivery.json；本机 release/rc451/*.log（私有、不提交）。最终 ZIP 的摘要、实机解压和重复启动以 final-validation.json 为准。
 
 最终交付 ZIP SHA256 `1a21ec877b74bdc7081bb2bdc12298ebe61b0d48596074f804c35e3bc686ea60`，403853508字节；Windows本地副本摘要匹配，C:\QCU451-final完整解压10178文件，原生首次与重复准备通过。该最终包已复制到主工作区 releases/0.1.0-rc.4.5.1/win-x64，尚未推送或新建GitHub发布/tag。
+
+2026-11-17后续：用户明确授权后已应用真实Windows rc4.5 profile热修，cordis.patch.yml前后字节摘要一致；真实已装qcu-market 16.15与rc45.2回执匹配。以用户真实缓存从腾讯云刷新17项签名目录成功，5460ms，模型调用0；新包启动进程存在。CUA遇到用户正在操作虚拟机，停止前台切换；不能宣称完整界面升级入口/市场页面已亲眼验收。此前拒绝的授权缺口已解除，新增待办仅为视觉验收。
+
+正式本机程序副本置于 C:\QCU451\QCU助手\QCU助手.exe，启动器/manifest/ASAR与最终包样本摘要一致。开始菜单新增 QCU Teacher rc4.5.1；该虚拟机WSH中文目标乱码已复现，入口改为系统Explorer加同一EXE的8.3路径参数，目标/参数回读及文件存在核对通过，未在用户操作桌面时点击。旧程序保留，旧数据无重置。
