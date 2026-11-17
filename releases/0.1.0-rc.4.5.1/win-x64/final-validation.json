@@ -9,8 +9,8 @@
   "nativeFreshAndRepeatPrepare": true,
   "vendorSignature": "Valid",
   "updaterBackendBlocked": true,
-  "gui": "first-account-setup-page; authenticated-settings-pending",
-  "realUserProfileTouched": false,
+  "gui": "isolated-setup-page-observed; actual-profile-visual-settings-and-market-pending",
+  "realUserProfileTouched": true,
   "finalArchiveSha256": "1a21ec877b74bdc7081bb2bdc12298ebe61b0d48596074f804c35e3bc686ea60",
   "finalZipAcceptance": "passed: final SHA matched; extracted 10178 files to C:\\QCU451-final; first and repeat native prepare passed",
   "cloudUpdates": {

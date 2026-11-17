@@ -1,5 +1,9 @@
 # QCU Harness
 
+## 最新 Windows 热修：rc.4.5.1（2026-11-17）
+
+Windows x64 使用 [rc.4.5.1 热修](releases/0.1.0-rc.4.5.1/README.md)，修复 Windows 市场权限兼容、阻止官方内核升级并接入云端签名市场；沿用 rc.4.5 数据目录。已验证原配置保留及真实云目录，完整 GUI 仍待试用复核。Mac 当前为下方 rc.4.5；旧 ZIP/tag 不变。源码位于 `fix/qcu-windows-rc451`，不合并或推送 main。
+
 ## 最新跨平台候选：rc.4.5（2026-11-17）
 
 Mac Apple Silicon 与 Windows x64 统一为 rc.4.5，源码标签 `qcu-teacher-v0.1.0-rc.4.5`。本轮集成工作助手、统一首页快捷入口、市场自动加载、专家团和技能包，启动诊断及受登录保护的查询页迁到腾讯云固定IP HTTPS。请以 [rc.4.5发布说明](releases/0.1.0-rc.4.5/README.md) 和 [重建记录](docs/release-rc45.md) 为最新入口，下方旧版本段落保留历史语境。本分支不合并或推送main。
