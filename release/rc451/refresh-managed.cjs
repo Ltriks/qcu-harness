@@ -2,8 +2,11 @@
 'use strict';
 const fs=require('node:fs'),path=require('node:path');
 module.exports=function refresh(kit,home,m,h,parseYaml,previous){
- const allowed={'win-x64':'2d401583c171fae2233548d1646a050d7e199152d94f5e03b913777a1502e632'};
- if(m.target!=='win-x64'||m.buildId!=='rc45.2'||previous.version!==m.version||previous.seedId!==allowed[m.target])throw Error('Unrecognized previous hotfix composition; preserved');
+ const allowed={
+  'win-x64':'2d401583c171fae2233548d1646a050d7e199152d94f5e03b913777a1502e632',
+  'mac-arm64':'b69fcd0a75b0addaac4858162024165e3643b97b71d6da8e54c2f179ec70fb37'
+ };
+ if(!Object.hasOwn(allowed,m.target)||m.buildId!=='rc45.2'||previous.version!==m.version||previous.seedId!==allowed[m.target])throw Error('Unrecognized previous hotfix composition; preserved');
  const integrated=require('./integrated.cjs');integrated.installed(home,m,h,parseYaml);(h.assertPreviousStopped??require('./start.cjs').assertPreviousStopped)(home);
  const profile=path.join(home,'profiles/desktop'),seedProfile=path.join(kit,'seed/profiles/desktop'),pkgPath=path.join(profile,'package.json'),receiptPath=path.join(home,'qcu-teacher.json');
  const oldPkg=fs.readFileSync(pkgPath),oldReceipt=fs.readFileSync(receiptPath),pkg=JSON.parse(oldPkg),oldSources=new Map(previous.localSources.map(p=>[p.id,p]));

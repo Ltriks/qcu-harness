@@ -1,0 +1,44 @@
+{
+  "suiteVersion": "0.1.0-rc.4.5",
+  "build": "rc45.2",
+  "packageRevision": "0.1.0-rc.4.5.1",
+  "previousSeedId": "b69fcd0a75b0addaac4858162024165e3643b97b71d6da8e54c2f179ec70fb37",
+  "seedId": "f9feb24888f14c717056df3cd762fbbcbfc291d55c7db6f8960d2171d2c8922a",
+  "market": {
+    "id": "qcu-market",
+    "version": "0.1.0-pilot.16.15",
+    "file": "qcu-market-0.1.0-pilot.16.15-2df24f5ac60c1c8711e6171aed77c56475f492cec0481e645e037a95442148b6.tgz",
+    "bytes": 109015,
+    "sha256": "2df24f5ac60c1c8711e6171aed77c56475f492cec0481e645e037a95442148b6",
+    "source": "file:./.qcu-bundles/qcu-market-0.1.0-pilot.16.15-2df24f5ac60c1c8711e6171aed77c56475f492cec0481e645e037a95442148b6.tgz",
+    "status": "frozen-rc45-offline-input"
+  },
+  "updater": {
+    "managedUpdates": true,
+    "originalAsarSha256": "18d5036bbb58eaff41d351ede99314b8d06505aec06fb2e164c49874ada30f9e",
+    "customAsarSha256": "759bf095f7e4e6b97380f6103a9a6b8c34fc980c4b7b9b34bd1c1cf1f8ed0583",
+    "modifiedAsarMembers": [
+      "lib/main.js",
+      "dsh/node_modules/@deepseek-ai/dsh-client-ui-settings-general/lib/client.js"
+    ],
+    "otherPackedMembersUnchanged": 11478,
+    "securityFusesChanged": false,
+    "vendorExecutableCodePatched": false,
+    "minimumVersionPolicyUnchanged": true,
+    "target": "mac-arm64",
+    "policy": "native-kernel-update-blocked; verified-existing-mac-asar; manual-verified-suite-update",
+    "asarRepatched": false,
+    "verifiedMainHasManagedGuard": true
+  },
+  "existingConfigAutoReset": false,
+  "notarized": false,
+  "signing": "ad-hoc",
+  "gatekeeperBypass": false,
+  "target": "mac-arm64",
+  "file": "QCU-Teacher-0.1.0-rc.4.5.1-mac-arm64.zip",
+  "bytes": 398160952,
+  "sha256": "585cd723bd3f2212978640c4146842b33cfdc94450db04250cf04019988db32f",
+  "modelCalls": 0,
+  "guiAcceptance": "pending",
+  "legacyDataMigration": "not-automatic"
+}
