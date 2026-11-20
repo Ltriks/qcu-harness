@@ -1,0 +1,59 @@
+{
+  "suiteVersion": "0.1.0-rc.4.5",
+  "build": "rc45.7",
+  "packageRevision": "0.1.0-rc.4.5.6",
+  "previousSeedId": "0ddf9a0a028f58ccb4b73d1e44ab867f03e39615eb67288fc4f274bb6de14bd0",
+  "seedId": "04734c308c70a989616aa97efa4fa7aa43587f14623691ea0d245acfd4364d95",
+  "branding": {
+    "id": "qcu-branding",
+    "version": "0.3.0-pilot.8",
+    "file": "qcu-branding-0.3.0-pilot.8-af01bc595059e832e10ba05487ac92b99ebafdb80cd1f4822e1419b5cf86494d.tgz",
+    "bytes": 43996,
+    "sha256": "af01bc595059e832e10ba05487ac92b99ebafdb80cd1f4822e1419b5cf86494d",
+    "source": "file:./.qcu-bundles/qcu-branding-0.3.0-pilot.8-af01bc595059e832e10ba05487ac92b99ebafdb80cd1f4822e1419b5cf86494d.tgz",
+    "status": "frozen-rc45-offline-input"
+  },
+  "updater": {
+    "managedUpdates": true,
+    "originalAsarSha256": "18d5036bbb58eaff41d351ede99314b8d06505aec06fb2e164c49874ada30f9e",
+    "customAsarSha256": "15927d24cb2de95d1550742c9178b913f2b221005ad39f94fb621111fe29c498",
+    "modifiedAsarMembers": [
+      "dsh/node_modules/@deepseek-ai/dsh-client-ui-settings-general/lib/client.js",
+      "lib/main.js",
+      "lib/preload-app.cjs",
+      "lib/preload-welcome.cjs",
+      "lib/welcome/welcome.js",
+      "renderer/assets/welcome-brand.svg",
+      "renderer/welcome.css"
+    ],
+    "otherPackedMembersUnchanged": 11478,
+    "securityFusesChanged": false,
+    "vendorExecutableCodePatched": false,
+    "minimumVersionPolicyUnchanged": true,
+    "target": "mac-arm64",
+    "policy": "native-kernel-update-blocked; verified-existing-mac-asar; manual-verified-suite-update",
+    "asarRepatched": false,
+    "verifiedMainHasManagedGuard": true,
+    "brandBaselineAsarSha256": "759bf095f7e4e6b97380f6103a9a6b8c34fc980c4b7b9b34bd1c1cf1f8ed0583",
+    "branding": "QCU Buddy",
+    "brandingModifiedMembers": [
+      "lib/main.js",
+      "lib/preload-app.cjs",
+      "lib/preload-welcome.cjs",
+      "lib/welcome/welcome.js",
+      "renderer/assets/welcome-brand.svg",
+      "renderer/welcome.css"
+    ],
+    "brandingOtherPackedMembersUnchanged": 11474,
+    "authAndProviderConfigurationUnchanged": true,
+    "appIdsAndDataPathsUnchanged": true,
+    "internalProductNameAndSecretStorageIdentityUnchanged": true
+  },
+  "existingConfigAutoReset": false,
+  "diagGate": "0.1.0-rc.4.5/rc45.*",
+  "target": "mac-arm64",
+  "file": "QCU-Buddy-0.1.0-rc.4.5.6-mac-arm64.zip",
+  "bytes": 397430864,
+  "sha256": "a778817fbc9ea92b75b7b0513a8f1700913c8a8f104dcbb624b8f1f12a852275",
+  "modelCalls": 0
+}

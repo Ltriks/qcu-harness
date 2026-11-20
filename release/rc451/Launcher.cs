@@ -14,11 +14,11 @@ internal static class Launcher {
         Directory.Move(stage, target); // Windows refuses an existing destination, including an empty directory.
     }
     private static void Failure(string message, bool checking) {
-        string body = message + "\n\n套件 0.1.0-rc.4.5 · 构建 rc45.2 · Windows x64\n已有数据保留。";
+        string body = message + "\n\n套件 0.1.0-rc.4.5 · 构建 rc45.7 · Windows x64\n已有数据保留。";
         if (!body.Contains("故障编号：")) body += "\n故障编号：" + Guid.NewGuid().ToString();
         if (checking) { Console.Error.WriteLine(body); Environment.ExitCode = 1; return; }
         using (var f = new Form()) {
-            f.Text = "城院助手暂时未能打开"; f.Width = 640; f.Height = 420; f.StartPosition = FormStartPosition.CenterScreen;
+            f.Text = "QCU Buddy暂时未能打开"; f.Width = 640; f.Height = 420; f.StartPosition = FormStartPosition.CenterScreen;
             var text = new TextBox { Multiline=true, ReadOnly=true, Dock=DockStyle.Fill, ScrollBars=ScrollBars.Vertical, Text=body.Replace("\n", "\r\n") };
             var buttons = new FlowLayoutPanel { Dock=DockStyle.Bottom, Height=48 };
             var copy = new Button { Text="复制诊断", AutoSize=true }; copy.Click += delegate { try { Clipboard.SetText(body); } catch { MessageBox.Show("请手动选择并复制诊断文字。"); } };
@@ -35,11 +35,11 @@ internal static class Launcher {
         bool checking = args.Length == 1 && args[0] == "--prepare-only";
         string root = AppDomain.CurrentDomain.BaseDirectory;
         try {
-            if (root.StartsWith(@"\\")) throw new Exception("QCU_TEACHER_ERROR: [QCU-ST-1304] 请把整个QCU助手文件夹复制到Windows本地磁盘（例如C盘）后再打开。当前是Mac/网络共享目录，原配置与资料保留。");
+            if (root.StartsWith(@"\\")) throw new Exception("QCU_TEACHER_ERROR: [QCU-ST-1304] 请把整个 QCU Buddy 文件夹复制到Windows本地磁盘（例如C盘）后再打开。当前是Mac/网络共享目录，原配置与资料保留。");
             string executable = Path.Combine(root, "program", "DeepSeek Harness.exe");
             string bootstrap = Path.Combine(root, "support", "start.cjs");
             if (!File.Exists(executable) || !File.Exists(bootstrap))
-                throw new Exception("请先解压整个文件夹，再打开城院助手。请勿单独移动此启动文件。");
+                throw new Exception("请先解压整个文件夹，再打开QCU Buddy。请勿单独移动此启动文件。");
             var setup = new ProcessStartInfo(executable,
                 "--expose-internals " + Quote(bootstrap) + " prepare --kit " + Quote(root.TrimEnd('\\')));
             setup.UseShellExecute = false;

@@ -26,5 +26,12 @@ function status(){
  return {version:info.version,build:info.build,kernel:info.kernel,autoReport:lan.enabled(root()),storageAvailable,receiver:lan.receiverLabel,records:records.slice(0,50)};
 }
 async function preference(enabled){if(typeof enabled!=='boolean')throw Error('diagnostics.preference');lan.setPreference(initialize(),enabled);if(enabled)await lan.flush(root());return status()}
+function onboarding(action){
+ if(!['inspect','disclosed','disable'].includes(action))throw Error('diagnostics.onboarding');
+ const dir=initialize();
+ if(action==='disable')lan.setPreference(dir,false);
+ const state=action==='disclosed'?lan.initializeDefault(dir):lan.preferenceState(dir);
+ return {...state,receiver:lan.receiverLabel};
+}
 function exportRecord(id){return {schemaVersion:1,diagnostic:record(id),delivery:delivery(id)}}
-module.exports={root,status,preference,exportRecord};
+module.exports={root,status,preference,exportRecord,onboarding};

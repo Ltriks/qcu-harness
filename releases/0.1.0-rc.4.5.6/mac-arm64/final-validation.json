@@ -1,0 +1,118 @@
+{
+  "packageRevision": "0.1.0-rc.4.5.6",
+  "build": "rc45.7",
+  "target": "mac-arm64",
+  "passed": true,
+  "native": {
+    "passed": true,
+    "platform": "darwin",
+    "arch": "arm64",
+    "build": "rc45.7",
+    "seedId": "04734c308c70a989616aa97efa4fa7aa43587f14623691ea0d245acfd4364d95",
+    "results": [
+      {
+        "case": "native-launcher-fresh-and-repeat",
+        "passed": true
+      },
+      {
+        "case": "upgrade-4.5.1",
+        "passed": true,
+        "settingsAndWorkPreserved": true
+      },
+      {
+        "case": "upgrade-4.5.2",
+        "passed": true,
+        "settingsAndWorkPreserved": true
+      },
+      {
+        "case": "upgrade-4.5.3",
+        "passed": true,
+        "settingsAndWorkPreserved": true
+      },
+      {
+        "case": "upgrade-4.5.4",
+        "passed": true,
+        "settingsAndWorkPreserved": true
+      },
+      {
+        "case": "upgrade-4.5.5",
+        "passed": true,
+        "settingsAndWorkPreserved": true
+      },
+      {
+        "case": "injected-hotfix-failure-rolls-back",
+        "passed": true
+      },
+      {
+        "case": "unknown-build-preserved-and-refused",
+        "passed": true
+      },
+      {
+        "case": "cloud-HTTPS-self-test-and-idempotence",
+        "passed": true,
+        "incidentId": "561c539a-dae6-483a-8fa8-5e07d1e3ba31",
+        "receiptId": "d969a1d54eeb6a75d8a36c904a1191be14732b0ea7665fbdaa29d27fcee69893",
+        "sourceKind": "self-test"
+      }
+    ],
+    "realUserDataTouched": false,
+    "modelCalls": 0,
+    "syntheticCloudIncidents": 1,
+    "guiVerified": false
+  },
+  "gui": [
+    {
+      "passed": true,
+      "brandName": "QCU Buddy",
+      "schoolNameShown": false,
+      "logoVerified": true,
+      "aboutVerified": true,
+      "windowTitleVerified": true,
+      "screenshotAvailable": true,
+      "visibility": "visible",
+      "platform": "darwin",
+      "guiLoaded": true,
+      "firstUse": true,
+      "restart": false,
+      "directDisableVerified": true,
+      "explicitOffPersisted": true,
+      "diagnosticsDisplayed": true,
+      "modelCalls": 0
+    },
+    {
+      "passed": true,
+      "brandName": "QCU Buddy",
+      "schoolNameShown": false,
+      "logoVerified": true,
+      "aboutVerified": true,
+      "windowTitleVerified": true,
+      "screenshotAvailable": true,
+      "visibility": "visible",
+      "platform": "darwin",
+      "guiLoaded": true,
+      "firstUse": false,
+      "restart": true,
+      "directDisableVerified": false,
+      "explicitOffPersisted": true,
+      "diagnosticsDisplayed": true,
+      "modelCalls": 0
+    }
+  ],
+  "archive": {
+    "zipSha256": "a778817fbc9ea92b75b7b0513a8f1700913c8a8f104dcbb624b8f1f12a852275",
+    "codesignDeepStrict": true,
+    "nativePrepareFromZipTwice": true
+  },
+  "branding": "QCU Buddy; official navy symbol only, no school name",
+  "identityAndDataPathsUnchanged": true,
+  "managedUpdaterProtectionVerified": true,
+  "nodeRegressionTestsPassed": 41,
+  "diagnosticServerTestsPassed": 9,
+  "cloudHealth": 200,
+  "cloudAnonymousMaintainer": 401,
+  "vendorSignature": "ad-hoc; deep/strict verified after final ZIP extraction",
+  "limitations": [
+    "Not Apple-notarized",
+    "No actual model calls or teacher business acceptance"
+  ]
+}

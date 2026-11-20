@@ -1,0 +1,20 @@
+[
+  {
+    "target": "win-x64",
+    "file": "QCU-Teacher-0.1.0-rc.4.5.5-win-x64.zip",
+    "sha256": "667b3131c5a1f82836fe209bea9c2f31ff35a7e481ddd5a064f039bf953a6cad",
+    "bytes": 403845138,
+    "localLocation": ".local/build-inputs/rc455/QCU-Teacher-0.1.0-rc.4.5.5-win-x64.zip",
+    "requiredBy": "scripts/build-rc456.py",
+    "reason": "Pinned, verified build input; not an additional user installation"
+  },
+  {
+    "target": "mac-arm64",
+    "file": "QCU-Teacher-0.1.0-rc.4.5.5-mac-arm64.zip",
+    "sha256": "d583d40d87dd835bec1a94291f77fed4001c67ae092dc5e0bcda1c1a68bd8ed9",
+    "bytes": 398171960,
+    "localLocation": ".local/build-inputs/rc455/QCU-Teacher-0.1.0-rc.4.5.5-mac-arm64.zip",
+    "requiredBy": "scripts/build-rc456.py",
+    "reason": "Pinned, verified build input; not an additional user installation"
+  }
+]

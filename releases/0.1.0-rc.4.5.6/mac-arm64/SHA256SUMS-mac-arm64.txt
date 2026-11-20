@@ -1,0 +1,1 @@
+a778817fbc9ea92b75b7b0513a8f1700913c8a8f104dcbb624b8f1f12a852275  QCU-Buddy-0.1.0-rc.4.5.6-mac-arm64.zip

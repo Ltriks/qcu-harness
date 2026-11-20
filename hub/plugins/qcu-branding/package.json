@@ -1,9 +1,9 @@
 {
   "name": "qcu-branding",
-  "version": "0.3.0-pilot.6",
+  "version": "0.3.0-pilot.8",
   "type": "module",
   "license": "MIT",
-  "description": "QCU首页、个人常用能力与清蓝主题",
+  "description": "QCU Buddy 品牌界面、首页与常用能力",
   "exports": {
     ".": "./index.js",
     "./client": "./client.js",
@@ -41,6 +41,9 @@
     "src/tasks.mjs",
     "src/personalization.mjs",
     "src/view.mjs",
-    "src/plugin.mjs"
+    "src/plugin.mjs",
+    "diagnostics-worker.js",
+    "assets/qcu-symbol.svg",
+    "assets/qcu-symbol-source.json"
   ]
 }

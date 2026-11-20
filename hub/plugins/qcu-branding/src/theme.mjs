@@ -162,4 +162,8 @@ html[data-platform=darwin] .qcu-home-inner{padding-top:26px}
 .qcu-shortcuts p{margin:0}.qcu-shortcut-launch{font:inherit;font-weight:600;color:var(--qcu-blue);border:0;background:transparent;min-height:44px;padding:4px 0;text-align:left}.qcu-shortcut-launch:hover:not(:disabled){text-decoration:underline;text-underline-offset:4px}
 .qcu-teacher textarea{caret-color:var(--qcu-blue)}.qcu-teacher ::selection{color:var(--qcu-ink);background:var(--qcu-selected)}
 @container(max-width:480px){.qcu-shortcuts li{align-items:flex-start;flex-direction:column}.qcu-home-compose{padding:12px}}
+
+.qcu-product-mark{flex:none;object-fit:contain;background:#fff;border-radius:8px}
+.qcu-about-brand>.qcu-product-mark{margin:4px 0 8px}
+.qcu-about-brand>h2{margin:0 0 4px}
 `;

@@ -1,7 +1,7 @@
 #import <Cocoa/Cocoa.h>
 #include <stdio.h>
 static NSString *const VERSION=@"0.1.0-rc.4.5";
-static NSString *const BUILD=@"rc45.2";
+static NSString *const BUILD=@"rc45.7";
 static NSString *dataHome(void){NSString *test=NSProcessInfo.processInfo.environment[@"QCU_TEACHER_TEST_HOME"];return test.length?test.stringByStandardizingPath:[NSHomeDirectory() stringByAppendingPathComponent:[@"Library/Application Support/QCU-DSH/teacher/" stringByAppendingString:VERSION]];}
 static BOOL noLinks(NSString *p){NSFileManager *fm=NSFileManager.defaultManager;for(NSString *x=p;x.length>1;x=x.stringByDeletingLastPathComponent){NSDictionary *a=[fm attributesOfItemAtPath:x error:nil];if(a&&![a[NSFileType] isEqual:NSFileTypeDirectory])return NO;}return YES;}
 static int commit(NSString *stage,NSString *target){NSString *home=dataHome();if(![target isEqual:home]||![stage.stringByDeletingLastPathComponent isEqual:home.stringByDeletingLastPathComponent]||!([stage.lastPathComponent hasPrefix:@".qcu-upgrade-"]||[stage.lastPathComponent hasPrefix:@".qcu-prepare-"])||!noLinks(stage)||!noLinks(home.stringByDeletingLastPathComponent))return 10;return renamex_np(stage.fileSystemRepresentation,target.fileSystemRepresentation,RENAME_EXCL)==0?0:11;}
@@ -12,7 +12,7 @@ static BOOL fail(BOOL checking,NSString *message){
  NSString *footer=[NSString stringWithFormat:@"\n\n套件 %@ · 构建 %@\n已有数据保留。可复制或导出此提示交给维护人员。",VERSION,BUILD];
  NSString *body=[message stringByAppendingString:footer];
  while(YES){
-  NSAlert *a=[NSAlert new];a.messageText=@"城院助手暂时未能打开";a.informativeText=body;
+  NSAlert *a=[NSAlert new];a.messageText=@"QCU Buddy暂时未能打开";a.informativeText=body;
   [a addButtonWithTitle:@"关闭"];[a addButtonWithTitle:@"复制诊断"];[a addButtonWithTitle:@"导出诊断"];
   [NSApp activateIgnoringOtherApps:YES];NSModalResponse r=[a runModal];
   if(r==NSAlertFirstButtonReturn)break;

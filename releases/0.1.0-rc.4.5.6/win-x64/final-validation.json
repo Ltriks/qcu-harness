@@ -1,0 +1,117 @@
+{
+  "packageRevision": "0.1.0-rc.4.5.6",
+  "build": "rc45.7",
+  "target": "win-x64",
+  "passed": true,
+  "native": {
+    "passed": true,
+    "platform": "win32",
+    "arch": "x64",
+    "build": "rc45.7",
+    "seedId": "714333595397c39cf8432c5f885b0da7656fd33936d3311f1ad8617c9190e8ea",
+    "results": [
+      {
+        "case": "native-launcher-fresh-and-repeat",
+        "passed": true
+      },
+      {
+        "case": "upgrade-4.5.1",
+        "passed": true,
+        "settingsAndWorkPreserved": true
+      },
+      {
+        "case": "upgrade-4.5.2",
+        "passed": true,
+        "settingsAndWorkPreserved": true
+      },
+      {
+        "case": "upgrade-4.5.3",
+        "passed": true,
+        "settingsAndWorkPreserved": true
+      },
+      {
+        "case": "upgrade-4.5.4",
+        "passed": true,
+        "settingsAndWorkPreserved": true
+      },
+      {
+        "case": "upgrade-4.5.5",
+        "passed": true,
+        "settingsAndWorkPreserved": true
+      },
+      {
+        "case": "injected-hotfix-failure-rolls-back",
+        "passed": true
+      },
+      {
+        "case": "unknown-build-preserved-and-refused",
+        "passed": true
+      },
+      {
+        "case": "cloud-HTTPS-self-test-and-idempotence",
+        "passed": true,
+        "incidentId": "ce5404ab-db61-4f3c-9fec-e5a3c0fc18a1",
+        "receiptId": "48a39139237e83ec5e04df5f15ec80eec6db5d46e0b23e2e54d2658f458de12b",
+        "sourceKind": "self-test"
+      }
+    ],
+    "realUserDataTouched": false,
+    "modelCalls": 0,
+    "syntheticCloudIncidents": 1,
+    "guiVerified": false
+  },
+  "gui": [
+    {
+      "passed": true,
+      "brandName": "QCU Buddy",
+      "schoolNameShown": false,
+      "logoVerified": true,
+      "aboutVerified": true,
+      "windowTitleVerified": true,
+      "screenshotAvailable": true,
+      "visibility": "visible",
+      "platform": "win32",
+      "guiLoaded": true,
+      "firstUse": true,
+      "restart": false,
+      "directDisableVerified": true,
+      "explicitOffPersisted": true,
+      "diagnosticsDisplayed": true,
+      "modelCalls": 0
+    },
+    {
+      "passed": true,
+      "brandName": "QCU Buddy",
+      "schoolNameShown": false,
+      "logoVerified": true,
+      "aboutVerified": true,
+      "windowTitleVerified": true,
+      "screenshotAvailable": true,
+      "visibility": "visible",
+      "platform": "win32",
+      "guiLoaded": true,
+      "firstUse": false,
+      "restart": true,
+      "directDisableVerified": false,
+      "explicitOffPersisted": true,
+      "diagnosticsDisplayed": true,
+      "modelCalls": 0
+    }
+  ],
+  "archive": {
+    "zipSha256": "42f08e4cdf6f36abfd819658b24e26fc031ba22cfa512f3bc80cf53b8490e8a9",
+    "fileMembersVerified": 10180
+  },
+  "branding": "QCU Buddy; official navy symbol only, no school name",
+  "identityAndDataPathsUnchanged": true,
+  "managedUpdaterProtectionVerified": true,
+  "nodeRegressionTestsPassed": 41,
+  "diagnosticServerTestsPassed": 9,
+  "cloudHealth": 200,
+  "cloudAnonymousMaintainer": 401,
+  "vendorSignature": "Valid",
+  "limitations": [
+    "No actual model calls or teacher business acceptance",
+    "Windows x64 tested on Windows11 ARM Parallels, not separate Intel/AMD hardware"
+  ]
+}

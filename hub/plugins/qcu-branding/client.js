@@ -1,6 +1,6 @@
 window.__ModuleLoader__.load({id:'qcu-branding',factory:require=>{
   const React=require('react');
-  const icon='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCIgZmlsbD0ibm9uZSI+CiAgPHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiMxNzRGOTEiLz4KICA8cGF0aCBkPSJNMjAgMzFWMjBDMjAgMTAgNDQgMTAgNDQgMjBWMzFIMzhWMjFDMzggMTcgMjYgMTcgMjYgMjFWMzFIMjBaIiBmaWxsPSIjRkZGIi8+CiAgPHBhdGggZD0iTTEyIDM3QzIwIDM0IDI2IDM2IDMyIDQxQzM4IDM2IDQ0IDM0IDUyIDM3VjQ5QzQ0IDQ2IDM4IDQ4IDMyIDUzQzI2IDQ4IDIwIDQ2IDEyIDQ5VjM3WiIgZmlsbD0iI0ZGRiIvPgogIDxwYXRoIGQ9Ik0zMiA0MVY1MyIgc3Ryb2tlPSIjMTc0RjkxIiBzdHJva2Utd2lkdGg9IjIuNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CiAgPHBhdGggZD0iTTE2IDQyQzIxIDQxIDI1IDQyIDI4IDQ0TTM2IDQ0QzM5IDQyIDQzIDQxIDQ4IDQyIiBzdHJva2U9IiM5QUQ1RjEiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+Cjwvc3ZnPgo=';
+  const icon='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjExMC41NjQ4IDEwMy41NzMyOSAxODAuMTAzOSAyNjEuMzE0MDEiIHdpZHRoPSIxODAuMTAzOSIgaGVpZ2h0PSIyNjEuMzE0MDEiIHJvbGU9ImltZyIgYXJpYS1sYWJlbD0iUUNVIEJ1ZGR5Ij48cGF0aCBmaWxsPSIjMTgxZDdlIiBmaWxsLXJ1bGU9Im5vbnplcm8iIGQ9Ik0yMDYuMTQ3NTEgMjYxLjExNzE5IEwyMDYuMTIyNTEgMjYxLjExNzE5IEMyMDAuMzMxNTEgMjYwLjg1NjIgMTk1LjEzODUgMjU4LjIwMTIgMTkxLjUyMTUgMjU0LjEzMDE5IEMxODkuMDc3NTEgMjUxLjM3MzE4IDE4Ny4zNTc1MSAyNDguMDAxMTkgMTg2LjY0MDUgMjQ0LjI2NjE5IEwxODYuNjE2NSAyNDQuMjY2MTkgQzE4Ni4zNzI1MSAyNDIuOTc3MTkgMTg2LjIyNzUxIDI0MS42MTIxOCAxODYuMjI3NTEgMjQwLjI0NjE5IEwxODYuMjI3NTEgMjE0LjMwMDE5IEMxODYuMjI3NTEgMjEyLjg1OTE5IDE4Ni4zNzI1MSAyMTEuNDc2MiAxODYuNjU4NTEgMjEwLjEzNjE4IEMxODYuOTI3NTEgMjA4LjgyMTE4IDE4Ny4zMDc1MSAyMDcuNTIzMTkgMTg3LjgzODUgMjA2LjMwOTE5IEMxOTAuOTQ4NSAxOTguNzE0MTkgMTk4LjQxODUgMTkzLjM3OTE4IDIwNy4xMjU1IDE5My4zNzkxOCBMMjA3LjEyNTUgMTc5LjQ1MjE4IEwyMDAuMTYzNTEgMTc5LjQ1MjE4IEMxOTUuMTc5NSAxNzkuNDUyMTggMTkwLjQ2NzUgMTgwLjUyMzE5IDE4Ni4yMjc1MSAxODIuNDQ2MiBDMTc0LjUwMjUgMTg3Ljc1NjIgMTY2LjM0MzUxIDE5OS41NTcxOSAxNjYuMzQzNTEgMjEzLjI3MjE5IEwxNjYuMzQzNTEgMjQxLjE1NzIgQzE2Ni4zNDM1MSAyNTQuODcxMTkgMTc0LjUwMjUgMjY2LjY3MzE5IDE4Ni4yMjc1MSAyNzEuOTgzMTggQzE4Ni4zNzI1MSAyNzIuMDU5MTcgMTg2LjUxNDUxIDI3Mi4xMjYxOSAxODYuNjU4NTEgMjcyLjE3NzE5IEMxOTAuODA1NTEgMjczLjk3MjIgMTk1LjM0ODUxIDI3NC45NzUxOSAyMDAuMTYzNTEgMjc0Ljk3NTE5IEwyMDcuMTI1NSAyNzQuOTc1MTkgTDIwNy4xMjU1IDI2MS4wNTAyIEMyMDYuNzk1NSAyNjEuMDUwMiAyMDYuNDU5NSAyNjEuMDY3MiAyMDYuMTQ3NTEgMjYxLjExNzE5Ii8+PHBhdGggZmlsbD0iIzE4MWQ3ZSIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMTY2LjM0MjggMjgyLjQ0NjI5IEMxNjMuNDY3OCAyODAuMzY0MjkgMTYwLjkzMDggMjc3Ljg1MjI5IDE1OC44NDg4IDI3NC45NzgzIEMxNTQuNzc3OCAyNjkuMzk4MjggMTUyLjM4MjggMjYyLjUyODI5IDE1Mi4zODI4IDI1NS4wODQyOSBMMTUyLjM4MjggMjAwLjM0NDMgQzE1Mi4zODI4IDE5MC42NzUyOSAxNDUuNzk5OCAxODIuNTE1MjkgMTM2Ljg0NzgxIDE4MC4xNjMzIEMxMzUuMTc4OCAxNzkuNjkxMjggMTMzLjQwODgxIDE3OS40NDYyOSAxMzEuNTg3OCAxNzkuNDQ2MjkgTDEzMS41ODc4IDE3Ni44MTcyOSBMMjA3LjEyMzgxIDE3Ni44MTcyOSBMMjA3LjEyMzgxIDExMS41NzMyOSBMMTE4LjU2NDggMTQ1LjUwMjI5IEwxMTguNTY0OCAzNTYuODg3MyBMMjA3LjEyMzgxIDMyMi42MTMyOCBMMjA3LjEyMzgxIDI4OC45MTIyOSBMMTg2LjIyNzggMjg4LjkxMjI5IEMxNzguNzkxODEgMjg4LjkxMjI5IDE3MS45MjI4MSAyODYuNTA5MjggMTY2LjM0MjggMjgyLjQ0NjI5Ii8+PHBhdGggZmlsbD0iIzE4MWQ3ZSIgZmlsbC1ydWxlPSJub256ZXJvIiBkPSJNMjE0LjA5NTcgMTc2LjgxNSBMMjE0LjA5NTcgMTc5LjQ0NCBDMjE5LjA2ODcxIDE3OS40NDQgMjIzLjc4ODcgMTgwLjUyMjk5IDIyOC4wMjA3MSAxODIuNDM3IEMyMzkuNzU0NyAxODcuNzU2IDI0Ny45MTM3IDE5OS41NTcwMSAyNDcuOTEzNyAyMTMuMjcyIEwyNDcuOTEzNyAyNDEuMTU3MDEgQzI0Ny45MTM3IDI0NC40Njg5OSAyNDcuNDMzNyAyNDcuNjY0IDI0Ni41Mzk3IDI1MC42OSBDMjQxLjgyNzcgMjUyLjMyNiAyMzYuMTk3NzEgMjUyLjI1OCAyMzAuNjU4NzEgMjQ5LjUxOTAxIEMyMjMuMzE3NyAyNDUuODk0MDEgMjE0Ljk4ODcxIDI0NS4xNDQwMSAyMDcuMTIzNyAyNDcuMDU3MDEgTDIwNy4xMjM3IDI2MS4wNDE5OSBDMjEyLjAxMjcxIDI1OC44NTAwMSAyMTguMzAxNyAyNTguMzM2IDIyNS4yNzI3MSAyNjIuMTEyIEMyMjkuMDY2NyAyNjQuMTYxMDEgMjMzLjIzODcxIDI2NS4yOTAwMSAyMzcuNDEwNzEgMjY1LjYzNTk5IEMyMzQuNjcwNyAyNjguMjQxIDIzMS41MTA3MSAyNzAuNDA3MDEgMjI4LjAyMDcxIDI3MS45ODMgQzIyNy44NzY3MSAyNzIuMDU5MDIgMjI3LjczNDcxIDI3Mi4xMjcwMSAyMjcuNTkwNyAyNzIuMTc3IEMyMjMuNDUwNyAyNzMuOTcxOTggMjE4LjkwNzcgMjc0Ljk3NjAxIDIxNC4wOTU3IDI3NC45NzYwMSBMMjA3LjEyMzcgMjc0Ljk3NjAxIEwyMDcuMTIzNyAyODguOTEgTDIxNC4wOTU3IDI4OC45MSBMMjI4LjAyMDcxIDI4OC45MSBDMjM1LjQ3MjcgMjg4LjkxIDI0Mi4zNDE3MSAyODYuNTE1OTkgMjQ3LjkxMzcgMjgyLjQ0NCBDMjUwLjc4ODcgMjgwLjM2MiAyNTMuMzI1NyAyNzcuODUwMDEgMjU1LjQwNzcgMjc0Ljk3NjAxIEMyNTkuNDc5NzEgMjY5LjM5NiAyNjEuODY0NzIgMjYyLjUyNDk5IDI2MS44NjQ3MiAyNTUuMDkgTDI2MS44NjQ3MiAyMDAuMzUwMDEgQzI2MS44NjQ3MiAxOTAuNjcyIDI2OC40NDg3IDE4Mi41MTMgMjc3LjQwMDcgMTgwLjE2MSBDMjc5LjA3NzcgMTc5LjY4OSAyODAuODQ3NzIgMTc5LjQ0NCAyODIuNjY4NyAxNzkuNDQ0IEwyODIuNjY4NyAxNzYuODE1IEwyMTQuMDk1NyAxNzYuODE1Ii8+PC9zdmc+';
   const themeTokens = {
  '--dsw-alias-bg-base':['#FFFFFF','#17212E'],
  '--dsw-alias-bg-layer-1':['#FFFFFF','#1D2A3A'],
@@ -165,6 +165,10 @@ html[data-platform=darwin] .qcu-home-inner{padding-top:26px}
 .qcu-shortcuts p{margin:0}.qcu-shortcut-launch{font:inherit;font-weight:600;color:var(--qcu-blue);border:0;background:transparent;min-height:44px;padding:4px 0;text-align:left}.qcu-shortcut-launch:hover:not(:disabled){text-decoration:underline;text-underline-offset:4px}
 .qcu-teacher textarea{caret-color:var(--qcu-blue)}.qcu-teacher ::selection{color:var(--qcu-ink);background:var(--qcu-selected)}
 @container(max-width:480px){.qcu-shortcuts li{align-items:flex-start;flex-direction:column}.qcu-home-compose{padding:12px}}
+
+.qcu-product-mark{flex:none;object-fit:contain;background:#fff;border-radius:8px}
+.qcu-about-brand>.qcu-product-mark{margin:4px 0 8px}
+.qcu-about-brand>h2{margin:0 0 4px}
 `;
 
 const teachingTasks = [
@@ -209,6 +213,25 @@ function createHomePersonalization({storage}={}) {
  return {snapshot:()=>snapshot,subscribe:fn=>{listeners.add(fn);return()=>listeners.delete(fn)},favorite(id){if(!ids([id]).length)return;const removing=snapshot.favorites.includes(id);change({...snapshot,favorites:removing?snapshot.favorites.filter(x=>x!==id):[...snapshot.favorites,id],pinned:removing?snapshot.pinned.filter(x=>x!==id):snapshot.pinned})},pin(id){if(!ids([id]).length)return;change({...snapshot,favorites:ids([...snapshot.favorites,id]),pinned:snapshot.pinned.includes(id)?snapshot.pinned.filter(x=>x!==id):ids([...snapshot.pinned,id])})},move(id,direction){const pinned=[...snapshot.pinned],index=pinned.indexOf(id),next=index+direction;if(index<0||next<0||next>=pinned.length)return;[pinned[index],pinned[next]]=[pinned[next],pinned[index]];change({...snapshot,pinned})},dispose(){listeners.clear()}}
 }
 
+async function requestDiagnostics(connection,method,payload,{timeoutMs=60000}={}) {
+ const failure=code=>Object.assign(new Error(code),{code});
+ const remote=connection.current;
+ if(!remote||typeof remote[method]!=='function')throw failure('QCU-DIAG-CONNECTION');
+ let timer;
+ try{
+  const timedOut=new Promise((_,reject)=>{timer=setTimeout(()=>reject(failure('QCU-DIAG-TIMEOUT')),timeoutMs)});
+  let value=await Promise.race([payload===undefined?remote[method]():remote[method](JSON.stringify(payload)),timedOut]);
+  // The official RPC success envelope wraps the Host's own JSON envelope.
+  if(value&&typeof value==='object'&&value.ok===true&&(typeof value.value==='string'||(value.value&&typeof value.value==='object'&&typeof value.value.ok==='boolean')))value=value.value;
+  if(value&&typeof value==='object'&&!Object.hasOwn(value,'ok')&&Object.hasOwn(value,'value'))value=value.value;
+  if(typeof value==='string'){try{value=JSON.parse(value)}catch{throw failure('QCU-DIAG-REPLY')}}
+  if(!value||typeof value!=='object'||value.ok!==true)throw failure('QCU-DIAG-HOST');
+  if(!value.value||typeof value.value!=='object')throw failure('QCU-DIAG-REPLY');
+  return value.value;
+ }catch(error){if(/^QCU-DIAG-[A-Z-]+$/.test(error?.code??''))throw error;throw failure('QCU-DIAG-TRANSPORT')}
+ finally{clearTimeout(timer)}
+}
+
 const problemHelp = [
  {id:'network',title:'网络或校内 Hub 无法连接',text:'先确认设备网络和校内连接可用；校内 Hub 暂时离线时，稍后再由你尝试。反馈提交结果不确定时，先查询已有回执，不要重复提交。'},
  {id:'key',title:'提示缺少或无效的 API Key',text:'打开左下角“设置 → 模型”，在对应服务商的官方设置中核对并保存 Key。不要把 Key 贴到对话、截图或反馈里。'},
@@ -225,8 +248,8 @@ function createTeacherViews(React, icon) {
   const paths={home:'M3 10l9-7 9 7v10H7V10m5 4v6',book:'M3 4h7l2 2 2-2h7v15h-7l-2 2-2-2H3zM12 6v15',tools:'M5 3h14v18H5zM9 8h6M9 12h6M9 16h3',folder:'M3 6h7l2 3h9v11H3z',chat:'M3 4h18v14H9l-6 4z',menu:'M4 6h16M4 12h16M4 18h16',more:'M5 12h.01M12 12h.01M19 12h.01',collapse:'M3 4h18v16H3zM8 4v16M16 9l-3 3 3 3',expand:'M3 4h18v16H3zM8 4v16M13 9l3 3-3 3',help:'M9 9a3 3 0 116 0c0 2-3 2-3 5m0 3h.01',chevron:'M14 6l-6 6 6 6'};
   return h('svg',{width:size,height:size,viewBox:'0 0 24 24',fill:'none',stroke:'currentColor',strokeWidth:1.7,strokeLinecap:'round',strokeLinejoin:'round','aria-hidden':true},h('path',{d:paths[kind]??paths.tools}));
  }
- function Mark({size=28,className}) {return h('img',{src:icon,width:size,height:size,className,alt:'',draggable:false});}
- function Name(){return h('strong',null,'QCU助手');}
+ function Mark({size=40,className=''}) {return h('img',{src:icon,width:size,height:size,className:'qcu-product-mark '+className,alt:'',draggable:false});}
+ function Name(){return h('strong',null,'QCU Buddy');}
  function HeaderNavigation({ctx}) {
   return h('nav',{className:'qcu-teacher qcu-header-nav','aria-label':'窗口导航'},
    h('button',{type:'button',className:'qcu-sidebar-toggle','aria-label':'展开导航',title:'展开导航',onClick:()=>ctx.layout.toggleSidebar()},h(Glyph,{kind:'expand',size:20})));
@@ -244,7 +267,7 @@ function createTeacherViews(React, icon) {
   const maintenance=extraPanels.filter(o=>!['qcu-market','qcu-expert-teams'].includes(o.id));
   const active=info.activePanelId,hiddenMacSidebar=collapsed&&document.documentElement?.dataset.platform==='darwin';
   const nav=(id,label,kind)=>h('button',{key:id,type:'button','aria-label':label,title:collapsed?label:undefined,'aria-current':active===id?'page':undefined,onClick:()=>ctx.layout.selectPanel(id)},h(Glyph,{kind}),!collapsed&&h('span',null,label));
-  return h('aside',{className:'qcu-teacher qcu-side'+(collapsed?' collapsed':''),'aria-label':'QCU导航','aria-hidden':hiddenMacSidebar||undefined,inert:hiddenMacSidebar?'':undefined},
+  return h('aside',{className:'qcu-teacher qcu-side'+(collapsed?' collapsed':''),'aria-label':'QCU Buddy 导航','aria-hidden':hiddenMacSidebar||undefined,inert:hiddenMacSidebar?'':undefined},
    collapsed&&h('div',{className:'qcu-windows-recovery'},h(HeaderNavigation,{ctx})),
    h('div',{className:'qcu-side-brand'},!collapsed&&h(Mark,{}),!collapsed&&h('div',{className:'qcu-brand-name'},h(Name),h('small',null,'教学与教研助手')),h('button',{type:'button',className:'qcu-sidebar-toggle','aria-label':collapsed?'展开导航':'收起导航',title:collapsed?'展开导航':'收起导航',onClick:toggleSidebar},h(Glyph,{kind:collapsed?'expand':'collapse',size:20}))),
    h('nav',{className:'qcu-side-nav','aria-label':'主要功能'},nav('qcu-teacher-home','首页','home'),nav('qcu-capabilities','工作助手','tools'),...promoted.map(o=>nav(o.id,o.id==='qcu-market'?'工具市场':'专家团','tools')),
@@ -263,7 +286,42 @@ function createTeacherViews(React, icon) {
   return h('li',{'data-shortcut':id},h('div',null,h('button',{type:'button',className:'qcu-shortcut-launch',disabled:!active,onClick:()=>onLaunch(item,flow)},title),h('p',{className:'qcu-muted'},!item?'当前目录中不可用':item.conversationTask?'对话任务':active?'已启用':state.status?.state==='not-installed'?'尚未安装':'需检查启用或连接状态')),
    h('div',{className:'qcu-toolbar'},!active&&h('button',{type:'button',className:'qcu-button',onClick:()=>onManage(id)},'查看状态'),managing&&h(React.Fragment,null,h('button',{type:'button',className:'qcu-button','aria-label':'上移'+title,disabled:index===0,onClick:()=>personalization.move(id,-1)},'上移'),h('button',{type:'button',className:'qcu-button','aria-label':'下移'+title,disabled:index===total-1,onClick:()=>personalization.move(id,1)},'下移'),h('button',{type:'button',className:'qcu-button','aria-label':'取消固定'+title,onClick:()=>personalization.pin(id)},'取消固定'))));
  }
- function Home({ctx,homeState,personalization,capabilitySource}) {
+ function ReportingNotice({diagnosticConnection}){
+  const [data,setData]=React.useState(null),[message,setMessage]=React.useState(''),[visible,setVisible]=React.useState(false);
+  const generation=React.useRef(0);
+  React.useEffect(()=>{
+   let mounted=true;
+   (async()=>{for(let attempt=0;attempt<12&&mounted;attempt++){try{return await requestDiagnostics(diagnosticConnection,'onboarding',{action:'inspect'})}catch(error){if(error.code!=='QCU-DIAG-CONNECTION'||attempt===11)throw error;await new Promise(resolve=>setTimeout(resolve,250))}}})().then(value=>{
+    if(!mounted||value?.state!=='unset')return;
+    setData(value);setVisible(true);setMessage('说明展示后将默认开启，你可以随时关闭。');
+   }).catch(()=>{});
+   return()=>{mounted=false};
+  },[diagnosticConnection]);
+  React.useEffect(()=>{
+   if(data?.state!=='unset')return;
+   // Effects run after the notice has been committed; allow a visible paint too.
+   let mounted=true,frame1,frame2;
+   const disclose=()=>{
+    if(!mounted||document.visibilityState==='hidden')return;
+    document.removeEventListener('visibilitychange',disclose);
+    frame1=requestAnimationFrame(()=>{frame2=requestAnimationFrame(async()=>{
+     if(!mounted||generation.current>0)return;
+     if(document.visibilityState==='hidden'){document.addEventListener('visibilitychange',disclose);return}
+     const token=generation.current;
+     try{const next=await requestDiagnostics(diagnosticConnection,'onboarding',{action:'disclosed'});if(mounted&&token===generation.current){setData(next);setMessage(next.autoReport?'基础故障上报已开启。':next.state==='explicit-disabled'?'自动上报已关闭。':'暂未开启，请到使用指南查看诊断设置。')}}catch{if(mounted&&token===generation.current)setMessage('暂未确认开启状态，请到使用指南查看诊断设置。')}
+    })});
+   };
+   document.addEventListener('visibilitychange',disclose);disclose();
+   return()=>{mounted=false;document.removeEventListener('visibilitychange',disclose);cancelAnimationFrame(frame1);cancelAnimationFrame(frame2)};
+  },[data?.state,diagnosticConnection]);
+  async function disable(){
+   ++generation.current;setMessage('正在关闭自动上报…');
+   try{const next=await requestDiagnostics(diagnosticConnection,'onboarding',{action:'disable'});setData(next);setMessage('自动上报已关闭，故障记录仅保存在本机。')}catch{setMessage('尚未确认关闭，请重试或到使用指南查看诊断设置。')}
+  }
+  if(!visible)return null;
+  return h('section',{className:'qcu-notice','aria-label':'基础故障上报告知'},h('h2',null,'故障反馈，少一步操作'),h('p',null,'首次使用告知后，基础故障上报默认开启。仅向'+(data?.receiver||'维护服务')+'发送故障编号、版本、平台、阶段与固定技术错误码；不含密钥、配置正文、对话或教学资料。断网时保存在本机，联网后重试。'),h('p',{role:'status'},message),h('div',{className:'qcu-toolbar'},h('button',{type:'button',className:'qcu-button',onClick:disable},'关闭自动上报'),h('button',{type:'button',className:'qcu-button',onClick:()=>setVisible(false)},'收起说明')),h('p',{className:'qcu-muted'},'以后可在“更多 → 使用指南 → 问题与维护 → 诊断与上报”修改。'));
+ }
+ function Home({ctx,homeState,personalization,capabilitySource,diagnosticConnection}) {
   const workspaces=useSource(ctx.workspaces.list),sessions=useSource(ctx.sessions.list),local=useSource(homeState),bridge=useSource(capabilitySource);
   const personal=React.useSyncExternalStore(personalization.subscribe,personalization.snapshot,personalization.snapshot),ready=React.useSyncExternalStore(bridge?.availability?.subscribe??emptySubscribe,bridge?.availability?.snapshot??emptySnapshot,bridge?.availability?.snapshot??emptySnapshot);
   const [busy,setBusy]=React.useState(false),[error,setError]=React.useState(''),[managing,setManaging]=React.useState(false);
@@ -273,7 +331,7 @@ function createTeacherViews(React, icon) {
   const launch=async(item,flow)=>{setError('');setBusy(true);try{if(item.conversationTask){if(!bridge?.openTask)throw Error('工作助手尚未就绪，请稍后重试。');await bridge.openTask(item.id,workspaceId,draft);return}const status=await flow?.status();if(status?.state!=='component-active')throw Error('能力状态已变化，请在技能中检查后重试。');if(bridge?.isTeam(item)){await bridge.openTeam(item.id);return}if(!(item.skillName??item.release.skill))throw Error('此项能力需要从技能页面打开。');await openTeachingDraft(ctx,workspaceId,`/${item.skillName??item.release.skill}\n${draft}`)}catch(e){setError(e.message||'暂时无法打开，请检查工作文件夹和能力状态。')}finally{setBusy(false)}};
   const start=async()=>{setError('');setBusy(true);try{await openTeachingDraft(ctx,workspaceId,draft)}catch{setError('暂时无法打开对话，要求已保留。请检查工作文件夹后重试。')}finally{setBusy(false)}};
   const recent=recentTasks(sessions,workspaces);
-  return h('div',{className:'qcu-teacher qcu-home'},h('div',{className:'qcu-home-inner'},h('header',{className:'qcu-home-top'},h('h1',null,'首页')),
+  return h('div',{className:'qcu-teacher qcu-home'},h('div',{className:'qcu-home-inner'},h('header',{className:'qcu-home-top'},h('h1',null,'首页')),h(ReportingNotice,{diagnosticConnection}),
    h('section',{className:'qcu-home-compose','aria-label':'开始对话'},h('h2',null,'今天想做什么？'),h('label',{className:'qcu-field'},h('span',null,'任务要求'),h('textarea',{'aria-label':'任务要求',placeholder:'描述你的目标，或从下方选择常用技能…',value:draft,maxLength:12000,disabled:busy,onChange:e=>homeState.update({conversationDraft:e.target.value})})),
     h('label',{className:'qcu-field'},h('span',null,'工作文件夹'),h('select',{'aria-label':'工作文件夹',value:workspaceId,disabled:busy||!workspaces.items.length,onChange:e=>homeState.update({workspaceId:e.target.value})},!workspaces.items.length&&h('option',{value:''},'请先在左侧添加工作文件夹'),workspaces.items.map(w=>h('option',{key:w.workspaceId,value:w.workspaceId},w.label??w.title??w.path)))),
     error&&h('p',{role:'alert'},error),h('div',{className:'qcu-task-bottom'},h('p',{className:'qcu-muted'},'先打开草稿，检查后由你发送。'),h('button',{type:'button',className:'qcu-button primary',disabled:busy||!workspaceId||!draft.trim(),onClick:start},busy?'正在打开…':'在对话中继续'))),
@@ -311,32 +369,40 @@ function createTeacherViews(React, icon) {
    h('details',null,h('summary',null,'收藏技能与定制首页'),h('p',null,'打开“工作助手”，收藏感兴趣的能力；选择“固定到首页”后即可从“我的常用”访问。首页可以调整顺序或取消固定，取消固定不会卸载技能。')),
    h('details',null,h('summary',null,'任务示例'),h(ExampleComposer,{ctx,preferences,homeState})),
    h('details',null,h('summary',null,'保存与检查成果'),h('p',null,'在对话中审阅结果，按需复制或保存到工作文件夹；保存后检查实际文件。知识、计算和来源仍需核对。')),
-   h('details',null,h('summary',null,'套件版本说明'),h(About,{ctx,diagnosticConnection}))),
+   h('details',null,h('summary',null,'关于 QCU Buddy'),h(About,{ctx,diagnosticConnection}))),
   h('section',{'aria-label':'问题与维护'},h('h2',null,'问题与维护'),problemHelp.map(topic=>h('details',{key:topic.id},h('summary',null,topic.title),h('p',null,topic.text))),h('details',null,h('summary',null,'诊断与上报'),h(Diagnostics,{diagnosticConnection})))));}
  function Diagnostics({diagnosticConnection}){
   const [data,setData]=React.useState(null),[notice,setNotice]=React.useState('正在读取本机诊断状态…'),[busy,setBusy]=React.useState(false),[copy,setCopy]=React.useState('');
-  async function call(method,payload){const timer=new Promise((_,reject)=>setTimeout(()=>reject(Error('timeout')),6000));let v=await Promise.race([payload===undefined?diagnosticConnection.current[method]():diagnosticConnection.current[method](JSON.stringify(payload)),timer]);if(v&&typeof v==='object'&&v.ok===true)v=v.value;const result=typeof v==='string'?JSON.parse(v):v;if(!result?.ok)throw Error('unavailable');return result.value}
-  async function refresh(){setBusy(true);try{setData(await call('status'));setNotice('')}catch{setNotice('暂时无法读取诊断。可重开助手后再试；不会影响已保存资料。')}finally{setBusy(false)}}
-  React.useEffect(()=>{let active=true;call('status').then(v=>{if(active){setData(v);setNotice('')}}).catch(()=>{if(active)setNotice('诊断服务暂不可用，请重开助手后再试。')});return()=>{active=false}},[]);
-  async function toggle(){setBusy(true);try{setData(await call('preference',{enabled:!data.autoReport}));setNotice('设置已保存。')}catch{setNotice('设置未能保存，请重试。')}finally{setBusy(false)}}
+  async function call(method,payload){return requestDiagnostics(diagnosticConnection,method,payload)}
+  async function refresh(){setBusy(true);try{setData(await call('status'));setNotice('')}catch(error){setNotice('暂时无法读取诊断（'+error.code+'）。可刷新重试；不会影响已保存资料。')}finally{setBusy(false)}}
+  React.useEffect(()=>{let active=true,tries=0;const run=()=>call('status').then(v=>{if(active){setData(v);setNotice('')}}).catch(error=>{if(!active)return;if(error.code==='QCU-DIAG-CONNECTION'&&++tries<12){setTimeout(run,250);return}setNotice('诊断暂不可用（'+error.code+'），请刷新状态。')});run();return()=>{active=false}},[]);
+  async function toggle(){setBusy(true);try{setData(await call('preference',{enabled:!data.autoReport}));setNotice('设置已保存。')}catch(error){setNotice('设置保存未确认（'+error.code+'），请先刷新状态核对。')}finally{setBusy(false)}}
   async function output(id,download){setBusy(true);try{const text=JSON.stringify(await call('exportRecord',{incidentId:id}),null,2);if(download){const url=URL.createObjectURL(new Blob([text],{type:'application/json'})),a=document.createElement('a');a.href=url;a.download='QCU-diagnostic-'+id+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);setNotice('已请求保存诊断文件。')}else{try{await navigator.clipboard.writeText(text);setNotice('诊断已复制。')}catch{setCopy(text);setNotice('请从下方文本框手动复制。')}}}catch{setNotice('记录无法读取，请刷新后重试。')}finally{setBusy(false)}}
   const labels={'received':'已获回执','queued':'等待发送','unknown':'待确认回执','local-only':'仅保存在本机'};
-  return h('section',{className:'qcu-notice','aria-label':'诊断与上报'},h('h2',null,'诊断与上报'),data&&h('p',null,'套件 '+data.version+' · 构建 '+data.build+' · 内核 '+data.kernel),h('p',null,'仅发送故障编号、版本、阶段与固定技术错误码到'+(data?.receiver||'维护服务')+'；不含密钥、配置正文、对话或教学资料。默认关闭，断网保存在本机。'),data&&h('p',null,'自动上报：'+(data.autoReport?'已开启':'已关闭')+(data.storageAvailable?'':'；诊断目录暂不可用')),h('div',{className:'qcu-toolbar'},data&&h('button',{type:'button',className:'qcu-button',disabled:busy,onClick:toggle},data.autoReport?'关闭自动上报':'同意并开启自动上报'),h('button',{type:'button',className:'qcu-button',disabled:busy,onClick:refresh},'刷新状态')),h('p',{role:'status'},notice),data?.records.length===0&&h('p',null,'暂无故障记录。'),data&&h('ul',null,data.records.map(r=>h('li',{key:r.incidentId},h('p',null,r.errorCode+' · '+r.createdAt+' · '+(labels[r.delivery]||'仅保存在本机')),h('code',null,r.incidentId),h('div',{className:'qcu-toolbar'},h('button',{type:'button',className:'qcu-button',disabled:busy,onClick:()=>output(r.incidentId,false)},'复制诊断'),h('button',{type:'button',className:'qcu-button',disabled:busy,onClick:()=>output(r.incidentId,true)},'导出诊断 JSON'))))),copy&&h('textarea',{'aria-label':'诊断文本',readOnly:true,value:copy,rows:8,style:{width:'100%'}}));
+  return h('section',{className:'qcu-notice','aria-label':'诊断与上报'},h('h2',null,'诊断与上报'),data&&h('p',null,'套件 '+data.version+' · 构建 '+data.build+' · 内核 '+data.kernel),h('p',null,'仅发送故障编号、版本、阶段与固定技术错误码到'+(data?.receiver||'维护服务')+'；不含密钥、配置正文、对话或教学资料。首次使用告知后默认开启；已保存的选择会保留。断网保存在本机。'),data&&h('p',null,'自动上报：'+(data.autoReport?'已开启':'已关闭')+(data.storageAvailable?'':'；诊断目录暂不可用')),h('div',{className:'qcu-toolbar'},data&&h('button',{type:'button',className:'qcu-button',disabled:busy,onClick:toggle},data.autoReport?'关闭自动上报':'开启自动上报'),h('button',{type:'button',className:'qcu-button',disabled:busy,onClick:refresh},'刷新状态')),h('p',{role:'status'},notice),data?.records.length===0&&h('p',null,'暂无故障记录。'),data&&h('ul',null,data.records.map(r=>h('li',{key:r.incidentId},h('p',null,r.errorCode+' · '+r.createdAt+' · '+(labels[r.delivery]||'仅保存在本机')),h('code',null,r.incidentId),h('div',{className:'qcu-toolbar'},h('button',{type:'button',className:'qcu-button',disabled:busy,onClick:()=>output(r.incidentId,false)},'复制诊断'),h('button',{type:'button',className:'qcu-button',disabled:busy,onClick:()=>output(r.incidentId,true)},'导出诊断 JSON'))))),copy&&h('textarea',{'aria-label':'诊断文本',readOnly:true,value:copy,rows:8,style:{width:'100%'}}));
  }
- function About(){return h('div',null,h('p',null,'QCU助手 · 清蓝主题 0.3.0-pilot.6'),h('p',null,'主题版本与完整应用版本分别维护。当前套件与内核版本可在下方“问题与维护 → 诊断与上报”查看。'),h('p',null,'完整套件由维护者统一交付；单独更新主题不会升级客户端。'))}
+ function About(){return h('div',{className:'qcu-about-brand'},h(Mark,{size:72}),h('h2',null,'QCU Buddy'),h('p',null,'教学与教研助手'),h('p',{className:'qcu-muted'},'界面组件 0.3.0-pilot.8'),h('p',null,'主题版本与完整应用版本分别维护。当前套件与内核版本可在下方“问题与维护 → 诊断与上报”查看。'),h('p',null,'完整套件由维护者统一交付；单独更新主题不会升级客户端。'))}
 
 
- return {Sidebar,Home,Help,About,Mark,Name,Glyph,HeaderNavigation,SettingsLauncher};
+ return {Sidebar,Home,Help,About,Mark,Name,Glyph,HeaderNavigation,SettingsLauncher,ReportingNotice};
 }
 
 function createTeacherPlugin(React,icon) {
  const {Sidebar,Home,Help,Mark,Name,HeaderNavigation,SettingsLauncher}=createTeacherViews(React,icon),h=React.createElement;
  return {inject:['slots','layout','theme','locale','uiWorkspace','sessions','workspaces','conversation','remote'],apply(ctx){
   const diagnosticCodec={mode:'strict',typeSymbol:'qcu-branding#DiagnosticJson',create:()=>({parse(value){if(typeof value!=='string'||new TextEncoder().encode(value).length>32768)throw Error('Invalid diagnostic');JSON.parse(value);return value}})};
-  const diagnosticsContract={package:'qcu-branding',descriptors:[['status',[]],['preference',[{name:'payload',wire:'payload',source:'json',codec:diagnosticCodec}]],['exportRecord',[{name:'payload',wire:'payload',source:'json',codec:diagnosticCodec}]]].map(([method,parameters])=>({id:'qcu-branding#qcuDiagnostics/'+method,service:'qcuDiagnostics',namespace:'qcuDiagnostics',method,invocation:{kind:'direct'},parameters,result:diagnosticCodec}))};
+  const diagnosticsContract={package:'qcu-branding',descriptors:[['status',[]],['onboarding',[{name:'payload',wire:'payload',source:'json',codec:diagnosticCodec}]],['preference',[{name:'payload',wire:'payload',source:'json',codec:diagnosticCodec}]],['exportRecord',[{name:'payload',wire:'payload',source:'json',codec:diagnosticCodec}]]].map(([method,parameters])=>({id:'qcu-branding#qcuDiagnostics/'+method,service:'qcuDiagnostics',namespace:'qcuDiagnostics',method,invocation:{kind:'direct'},parameters,result:diagnosticCodec}))};
   const diagnosticConnection={current:null};
   ctx.inject(['remote'],async scope=>{const unmount=await scope.remote.$mount(diagnosticsContract);const consumer=scope.inject(['remote.qcuDiagnostics'],ready=>{diagnosticConnection.current=ready.remote.qcuDiagnostics;ready.effect(()=>()=>{diagnosticConnection.current=null})});scope.effect(()=>async()=>{await consumer.dispose();await unmount()})});
   ctx.effect(()=>ctx.theme.overrideTokens('qcu-branding',pairedTokens));
+  ctx.effect(()=>{
+   const previous=document.title;
+   const normalizeTitle=()=>{const value=document.title||'';const next=value?value.replaceAll('DeepSeek Harness','QCU Buddy').replaceAll('QCU助手','QCU Buddy'):'QCU Buddy';if(value!==next)document.title=next};
+   document.title='QCU Buddy';
+   const observer=typeof globalThis.MutationObserver==='function'?new MutationObserver(normalizeTitle):null;
+   observer?.observe(document.head,{childList:true,subtree:true,characterData:true});
+   return()=>{observer?.disconnect();document.title=previous};
+  });
   ctx.effect(()=>{
    const tag=document.createElement('style');tag.dataset.plugin='qcu-branding';tag.textContent=teacherStyles;document.head.append(tag);document.body.setAttribute('data-qcu-teacher','');
    return()=>{tag.remove();document.body.removeAttribute('data-qcu-teacher');};
@@ -353,7 +419,7 @@ function createTeacherPlugin(React,icon) {
   ctx.inject(['qcuHomeCapabilities'],scope=>{publishCapabilities(scope.qcuHomeCapabilities);scope.effect(()=>()=>publishCapabilities(null))});
   ctx.effect(()=>()=>capabilityListeners.clear());
   ctx.effect(()=>()=>homeState.dispose());
-  function HomePanel(){return h(Home,{ctx,preferences,homeState,personalization,capabilitySource});}
+  function HomePanel(){return h(Home,{ctx,preferences,homeState,personalization,capabilitySource,diagnosticConnection});}
   ctx.slots.inject('main',function*(){
    yield ctx.slots.register({name:'main',key:'qcu-teacher-home'},HomePanel);
    yield ctx.slots.register({name:'main',key:'qcu-teacher-tools'},()=>h(Help,{ctx,preferences,homeState,diagnosticConnection}));

@@ -64,6 +64,12 @@ class Tests(unittest.TestCase):
         self.assertEqual(self.request('POST','/v1/incidents',value)[0],201)
         value['privateText']='must never be stored'
         self.assertEqual(self.request('POST','/v1/incidents',value)[0],400)
+    def test_released_hotfix_builds_only(self):
+        for build in ['rc45.2','rc45.3','rc45.4','rc45.5','rc45.6','rc45.7','rc45.999']:
+            with self.subTest(build=build):
+                value=sample();value.update(buildId=build,suiteVersion='0.1.0-rc.4.5')
+                value['fingerprint']=hashlib.sha256(json.dumps([1,value['errorCode'],value['stage'],value['buildId'],value['suiteVersion']],separators=(',',':')).encode()).hexdigest()
+                self.assertEqual(self.request('POST','/v1/incidents',value)[0],400 if build=='rc45.999' else 201)
     def test_health_does_not_reveal_reports(self):
         status,value=self.request('GET','/health');self.assertEqual(status,200);self.assertEqual(set(value),{'ok','service','schemaVersion'})
         self.assertEqual(self.store.path.stat().st_mode&0o777,0o600)

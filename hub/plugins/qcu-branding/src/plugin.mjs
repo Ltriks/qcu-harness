@@ -2,10 +2,18 @@ export function createTeacherPlugin(React,icon) {
  const {Sidebar,Home,Help,Mark,Name,HeaderNavigation,SettingsLauncher}=createTeacherViews(React,icon),h=React.createElement;
  return {inject:['slots','layout','theme','locale','uiWorkspace','sessions','workspaces','conversation','remote'],apply(ctx){
   const diagnosticCodec={mode:'strict',typeSymbol:'qcu-branding#DiagnosticJson',create:()=>({parse(value){if(typeof value!=='string'||new TextEncoder().encode(value).length>32768)throw Error('Invalid diagnostic');JSON.parse(value);return value}})};
-  const diagnosticsContract={package:'qcu-branding',descriptors:[['status',[]],['preference',[{name:'payload',wire:'payload',source:'json',codec:diagnosticCodec}]],['exportRecord',[{name:'payload',wire:'payload',source:'json',codec:diagnosticCodec}]]].map(([method,parameters])=>({id:'qcu-branding#qcuDiagnostics/'+method,service:'qcuDiagnostics',namespace:'qcuDiagnostics',method,invocation:{kind:'direct'},parameters,result:diagnosticCodec}))};
+  const diagnosticsContract={package:'qcu-branding',descriptors:[['status',[]],['onboarding',[{name:'payload',wire:'payload',source:'json',codec:diagnosticCodec}]],['preference',[{name:'payload',wire:'payload',source:'json',codec:diagnosticCodec}]],['exportRecord',[{name:'payload',wire:'payload',source:'json',codec:diagnosticCodec}]]].map(([method,parameters])=>({id:'qcu-branding#qcuDiagnostics/'+method,service:'qcuDiagnostics',namespace:'qcuDiagnostics',method,invocation:{kind:'direct'},parameters,result:diagnosticCodec}))};
   const diagnosticConnection={current:null};
   ctx.inject(['remote'],async scope=>{const unmount=await scope.remote.$mount(diagnosticsContract);const consumer=scope.inject(['remote.qcuDiagnostics'],ready=>{diagnosticConnection.current=ready.remote.qcuDiagnostics;ready.effect(()=>()=>{diagnosticConnection.current=null})});scope.effect(()=>async()=>{await consumer.dispose();await unmount()})});
   ctx.effect(()=>ctx.theme.overrideTokens('qcu-branding',pairedTokens));
+  ctx.effect(()=>{
+   const previous=document.title;
+   const normalizeTitle=()=>{const value=document.title||'';const next=value?value.replaceAll('DeepSeek Harness','QCU Buddy').replaceAll('QCU助手','QCU Buddy'):'QCU Buddy';if(value!==next)document.title=next};
+   document.title='QCU Buddy';
+   const observer=typeof globalThis.MutationObserver==='function'?new MutationObserver(normalizeTitle):null;
+   observer?.observe(document.head,{childList:true,subtree:true,characterData:true});
+   return()=>{observer?.disconnect();document.title=previous};
+  });
   ctx.effect(()=>{
    const tag=document.createElement('style');tag.dataset.plugin='qcu-branding';tag.textContent=teacherStyles;document.head.append(tag);document.body.setAttribute('data-qcu-teacher','');
    return()=>{tag.remove();document.body.removeAttribute('data-qcu-teacher');};
@@ -22,7 +30,7 @@ export function createTeacherPlugin(React,icon) {
   ctx.inject(['qcuHomeCapabilities'],scope=>{publishCapabilities(scope.qcuHomeCapabilities);scope.effect(()=>()=>publishCapabilities(null))});
   ctx.effect(()=>()=>capabilityListeners.clear());
   ctx.effect(()=>()=>homeState.dispose());
-  function HomePanel(){return h(Home,{ctx,preferences,homeState,personalization,capabilitySource});}
+  function HomePanel(){return h(Home,{ctx,preferences,homeState,personalization,capabilitySource,diagnosticConnection});}
   ctx.slots.inject('main',function*(){
    yield ctx.slots.register({name:'main',key:'qcu-teacher-home'},HomePanel);
    yield ctx.slots.register({name:'main',key:'qcu-teacher-tools'},()=>h(Help,{ctx,preferences,homeState,diagnosticConnection}));

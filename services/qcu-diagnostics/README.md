@@ -25,3 +25,11 @@ Certbot 5.4.0 和依赖固定在 `certbot-requirements.txt`，虚拟环境 `/opt
 默认关闭自动上报。客户端 `reporting-endpoint.json` 是构建配置；同意记录绑定接收方ID及地址摘要，地址变化后不沿用旧同意。断网保存在本机，有限重试，不阻塞打开。Windows rc.4.5.1 起另提供只读签名市场目录 `/market/catalog.signed.json`、历史组件更新 `/updates.json` 和固定 `/plugins/*.tgz` 归档；无公开上传或发布管理接口，私钥仍留在受控发布机。课程服务及原有市场反馈按各自部署维护。
 
 Windows权限检查耗时不计入网络预算，保留原有ACL校验和网络上限；此修复已在Windows11虚拟机完成真实HTTPS回执检查。
+
+## 2026-11-19 rc45.6 接收兼容
+
+服务端严格白名单已包含 rc45.1 至 rc45.6，覆盖 rc.4.5.1—rc.4.5.5 套件；不接受任意 rc45.*。更新前原文件备份为 `/opt/qcu-diagnostics/server.py.before-rc455-20261119`，数据库未迁移。9项本地服务测试通过，双端 rc45.6 固定字段 self-test 已通过公网IP HTTPS并收到幂等回执。健康接口200，维护页匿名401；无凭据或教学内容随测试上报。
+
+## 2026-11-20 QCU Buddy rc45.7 接收兼容
+
+严格白名单扩展到 rc45.7（包4.5.6），仍拒绝任意构建。备份 `/opt/qcu-diagnostics/server.py.before-rc456-20261120`；数据库与维护认证保持。9项测试及最终Mac/Windows公网HTTPS自测和幂等回执通过；健康200，匿名维护页401。参见 `../../docs/release-rc456-validation.md`。

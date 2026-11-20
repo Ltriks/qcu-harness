@@ -18,13 +18,36 @@ function writeJSON(root,name,value){
  const temporary=path.join(root,'.pending-delivery-'+crypto.randomUUID());
  try{fs.writeFileSync(temporary,JSON.stringify(value)+'\n',{flag:'wx',mode:0o600});fs.renameSync(temporary,path.join(root,name))}finally{try{fs.unlinkSync(temporary)}catch{}}
 }
+// A missing file is different from an explicit opt-out or an unreadable file.
+function preferenceState(root){
+ try{
+  privateRoot(root);
+  const file=path.join(root,'reporting-settings.json');
+  try{fs.lstatSync(file)}catch(e){if(e.code==='ENOENT')return {state:'unset',autoReport:false};throw e}
+  const v=readJSON(file,1024),keys=Object.keys(v).sort().join();
+  const legacy=v.schemaVersion===2&&keys==='autoReport,policyVersion,receiver,schemaVersion';
+  const current=v.schemaVersion===3&&keys==='autoReport,noticeVersion,policyVersion,receiver,schemaVersion,source'&&v.noticeVersion===1&&['default','user'].includes(v.source);
+  if(!(legacy||current)||typeof v.autoReport!=='boolean'||v.policyVersion!==2||typeof v.receiver!=='string')throw Error('settings');
+  if(v.receiver!==RECEIVER)return {state:'receiver-changed',autoReport:false};
+  return {state:v.autoReport?(current&&v.source==='default'?'default-enabled':'explicit-enabled'):'explicit-disabled',autoReport:v.autoReport};
+ }catch{return {state:'unavailable',autoReport:false}}
+}
+function preferenceValue(autoReport,source){return {schemaVersion:3,autoReport,receiver:RECEIVER,policyVersion:2,noticeVersion:1,source}}
 function setPreference(root,enabled){
  privateRoot(root);if(typeof enabled!=='boolean')throw Error('preference');
- writeJSON(root,'reporting-settings.json',{schemaVersion:2,autoReport:enabled,receiver:RECEIVER,policyVersion:2});
+ writeJSON(root,'reporting-settings.json',preferenceValue(enabled,'user'));
 }
-function enabled(root){
- try{privateRoot(root);const v=readJSON(path.join(root,'reporting-settings.json'),1024);return Object.keys(v).sort().join()==='autoReport,policyVersion,receiver,schemaVersion'&&v.schemaVersion===2&&v.autoReport===true&&v.receiver===RECEIVER&&v.policyVersion===2}catch{return false}
+function initializeDefault(root){
+ const current=preferenceState(root);if(current.state!=='unset')return current;
+ const temporary=path.join(root,'.pending-delivery-'+crypto.randomUUID());
+ try{
+  fs.writeFileSync(temporary,JSON.stringify(preferenceValue(true,'default'))+'\n',{flag:'wx',mode:0o600});
+  // Atomic create-if-absent: never replace an explicit choice written concurrently.
+  try{fs.linkSync(temporary,path.join(root,'reporting-settings.json'))}catch(e){if(e.code!=='EEXIST')throw e}
+ }finally{try{fs.unlinkSync(temporary)}catch{}}
+ return preferenceState(root);
 }
+function enabled(root){return preferenceState(root).autoReport}
 async function jsonResponse(response){
  const length=Number(response.headers.get('content-length'));
  if(!Number.isSafeInteger(length)||length<1||length>4096||!response.body)throw Error('response');
@@ -63,4 +86,4 @@ async function flush(root,{origin=ORIGIN,fetcher=fetch,test=false,budgetMs=1500}
   return {state:attempted?'checked':'idle',received};
  }catch{return {state:'unavailable',received}}
 }
-module.exports={ORIGIN,RECEIVER,receiverLabel:endpoint.label,setPreference,enabled,flush};
+module.exports={ORIGIN,RECEIVER,receiverLabel:endpoint.label,setPreference,preferenceState,initializeDefault,enabled,flush};
